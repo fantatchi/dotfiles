@@ -17,7 +17,7 @@ set rtp+=~/.vim/vundle.git/
 call vundle#rc()
 
 " original repos on github
-Bundle 'altercation/vim-colors-solarized'
+"Bundle 'altercation/vim-colors-solarized'
 
 " vim-scripts repos
 Bundle 'L9'
@@ -29,7 +29,7 @@ Bundle 'neocomplcache'
 filetype plugin indent on     " required!
 
 source ~/.vim/plugin.vimrc
-source ~/.vim/colors-solarized.vimrc
+"source ~/.vim/colors-solarized.vimrc
 
 if filereadable(expand('~/.vimrc.local'))
     source ~/.vimrc.local
