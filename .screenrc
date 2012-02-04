@@ -9,20 +9,21 @@ defscrollback 5000
 autodetach on
 
 # コマンドキーを Ctrl+T に変更
-escape ^Tt 
+escape ^Tt
 
 # ビープを鳴らさない
-vbell off 
+vbell off
 
 # 起動時にでるメッセージを表示させない
 startup_message off
 
 hardstatus alwayslastline "%{= gk}[%m/%d %02c:%s] %{gW} %-w%{= wk}%n %t%{-}%+w %=%{gk}$USER@$HOSTNAME[$LANG] (%l) "
 
-bind w windowlist -b 
+bind w windowlist -b
 windowlist title 'Num Title%=Flags'
 
-termcapinfo xterm* ti@:te@
+# 256 colors
+defbce on
+term xterm-256color
 
 shell $SHELL
-

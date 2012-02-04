@@ -27,10 +27,15 @@ set smartindent
 set expandtab
 " タブ幅
 set ts=4 sw=4 sts=4
+au FileType ruby set ts=2 sw=2 sts=2
 " オートインデントする
 set autoindent
 " 括弧入力時の対応する括弧を表示
 set showmatch
+" tab と 行末スペース
+set list listchars=tab:>-,trail:_
+" 最後の編集位置にカーソルを自動移動
+autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | execute "normal! g`\"" | endif
 " 保存時に行末の空白を除去する
 function! RTrim()
     let s:cursor = getpos(".")
@@ -38,17 +43,5 @@ function! RTrim()
     call setpos(".", s:cursor)
 endfunction
 autocmd BufWritePre * call RTrim()
-" syntax color
-if has("syntax")
-    syntax on
-    " tab と 行末スペース
-    set list listchars=tab:>-,trail:_
-    " 全角スペース
-    scriptencoding utf-8
-    augroup hilightIdegraphicSpace
-        autocmd!
-        autocmd ColorScheme * highlight IdeographicSpace term=underline ctermbg=DarkGreen guibg=DarkGreen
-        autocmd VimEnter,WinEnter * match IdeographicSpace /　/
-    augroup END
-    colorscheme default
-endif
+" ビジュアルモードの設定
+set virtualedit=block
