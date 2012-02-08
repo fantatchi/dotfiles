@@ -22,8 +22,8 @@ Bundle 'tomasr/molokai'
 " vim-scripts repos
 Bundle 'YankRing.vim'
 Bundle 'neocomplcache'
-Bundle 'tComment'
 Bundle 'buftabs'
+"Bundle 'dbext.vim'
 " non github repos
 
 filetype plugin indent on       " required!

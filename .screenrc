@@ -26,4 +26,7 @@ windowlist title 'Num Title%=Flags'
 defbce on
 term xterm-256color
 
+# for sh setting
+setenv SCREEN true
+
 shell $SHELL
