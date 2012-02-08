@@ -61,7 +61,7 @@ setopt auto_pushd
 
 # for screen
 # $SCREEN is in .screenrc
-if [ $SCREEN = true ]; then
+if [ "$SCREEN" = true ]; then
 
     # ssh コマンドで別の screen を開く
     function ssh_screen(){
