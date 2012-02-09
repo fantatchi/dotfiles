@@ -14,8 +14,10 @@ call vundle#rc()
 "let g:vundle_default_git_proto = 'git'
 
 " original repos on github
-Bundle 'Shougo/unite.vim'
-Bundle 'Shougo/vimfiler'
+if empty($SUDO_USER)
+    Bundle 'Shougo/unite.vim'
+    Bundle 'Shougo/vimfiler'
+endif
 Bundle 'mattn/zencoding-vim'
 Bundle 'tomasr/molokai'
 
@@ -24,6 +26,8 @@ Bundle 'YankRing.vim'
 Bundle 'neocomplcache'
 Bundle 'buftabs'
 "Bundle 'dbext.vim'
+Bundle 'PDV--phpDocumentor-for-Vim'
+
 " non github repos
 
 filetype plugin indent on       " required!

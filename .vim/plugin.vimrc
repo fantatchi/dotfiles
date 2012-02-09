@@ -91,3 +91,7 @@ let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
 let g:buftabs_only_basename=1
 let g:buftabs_in_statusline=1
 
+"-----------------------------------------------------------------------------
+" PDV--phpDocumentor-for-Vim
+"-----------------------------------------------------------------------------
+nnoremap <unique> <silent> <space>p :call PhpDocSingle()<CR>

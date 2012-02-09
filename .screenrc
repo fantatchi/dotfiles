@@ -22,6 +22,9 @@ hardstatus alwayslastline "%{= gk}[%m/%d %02c:%s] %{gW} %-w%{= wk}%n %t%{-}%+w %
 bind w windowlist -b
 windowlist title 'Num Title%=Flags'
 
+# attach 時の ウインドウリサイズを防ぐ
+termcapinfo xterm-256color hs@:is=\E[r\E[m\E[2J\E[H\E[?7h\E[?1;4;6l
+
 # 256 colors
 defbce on
 term xterm-256color
