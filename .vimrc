@@ -15,6 +15,8 @@ call vundle#rc()
 
 " original repos on github
 if empty($SUDO_USER)
+    Bundle 'Shougo/vimproc'
+    Bundle 'Shougo/vimshell'
     Bundle 'Shougo/unite.vim'
     Bundle 'Shougo/vimfiler'
 endif

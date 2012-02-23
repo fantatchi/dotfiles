@@ -37,11 +37,6 @@ set list listchars=tab:>-,trail:_
 " 最後の編集位置にカーソルを自動移動
 autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | execute "normal! g`\"" | endif
 " 保存時に行末の空白を除去する
-function! RTrim()
-    let s:cursor = getpos(".")
-    %s/\s\+$//e
-    call setpos(".", s:cursor)
-endfunction
-autocmd BufWritePre * call RTrim()
+autocmd BufWritePre * :%s/\s\+$//ge
 " ビジュアルモードの設定
 set virtualedit=block
