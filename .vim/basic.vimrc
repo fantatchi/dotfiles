@@ -40,3 +40,5 @@ autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | execute "
 autocmd BufWritePre * :%s/\s\+$//ge
 " ビジュアルモードの設定
 set virtualedit=block
+" syntax color
+syntax on

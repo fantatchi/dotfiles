@@ -3,7 +3,7 @@
 "-----------------------------------------------------------------------------
 if has("syntax")
 
-    syntax on
+    syntax enable
 
     " 全角スペースを表示
     scriptencoding utf-8
