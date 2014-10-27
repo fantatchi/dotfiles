@@ -6,41 +6,50 @@ source ~/.vim/basic.vimrc
 source ~/.vim/encoding.vimrc
 
 "-----------------------------------------------------------------------------
-" gmarik / vundle
-" https://github.com/gmarik/vundle
+" gmarik/Vundle.vim
+" https://github.com/gmarik/Vundle.vim
 "-----------------------------------------------------------------------------
 if empty($SUDO_USER)
-    set nocompatible                " be iMproved
-    filetype off                    " required!
+    set nocompatible              " be iMproved, required
+    filetype off                  " required
 
-    set rtp+=~/.vim/vundle.git/
-    call vundle#rc()
-    "let g:vundle_default_git_proto = 'git'
+    " set the runtime path to include Vundle and initialize
+    set rtp+=~/.vim/Vundle.vim
+    call vundle#begin()
 
-    " original repos on github
-    Bundle 'Shougo/vimproc'
-    Bundle 'Shougo/vimshell'
-    Bundle 'Shougo/unite.vim'
-    Bundle 'Shougo/vimfiler'
-    Bundle 'mattn/zencoding-vim'
-    Bundle 'tomasr/molokai'
+    " plugin on GitHub repo
+    Plugin 'Shougo/vimproc'
+    Plugin 'Shougo/vimshell'
+    Plugin 'Shougo/unite.vim'
+    Plugin 'Shougo/neomru.vim'
+    Plugin 'Shougo/vimfiler'
+    Plugin 'tomasr/molokai'
+    Plugin 'w0ng/vim-hybrid'
+    Plugin 'tomtom/tcomment_vim'
 
-    " vim-scripts repos
-    Bundle 'YankRing.vim'
-    Bundle 'neocomplcache'
-    Bundle 'buftabs'
-    "Bundle 'dbext.vim'
-    Bundle 'PDV--phpDocumentor-for-Vim'
+    " plugin from http://vim-scripts.org/vim/scripts.html
+    Plugin 'YankRing.vim'
+    Plugin 'neocomplcache'
+    Plugin 'buftabs'
+    Plugin 'PDV--phpDocumentor-for-Vim'
 
-    " non github repos
+    " Git plugin not hosted on GitHub
+    "Plugin 'git://git.wincent.com/command-t.git'
 
+    " git repos on your local machine (i.e. when working on your own plugin)
+    "Plugin 'file:///home/gmarik/path/to/plugin'
 
-    filetype plugin indent on       " required!
+    " All of your Plugins must be added before the following line
+    call vundle#end()            " required
+    filetype plugin indent on    " required
+    " To ignore plugin indent changes, instead use:
+    "filetype plugin on
+    "
     " Brief help
-    " :BundleList          - list configured bundles
-    " :BundleInstall(!)    - install(update) bundles
-    " :BundleSearch(!) foo - search(or refresh cache first) for foo
-    " :BundleClean(!)      - confirm(or auto-approve) removal of unused bundles
+    " :PluginList       - lists configured plugins
+    " :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
+    " :PluginSearch foo - searches for foo; append `!` to refresh local cache
+    " :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
 
     source ~/.vim/color.vimrc
     source ~/.vim/plugin.vimrc

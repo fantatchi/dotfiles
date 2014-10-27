@@ -14,7 +14,8 @@ if has("syntax")
     augroup END
 
     if !has('gui_running') && &t_Co >= 256
-        colorscheme molokai
+        " colorscheme molokai
+        colorscheme hybrid
     else
         colorscheme default
     endif
