@@ -10,46 +10,54 @@ source ~/.vim/encoding.vimrc
 " https://github.com/gmarik/Vundle.vim
 "-----------------------------------------------------------------------------
 if empty($SUDO_USER)
-    set nocompatible              " be iMproved, required
-    filetype off                  " required
 
-    " set the runtime path to include Vundle and initialize
-    set rtp+=~/.vim/Vundle.vim
-    call vundle#begin()
+    " Note. Skip initialization for vim-tiny or vim-small.
+    if !1 | finish | endif
+
+    if has('vim_starting')
+        set nocompatible               " Be iMproved
+
+        " Required
+        set runtimepath+=~/.vim/bundle/neobundle.vim/
+    endif
+
+    " Required
+    call neobundle#begin(expand('~/.vim/bundle/'))
+
+    " Required
+    NeoBundleFetch 'Shougo/neobundle.vim'
 
     " plugin on GitHub repo
-    Plugin 'Shougo/vimproc'
-    Plugin 'Shougo/vimshell'
-    Plugin 'Shougo/unite.vim'
-    Plugin 'Shougo/neomru.vim'
-    Plugin 'Shougo/vimfiler'
-    Plugin 'tomasr/molokai'
-    Plugin 'w0ng/vim-hybrid'
-    Plugin 'tomtom/tcomment_vim'
+    NeoBundle 'Shougo/vimproc', {
+        \ 'build' : {
+            \ 'windows' : 'make -f make_mingw32.mak',
+            \ 'cygwin' : 'make -f make_cygwin.mak',
+            \ 'mac' : 'make -f make_mac.mak',
+            \ 'unix' : 'make -f make_unix.mak',
+        \ },
+    \ }
+    NeoBundle 'Shougo/vimshell'
+    NeoBundle 'Shougo/unite.vim'
+    NeoBundle 'Shougo/neomru.vim'
+    NeoBundle 'Shougo/vimfiler'
+    NeoBundle 'tomasr/molokai'
+    NeoBundle 'w0ng/vim-hybrid'
+    NeoBundle 'tomtom/tcomment_vim'
 
     " plugin from http://vim-scripts.org/vim/scripts.html
-    Plugin 'YankRing.vim'
-    Plugin 'neocomplcache'
-    Plugin 'buftabs'
-    Plugin 'PDV--phpDocumentor-for-Vim'
+    NeoBundle 'YankRing.vim'
+    NeoBundle 'neocomplcache'
+    NeoBundle 'buftabs'
+    NeoBundle 'PDV--phpDocumentor-for-Vim'
 
-    " Git plugin not hosted on GitHub
-    "Plugin 'git://git.wincent.com/command-t.git'
+    call neobundle#end()
 
-    " git repos on your local machine (i.e. when working on your own plugin)
-    "Plugin 'file:///home/gmarik/path/to/plugin'
+    " Required:
+    filetype plugin indent on
 
-    " All of your Plugins must be added before the following line
-    call vundle#end()            " required
-    filetype plugin indent on    " required
-    " To ignore plugin indent changes, instead use:
-    "filetype plugin on
-    "
-    " Brief help
-    " :PluginList       - lists configured plugins
-    " :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
-    " :PluginSearch foo - searches for foo; append `!` to refresh local cache
-    " :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
+    " If there are uninstalled bundles found on startup,
+    " this will conveniently prompt you to install them.
+    NeoBundleCheck
 
     source ~/.vim/color.vimrc
     source ~/.vim/plugin.vimrc
@@ -58,4 +66,3 @@ endif
 if filereadable(expand('~/.vimrc.local'))
     source ~/.vimrc.local
 endif
-
