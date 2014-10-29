@@ -6,8 +6,8 @@ source ~/.vim/basic.vimrc
 source ~/.vim/encoding.vimrc
 
 "-----------------------------------------------------------------------------
-" gmarik/Vundle.vim
-" https://github.com/gmarik/Vundle.vim
+" Shougo/neobundle.vim
+" https://github.com/Shougo/neobundle.vim
 "-----------------------------------------------------------------------------
 if empty($SUDO_USER)
 
@@ -52,7 +52,7 @@ if empty($SUDO_USER)
 
     call neobundle#end()
 
-    " Required:
+    " Required
     filetype plugin indent on
 
     " If there are uninstalled bundles found on startup,
