@@ -59,32 +59,6 @@ prompt walters
 # ディレクトリ履歴
 setopt auto_pushd
 
-# for screen
-# $SCREEN is in .screenrc
-if [ "$SCREEN" = true ]; then
-
-    # ssh コマンドで別の screen を開く
-    function ssh_screen(){
-        eval server=\${$#}
-        screen -t $server ssh "$@"
-    }
-
-    compctl -k _cache_hosts ssh_screen
-    alias ssh=ssh_screen
-
-    # 実行中のコマンドまたはカレントディレクトリの表示
-    # .screenrc で term xterm-256colorと設定している場合
-    if [ $TERM = xterm-256color ]; then
-        preexec() {
-            echo -ne "\ek#${1%% *}\e\\"
-        }
-        precmd() {
-            echo -ne "\ek$(basename $(pwd))\e\\"
-        }
-    fi
-
-fi
-
 if [ -r "$HOME/.zshrc.local" ]; then
     source $HOME/.zshrc.local
 fi
