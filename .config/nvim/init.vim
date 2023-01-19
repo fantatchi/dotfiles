@@ -1,9 +1,4 @@
 "-----------------------------------------------------------------------------
-" Personal preference .vimrc file
+" Personal preference init.vim file
 " Created by fantatchi fantatchi@twitter
 "-----------------------------------------------------------------------------
-runtime! init/*.vim
-
-if filereadable(expand('~/.vimrc.local'))
-    source ~/.vimrc.local
-endif

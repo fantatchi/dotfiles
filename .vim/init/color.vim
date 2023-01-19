@@ -16,7 +16,5 @@ if has("syntax")
     if !has('gui_running') && &t_Co >= 256
         set background=dark
         silent! colorscheme hybrid
-        " silent! colorscheme molokai
     endif
-
 endif
