@@ -8,17 +8,17 @@ ln -s ~/dotfiles/.vimrc ~/.vimrc
 touch ~/.vimrc.local
 ```
 
-## neovim
+## zsh (oh-my-zsh)
 ```sh
-mkdir -p ~/.config/nvim
-ln -s ~/dotfiles/.config/nvim/init.vim ~/.config/nvim/init.vim
+ln -s ~/dotfiles/.zsh ~/.zsh
+ln -s ~/dotfiles/.zshrc ~/.zshrc
 ```
 
-## zsh
+### oh-my-zsh (https://ohmyz.sh/)
 ```sh
-ln -s ~/dotfiles/.zshrc ~/.zshrc
-chsh -s /usr/bin/zsh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 ```
+
 ### local config
 ```
 touch ~/.zshrc.local
