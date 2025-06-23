@@ -1,49 +1,30 @@
-"-----------------------------------------------------------------------------
-" Basic settings
-"-----------------------------------------------------------------------------
-" 文字コード判別
+" 基本設定：エンコーディングやインデントなど
+
+" ファイルの文字コードと改行コードの自動判別
 set encoding=utf-8
 set fileencodings=utf-8,utf-16,ucs2le,ucs-2,iso-2022-jp,euc-jp,sjis,cp932
-" 改行コード判別
 set fileformats=unix,dos,mac
-" 行番号を表示しない
-set nonumber
-" 入力中のコマンドをステータスに表示する
-set showcmd
-" 検索結果文字列のハイライトを有効にする
-set hlsearch
-" Escの2回押しでハイライト消去
-nmap <ESC><ESC> :nohlsearch<CR><ESC>
-" ステータスラインを常に表示
-set laststatus=2
-" ステータスラインに文字コードと改行文字を表示する
-set statusline=%<%f\ %m%r%h%w%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%l,%c%V%8P
-" 検索文字列が小文字の場合は大文字小文字を区別なく検索する
-set ignorecase
-" 検索文字列に大文字が含まれている場合は区別して検索する
-set smartcase
-" 検索時に最後まで行ったら最初に戻る
-set wrapscan
-" 検索文字列入力時に順次対象文字列にヒットさせない
-set noincsearch
-" インデントはスマートインデント
-set smartindent
-" タブはスペースで入力
-set expandtab
-" タブ幅
-set ts=4 sw=4 sts=4
-au FileType ruby set ts=2 sw=2 sts=2
-" オートインデントする
-set autoindent
-" 括弧入力時の対応する括弧を表示
+
+" インデントとタブ設定（タブ→スペース）
+set expandtab          " Tabキーでスペースを挿入
+set tabstop=4          " 画面上のタブ幅
+set shiftwidth=4       " 自動インデントで使う幅
+set softtabstop=4      " Tab入力時に使うスペース数
+set smartindent        " スマートインデント有効
+set autoindent         " 前の行のインデントを継承
+
+" タブ幅2スペース
+augroup indent_two
+  autocmd!
+  autocmd FileType ruby,javascript,typescript,json,yaml,html,css,scss,vue,svelte setlocal ts=2 sw=2 sts=2
+augroup END
+
+" 括弧入力時に対応する括弧を一瞬表示
 set showmatch
-" tab と 行末スペース
-set list listchars=tab:>-,trail:_
-" 最後の編集位置にカーソルを自動移動
-autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | execute "normal! g`\"" | endif
-" 保存時に行末の空白を除去する
-autocmd BufWritePre * :%s/\s\+$//ge
-" ビジュアルモードの設定
+
+" ビジュアルモードで矩形選択を許可
 set virtualedit=block
-" syntax color
-syntax on
+
+" 改行文字やタブ、行末スペースを可視化
+set list
+set listchars=tab:>-,trail:_
