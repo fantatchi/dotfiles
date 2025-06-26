@@ -2,6 +2,11 @@
 export LANG=ja_JP.UTF-8
 export LESSCHARSET=utf-8
 
+# テーマ
+autoload promptinit
+promptinit
+prompt walters
+
 # エイリアス
 case "${OSTYPE}" in
   freebsd*|darwin*) alias ls="ls -GwF" ;;
