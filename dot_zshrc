@@ -1,0 +1,22 @@
+#------------------------------------------------------------------------------
+# basic setting
+#------------------------------------------------------------------------------
+for file in $HOME/.zsh/(env|options|bindings).zsh; do
+  source "$file"
+done
+
+#------------------------------------------------------------------------------
+# oh-my-zsh setting
+#------------------------------------------------------------------------------
+source $HOME/.zsh/ohmy.zsh
+
+#------------------------------------------------------------------------------
+# local setting
+#------------------------------------------------------------------------------
+if [ -r "$HOME/.zshrc.local" ]; then
+    source $HOME/.zshrc.local
+fi
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
