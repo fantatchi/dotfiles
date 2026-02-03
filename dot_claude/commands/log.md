@@ -4,7 +4,7 @@
 
 ## 書き出し先
 
-`~/ObsidianVault/Claude-Logs/`
+`~/ObsidianVault/_ClaudeLogs/`
 
 ※ 複数環境で共通パスにするため、各環境で `~/ObsidianVault` がVault本体を指すようにシンボリックリンクを設定しておくこと：
 
