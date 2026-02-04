@@ -1,6 +1,8 @@
+{{- $use_github_mcp := eq (lower (promptStringOnce . "use_github_mcp" "GitHub MCP を使いますか [y/N]")) "y" -}}
+{{- $use_obsidian := eq (lower (promptStringOnce . "use_obsidian" "Obsidian 連携機能を使いますか [y/N]")) "y" -}}
 [data]
-  use_github_mcp = {{ eq (lower (promptStringOnce . "use_github_mcp" "GitHub MCP を使いますか [y/N]")) "y" }}
-{{- if eq (lower (promptStringOnce . "use_github_mcp" "GitHub MCP を使いますか [y/N]")) "y" }}
+  use_github_mcp = {{ $use_github_mcp }}
+{{- if $use_github_mcp }}
   github_token = {{ promptStringOnce . "github_token" "GitHub Personal Access Token" | quote }}
 {{- end }}
-  use_obsidian = {{ eq (lower (promptStringOnce . "use_obsidian" "Obsidian 連携機能を使いますか [y/N]")) "y" }}
+  use_obsidian = {{ $use_obsidian }}
