@@ -88,6 +88,14 @@ export OBSIDIAN_VAULT="/path/to/your/vault"
 
 ## chezmoi の使い方
 
+### 他の環境で更新を取り込む
+
+```bash
+chezmoi update
+```
+
+リモートから最新を取得して適用する。
+
 ### 日常操作
 
 ```bash
