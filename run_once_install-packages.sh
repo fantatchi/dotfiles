@@ -31,7 +31,9 @@ command -v dos2unix >/dev/null 2>&1 && {
 ## === Claude Code のインストール ===
 if ! command -v claude &> /dev/null; then
     echo "Claude Code をインストール中..."
-    curl -fsSL https://claude.ai/install.sh | bash
+    if ! curl -fsSL https://claude.ai/install.sh | bash; then
+        echo "警告: Claude Code のインストールに失敗しました"
+    fi
 else
     echo "Claude Code は既にインストール済みです。"
 fi

@@ -1,1 +1,6 @@
 .vim/.netrwhist
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
