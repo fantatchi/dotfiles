@@ -2,127 +2,49 @@
 
 [chezmoi](https://www.chezmoi.io/) で管理する dotfiles。
 
-## 新しい PC でのセットアップ
+## クイックスタート
 
 ```bash
 sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply fantatchi
 ```
 
 初回セットアップ時に以下を聞かれる（Enter でスキップ可）：
-- GitHub MCP を使うか → y で GitHub Personal Access Token を入力
-- Obsidian 連携機能を使うか
 
-セットアップ後、tmux 内で `prefix + I` を実行してプラグインをインストールする。
+| 質問 | 説明 |
+|------|------|
+| GitHub MCP を使うか | Claude Code から GitHub API を使う場合は y → PAT を入力 |
+| Obsidian 連携を使うか | 作業ログを Obsidian に記録する場合は y |
 
-## 管理しているファイル
+セットアップ後、tmux 内で `prefix + I` を実行してプラグインをインストール。
+
+## 含まれるもの
 
 | 対象 | ファイル | 備考 |
 |------|---------|------|
-| zsh | `.zshrc`, `.zsh/` | oh-my-zsh + 最小限のプラグイン（git のみ） |
-| vim | `.vimrc`, `.vim/` | プラグインレス構成 |
+| zsh | `.zshrc`, `.zsh/` | oh-my-zsh（プラグイン: git のみ） |
+| vim | `.vimrc`, `.vim/` | プラグインレス |
 | tmux | `.tmux.conf` | TPM でプラグイン管理 |
-| Claude | `.claude/CLAUDE.md`, `.claude/settings.json`, `.claude/mcp.json`, `.claude/skills/` | - |
+| Claude Code | `.claude/` | 設定・スキル |
 
-**管理していないファイル:**
-- `.gitconfig`: ユーザー名・メールアドレスは環境ごとに異なるため、手動で設定
+## 環境別設定
 
-## よく使うコマンド
-
-```bash
-# ファイルを管理対象に追加
-chezmoi add ~/.some_config
-
-# 変更を確認（適用前の diff）
-chezmoi diff
-
-# 変更を適用
-chezmoi apply
-
-# ソースディレクトリに移動
-chezmoi cd
-
-# 管理中のファイル一覧
-chezmoi managed
-```
-
-## 変更の流れ
-
-```bash
-# 1. 設定ファイルを直接編集した場合
-vim ~/.zshrc
-chezmoi re-add  # 変更をソースに反映
-
-# 2. ソース側で編集する場合
-chezmoi edit ~/.zshrc
-chezmoi apply
-
-# 3. コミット & push
-chezmoi cd
-git add -A && git commit -m "メッセージ"
-git push
-```
-
-## テンプレート
-
-`.tmpl` 拡張子のファイルはテンプレートとして処理される。
-トークンなどの秘密情報は `~/.config/chezmoi/chezmoi.toml` に保存され、git には含まれない。
-
-トークンを再設定したい場合：
-
-```bash
-chezmoi init
-```
-
-## 環境別設定（local ファイル）
-
-chezmoi で管理しない環境固有の設定は `~/.zshrc.local` に記述する。
+マシンごとに異なる設定は `~/.zshrc.local` に記述する（chezmoi 管理外）。
 
 ```bash
 # ~/.zshrc.local の例
 export OBSIDIAN_VAULT="~/ObsidianVault"
 export MAX_THINKING_TOKENS=31999
-```
 
-このファイルは `.zshrc` から自動的に読み込まれる。マシンごとに異なる設定（パス、トークン等）はここに書く。
-
-### NVM（Node Version Manager）
-
-NVM を使用する場合は、公式の手順でインストール後、`~/.zshrc.local` に追記：
-
-```bash
-# インストール
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
-
-# ~/.zshrc.local に追記
+# NVM を使う場合
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 ```
 
-## Obsidian 連携
+このファイルは `.zshrc` から自動的に読み込まれる。
 
-Claude Code の作業ログを Obsidian Vault に記録する機能。
+## オプション機能
 
-**利用可能なコマンド:**
-- `/obs-log`: 作業履歴を記録
-- `/obs-resource`: 調査結果やリソースをメモ
-- 自動ロギング: 一定条件で自動的に作業ログを記録
-
-**セットアップ:**
-
-環境変数 `OBSIDIAN_VAULT` に Vault のパスを設定する。
-
-```bash
-export OBSIDIAN_VAULT="/path/to/your/vault"
-```
-
-**保存先:**
-- `/obs-log` → `$OBSIDIAN_VAULT/_ClaudeLogs/`
-- `/obs-resource` → `$OBSIDIAN_VAULT/_ClaudeResources/`
-
-## Claude Code 設定
-
-### デフォルトモデル・Extended Thinking
+### Claude Code
 
 `settings.json` で以下を設定済み：
 
@@ -131,21 +53,64 @@ export OBSIDIAN_VAULT="/path/to/your/vault"
 | `model` | `opus` | デフォルトで Opus 4.5 を使用 |
 | `alwaysThinkingEnabled` | `true` | Extended Thinking を常に有効化 |
 
-### MAX_THINKING_TOKENS（環境ごとに設定）
-
-Extended Thinking のトークン上限を設定する環境変数。`~/.zshrc.local` に追記：
+**ultrathink（最大の思考深度）を使う場合:**
 
 ```bash
+# ~/.zshrc.local に追記
 export MAX_THINKING_TOKENS=31999
 ```
 
-| 値 | 相当するプロンプト | 用途 |
-|----|-------------------|------|
-| 設定なし | `think` | 簡単なタスク（デフォルト） |
-| 中程度 | `think hard` | 中程度の複雑さ |
-| `31999` | `ultrathink` | 最大の思考深度 |
+セッション中のモデル切り替えは `/model sonnet` などを使用。
 
-セッション中にモデルを切り替える場合は `/model sonnet` などを使用。
+### Obsidian 連携
+
+Claude Code の作業ログを Obsidian Vault に記録する機能。
+
+**セットアップ:**
+
+```bash
+# ~/.zshrc.local に追記
+export OBSIDIAN_VAULT="/path/to/your/vault"
+```
+
+**スキル:**
+
+| コマンド | 保存先 | 説明 |
+|----------|--------|------|
+| `/obs-log` | `$OBSIDIAN_VAULT/_ClaudeLogs/` | 作業履歴を記録 |
+| `/obs-resource` | `$OBSIDIAN_VAULT/_ClaudeResources/` | 調査結果をメモ |
+
+自動ロギング機能もあり（詳細は `CLAUDE.md` 参照）。
+
+## chezmoi の使い方
+
+### 日常操作
+
+```bash
+chezmoi diff          # 変更を確認
+chezmoi apply         # 変更を適用
+chezmoi add ~/.file   # ファイルを管理対象に追加
+chezmoi cd            # ソースディレクトリに移動
+```
+
+### 設定ファイルを編集したとき
+
+```bash
+# ホームの設定を直接編集した場合
+chezmoi re-add
+
+# ソース側で編集する場合
+chezmoi edit ~/.zshrc
+chezmoi apply
+```
+
+### トークンを再設定したいとき
+
+```bash
+chezmoi init
+```
+
+秘密情報は `~/.config/chezmoi/chezmoi.toml` に保存され、git には含まれない。
 
 ## 作者環境メモ
 
@@ -153,11 +118,12 @@ export MAX_THINKING_TOKENS=31999
 
 Vault 本体は Windows の `C:\Users\<username>\ObsidianVault` に配置。
 
-- OneDrive で Vault フォルダを PC 間で同期
-- メモの同期は Obsidian の git 拡張機能で行う
-- 拡張機能や設定を変更した場合は `.obsidian` フォルダを各環境にコピー
+- OneDrive で PC 間同期
+- メモの同期は Obsidian の git 拡張機能
+- `.obsidian` フォルダは各環境にコピー
 
 **WSL からのアクセス:**
+
 ```bash
 ln -s /mnt/c/Users/<username>/ObsidianVault ~/ObsidianVault
 export OBSIDIAN_VAULT="$HOME/ObsidianVault"
