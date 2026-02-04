@@ -4,7 +4,9 @@ Claude に調べてもらった内容や、参考になるリソースを Obsidi
 
 ## 書き出し先
 
-`~/ObsidianVault/_ClaudeResources/`
+`$OBSIDIAN_VAULT/_ClaudeResources/`
+
+※ 環境変数 `OBSIDIAN_VAULT` が設定されていない場合はエラーを表示し、設定方法を案内すること。
 
 ## ファイル名
 

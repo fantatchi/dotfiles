@@ -1,2 +1,3 @@
 [data]
   github_token = {{ promptStringOnce . "github_token" "GitHub Personal Access Token" | quote }}
+  use_obsidian = {{ promptBoolOnce . "use_obsidian" "Obsidian 連携機能を使いますか (y/n)" }}

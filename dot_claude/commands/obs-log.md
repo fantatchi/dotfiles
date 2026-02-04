@@ -4,13 +4,9 @@
 
 ## 書き出し先
 
-`~/ObsidianVault/_ClaudeLogs/`
+`$OBSIDIAN_VAULT/_ClaudeLogs/`
 
-※ Vault 本体は Windows の `~/ObsidianVault`（`C:\Users\<username>\ObsidianVault`）に置く。WSL からは以下のようにシンボリックリンクを設定すること：
-
-```bash
-ln -s /mnt/c/Users/<username>/ObsidianVault ~/ObsidianVault
-```
+※ 環境変数 `OBSIDIAN_VAULT` が設定されていない場合はエラーを表示し、設定方法を案内すること。
 
 ## ファイル名
 
