@@ -2,6 +2,8 @@
 
 [chezmoi](https://www.chezmoi.io/) で管理する dotfiles。
 
+**対象環境:** Linux / macOS / WSL
+
 ## クイックスタート
 
 **前提条件:** git がインストールされていること
