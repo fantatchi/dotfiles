@@ -28,6 +28,14 @@ command -v dos2unix >/dev/null 2>&1 && {
     dos2unix "$TPM_DIR"/bin/* "$TPM_DIR"/scripts/* "$TPM_DIR"/bindings/* 2>/dev/null || true
 }
 
+## === Claude Code のインストール ===
+if ! command -v claude &> /dev/null; then
+    echo "Claude Code をインストール中..."
+    curl -fsSL https://claude.ai/install.sh | bash
+else
+    echo "Claude Code は既にインストール済みです。"
+fi
+
 ## === tmux プラグインのインストール ===
 if command -v tmux >/dev/null 2>&1; then
     echo "tmux プラグインをインストール中..."
