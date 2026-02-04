@@ -4,6 +4,8 @@
 
 ## クイックスタート
 
+**前提条件:** git がインストールされていること
+
 ```bash
 sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply fantatchi
 ```
