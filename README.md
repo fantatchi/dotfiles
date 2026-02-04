@@ -21,7 +21,7 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply fantatchi
 | zsh | `.zshrc`, `.zsh/` |
 | vim | `.vimrc`, `.vim/` |
 | tmux | `.tmux.conf` |
-| Claude | `.claude/CLAUDE.md`, `.claude/settings.json`, `.claude/mcp.json`, `.claude/commands/` |
+| Claude | `.claude/CLAUDE.md`, `.claude/settings.json`, `.claude/mcp.json`, `.claude/skills/` |
 
 ## よく使うコマンド
 
@@ -90,6 +90,33 @@ export OBSIDIAN_VAULT="/path/to/your/vault"
 **保存先:**
 - `/obs-log` → `$OBSIDIAN_VAULT/_ClaudeLogs/`
 - `/obs-resource` → `$OBSIDIAN_VAULT/_ClaudeResources/`
+
+## Claude Code 設定
+
+### デフォルトモデル・Extended Thinking
+
+`settings.json` で以下を設定済み：
+
+| 設定 | 値 | 説明 |
+|------|-----|------|
+| `model` | `opus` | デフォルトで Opus 4.5 を使用 |
+| `alwaysThinkingEnabled` | `true` | Extended Thinking を常に有効化 |
+
+### MAX_THINKING_TOKENS（環境ごとに設定）
+
+Extended Thinking のトークン上限を設定する環境変数。`~/.zshrc.local` に追記：
+
+```bash
+export MAX_THINKING_TOKENS=31999
+```
+
+| 値 | 相当するプロンプト | 用途 |
+|----|-------------------|------|
+| 設定なし | `think` | 簡単なタスク（デフォルト） |
+| 中程度 | `think hard` | 中程度の複雑さ |
+| `31999` | `ultrathink` | 最大の思考深度 |
+
+セッション中にモデルを切り替える場合は `/model sonnet` などを使用。
 
 ## 作者環境メモ
 
