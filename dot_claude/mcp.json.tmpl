@@ -1,3 +1,4 @@
+{{- if .use_github_mcp }}
 {
   "mcpServers": {
     "github": {
@@ -9,3 +10,8 @@
     }
   }
 }
+{{- else }}
+{
+  "mcpServers": {}
+}
+{{- end }}

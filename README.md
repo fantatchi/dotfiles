@@ -8,8 +8,8 @@
 sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply fantatchi
 ```
 
-初回セットアップ時に以下を聞かれる：
-- GitHub Personal Access Token（MCP サーバーで GitHub API を使用するため）
+初回セットアップ時に以下を聞かれる（Enter でスキップ可）：
+- GitHub MCP を使うか → y で GitHub Personal Access Token を入力
 - Obsidian 連携機能を使うか
 
 セットアップ後、tmux 内で `prefix + I` を実行してプラグインをインストールする。
