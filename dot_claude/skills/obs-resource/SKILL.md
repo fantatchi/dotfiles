@@ -1,3 +1,8 @@
+---
+name: obs-resource
+description: リソース・調査結果の記録
+---
+
 # リソース・調査結果の記録
 
 Claude に調べてもらった内容や、参考になるリソースを Obsidian Vault に記録してください。
