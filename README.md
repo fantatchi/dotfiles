@@ -9,7 +9,7 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply fantatchi
 ```
 
 初回セットアップ時に以下を聞かれる：
-- GitHub Personal Access Token
+- GitHub Personal Access Token（MCP サーバーで GitHub API を使用するため）
 - Obsidian 連携機能を使うか
 
 セットアップ後、tmux 内で `prefix + I` を実行してプラグインをインストールする。
@@ -69,6 +69,28 @@ git push
 ```bash
 chezmoi init
 ```
+
+## 環境別設定（local ファイル）
+
+chezmoi で管理しない環境固有の設定は `~/.zshrc.local` に記述する。
+
+```bash
+# ~/.zshrc.local の例
+export OBSIDIAN_VAULT="~/ObsidianVault"
+export MAX_THINKING_TOKENS=31999
+```
+
+このファイルは `.zshrc` から自動的に読み込まれる。マシンごとに異なる設定（パス、トークン等）はここに書く。
+
+### NVM（Node Version Manager）
+
+NVM を使用する場合は、公式の手順でインストール：
+
+```bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+```
+
+`.zshrc` に NVM のロード処理が含まれているため、インストール後は自動で読み込まれる。
 
 ## Obsidian 連携
 
