@@ -1,5 +1,6 @@
 # 言語・環境変数
 export LANG=ja_JP.UTF-8
+export MAX_THINKING_TOKENS=31999
 export LC_CTYPE=ja_JP.UTF-8
 export LC_MESSAGES=en_US.UTF-8
 export LESSCHARSET=utf-8
