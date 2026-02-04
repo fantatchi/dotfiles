@@ -16,12 +16,15 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply fantatchi
 
 ## 管理しているファイル
 
-| 対象 | ファイル |
-|------|---------|
-| zsh | `.zshrc`, `.zsh/` |
-| vim | `.vimrc`, `.vim/` |
-| tmux | `.tmux.conf` |
-| Claude | `.claude/CLAUDE.md`, `.claude/settings.json`, `.claude/mcp.json`, `.claude/skills/` |
+| 対象 | ファイル | 備考 |
+|------|---------|------|
+| zsh | `.zshrc`, `.zsh/` | oh-my-zsh + 最小限のプラグイン（git のみ） |
+| vim | `.vimrc`, `.vim/` | プラグインレス構成 |
+| tmux | `.tmux.conf` | TPM でプラグイン管理 |
+| Claude | `.claude/CLAUDE.md`, `.claude/settings.json`, `.claude/mcp.json`, `.claude/skills/` | - |
+
+**管理していないファイル:**
+- `.gitconfig`: ユーザー名・メールアドレスは環境ごとに異なるため、手動で設定
 
 ## よく使うコマンド
 
