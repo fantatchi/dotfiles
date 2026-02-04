@@ -1,11 +1,17 @@
 #!/bin/bash
-{{ if .use_obsidian }}
 echo ""
+echo "=== Claude Code の設定 ==="
+echo ""
+echo "Extended Thinking（ultrathink）を有効にするには、~/.zshrc.local に追加:"
+echo ""
+echo "  export MAX_THINKING_TOKENS=31999"
+echo ""
+echo "※ 設定しない場合はデフォルトの思考深度で動作します"
+echo ""
+{{ if .use_obsidian }}
 echo "=== Obsidian 連携のセットアップ ==="
 echo ""
-echo "Claude Code の作業ログ機能を使用するには、環境変数の設定が必要です。"
-echo ""
-echo "~/.zshrc.local に以下を追加:"
+echo "Claude Code の作業ログ機能を使用するには、~/.zshrc.local に追加:"
 echo ""
 echo "  export OBSIDIAN_VAULT=\"/path/to/your/vault\""
 echo ""
