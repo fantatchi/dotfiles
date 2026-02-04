@@ -74,6 +74,10 @@ chezmoi init
 
 Vault 本体は Windows の `~/ObsidianVault`（`C:\Users\<username>\ObsidianVault`）に配置。
 
+**Claude Code の保存先:**
+- `/obs-log` → `$OBSIDIAN_VAULT/_ClaudeLogs/`
+- `/obs-resource` → `$OBSIDIAN_VAULT/_ClaudeResources/`
+
 **PC 間の同期:**
 - OneDrive で Vault フォルダを同期
 - 拡張機能や設定を変更した場合は `.obsidian` フォルダを各環境にコピー
