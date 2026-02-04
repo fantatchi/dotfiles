@@ -8,7 +8,9 @@
 sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply fantatchi
 ```
 
-GitHub Personal Access Token の入力を求められるので、入力する。
+初回セットアップ時に以下を聞かれる：
+- GitHub Personal Access Token
+- Obsidian 連携機能を使うか
 
 セットアップ後、tmux 内で `prefix + I` を実行してプラグインをインストールする。
 
@@ -19,7 +21,7 @@ GitHub Personal Access Token の入力を求められるので、入力する。
 | zsh | `.zshrc`, `.zsh/` |
 | vim | `.vimrc`, `.vim/` |
 | tmux | `.tmux.conf` |
-| Claude | `.claude/CLAUDE.md`, `.claude/settings.json`, `.claude/mcp.json` |
+| Claude | `.claude/CLAUDE.md`, `.claude/settings.json`, `.claude/mcp.json`, `.claude/commands/` |
 
 ## よく使うコマンド
 
@@ -68,20 +70,36 @@ git push
 chezmoi init
 ```
 
-## 作者環境メモ
+## Obsidian 連携
 
-### Obsidian Vault の同期設定
+Claude Code の作業ログを Obsidian Vault に記録する機能。
 
-Vault 本体は Windows の `~/ObsidianVault`（`C:\Users\<username>\ObsidianVault`）に配置。
+**利用可能なコマンド:**
+- `/obs-log`: 作業履歴を記録
+- `/obs-resource`: 調査結果やリソースをメモ
+- 自動ロギング: 一定条件で自動的に作業ログを記録
 
-**Claude Code の保存先:**
+**セットアップ:**
+
+環境変数 `OBSIDIAN_VAULT` に Vault のパスを設定する。
+
+```bash
+export OBSIDIAN_VAULT="/path/to/your/vault"
+```
+
+**保存先:**
 - `/obs-log` → `$OBSIDIAN_VAULT/_ClaudeLogs/`
 - `/obs-resource` → `$OBSIDIAN_VAULT/_ClaudeResources/`
 
-**PC 間の同期:**
-- OneDrive で Vault フォルダを同期
-- 拡張機能や設定を変更した場合は `.obsidian` フォルダを各環境にコピー
+## 作者環境メモ
+
+### Obsidian Vault
+
+Vault 本体は Windows の `C:\Users\<username>\ObsidianVault` に配置。
+
+- OneDrive で Vault フォルダを PC 間で同期
 - メモの同期は Obsidian の git 拡張機能で行う
+- 拡張機能や設定を変更した場合は `.obsidian` フォルダを各環境にコピー
 
 **WSL からのアクセス:**
 ```bash
