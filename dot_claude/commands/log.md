@@ -6,14 +6,11 @@
 
 `~/ObsidianVault/_ClaudeLogs/`
 
-※ 複数環境で共通パスにするため、各環境で `~/ObsidianVault` がVault本体を指すようにシンボリックリンクを設定しておくこと：
+※ Vault 本体は Windows の `~/ObsidianVault`（`C:\Users\<username>\ObsidianVault`）に置く。WSL からは以下のようにシンボリックリンクを設定すること：
 
-- WSL: `ln -s /mnt/c/ObsidianVault ~/ObsidianVault`
-- Windows: Vault本体を `C:\ObsidianVault` に置くか、ユーザーホームからリンクを張る
-  ```cmd
-  mklink /D "%USERPROFILE%\ObsidianVault" "C:\ObsidianVault"
-  ```
-  ※ 管理者権限のコマンドプロンプトで実行すること
+```bash
+ln -s /mnt/c/Users/<username>/ObsidianVault ~/ObsidianVault
+```
 
 ## ファイル名
 
