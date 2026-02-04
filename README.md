@@ -67,3 +67,20 @@ git push
 ```bash
 chezmoi init
 ```
+
+## 作者環境メモ
+
+### Obsidian Vault の同期設定
+
+Vault 本体は Windows の `~/ObsidianVault`（`C:\Users\<username>\ObsidianVault`）に配置。
+
+**PC 間の同期:**
+- OneDrive で Vault フォルダを同期
+- 拡張機能や設定を変更した場合は `.obsidian` フォルダを各環境にコピー
+- メモの同期は Obsidian の git 拡張機能で行う
+
+**WSL からのアクセス:**
+```bash
+ln -s /mnt/c/Users/<username>/ObsidianVault ~/ObsidianVault
+export OBSIDIAN_VAULT="$HOME/ObsidianVault"
+```
