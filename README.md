@@ -87,13 +87,17 @@ export MAX_THINKING_TOKENS=31999
 
 ### NVM（Node Version Manager）
 
-NVM を使用する場合は、公式の手順でインストール：
+NVM を使用する場合は、公式の手順でインストール後、`~/.zshrc.local` に追記：
 
 ```bash
+# インストール
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
-```
 
-`.zshrc` に NVM のロード処理が含まれているため、インストール後は自動で読み込まれる。
+# ~/.zshrc.local に追記
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+```
 
 ## Obsidian 連携
 
