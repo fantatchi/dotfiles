@@ -1,6 +1,9 @@
 ---
 name: obs-resource
-description: リソース・調査結果の記録
+description: 調べた内容・参考リンク・技術メモなどをObsidian Vaultに保存する。「調査結果をメモして」「この情報を保存して」「参考リンクを記録」といった依頼で使う。
+argument-hint: [タグ...]
+disable-model-invocation: true
+allowed-tools: Read, Write, Glob, Bash(mkdir *)
 ---
 
 # リソース・調査結果の記録
@@ -40,33 +43,7 @@ $ARGUMENTS が渡される。
 
 ## 出力フォーマット
 
-以下のフォーマットで書き出すこと：
-
-```
----
-tags:
-  - claude-resource
-  - （自動生成タグ・引数タグをここに追加）
-date: YYYY-MM-DD
-source: claude
----
-
-## 概要
-
-（1-2行で何についての情報か）
-
-## 内容
-
-（調査結果・説明をここに記載）
-
-## 参考リンク
-
-- （あれば。なければこのセクションごと省略）
-
-## 関連メモ
-
-- （Vault 内の関連メモがあれば。なければこのセクションごと省略）
-```
+`./template.md` のフォーマットに従って書き出すこと。
 
 ### 内容の書き方ルール
 
