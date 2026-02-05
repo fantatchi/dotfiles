@@ -1,6 +1,4 @@
 {
-  "model": "opus",
-  "alwaysThinkingEnabled": true,
   "permissions": {
     "allow": [
       "Read",
@@ -17,5 +15,11 @@
       "Read(**/.env.*)",
       "Read(**/secrets/**)"
     ]
-  }
+  },
+  "model": "opus",
+  "enabledPlugins": {
+    "example-skills@anthropic-agent-skills": true,
+    "document-skills@anthropic-agent-skills": true
+  },
+  "alwaysThinkingEnabled": true
 }
