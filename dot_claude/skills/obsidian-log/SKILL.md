@@ -1,6 +1,6 @@
 ---
-name: obs-log
-description: セッション中の作業内容をObsidian Vaultに記録する。手動（/obs-log）でも、CLAUDE.mdのトリガー条件による自動記録でも呼ばれる。「作業ログを書いて」「今日の作業を記録」といった依頼で使う。
+name: obsidian-log
+description: セッション中の作業内容をObsidian Vaultに記録する。手動（/obsidian-log）でも、CLAUDE.mdのトリガー条件による自動記録でも呼ばれる。「作業ログを書いて」「今日の作業を記録」といった依頼で使う。
 argument-hint: [タグ...]
 allowed-tools: Read, Write, Glob, Bash(mkdir *)
 ---
@@ -30,7 +30,7 @@ allowed-tools: Read, Write, Glob, Bash(mkdir *)
 $ARGUMENTS が渡される。
 
 - スペース区切りでそれぞれを tags に追加する
-- 例: `/obs-log backend auth` → tags: claude-log, backend, auth, ...
+- 例: `/obsidian-log backend auth` → tags: claude-log, backend, auth, ...
 - 引数が空の場合は `claude-log` のみ＋自動生成タグ
 
 ## タグの自動生成
@@ -72,7 +72,7 @@ $ARGUMENTS が渡される。
 - 書き出したら「自動ログを記録しました: （ファイル名）」とユーザーに通知する
 - ユーザーの作業を中断しないこと
 - 同じ内容で重複して書き出さないこと
-- ユーザーが `/obs-log` を実行した直後は、次の条件を満たすまでカウントをリセットする
+- ユーザーが `/obsidian-log` を実行した直後は、次の条件を満たすまでカウントをリセットする
 
 ## 注意事項
 

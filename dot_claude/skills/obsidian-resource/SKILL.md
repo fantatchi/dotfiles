@@ -1,5 +1,5 @@
 ---
-name: obs-resource
+name: obsidian-resource
 description: 調べた内容・参考リンク・技術メモなどをObsidian Vaultに保存する。「調査結果をメモして」「この情報を保存して」「参考リンクを記録」といった依頼で使う。
 argument-hint: [タグ...]
 disable-model-invocation: true
@@ -25,7 +25,7 @@ Claude に調べてもらった内容や、参考になるリソースを Obsidi
 $ARGUMENTS が渡される。
 
 - スペース区切りでそれぞれを tags に追加する
-- 例: `/obs-resource api auth` → tags: claude-resource, api, auth, ...
+- 例: `/obsidian-resource api auth` → tags: claude-resource, api, auth, ...
 - 引数が空の場合は `claude-resource` のみ＋自動生成タグ
 
 ## タグの自動生成
