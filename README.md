@@ -39,9 +39,9 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply fantatchi
 export OBSIDIAN_VAULT="~/ObsidianVault"
 export MAX_THINKING_TOKENS=31999
 
-# NVM を使う場合
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+# Volta（Node.js バージョン管理）
+export VOLTA_HOME="$HOME/.volta"
+export PATH="$VOLTA_HOME/bin:$PATH"
 ```
 
 このファイルは `.zshrc` から自動的に読み込まれる。
