@@ -14,11 +14,11 @@ Claude に調べてもらった内容や、参考になるリソースを Obsidi
 
 `$OBSIDIAN_VAULT/_ClaudeResources/`
 
-※ 環境変数 `OBSIDIAN_VAULT` が設定されていない場合はエラーを表示し、設定方法を案内すること。
+※ 環境変数の確認は不要（CLAUDE.md 側で担保済み）。ディレクトリが存在しなければ作成すること。
 
 ## ファイル名
 
-`YYYY-MM-DD_HHmm_簡潔なタイトル.md`（日本語OK、スペースはハイフンに置換）
+`YYYY-MM-DD_HHmmss_簡潔なタイトル.md`（日本語OK、スペースはハイフンに置換）
 
 ## 引数の扱い
 

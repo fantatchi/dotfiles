@@ -16,12 +16,12 @@ allowed-tools: Read, Write, Glob, Bash(mkdir *)
 
 `$OBSIDIAN_VAULT/_ClaudeLogs/`
 
-※ 環境変数 `OBSIDIAN_VAULT` が設定されていない場合はエラーを表示し、設定方法を案内すること。
+※ 環境変数の確認は不要（CLAUDE.md 側で担保済み）。ディレクトリが存在しなければ作成すること。
 
 ## ファイル名
 
-- 手動記録: `YYYY-MM-DD_HHmm_簡潔な作業概要.md`
-- 自動記録: `YYYY-MM-DD_HHmm_簡潔な作業概要_auto.md`
+- 手動記録: `YYYY-MM-DD_HHmmss_簡潔な作業概要.md`
+- 自動記録: `YYYY-MM-DD_HHmmss_簡潔な作業概要_auto.md`
 
 （日本語OK、スペースはハイフンに置換）
 
@@ -68,7 +68,7 @@ $ARGUMENTS が渡される。
 自動記録（CLAUDE.md のトリガー条件で呼ばれた場合）は以下に従うこと：
 
 - タグに `auto` を常に含める
-- ファイル名に `_auto` を付けて手動ログと区別する（例: `YYYY-MM-DD_HHmm_作業概要_auto.md`）
+- ファイル名に `_auto` を付けて手動ログと区別する（例: `YYYY-MM-DD_HHmmss_作業概要_auto.md`）
 - 書き出したら「自動ログを記録しました: （ファイル名）」とユーザーに通知する
 - ユーザーの作業を中断しないこと
 - 同じ内容で重複して書き出さないこと

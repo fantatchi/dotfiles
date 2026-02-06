@@ -14,7 +14,7 @@ disable-model-invocation: true
 
 `$OBSIDIAN_VAULT/_BlogDrafts/`
 
-※ 環境変数 `OBSIDIAN_VAULT` が未設定ならエラーを表示し、設定方法を案内する。
+※ 環境変数の確認は不要（CLAUDE.md 側で担保済み）。ディレクトリが存在しなければ作成すること。
 
 ## ファイル名
 
