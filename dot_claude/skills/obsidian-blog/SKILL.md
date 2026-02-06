@@ -18,7 +18,7 @@ disable-model-invocation: true
 
 ## ファイル名
 
-`YYYY-MM-DD_簡潔なタイトル.md`（日本語OK、スペースはハイフンに置換）
+`YYYYMMDD_簡潔なタイトル.md`（日本語OK、スペースはハイフンに置換）
 
 ## 出力フォーマット
 
