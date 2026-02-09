@@ -14,11 +14,14 @@ Claude に調べてもらった内容や、参考になるリソースを Obsidi
 
 `$OBSIDIAN_VAULT/_ClaudeResources/`
 
-※ 環境変数の確認は不要（CLAUDE.md 側で担保済み）。ディレクトリが存在しなければ作成すること。
+※ 環境変数の存在は CLAUDE.md 側で担保済み。ただし書き出し時は **必ず `printenv OBSIDIAN_VAULT` で実パスを取得**し、そのパスを使うこと（パスの推測・ハードコード禁止）。ディレクトリが存在しなければ `mkdir -p` で作成すること。
 
 ## ファイル名
 
-`YYYYMMDDHHmmss_簡潔なタイトル.md`（日本語OK、スペースはハイフンに置換）
+`YYYYMMDDHHmmss_簡潔なタイトル.md`
+
+※ タイムスタンプは **`date +%Y%m%d%H%M%S` で取得**すること（`HHmmss` まで必須）。
+（日本語OK、スペースはハイフンに置換）
 
 ## 引数の扱い
 
