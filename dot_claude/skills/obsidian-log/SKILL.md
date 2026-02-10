@@ -1,6 +1,6 @@
 ---
 name: obsidian-log
-description: セッション中の作業内容をObsidian Vaultに記録する。手動（/obsidian-log）でも、CLAUDE.mdのトリガー条件による自動記録でも呼ばれる。「作業ログを書いて」「今日の作業を記録」といった依頼で使う。
+description: セッション中の作業内容をObsidian Vaultに記録する。手動でも自動記録トリガーでも呼ばれる。「作業ログを書いて」「今日の作業を記録」といった依頼で使う。
 argument-hint: [タグ...]
 allowed-tools: Read, Write, Glob, Bash(echo *), Bash(mkdir *), Bash(date *)
 ---

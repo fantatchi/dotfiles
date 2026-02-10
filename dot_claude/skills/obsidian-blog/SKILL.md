@@ -1,6 +1,6 @@
 ---
 name: obsidian-blog
-description: 技術ブログのドラフトを作成し Obsidian Vault に保存する。「ブログ書いて」「この作業をブログにまとめて」「記事のドラフト作って」といった依頼や、/obsidian-blog で呼び出す。セッション内容からの自動ドラフト化も対応。
+description: 技術ブログのドラフトを作成し Obsidian Vault に保存する。「ブログ書いて」「この作業をブログにまとめて」「記事のドラフト作って」といった依頼で使う。セッション内容からの自動ドラフト化も対応。
 argument-hint: [テーマ or "auto"]
 allowed-tools: Read, Write, Glob, Bash(echo *), Bash(mkdir *), Bash(date *)
 disable-model-invocation: true
