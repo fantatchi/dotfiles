@@ -3,7 +3,7 @@ name: obsidian-resource
 description: 調べた内容・参考リンク・技術メモなどをObsidian Vaultに保存する。「調査結果をメモして」「この情報を保存して」「参考リンクを記録」といった依頼で使う。
 argument-hint: [タグ...]
 disable-model-invocation: true
-allowed-tools: Read, Write, Glob, Bash(echo *), Bash(mkdir *)
+allowed-tools: Read, Write, Glob, Bash(echo *), Bash(mkdir *), Bash(date *)
 ---
 
 # リソース・調査結果の記録
