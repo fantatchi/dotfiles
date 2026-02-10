@@ -26,12 +26,13 @@ allowed-tools: Read, Glob, Grep, Bash(git *), Bash(printenv *), Bash(basename *)
 
 ### 引数なし
 
-`_ClaudeContext/` 内の保存済みコンテキスト一覧を取得し、AskUserQuestion の選択肢として提示する。
+`~/CLAUDE.local.md` のプロジェクト一覧テーブルからプロジェクト候補を取得し、`_ClaudeContext/` 内に対応するコンテキストファイルが存在するものを AskUserQuestion の選択肢として提示する。
 
-- 各ファイルの frontmatter から `project`、`updated`、`branch` を読み取り、選択肢のラベルと説明に使う
+- `~/CLAUDE.local.md` が存在しない場合は `_ClaudeContext/` 一覧にフォールバック
+- 各コンテキストファイルの frontmatter から `project`、`updated`、`branch` を読み取り、選択肢のラベルと説明に使う
 - 例: `ict-pf` — 最終更新: 2025-02-10, ブランチ: feature/xxx
 - git リポジトリ内にいる場合は、現在のリポジトリに対応するプロジェクトを推奨（選択肢の先頭に配置）
-- 保存済みコンテキストが 0 件の場合は「保存済みコンテキストがありません」と案内
+- コンテキストファイルが存在するプロジェクトが 0 件の場合は「保存済みコンテキストがありません」と案内
 
 ## 読み込み処理
 

@@ -32,7 +32,7 @@ allowed-tools: Read, Write, Edit, Bash(git *), Bash(printenv *), Bash(mkdir *), 
 
 1. **セッション中に `/context-load` で読み込んだプロジェクトがある場合** → そのプロジェクトをデフォルトとして提示（会話履歴から判断する）
 2. git リポジトリ内の場合 → リポジトリ名を推奨として提示
-3. 上記いずれでもない場合 → 既存の `_ClaudeContext/` 一覧を AskUserQuestion で提示
+3. 上記いずれでもない場合 → `~/CLAUDE.local.md` のプロジェクト一覧テーブルを AskUserQuestion で提示（テーブルが存在しない場合は `_ClaudeContext/` 一覧にフォールバック）
 
 いずれの場合も、別のプロジェクトを選べるよう一覧も選択肢に含める（新規作成も選べる）。
 新規作成が選ばれた場合 → プロジェクト名を通常のメッセージで聞く。

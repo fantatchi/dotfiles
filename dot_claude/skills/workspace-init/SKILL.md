@@ -1,6 +1,6 @@
 ---
 name: workspace-init
-description: 任意のディレクトリをClaude Codeのワークスペースとして初期化する。プロジェクトのリンクや直接配置を登録し、CLAUDE.local.mdを生成する。
+description: ワークスペースを初期化する。プロジェクトのリンクや直接配置を登録し、~/CLAUDE.local.mdを生成する。
 disable-model-invocation: true
 allowed-tools: Read, Write, Edit, Bash(ln *), Bash(cmd *), Bash(uname *), Bash(readlink *), Bash(ls *), Bash(mkdir *), Bash(test *), Bash(printenv *)
 ---
@@ -20,14 +20,23 @@ allowed-tools: Read, Write, Edit, Bash(ln *), Bash(cmd *), Bash(uname *), Bash(r
 - それ以外（`uname` がない / `MINGW` / `MSYS` / `CYGWIN`）→ Windows
   - ジャンクション: `cmd /c mklink /J <linkname> <target>`（管理者権限不要）
 
-### 2. 既存状態の確認
+### 2. 書き出し先の決定
 
-`CLAUDE.local.md` が既に存在する場合：
+`~/CLAUDE.local.md`（ユーザーのホームディレクトリ）に書き出す。
+
+- WSL/Linux: `$HOME/CLAUDE.local.md`
+- Windows: `%USERPROFILE%\CLAUDE.local.md`
+
+※ WSL と Windows はそれぞれ独立した `CLAUDE.local.md` を持つ（パス形式が異なるため同期不要）。
+
+### 3. 既存状態の確認
+
+`~/CLAUDE.local.md` が既に存在する場合：
 - 既存のプロジェクト一覧テーブルをパースして読み込む
 - 「既存プロジェクトが見つかりました」と一覧を表示
 - 追加・削除の選択肢を提示
 
-### 3. プロジェクト登録（対話形式）
+### 4. プロジェクト登録（対話形式）
 
 以下を繰り返す。**選択式の質問には AskUserQuestion を使い、自由入力（パス・説明など）は通常のメッセージで聞く。**
 
@@ -54,7 +63,7 @@ allowed-tools: Read, Write, Edit, Bash(ln *), Bash(cmd *), Bash(uname *), Bash(r
 
 4. **削除**の場合、既存一覧を AskUserQuestion の選択肢として提示
 
-### 4. プロジェクト配置
+### 5. プロジェクト配置
 
 **リンク方式:**
 - シンボリックリンク（WSL/Linux）またはジャンクション（Windows）を作成
@@ -68,14 +77,14 @@ allowed-tools: Read, Write, Edit, Bash(ln *), Bash(cmd *), Bash(uname *), Bash(r
 - リンク・フォルダは削除しない（手動削除を案内する）
 - CLAUDE.local.md の一覧からのみ除外
 
-### 5. CLAUDE.local.md 生成
+### 6. CLAUDE.local.md 生成
 
-以下の内容で `CLAUDE.local.md` を生成（既存がある場合は上書き）：
+以下の内容で `~/CLAUDE.local.md` を生成（既存がある場合は上書き）：
 
 ```markdown
 # ワークスペース
 
-このディレクトリはClaude Code のワークスペースとして機能する。
+`~/workspace/` を Claude Code のワークスペースとして使用する。
 プロジェクトはリンクまたは直接配置で構成されている。
 
 ## プロジェクト一覧
@@ -116,7 +125,7 @@ claude
 このディレクトリで `/workspace-init` を再実行する。
 ```
 
-### 6. 初期コンテキストの作成
+### 7. 初期コンテキストの作成
 
 登録した各プロジェクトについて、`$OBSIDIAN_VAULT/_ClaudeContext/{project-name}.md` に初期コンテキストを作成する。
 
@@ -125,7 +134,7 @@ claude
 - ディレクトリが存在しなければ `mkdir -p` で作成
 - 内容は context-save の `template.md` に準拠し、最低限の情報（プロジェクト名、説明、git 情報があれば取得）を埋める
 
-### 7. 使い方の案内
+### 8. 使い方の案内
 
 CLAUDE.local.md 生成後、ユーザーに使い方を説明する。CLAUDE.local.md の「使い方」セクションの内容を要約して伝える。
 
@@ -140,6 +149,6 @@ CLAUDE.local.md 生成後、ユーザーに使い方を説明する。CLAUDE.loc
 ## 注意事項
 
 - ワークスペースディレクトリ自体は作成しない（ユーザーが選んだ既存ディレクトリを使う）
-- `CLAUDE.local.md` は `.gitignore` に含まれることが多いローカル設定ファイル
+- `~/CLAUDE.local.md` はホームディレクトリに配置するため、どこから Claude Code を起動しても読み込まれる
 - リンク方式でプロジェクトパスが存在しない場合は警告するが、リンク作成は続行する（リモートマウントなど後から利用可能になるケース）
 - 直接配置では workspace 直下にディレクトリが存在することを確認する
