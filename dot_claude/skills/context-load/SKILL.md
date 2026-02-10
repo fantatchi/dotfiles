@@ -3,7 +3,7 @@ name: context-load
 description: 保存済みのプロジェクトコンテキストを読み込み、前回の作業状態を復帰する。セッション開始時に使う。
 argument-hint: [project-id]
 disable-model-invocation: true
-allowed-tools: Read, Glob, Grep, Bash(git *), Bash(printenv *), Bash(basename *), Bash(ls *)
+allowed-tools: Read, Glob, Grep, Bash(git *), Bash(echo *), Bash(basename *), Bash(ls *)
 ---
 
 # コンテキスト読み込み
@@ -14,7 +14,7 @@ allowed-tools: Read, Glob, Grep, Bash(git *), Bash(printenv *), Bash(basename *)
 
 `$OBSIDIAN_VAULT/_ClaudeContext/{project-id}.md`
 
-※ **必ず `printenv OBSIDIAN_VAULT` で実パスを取得**すること。
+※ **必ず `echo "${OBSIDIAN_VAULT/#\~/$HOME}"` で実パスを取得**すること（チルダが `$HOME` に展開される）。
 
 ## プロジェクトの選択
 

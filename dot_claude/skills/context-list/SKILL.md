@@ -2,7 +2,7 @@
 name: context-list
 description: 管理中のプロジェクトとコンテキストの保存状態を一覧表示する。
 disable-model-invocation: true
-allowed-tools: Read, Glob, Bash(printenv *), Bash(ls *)
+allowed-tools: Read, Glob, Bash(echo *), Bash(ls *)
 ---
 
 # コンテキスト一覧
@@ -14,7 +14,7 @@ allowed-tools: Read, Glob, Bash(printenv *), Bash(ls *)
 1. **プロジェクト一覧**: `~/CLAUDE.local.md` のプロジェクト一覧テーブル
 2. **コンテキストファイル**: `$OBSIDIAN_VAULT/_ClaudeContext/*.md`
 
-※ **必ず `printenv OBSIDIAN_VAULT` で実パスを取得**すること。
+※ **必ず `echo "${OBSIDIAN_VAULT/#\~/$HOME}"` で実パスを取得**すること（チルダが `$HOME` に展開される）。
 
 ## 処理フロー
 

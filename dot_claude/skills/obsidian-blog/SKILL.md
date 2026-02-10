@@ -2,7 +2,7 @@
 name: obsidian-blog
 description: 技術ブログのドラフトを作成し Obsidian Vault に保存する。「ブログ書いて」「この作業をブログにまとめて」「記事のドラフト作って」といった依頼や、/obsidian-blog で呼び出す。セッション内容からの自動ドラフト化も対応。
 argument-hint: [テーマ or "auto"]
-allowed-tools: Read, Write, Glob, Bash(mkdir *)
+allowed-tools: Read, Write, Glob, Bash(echo *), Bash(mkdir *)
 disable-model-invocation: true
 ---
 
@@ -14,7 +14,7 @@ disable-model-invocation: true
 
 `$OBSIDIAN_VAULT/_BlogDrafts/`
 
-※ 環境変数の存在は CLAUDE.md 側で担保済み。ただし書き出し時は **必ず `printenv OBSIDIAN_VAULT` で実パスを取得**し、そのパスを使うこと（パスの推測・ハードコード禁止）。ディレクトリが存在しなければ `mkdir -p` で作成すること。
+※ 環境変数の存在は CLAUDE.md 側で担保済み。ただし書き出し時は **必ず `echo "${OBSIDIAN_VAULT/#\~/$HOME}"` で実パスを取得**し、そのパスを使うこと（チルダが `$HOME` に展開される。パスの推測・ハードコード禁止）。ディレクトリが存在しなければ `mkdir -p` で作成すること。
 
 ## ファイル名
 

@@ -2,7 +2,7 @@
 name: workspace-init
 description: ワークスペースを初期化する。プロジェクトのリンクや直接配置を登録し、~/CLAUDE.local.mdを生成する。
 disable-model-invocation: true
-allowed-tools: Read, Write, Edit, Bash(ln *), Bash(cmd *), Bash(uname *), Bash(readlink *), Bash(ls *), Bash(mkdir *), Bash(test *), Bash(printenv *), Bash(date *)
+allowed-tools: Read, Write, Edit, Bash(ln *), Bash(cmd *), Bash(uname *), Bash(readlink *), Bash(ls *), Bash(mkdir *), Bash(test *), Bash(echo *), Bash(date *)
 ---
 
 # ワークスペース初期化
@@ -136,7 +136,7 @@ claude
 登録した各プロジェクトについて、`$OBSIDIAN_VAULT/_ClaudeContext/{project-name}.md` に初期コンテキストを作成する。
 
 - 既にコンテキストファイルがあるプロジェクトはスキップ（上書きしない）
-- `printenv OBSIDIAN_VAULT` で実パスを取得。未設定ならこのステップをスキップ
+- `echo "${OBSIDIAN_VAULT/#\~/$HOME}"` で実パスを取得（チルダ展開）。未設定ならこのステップをスキップ
 - ディレクトリが存在しなければ `mkdir -p` で作成
 - 内容は context-save の `template.md` に準拠し、最低限の情報（プロジェクト名、説明、git 情報があれば取得）を埋める
 

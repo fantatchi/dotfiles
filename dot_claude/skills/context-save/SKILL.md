@@ -2,7 +2,7 @@
 name: context-save
 description: プロジェクトの作業状態をObsidian Vaultに保存し、次回セッションで復帰可能にする。セッション終了時や作業の区切りで使う。
 argument-hint: [project-id]
-allowed-tools: Read, Write, Edit, Glob, Bash(git *), Bash(printenv *), Bash(mkdir *), Bash(basename *), Bash(date *), Bash(ls *)
+allowed-tools: Read, Write, Edit, Glob, Bash(git *), Bash(echo *), Bash(mkdir *), Bash(basename *), Bash(date *), Bash(ls *)
 ---
 
 <!-- NOTE: disable-model-invocation は意図的に設定していない。
@@ -16,7 +16,7 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git *), Bash(printenv *), Bash(mkdi
 
 `$OBSIDIAN_VAULT/_ClaudeContext/{project-id}.md`（上書き保存）
 
-※ 環境変数の存在は CLAUDE.md 側で担保済み。ただし書き出し時は **必ず `printenv OBSIDIAN_VAULT` で実パスを取得**し、そのパスを使うこと（パスの推測・ハードコード禁止）。ディレクトリが存在しなければ `mkdir -p` で作成すること。
+※ 環境変数の存在は CLAUDE.md 側で担保済み。ただし書き出し時は **必ず `echo "${OBSIDIAN_VAULT/#\~/$HOME}"` で実パスを取得**し、そのパスを使うこと（チルダが `$HOME` に展開される。パスの推測・ハードコード禁止）。ディレクトリが存在しなければ `mkdir -p` で作成すること。
 
 ## プロジェクトの選択
 

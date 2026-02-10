@@ -3,7 +3,7 @@ name: knowledge-search
 description: Obsidian Vault内のClaudeナレッジ（ログ・リソース・コンテキスト・ブログ下書き）を横断検索する。
 argument-hint: <query>
 disable-model-invocation: true
-allowed-tools: Read, Glob, Grep, Bash(printenv *), Bash(ls *)
+allowed-tools: Read, Glob, Grep, Bash(echo *), Bash(ls *)
 ---
 
 # ナレッジ検索
@@ -19,7 +19,7 @@ Obsidian Vault 内の Claude ナレッジを横断検索する。
 - `_ClaudeContext/` — プロジェクトコンテキスト
 - `_BlogDrafts/` — ブログ下書き
 
-※ **必ず `printenv OBSIDIAN_VAULT` で実パスを取得**すること。
+※ **必ず `echo "${OBSIDIAN_VAULT/#\~/$HOME}"` で実パスを取得**すること（チルダが `$HOME` に展開される）。
 
 ## クエリの解釈
 

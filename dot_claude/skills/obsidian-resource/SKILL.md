@@ -3,7 +3,7 @@ name: obsidian-resource
 description: 調べた内容・参考リンク・技術メモなどをObsidian Vaultに保存する。「調査結果をメモして」「この情報を保存して」「参考リンクを記録」といった依頼で使う。
 argument-hint: [タグ...]
 disable-model-invocation: true
-allowed-tools: Read, Write, Glob, Bash(mkdir *)
+allowed-tools: Read, Write, Glob, Bash(echo *), Bash(mkdir *)
 ---
 
 # リソース・調査結果の記録
@@ -14,7 +14,7 @@ Claude に調べてもらった内容や、参考になるリソースを Obsidi
 
 `$OBSIDIAN_VAULT/_ClaudeResources/`
 
-※ 環境変数の存在は CLAUDE.md 側で担保済み。ただし書き出し時は **必ず `printenv OBSIDIAN_VAULT` で実パスを取得**し、そのパスを使うこと（パスの推測・ハードコード禁止）。ディレクトリが存在しなければ `mkdir -p` で作成すること。
+※ 環境変数の存在は CLAUDE.md 側で担保済み。ただし書き出し時は **必ず `echo "${OBSIDIAN_VAULT/#\~/$HOME}"` で実パスを取得**し、そのパスを使うこと（チルダが `$HOME` に展開される。パスの推測・ハードコード禁止）。ディレクトリが存在しなければ `mkdir -p` で作成すること。
 
 ## ファイル名
 
