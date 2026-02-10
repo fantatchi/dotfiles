@@ -21,5 +21,27 @@
     "example-skills@anthropic-agent-skills": true,
     "document-skills@anthropic-agent-skills": true
   },
-  "alwaysThinkingEnabled": true
+  "alwaysThinkingEnabled": true,
+  "hooks": {
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '【自動ログ】コンテキスト圧縮が発生します。未記録の作業内容があれば、/obsidian-log スキルを使って自動記録してください（自動記録のルールに従うこと）。記録すべき作業がなければ何もしなくて構いません。'"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '【自動ログ】セッションが終了します。未記録の作業内容があれば、/obsidian-log スキルを使って自動記録してください（自動記録のルールに従うこと）。記録すべき作業がなければ何もしなくて構いません。'"
+          }
+        ]
+      }
+    ]
+  }
 }
