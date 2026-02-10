@@ -21,7 +21,12 @@ allowed-tools: Read, Glob, Grep, Bash(git *), Bash(printenv *), Bash(basename *)
 ### 引数あり
 
 `$ARGUMENTS` で指定された値をプロジェクト識別子として使う。
-部分一致で検索し、一意に特定できればそのまま読み込む（例: `ict` → `ict-pf.md`）。
+以下の順で部分一致検索する：
+
+1. `~/CLAUDE.local.md` のプロジェクト一覧テーブルのプロジェクト名
+2. `_ClaudeContext/` 内の既存ファイル名
+
+一意に特定できればそのまま読み込む（例: `ict` → `ict-pf.md`）。
 複数マッチした場合は候補を AskUserQuestion で提示する。
 
 ### 引数なし

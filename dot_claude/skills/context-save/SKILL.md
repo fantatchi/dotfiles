@@ -2,7 +2,7 @@
 name: context-save
 description: プロジェクトの作業状態をObsidian Vaultに保存し、次回セッションで復帰可能にする。セッション終了時や作業の区切りで使う。
 argument-hint: [project-id]
-allowed-tools: Read, Write, Edit, Bash(git *), Bash(printenv *), Bash(mkdir *), Bash(basename *), Bash(date *), Bash(ls *)
+allowed-tools: Read, Write, Edit, Glob, Bash(git *), Bash(printenv *), Bash(mkdir *), Bash(basename *), Bash(date *), Bash(ls *)
 ---
 
 <!-- NOTE: disable-model-invocation は意図的に設定していない。
@@ -23,7 +23,12 @@ allowed-tools: Read, Write, Edit, Bash(git *), Bash(printenv *), Bash(mkdir *), 
 ### 引数あり
 
 `$ARGUMENTS` で指定された値をプロジェクト識別子として使う。
-部分一致で既存の `_ClaudeContext/` 内ファイルを検索し、一意に特定できればそのまま使う。
+以下の順で部分一致検索する：
+
+1. `~/CLAUDE.local.md` のプロジェクト一覧テーブルのプロジェクト名
+2. `_ClaudeContext/` 内の既存ファイル名
+
+一意に特定できればそのまま使う。複数マッチした場合は候補を AskUserQuestion で提示する。
 該当なしの場合は新規プロジェクトとして作成する。
 
 ### 引数なし（手動実行）
@@ -39,7 +44,10 @@ allowed-tools: Read, Write, Edit, Bash(git *), Bash(printenv *), Bash(mkdir *), 
 
 ### 引数なし（自動保存）
 
-SessionEnd フックから呼ばれた場合は対話できないため、以下の優先順で自動決定する：
+SessionEnd フックのリマインダー経由で呼ばれた場合。
+**判別方法**: 会話履歴にフックのリマインダーテキスト（`/context-save` の実行を促す内容）が直前にある場合は自動保存と判断する。ユーザーが明示的に `/context-save` を実行した場合は手動実行。
+
+対話できないため、以下の優先順で自動決定する：
 
 1. **セッション中に `/context-load` で読み込んだプロジェクトがある場合** → そのプロジェクトに保存
 2. git リポジトリ内 → リポジトリ名で自動保存

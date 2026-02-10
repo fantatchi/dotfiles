@@ -2,7 +2,7 @@
 name: workspace-init
 description: ワークスペースを初期化する。プロジェクトのリンクや直接配置を登録し、~/CLAUDE.local.mdを生成する。
 disable-model-invocation: true
-allowed-tools: Read, Write, Edit, Bash(ln *), Bash(cmd *), Bash(uname *), Bash(readlink *), Bash(ls *), Bash(mkdir *), Bash(test *), Bash(printenv *)
+allowed-tools: Read, Write, Edit, Bash(ln *), Bash(cmd *), Bash(uname *), Bash(readlink *), Bash(ls *), Bash(mkdir *), Bash(test *), Bash(printenv *), Bash(date *)
 ---
 
 # ワークスペース初期化
@@ -84,7 +84,7 @@ allowed-tools: Read, Write, Edit, Bash(ln *), Bash(cmd *), Bash(uname *), Bash(r
 ```markdown
 # ワークスペース
 
-`~/workspace/` を Claude Code のワークスペースとして使用する。
+`{$CWD}` を Claude Code のワークスペースとして使用する。
 プロジェクトはリンクまたは直接配置で構成されている。
 
 ## プロジェクト一覧
@@ -94,6 +94,12 @@ allowed-tools: Read, Write, Edit, Bash(ln *), Bash(cmd *), Bash(uname *), Bash(r
 | {name} | link | /path/to/project | 説明 |
 | {name} | direct | — | 説明 |
 | ... | ... | ... | ... |
+
+## コンテキストの共有
+
+このファイル（`~/CLAUDE.local.md`）は WSL と Windows でそれぞれ独立して管理する（パス形式が異なるため）。
+一方、`_ClaudeContext/` 内のコンテキストファイルは Obsidian Vault 経由で共有される。
+どちらの環境から `/context-save` しても同じファイルに書き込まれ、`/context-load` で復帰できる。
 
 ## 使い方
 
