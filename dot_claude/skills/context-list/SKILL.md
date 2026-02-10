@@ -31,12 +31,7 @@ allowed-tools: Read, Glob, Bash(printenv *), Bash(ls *)
 - `updated`: 最終更新日時
 - `branch`: ブランチ名
 
-### 3. 孤立コンテキストの検出
-
-`_ClaudeContext/` 内のファイルのうち、`~/CLAUDE.local.md` のプロジェクト一覧に含まれないものを「孤立コンテキスト」として検出する。
-（他の環境で保存されたコンテキストなど）
-
-### 4. 一覧の表示
+### 3. 一覧の表示
 
 以下の形式で表示する：
 
@@ -47,14 +42,6 @@ allowed-tools: Read, Glob, Bash(printenv *), Bash(ls *)
 |---|---|---|---|
 | ict-pf | ✓ | 2025-02-10 15:30 | feature/xxx |
 | cloud-education-syllabus | — | — | — |
-
-### 孤立コンテキスト（この環境に未登録）
-
-（CLAUDE.local.md に含まれないコンテキストファイルがある場合のみ表示）
-
-| コンテキスト | 最終更新 | ブランチ |
-|---|---|---|
-| old-project | 2025-01-15 10:00 | main |
 ```
 
 ## 注意事項
