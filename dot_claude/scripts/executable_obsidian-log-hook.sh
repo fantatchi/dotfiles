@@ -7,6 +7,9 @@
 
 set -euo pipefail
 
+# フックは stdin に JSON を受け取るが、本スクリプトでは使わないので閉じる
+exec < /dev/null
+
 CONFIG_FILE="${HOME}/.claude/config.json"
 
 # config.json から obsidian_vault を読み取る
@@ -14,7 +17,7 @@ if [ ! -f "$CONFIG_FILE" ]; then
     exit 0
 fi
 
-VAULT=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1])).get('obsidian_vault',''))" "$CONFIG_FILE" 2>/dev/null || echo "")
+VAULT=$(jq -r '.obsidian_vault // empty' "$CONFIG_FILE" 2>/dev/null || echo "")
 if [ -z "$VAULT" ]; then
     exit 0
 fi

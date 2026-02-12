@@ -7,6 +7,9 @@
 
 set -euo pipefail
 
+# フックは stdin に JSON を受け取るが、本スクリプトでは使わないので閉じる
+exec < /dev/null
+
 CONTEXT_DIR="${HOME}/.claude/context"
 
 # git リポジトリ外なら何もしない
