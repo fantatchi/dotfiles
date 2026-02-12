@@ -8,21 +8,19 @@ echo "  export MAX_THINKING_TOKENS=31999"
 echo ""
 echo "※ 設定しない場合はデフォルトの思考深度で動作します"
 echo ""
-{{ if .use_workspace }}
-echo "=== ワークスペースのセットアップ ==="
+echo "=== config.json の設定内容 ==="
 echo ""
-echo "ワークスペース機能を使用するには、環境変数に追加:"
+echo "  ~/.claude/config.json に以下が設定されます:"
 echo ""
-echo "  export WORKSPACE_DIR=\"~/workspace\""
+{{ if ne .obsidian_vault "" -}}
+echo "  obsidian_vault: {{ .obsidian_vault }}"
+{{ end -}}
+{{ if ne .workspace_dir "" -}}
+echo "  workspace_dir:  {{ .workspace_dir }}"
+{{ end -}}
+{{ if and (eq .obsidian_vault "") (eq .workspace_dir "") -}}
+echo "  （オプション機能は未設定です）"
+{{ end -}}
 echo ""
-echo "設定後、/workspace-setup でプロジェクトを登録できます。"
+echo "設定を変更するには chezmoi init を再実行してください。"
 echo ""
-{{ end }}
-{{ if .use_obsidian }}
-echo "=== Obsidian 連携のセットアップ ==="
-echo ""
-echo "Claude Code の作業ログ機能を使用するには、環境変数に追加:"
-echo ""
-echo "  export OBSIDIAN_VAULT=\"/path/to/your/vault\""
-echo ""
-{{ end }}

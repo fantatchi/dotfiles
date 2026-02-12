@@ -12,9 +12,26 @@ Claude に調べてもらった内容や、参考になるリソースを Obsidi
 
 ## 書き出し先
 
-`$OBSIDIAN_VAULT/_claude/resource/`
+設定ファイル `$HOME/.claude/config.json` の `obsidian_vault` の値を Vault パスとして使う。
 
-※ 環境変数の存在は CLAUDE.md 側で担保済み。ただし書き出し時は **必ず `echo "${OBSIDIAN_VAULT/#\~/$HOME}"` で実パスを取得**し、そのパスを使うこと（チルダが `$HOME` に展開される。パスの推測・ハードコード禁止）。ディレクトリが存在しなければ `mkdir -p` で作成すること。
+パスの取得手順:
+1. `$HOME/.claude/config.json` を Read ツールで読み込む
+2. JSON から `obsidian_vault` の値を取得する（値は絶対パス）
+3. `{obsidian_vault}/_claude/resource/` に書き出す
+
+※ `obsidian_vault` キーが存在しない場合は以下を案内して終了：
+
+```
+obsidian_vault が設定されていません。
+~/.claude/config.json に以下を追加してください：
+
+  "obsidian_vault": "/path/to/vault"
+
+chezmoi を使っている場合は `chezmoi init` で設定できます。
+```
+
+※ パスの推測・ハードコード禁止。
+※ ディレクトリが存在しなければ `mkdir -p` で作成すること。
 
 ## ファイル名
 

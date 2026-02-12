@@ -2,41 +2,40 @@
 name: workspace-list
 description: ワークスペース内のプロジェクト一覧と状態を表示する。
 disable-model-invocation: true
-allowed-tools: Bash(git *, readlink *, ls *, test *), Glob
+allowed-tools: Read, Bash(git *, readlink *, ls *, test *), Glob
 ---
 
 # ワークスペース一覧
 
-`WORKSPACE_DIR` 内のプロジェクトを一覧し、git の状態を表示する。読み取り専用。
+ワークスペース内のプロジェクトを一覧し、git の状態を表示する。読み取り専用。
 
 ## 前提条件
 
-- 環境変数 `WORKSPACE_DIR` が設定されていること
-- 未設定の場合は以下を案内して終了：
+設定ファイル `$HOME/.claude/config.json` の `workspace_dir` の値をワークスペースパスとして使う。
+
+パスの取得手順:
+1. `$HOME/.claude/config.json` を Read ツールで読み込む
+2. JSON から `workspace_dir` の値を取得する（値は絶対パス）
+
+※ `workspace_dir` キーが存在しない場合は以下を案内して終了：
 
 ```
-WORKSPACE_DIR が設定されていません。
-環境変数に以下を追加してください：
+workspace_dir が設定されていません。
+~/.claude/config.json に以下を追加してください：
 
-  export WORKSPACE_DIR="~/workspace"
+  "workspace_dir": "/path/to/workspace"
+
+chezmoi を使っている場合は `chezmoi init` で設定できます。
 ```
 
 ## 処理フロー
 
-### 1. ワークスペースディレクトリの解決
+### 1. プロジェクトの列挙
 
-チルダ展開して実パスを取得する：
-
-```bash
-WORKSPACE_DIR="${WORKSPACE_DIR/#\~/$HOME}"
-```
-
-### 2. プロジェクトの列挙
-
-`$WORKSPACE_DIR/` 直下のディレクトリを `ls` で取得する。
+`{workspace_dir}/` 直下のディレクトリを `ls` で取得する。
 0 件の場合は「プロジェクトがありません」と案内して終了。
 
-### 3. 各プロジェクトの情報取得
+### 2. 各プロジェクトの情報取得
 
 各ディレクトリについて以下を取得する：
 
@@ -54,7 +53,7 @@ WORKSPACE_DIR="${WORKSPACE_DIR/#\~/$HOME}"
 - symlink 先が存在しない → プロジェクト名の後に「（リンク切れ）」と表示し、他の項目は `—`
 - git リポジトリでないディレクトリ → ブランチ・変更・最終コミットは `—`
 
-### 4. 一覧の表示
+### 3. 一覧の表示
 
 以下の形式で表示する：
 

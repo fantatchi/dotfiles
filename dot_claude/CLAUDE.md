@@ -40,7 +40,7 @@
 作業ログは Obsidian Vault に記録する。
 
 前提条件：
-- 環境変数 `OBSIDIAN_VAULT` が設定されていること
+- `~/.claude/config.json` に `obsidian_vault` が設定されていること
 - 設定されていない場合は機能を使用せず、設定方法を案内すること
 
 ルール：

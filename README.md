@@ -17,8 +17,8 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply fantatchi
 | 質問 | 説明 |
 |------|------|
 | GitHub MCP を使うか | Claude Code から GitHub API を使う場合は y → PAT を入力 |
-| Obsidian 連携を使うか | 作業ログを Obsidian に記録する場合は y |
-| ワークスペース管理を使うか | プロジェクト一覧・登録機能を使う場合は y |
+| Obsidian Vault のパス | 作業ログを Obsidian に記録する場合はパスを入力 |
+| ワークスペースのパス | プロジェクト一覧・登録機能を使う場合はパスを入力 |
 
 セットアップ後、tmux 内で `prefix + I` を実行してプラグインをインストール。
 
@@ -29,7 +29,7 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply fantatchi
 | zsh | `.zshrc`, `.zsh/` | oh-my-zsh（プラグイン: git のみ） |
 | vim | `.vimrc`, `.vim/` | プラグインレス |
 | tmux | `.tmux.conf` | TPM でプラグイン管理 |
-| Claude Code | `.claude/` | 設定・スキル |
+| Claude Code | `.claude/` | 設定・スキル・config.json |
 
 ## 環境別設定
 
@@ -38,10 +38,10 @@ zsh の場合は `~/.zshrc.local`（`.zshrc` から自動読み込み）が使�
 
 ```bash
 # 環境変数の設定例
-export OBSIDIAN_VAULT="~/ObsidianVault"
-export WORKSPACE_DIR="~/workspace"
 export MAX_THINKING_TOKENS=31999
 ```
+
+Obsidian Vault やワークスペースのパスは `~/.claude/config.json` で管理する（`chezmoi init` で設定）。
 
 ## オプション機能
 
@@ -84,15 +84,28 @@ Claude Code の作業内容を Obsidian Vault に自動・手動で記録する�
 
 **セットアップ:**
 
-1. `chezmoi init` で「Obsidian 連携を使いますか」に `y` と回答する（既に回答済みなら不要）
-2. 環境変数 `OBSIDIAN_VAULT` に Vault のパスを設定する：
+`chezmoi init` で「Obsidian Vault のパス」を入力する（既に設定済みなら不要）。
+設定は `~/.claude/config.json` に保存される。
+
+chezmoi を使わない場合は、手動で `~/.claude/config.json` を作成する：
+
+```json
+{
+  "obsidian_vault": "/path/to/your/vault"
+}
+```
+
+WSL から Windows 側の Vault を使う場合はシンボリックリンク経由のパスを指定：
 
 ```bash
-export OBSIDIAN_VAULT="/path/to/your/vault"
+# シンボリックリンクを作成
+ln -s /mnt/c/Users/<username>/ObsidianVault ~/ObsidianVault
+```
 
-# WSL から Windows 側の Vault を使う場合はシンボリックリンク経由で指定
-# ln -s /mnt/c/Users/<username>/ObsidianVault ~/ObsidianVault
-# export OBSIDIAN_VAULT="$HOME/ObsidianVault"
+```json
+{
+  "obsidian_vault": "/home/<username>/ObsidianVault"
+}
 ```
 
 **使い方:**
@@ -122,11 +135,11 @@ export OBSIDIAN_VAULT="/path/to/your/vault"
 
 **仕組み:**
 
-`WORKSPACE_DIR` に指定したディレクトリの直下に、各プロジェクトへの symlink を配置する。
+`workspace_dir` に指定したディレクトリの直下に、各プロジェクトへの symlink を配置する。
 実際のプロジェクトはどこにあってもよく、symlink で一元管理する。
 
 ```
-~/workspace/              ← WORKSPACE_DIR
+~/workspace/              ← workspace_dir
   ├── project-a/          ← 実体（直接配置）
   ├── project-b → /path/to/project-b   ← symlink（別の場所にあるプロジェクト）
   └── project-c → /path/to/project-c   ← symlink
@@ -134,14 +147,17 @@ export OBSIDIAN_VAULT="/path/to/your/vault"
 
 **セットアップ:**
 
-1. `chezmoi init` で「ワークスペース管理を使いますか」に `y` と回答する（既に回答済みなら不要）
-2. 環境変数 `WORKSPACE_DIR` にワークスペースのパスを設定する：
+1. `chezmoi init` で「ワークスペースのパス」を入力する（既に設定済みなら不要）
 
-```bash
-export WORKSPACE_DIR="~/workspace"
-```
+   chezmoi を使わない場合は、手動で `~/.claude/config.json` に追加する：
 
-3. プロジェクトのディレクトリで `/workspace-setup` を実行して登録する：
+   ```json
+   {
+     "workspace_dir": "/path/to/workspace"
+   }
+   ```
+
+2. プロジェクトのディレクトリで `/workspace-setup` を実行して登録する：
 
 ```
 $ cd /path/to/my-project
