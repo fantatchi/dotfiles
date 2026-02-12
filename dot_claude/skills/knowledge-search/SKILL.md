@@ -1,6 +1,6 @@
 ---
 name: knowledge-search
-description: Obsidian Vault内のClaudeナレッジ（ログ・リソース・コンテキスト・ブログ下書き）を横断検索する。
+description: Obsidian Vault内のClaudeナレッジ（ログ・リソース・ブログ下書き）を横断検索する。
 argument-hint: <query>
 disable-model-invocation: true
 allowed-tools: Read, Glob, Grep, Bash(echo *), Bash(ls *)
