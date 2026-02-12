@@ -1,0 +1,16 @@
+{{- if ne .chezmoi.os "windows" -}}
+{{- /* Linux では実行しない（空出力でスキップ） */ -}}
+{{- else -}}
+Write-Host "=== Claude Code hook の依存チェック (Windows) ==="
+
+# BurntToast モジュール（トースト通知用）
+if (Get-Module -ListAvailable -Name BurntToast) {
+    Write-Host "  [OK] BurntToast"
+} else {
+    Write-Host "  [INSTALL] BurntToast"
+    Install-Module -Name BurntToast -Force -Scope CurrentUser
+}
+
+Write-Host ""
+Write-Host "依存チェック完了"
+{{ end -}}

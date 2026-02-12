@@ -22,30 +22,5 @@
     "document-skills@anthropic-agent-skills": true
   },
   "alwaysThinkingEnabled": true,
-  "hooks": {
-    "PreCompact": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$HOME\"/.claude/scripts/obsidian-log-hook.sh",
-            "timeout": 30,
-            "statusMessage": "作業ログを自動記録中..."
-          }
-        ]
-      }
-    ],
-    "SessionEnd": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$HOME\"/.claude/scripts/context-save-hook.sh",
-            "timeout": 30,
-            "statusMessage": "コンテキストを自動保存中..."
-          }
-        ]
-      }
-    ]
-  }
+  "hooks": {}
 }
