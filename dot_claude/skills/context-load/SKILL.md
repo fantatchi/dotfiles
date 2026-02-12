@@ -12,9 +12,9 @@ allowed-tools: Read, Glob, Grep, Bash(git *), Bash(echo *), Bash(basename *), Ba
 
 ## 読み込み元
 
-`$OBSIDIAN_VAULT/_ClaudeContext/{project-id}.md`
+`~/.claude/context/{project-id}.md`
 
-※ **必ず `echo "${OBSIDIAN_VAULT/#\~/$HOME}"` で実パスを取得**すること（チルダが `$HOME` に展開される）。
+※ 読み込み時は `$HOME/.claude/context/` を使うこと。
 
 ## プロジェクトの選択
 
@@ -24,16 +24,16 @@ allowed-tools: Read, Glob, Grep, Bash(git *), Bash(echo *), Bash(basename *), Ba
 以下の順で部分一致検索する：
 
 1. `~/CLAUDE.local.md` のプロジェクト一覧テーブルのプロジェクト名
-2. `_ClaudeContext/` 内の既存ファイル名
+2. `~/.claude/context/` 内の既存ファイル名
 
 一意に特定できればそのまま読み込む（例: `ict` → `ict-pf.md`）。
 複数マッチした場合は候補を AskUserQuestion で提示する。
 
 ### 引数なし
 
-`~/CLAUDE.local.md` のプロジェクト一覧テーブルからプロジェクト候補を取得し、`_ClaudeContext/` 内に対応するコンテキストファイルが存在するものを AskUserQuestion の選択肢として提示する。
+`~/CLAUDE.local.md` のプロジェクト一覧テーブルからプロジェクト候補を取得し、`~/.claude/context/` 内に対応するコンテキストファイルが存在するものを AskUserQuestion の選択肢として提示する。
 
-- `~/CLAUDE.local.md` が存在しない場合は `_ClaudeContext/` 一覧にフォールバック
+- `~/CLAUDE.local.md` が存在しない場合は `~/.claude/context/` 一覧にフォールバック
 - 各コンテキストファイルの frontmatter から `project`、`updated`、`branch` を読み取り、選択肢のラベルと説明に使う
 - 例: `ict-pf` — 最終更新: 2025-02-10, ブランチ: feature/xxx
 - git リポジトリ内にいる場合は、現在のリポジトリに対応するプロジェクトを推奨（選択肢の先頭に配置）
@@ -43,7 +43,7 @@ allowed-tools: Read, Glob, Grep, Bash(git *), Bash(echo *), Bash(basename *), Ba
 
 ### 1. コンテキストファイルの読み込み
 
-`_ClaudeContext/{project-id}.md` を読み込み、内容を把握する。
+`$HOME/.claude/context/{project-id}.md` を読み込み、内容を把握する。
 
 ### 2. 関連ログの検索
 

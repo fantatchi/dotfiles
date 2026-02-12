@@ -16,7 +16,6 @@ Obsidian Vault 内の Claude ナレッジを横断検索する。
 
 - `_ClaudeLogs/` — 作業ログ
 - `_ClaudeResources/` — 調査・参考資料
-- `_ClaudeContext/` — プロジェクトコンテキスト
 - `_BlogDrafts/` — ブログ下書き
 
 ※ **必ず `echo "${OBSIDIAN_VAULT/#\~/$HOME}"` で実パスを取得**すること（チルダが `$HOME` に展開される）。
@@ -68,10 +67,10 @@ Obsidian Vault 内の Claude ナレッジを横断検索する。
 ```
 ## 検索結果: {query}
 
-{N} 件見つかりました（対象: _ClaudeLogs, _ClaudeResources, _ClaudeContext, _BlogDrafts）
+{N} 件見つかりました（対象: _ClaudeLogs, _ClaudeResources, _BlogDrafts）
 
 ### 1. {ファイル名}
-- **種別**: ログ / リソース / コンテキスト / ブログ
+- **種別**: ログ / リソース / ブログ
 - **日付**: YYYY-MM-DD
 - **タグ**: #tag1, #tag2
 - **概要**: （ファイルの概要セクションまたはマッチ箇所の抜粋）

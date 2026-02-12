@@ -84,10 +84,9 @@ allowed-tools: Read, Write, Edit, Bash(ln *), Bash(cmd *), Bash(uname *), Bash(r
 
 ### 7. 初期コンテキストの作成
 
-登録した各プロジェクトについて、`$OBSIDIAN_VAULT/_ClaudeContext/{project-name}.md` に初期コンテキストを作成する。
+登録した各プロジェクトについて、`~/.claude/context/{project-name}.md` に初期コンテキストを作成する。
 
 - 既にコンテキストファイルがあるプロジェクトはスキップ（上書きしない）
-- `echo "${OBSIDIAN_VAULT/#\~/$HOME}"` で実パスを取得（チルダ展開）。未設定ならこのステップをスキップ
 - ディレクトリが存在しなければ `mkdir -p` で作成
 - 内容は `~/.claude/skills/context-save/template.md` に準拠し、最低限の情報（プロジェクト名、説明、git 情報があれば取得）を埋める
 
