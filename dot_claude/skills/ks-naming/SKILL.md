@@ -1,5 +1,5 @@
 ---
-name: naming
+name: ks-naming
 description: 日本語から土木業界向けの識別子名（変数・クラス・関数・型など）を生成する。命名規則や名前の相談、「この日本語を変数名にしたい」「クラス名どうする？」といった質問に使う。
 argument-hint: [日本語の用語や概念]
 allowed-tools: Read, Grep, Glob, WebFetch, WebSearch

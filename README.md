@@ -77,7 +77,7 @@ export MAX_THINKING_TOKENS=31999
 | `/context-load` | 保存済みコンテキストを読み込み復帰 |
 | `/context-list` | 保存済みコンテキストの一覧表示 |
 | `/review` | コーディング規約に基づくコードレビュー |
-| `/naming` | 日本語から識別子名（変数・クラス等）を生成 |
+| `/ks-naming` | KS-Value 向け：日本語から識別子名を生成 |
 
 ### Obsidian 連携
 
