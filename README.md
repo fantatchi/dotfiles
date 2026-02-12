@@ -77,6 +77,7 @@ export MAX_THINKING_TOKENS=31999
 | `/context-load` | 保存済みコンテキストを読み込み復帰 |
 | `/context-list` | 保存済みコンテキストの一覧表示 |
 | `/workspace-list` | ワークスペース内のプロジェクト一覧と状態表示 |
+| `/workspace-setup` | プロジェクトをワークスペースに登録 |
 | `/ks-review` | KS-Value 向け：コーディング規約に基づくコードレビュー |
 | `/ks-naming` | KS-Value 向け：日本語から識別子名を生成 |
 
