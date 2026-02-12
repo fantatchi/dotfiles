@@ -14,7 +14,8 @@ allowed-tools: Read, Glob, Grep, Bash(git *), Bash(echo *), Bash(basename *), Ba
 
 `~/.claude/context/{project-id}.md`
 
-※ 読み込み時は `$HOME/.claude/context/` を使うこと。
+- 読み込み時は `$HOME/.claude/context/` を使うこと
+- **ファイル名（拡張子なし）がプロジェクト ID の正**。frontmatter の `project` ではなくファイル名で識別する
 
 ## プロジェクトの選択
 

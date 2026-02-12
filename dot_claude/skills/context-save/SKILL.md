@@ -16,7 +16,8 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git *), Bash(echo *), Bash(mkdir *)
 
 `~/.claude/context/{project-id}.md`（上書き保存）
 
-※ 書き出し時は `$HOME/.claude/context/` を使うこと。ディレクトリが存在しなければ `mkdir -p` で作成すること。
+- 書き出し時は `$HOME/.claude/context/` を使うこと。ディレクトリが存在しなければ `mkdir -p` で作成すること
+- **ファイル名（拡張子なし）がプロジェクト ID の正**。frontmatter の `project` もファイル名と一致させること
 
 ## プロジェクトの選択
 

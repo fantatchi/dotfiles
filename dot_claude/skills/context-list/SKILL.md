@@ -44,3 +44,4 @@ allowed-tools: Read, Glob, Bash(ls *)
 ## 注意事項
 
 - 読み込み専用。ファイルを変更しない
+- **ファイル名（拡張子なし）がプロジェクト ID の正**。frontmatter の `project` ではなくファイル名を表示する
