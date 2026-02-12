@@ -72,7 +72,7 @@ export MAX_THINKING_TOKENS=31999
 |----------|------|
 | `/obsidian-log` | 作業履歴を Obsidian に記録（自動記録にも対応） |
 | `/obsidian-resource` | 調査結果・参考リンクを Obsidian に保存 |
-| `/obsidian-blog` | 技術ブログのドラフトを作成 |
+| `/obsidian-blog` | ブログ記事のドラフトを作成 |
 | `/knowledge-search` | Obsidian 内のナレッジを横断検索 |
 | `/context-save` | プロジェクトの作業状態を保存 |
 | `/context-load` | 保存済みコンテキストを読み込み復帰 |
