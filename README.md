@@ -33,19 +33,15 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply fantatchi
 
 ## 環境別設定
 
-マシンごとに異なる設定は `~/.zshrc.local` に記述する（chezmoi 管理外）。
+マシンごとに異なる環境変数は、シェルの設定ファイルに記述する（chezmoi 管理外）。
+zsh の場合は `~/.zshrc.local`（`.zshrc` から自動読み込み）が使える。
 
 ```bash
-# ~/.zshrc.local の例
+# 環境変数の設定例
 export OBSIDIAN_VAULT="~/ObsidianVault"
+export WORKSPACE_DIR="~/workspace"
 export MAX_THINKING_TOKENS=31999
-
-# Volta（Node.js バージョン管理）
-export VOLTA_HOME="$HOME/.volta"
-export PATH="$VOLTA_HOME/bin:$PATH"
 ```
-
-このファイルは `.zshrc` から自動的に読み込まれる。
 
 ## オプション機能
 
@@ -61,7 +57,6 @@ export PATH="$VOLTA_HOME/bin:$PATH"
 **ultrathink（最大の思考深度）を使う場合:**
 
 ```bash
-# ~/.zshrc.local に追記
 export MAX_THINKING_TOKENS=31999
 ```
 
@@ -93,15 +88,12 @@ Claude Code の作業内容を Obsidian Vault に自動・手動で記録する�
 2. 環境変数 `OBSIDIAN_VAULT` に Vault のパスを設定する：
 
 ```bash
-# 環境変数に追加（~/.zshrc.local や ~/.bashrc など）
 export OBSIDIAN_VAULT="/path/to/your/vault"
-```
 
-> **WSL の場合:** Windows 側の Vault を使うにはシンボリックリンクを作成する：
-> ```bash
-> ln -s /mnt/c/Users/<username>/ObsidianVault ~/ObsidianVault
-> export OBSIDIAN_VAULT="$HOME/ObsidianVault"
-> ```
+# WSL から Windows 側の Vault を使う場合はシンボリックリンク経由で指定
+# ln -s /mnt/c/Users/<username>/ObsidianVault ~/ObsidianVault
+# export OBSIDIAN_VAULT="$HOME/ObsidianVault"
+```
 
 **使い方:**
 
@@ -146,7 +138,6 @@ export OBSIDIAN_VAULT="/path/to/your/vault"
 2. 環境変数 `WORKSPACE_DIR` にワークスペースのパスを設定する：
 
 ```bash
-# 環境変数に追加（~/.zshrc.local や ~/.bashrc など）
 export WORKSPACE_DIR="~/workspace"
 ```
 
