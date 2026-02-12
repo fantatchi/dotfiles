@@ -83,6 +83,7 @@ export OBSIDIAN_VAULT="/path/to/your/vault"
 |----------|--------|------|
 | `/obsidian-log` | `$OBSIDIAN_VAULT/_claude/log/` | 作業履歴を記録 |
 | `/obsidian-resource` | `$OBSIDIAN_VAULT/_claude/resource/` | 調査結果をメモ |
+| `/obsidian-blog` | `$OBSIDIAN_VAULT/_claude/blog/` | ブログドラフト作成 |
 
 自動ロギング機能もあり（詳細は `CLAUDE.md` 参照）。
 
