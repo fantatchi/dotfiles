@@ -81,8 +81,8 @@ export OBSIDIAN_VAULT="/path/to/your/vault"
 
 | コマンド | 保存先 | 説明 |
 |----------|--------|------|
-| `/obsidian-log` | `$OBSIDIAN_VAULT/_ClaudeLogs/` | 作業履歴を記録 |
-| `/obsidian-resource` | `$OBSIDIAN_VAULT/_ClaudeResources/` | 調査結果をメモ |
+| `/obsidian-log` | `$OBSIDIAN_VAULT/_Claude/log/` | 作業履歴を記録 |
+| `/obsidian-resource` | `$OBSIDIAN_VAULT/_Claude/resource/` | 調査結果をメモ |
 
 自動ロギング機能もあり（詳細は `CLAUDE.md` 参照）。
 
