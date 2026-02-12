@@ -45,4 +45,3 @@ allowed-tools: Read, Glob, Bash(echo *), Bash(ls *)
 ## 注意事項
 
 - 読み込み専用。ファイルを変更しない
-- `OBSIDIAN_VAULT` が未設定の場合はプロジェクト一覧のみ表示し、コンテキスト列はすべて `?` とする
