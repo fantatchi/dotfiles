@@ -77,15 +77,29 @@ Claude Code の作業ログを Obsidian Vault に記録する機能。
 export OBSIDIAN_VAULT="/path/to/your/vault"
 ```
 
-**スキル:**
+**Obsidian スキル:**
 
 | コマンド | 保存先 | 説明 |
 |----------|--------|------|
-| `/obsidian-log` | `$OBSIDIAN_VAULT/_claude/log/` | 作業履歴を記録 |
-| `/obsidian-resource` | `$OBSIDIAN_VAULT/_claude/resource/` | 調査結果をメモ |
-| `/obsidian-blog` | `$OBSIDIAN_VAULT/_claude/blog/` | ブログドラフト作成 |
+| `/obsidian-log` | `_claude/log/` | 作業履歴を記録（自動記録にも対応） |
+| `/obsidian-resource` | `_claude/resource/` | 調査結果・参考リンクをメモ |
+| `/obsidian-blog` | `_claude/blog/` | 技術ブログのドラフト作成 |
+| `/knowledge-search` | — | Vault 内のログ・リソース・ブログを横断検索 |
 
-自動ロギング機能もあり（詳細は `CLAUDE.md` 参照）。
+### スキル一覧
+
+| コマンド | 説明 |
+|----------|------|
+| `/obsidian-log` | 作業履歴を Obsidian に記録 |
+| `/obsidian-resource` | 調査結果・参考リンクを Obsidian に保存 |
+| `/obsidian-blog` | 技術ブログのドラフトを作成 |
+| `/knowledge-search` | Obsidian 内のナレッジを横断検索 |
+| `/context-save` | プロジェクトの作業状態を保存 |
+| `/context-load` | 保存済みコンテキストを読み込み復帰 |
+| `/context-list` | プロジェクトとコンテキストの一覧表示 |
+| `/workspace-init` | ワークスペースを初期化し `CLAUDE.local.md` を生成 |
+| `/review` | コーディング規約に基づくコードレビュー |
+| `/naming` | 日本語から識別子名（変数・クラス等）を生成 |
 
 ## chezmoi の使い方
 
