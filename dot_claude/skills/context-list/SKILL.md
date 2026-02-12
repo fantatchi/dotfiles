@@ -1,45 +1,44 @@
 ---
 name: context-list
-description: 管理中のプロジェクトとコンテキストの保存状態を一覧表示する。
+description: 保存済みコンテキストの一覧を表示する。
 disable-model-invocation: true
-allowed-tools: Read, Glob, Bash(echo *), Bash(ls *)
+allowed-tools: Read, Glob, Bash(ls *)
 ---
 
 # コンテキスト一覧
 
-管理中のプロジェクトとコンテキストの保存状態を一覧表示する。
+保存済みコンテキストの一覧を表示する。
 
 ## データソース
 
-1. **プロジェクト一覧**: `~/CLAUDE.local.md` のプロジェクト一覧テーブル
-2. **コンテキストファイル**: `$HOME/.claude/context/*.md`
+`$HOME/.claude/context/*.md`
 
 ## 処理フロー
 
-### 1. プロジェクト一覧の取得
+### 1. コンテキストファイルの取得
 
-`~/CLAUDE.local.md` を読み込み、プロジェクト一覧テーブルをパースする。
-ファイルが存在しない場合は「`~/CLAUDE.local.md` が見つかりません。`/workspace-init` で初期化してください」と案内して終了。
+`$HOME/.claude/context/` 内の `.md` ファイルを Glob で取得する。
+ファイルが 0 件の場合は「保存済みコンテキストがありません」と案内して終了。
 
-### 2. コンテキストファイルの照合
+### 2. frontmatter の読み取り
 
-各プロジェクトについて `$HOME/.claude/context/{project-name}.md` の存在を確認する。
-存在する場合は frontmatter から以下を読み取る：
+各ファイルの frontmatter から以下を読み取る：
 
+- `project`: プロジェクト識別子
 - `updated`: 最終更新日時
 - `branch`: ブランチ名
 
 ### 3. 一覧の表示
 
-以下の形式で表示する：
+`updated` の新しい順に以下の形式で表示する：
 
 ```
 ## コンテキスト一覧
 
-| プロジェクト | コンテキスト | 最終更新 | ブランチ |
-|---|---|---|---|
-| ict-pf | ✓ | 2025-02-10 15:30 | feature/xxx |
-| cloud-education-syllabus | — | — | — |
+| プロジェクト | 最終更新 | ブランチ |
+|---|---|---|
+| dotfiles | 2026-02-12 11:11 | master |
+| ict-pf | 2026-02-10 15:41 | — |
 ```
 
 ## 注意事項

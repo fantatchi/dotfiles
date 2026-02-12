@@ -64,7 +64,6 @@
 - `/context-save` — 現在のプロジェクトコンテキストを保存
 - `/context-load` — 保存済みコンテキストを読み込み
 - `/knowledge-search` — Obsidian Vault 内のナレッジを横断検索
-- `/workspace-init` — ワークスペースを初期化
 
 ## 自動保存
 

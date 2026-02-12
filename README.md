@@ -76,8 +76,7 @@ export MAX_THINKING_TOKENS=31999
 | `/knowledge-search` | Obsidian 内のナレッジを横断検索 |
 | `/context-save` | プロジェクトの作業状態を保存 |
 | `/context-load` | 保存済みコンテキストを読み込み復帰 |
-| `/context-list` | プロジェクトとコンテキストの一覧表示 |
-| `/workspace-init` | ワークスペースを初期化し `CLAUDE.local.md` を生成 |
+| `/context-list` | 保存済みコンテキストの一覧表示 |
 | `/review` | コーディング規約に基づくコードレビュー |
 | `/naming` | 日本語から識別子名（変数・クラス等）を生成 |
 

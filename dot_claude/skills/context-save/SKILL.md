@@ -23,11 +23,7 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git *), Bash(echo *), Bash(mkdir *)
 ### 引数あり
 
 `$ARGUMENTS` で指定された値をプロジェクト識別子として使う。
-以下の順で部分一致検索する：
-
-1. `~/CLAUDE.local.md` のプロジェクト一覧テーブルのプロジェクト名
-2. `~/.claude/context/` 内の既存ファイル名
-
+`~/.claude/context/` 内の既存ファイル名で部分一致検索する。
 一意に特定できればそのまま使う。複数マッチした場合は候補を AskUserQuestion で提示する。
 該当なしの場合は新規プロジェクトとして作成する。
 
@@ -37,7 +33,7 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git *), Bash(echo *), Bash(mkdir *)
 
 1. **セッション中に `/context-load` で読み込んだプロジェクトがある場合** → そのプロジェクトをデフォルトとして提示（会話履歴から判断する）
 2. git リポジトリ内の場合 → リポジトリ名を推奨として提示
-3. 上記いずれでもない場合 → `~/CLAUDE.local.md` のプロジェクト一覧テーブルを AskUserQuestion で提示（テーブルが存在しない場合は `~/.claude/context/` 一覧にフォールバック）
+3. 上記いずれでもない場合 → `~/.claude/context/` 内の既存コンテキスト一覧を AskUserQuestion で提示
 
 いずれの場合も、別のプロジェクトを選べるよう一覧も選択肢に含める（新規作成も選べる）。
 新規作成が選ばれた場合 → プロジェクト名を通常のメッセージで聞く。

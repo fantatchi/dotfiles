@@ -21,19 +21,13 @@ allowed-tools: Read, Glob, Grep, Bash(git *), Bash(echo *), Bash(basename *), Ba
 ### 引数あり
 
 `$ARGUMENTS` で指定された値をプロジェクト識別子として使う。
-以下の順で部分一致検索する：
-
-1. `~/CLAUDE.local.md` のプロジェクト一覧テーブルのプロジェクト名
-2. `~/.claude/context/` 内の既存ファイル名
-
+`~/.claude/context/` 内の既存ファイル名で部分一致検索する。
 一意に特定できればそのまま読み込む（例: `ict` → `ict-pf.md`）。
 複数マッチした場合は候補を AskUserQuestion で提示する。
 
 ### 引数なし
 
-`~/CLAUDE.local.md` のプロジェクト一覧テーブルからプロジェクト候補を取得し、`~/.claude/context/` 内に対応するコンテキストファイルが存在するものを AskUserQuestion の選択肢として提示する。
-
-- `~/CLAUDE.local.md` が存在しない場合は `~/.claude/context/` 一覧にフォールバック
+`~/.claude/context/` 内のコンテキストファイル一覧を AskUserQuestion の選択肢として提示する。
 - 各コンテキストファイルの frontmatter から `project`、`updated`、`branch` を読み取り、選択肢のラベルと説明に使う
 - 例: `ict-pf` — 最終更新: 2025-02-10, ブランチ: feature/xxx
 - git リポジトリ内にいる場合は、現在のリポジトリに対応するプロジェクトを推奨（選択肢の先頭に配置）
