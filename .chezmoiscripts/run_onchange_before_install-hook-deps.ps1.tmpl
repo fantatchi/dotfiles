@@ -1,14 +1,32 @@
 {{- if ne .chezmoi.os "windows" -}}
-{{- /* Linux では実行しない（空出力でスキップ） */ -}}
+{{- /* Windows 以外では実行しない（空出力でスキップ） */ -}}
 {{- else -}}
-Write-Host "=== Claude Code hook の依存チェック (Windows) ==="
+Write-Host "=== Claude Code hook の依存チェック ==="
 
-# BurntToast モジュール（トースト通知用）
+# --- Windows 依存 ---
+Write-Host ""
+Write-Host "[Windows]"
+
 if (Get-Module -ListAvailable -Name BurntToast) {
     Write-Host "  [OK] BurntToast"
 } else {
     Write-Host "  [INSTALL] BurntToast"
     Install-Module -Name BurntToast -Force -Scope CurrentUser
+}
+
+# --- Linux 依存（WSL 環境のみ） ---
+if (Get-Command wsl -ErrorAction SilentlyContinue) {
+    Write-Host ""
+    Write-Host "[Linux via WSL]"
+
+    $jqCheck = wsl -- bash -c "command -v jq" 2>$null
+    if ($jqCheck) {
+        Write-Host "  [OK] jq"
+    } else {
+        Write-Host "  [INSTALL] jq"
+        wsl -- sudo apt-get update -qq
+        wsl -- sudo apt-get install -y -qq jq
+    }
 }
 
 Write-Host ""
