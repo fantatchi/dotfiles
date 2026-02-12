@@ -14,8 +14,8 @@
 ## コンテキストの共有
 
 このファイル（`~/CLAUDE.local.md`）は WSL と Windows でそれぞれ独立して管理する（パス形式が異なるため）。
-一方、`_ClaudeContext/` 内のコンテキストファイルは Obsidian Vault 経由で共有される。
-どちらの環境から `/context-save` しても同じファイルに書き込まれ、`/context-load` で復帰できる。
+コンテキストファイルは `~/.claude/context/` に保存される。
+`/context-save` で保存し、`/context-load` で復帰できる。
 
 ## 使い方
 

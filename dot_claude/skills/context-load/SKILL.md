@@ -47,7 +47,7 @@ allowed-tools: Read, Glob, Grep, Bash(git *), Bash(echo *), Bash(basename *), Ba
 
 ### 2. 関連ログの検索
 
-`_Claude/log/` 内から、このプロジェクトに関連する直近のログを検索する：
+`_claude/log/` 内から、このプロジェクトに関連する直近のログを検索する：
 
 - frontmatter の `project:` タグでマッチ
 - 直近 5 件まで取得し、最新のものから概要を確認

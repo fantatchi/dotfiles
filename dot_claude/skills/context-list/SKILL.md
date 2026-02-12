@@ -12,9 +12,7 @@ allowed-tools: Read, Glob, Bash(echo *), Bash(ls *)
 ## データソース
 
 1. **プロジェクト一覧**: `~/CLAUDE.local.md` のプロジェクト一覧テーブル
-2. **コンテキストファイル**: `$OBSIDIAN_VAULT/_ClaudeContext/*.md`
-
-※ **必ず `echo "${OBSIDIAN_VAULT/#\~/$HOME}"` で実パスを取得**すること（チルダが `$HOME` に展開される）。
+2. **コンテキストファイル**: `$HOME/.claude/context/*.md`
 
 ## 処理フロー
 
@@ -25,7 +23,7 @@ allowed-tools: Read, Glob, Bash(echo *), Bash(ls *)
 
 ### 2. コンテキストファイルの照合
 
-各プロジェクトについて `_ClaudeContext/{project-name}.md` の存在を確認する。
+各プロジェクトについて `$HOME/.claude/context/{project-name}.md` の存在を確認する。
 存在する場合は frontmatter から以下を読み取る：
 
 - `updated`: 最終更新日時

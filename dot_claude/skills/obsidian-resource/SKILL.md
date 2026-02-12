@@ -12,7 +12,7 @@ Claude に調べてもらった内容や、参考になるリソースを Obsidi
 
 ## 書き出し先
 
-`$OBSIDIAN_VAULT/_Claude/resource/`
+`$OBSIDIAN_VAULT/_claude/resource/`
 
 ※ 環境変数の存在は CLAUDE.md 側で担保済み。ただし書き出し時は **必ず `echo "${OBSIDIAN_VAULT/#\~/$HOME}"` で実パスを取得**し、そのパスを使うこと（チルダが `$HOME` に展開される。パスの推測・ハードコード禁止）。ディレクトリが存在しなければ `mkdir -p` で作成すること。
 
