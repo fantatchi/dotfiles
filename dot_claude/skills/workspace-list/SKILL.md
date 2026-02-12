@@ -1,5 +1,5 @@
 ---
-name: workspace
+name: workspace-list
 description: ワークスペース内のプロジェクト一覧と状態を表示する。
 disable-model-invocation: true
 allowed-tools: Bash(git *, readlink *, ls *, test *), Glob
