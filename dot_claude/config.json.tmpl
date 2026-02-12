@@ -3,17 +3,8 @@
 {{- if and (ne $obsidian "") (hasPrefix "~/" $obsidian) -}}
   {{- $obsidian = printf "%s%s" $home (trimPrefix "~" $obsidian) -}}
 {{- end -}}
-{{- $workspace := .workspace_dir -}}
-{{- if and (ne $workspace "") (hasPrefix "~/" $workspace) -}}
-  {{- $workspace = printf "%s%s" $home (trimPrefix "~" $workspace) -}}
-{{- end -}}
 {
-{{- if and (ne $obsidian "") (ne $workspace "") }}
-  "obsidian_vault": {{ $obsidian | quote }},
-  "workspace_dir": {{ $workspace | quote }}
-{{- else if ne $obsidian "" }}
+{{- if ne $obsidian "" }}
   "obsidian_vault": {{ $obsidian | quote }}
-{{- else if ne $workspace "" }}
-  "workspace_dir": {{ $workspace | quote }}
 {{- end }}
 }

@@ -1,10 +1,8 @@
 {{- $use_github_mcp := eq (lower (promptStringOnce . "use_github_mcp" "GitHub MCP を使いますか [y/N]")) "y" -}}
 {{- $obsidian_vault := promptStringOnce . "obsidian_vault" "Obsidian Vault のパス (Enter でスキップ)" -}}
-{{- $workspace_dir := promptStringOnce . "workspace_dir" "ワークスペースのパス (Enter でスキップ)" -}}
 [data]
   use_github_mcp = {{ $use_github_mcp }}
 {{- if $use_github_mcp }}
   github_token = {{ promptStringOnce . "github_token" "GitHub Personal Access Token" | quote }}
 {{- end }}
   obsidian_vault = {{ $obsidian_vault | quote }}
-  workspace_dir = {{ $workspace_dir | quote }}

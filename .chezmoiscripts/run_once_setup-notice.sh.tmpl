@@ -14,11 +14,7 @@ echo "  ~/.claude/config.json に以下が設定されます:"
 echo ""
 {{ if ne .obsidian_vault "" -}}
 echo "  obsidian_vault: {{ .obsidian_vault }}"
-{{ end -}}
-{{ if ne .workspace_dir "" -}}
-echo "  workspace_dir:  {{ .workspace_dir }}"
-{{ end -}}
-{{ if and (eq .obsidian_vault "") (eq .workspace_dir "") -}}
+{{ else -}}
 echo "  （オプション機能は未設定です）"
 {{ end -}}
 echo ""

@@ -18,7 +18,6 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply fantatchi
 |------|------|
 | GitHub MCP を使うか | Claude Code から GitHub API を使う場合は y → PAT を入力 |
 | Obsidian Vault のパス | 作業ログを Obsidian に記録する場合はパスを入力 |
-| ワークスペースのパス | プロジェクト一覧・登録機能を使う場合はパスを入力 |
 
 セットアップ後、tmux 内で `prefix + I` を実行してプラグインをインストール。
 
@@ -41,7 +40,7 @@ zsh の場合は `~/.zshrc.local`（`.zshrc` から自動読み込み）が使�
 export MAX_THINKING_TOKENS=31999
 ```
 
-Obsidian Vault やワークスペースのパスは `~/.claude/config.json` で管理する（`chezmoi init` で設定）。
+Obsidian Vault のパスは `~/.claude/config.json` で管理する（`chezmoi init` で設定）。
 
 ## オプション機能
 
@@ -72,8 +71,6 @@ export MAX_THINKING_TOKENS=31999
 | `/context-save` | プロジェクトの作業状態を保存 |
 | `/context-load` | 保存済みコンテキストを読み込み復帰 |
 | `/context-list` | 保存済みコンテキストの一覧表示 |
-| `/workspace-list` | ワークスペース内のプロジェクト一覧と状態表示 |
-| `/workspace-setup` | プロジェクトをワークスペースに登録 |
 | `/ks-review` | KS-Value 向け：コーディング規約に基づくコードレビュー |
 | `/ks-naming` | KS-Value 向け：日本語から識別子名を生成 |
 
@@ -127,65 +124,6 @@ ln -s /mnt/c/Users/<username>/ObsidianVault ~/ObsidianVault
 | `_claude/log/` | 作業履歴 |
 | `_claude/resource/` | 調査結果・参考資料 |
 | `_claude/blog/` | ブログドラフト |
-
-### ワークスペース管理
-
-複数のプロジェクトを 1 つのディレクトリにまとめて管理する機能。
-各プロジェクトの git ブランチ・未コミット変更・最終コミット日時を一覧で確認できる。
-
-**仕組み:**
-
-`workspace_dir` に指定したディレクトリの直下に、各プロジェクトへの symlink を配置する。
-実際のプロジェクトはどこにあってもよく、symlink で一元管理する。
-
-```
-~/workspace/              ← workspace_dir
-  ├── project-a/          ← 実体（直接配置）
-  ├── project-b → /path/to/project-b   ← symlink（別の場所にあるプロジェクト）
-  └── project-c → /path/to/project-c   ← symlink
-```
-
-**セットアップ:**
-
-1. `chezmoi init` で「ワークスペースのパス」を入力する（既に設定済みなら不要）
-
-   chezmoi を使わない場合は、手動で `~/.claude/config.json` に追加する：
-
-   ```json
-   {
-     "workspace_dir": "/path/to/workspace"
-   }
-   ```
-
-2. プロジェクトのディレクトリで `/workspace-setup` を実行して登録する：
-
-```
-$ cd /path/to/my-project
-$ claude
-> /workspace-setup
-
-✓ プロジェクトを登録しました
-
-  my-project → /path/to/my-project
-
-/workspace-list で一覧を確認できます。
-```
-
-**使い方:**
-
-| コマンド | 説明 |
-|----------|------|
-| `/workspace-setup` | カレントディレクトリのプロジェクトをワークスペースに登録 |
-| `/workspace-list` | 登録済みプロジェクトの一覧と git 状態を表示 |
-
-`/workspace-list` の出力例：
-
-```
-| プロジェクト | ブランチ | 変更 | 最終コミット | コンテキスト |
-|---|---|---|---|---|
-| project-a | main | — | 2026-02-12 | ✓ |
-| project-b → /path/to/project-b | feature/auth | 3 files | 2026-02-11 | — |
-```
 
 ## chezmoi の使い方
 
