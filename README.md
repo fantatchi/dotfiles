@@ -18,6 +18,7 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply fantatchi
 |------|------|
 | GitHub MCP を使うか | Claude Code から GitHub API を使う場合は y → PAT を入力 |
 | Obsidian 連携を使うか | 作業ログを Obsidian に記録する場合は y |
+| ワークスペース管理を使うか | プロジェクト一覧・登録機能を使う場合は y |
 
 セットアップ後、tmux 内で `prefix + I` を実行してプラグインをインストール。
 
