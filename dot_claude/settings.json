@@ -38,7 +38,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo '【自動保存】セッションが終了します。git リポジトリ内で作業していた場合は /context-save でコンテキストを保存してください。保存すべき内容がなければ何もしなくて構いません。'"
+            "command": "$HOME/.claude/scripts/context-save-hook.sh"
           }
         ]
       }
