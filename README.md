@@ -84,22 +84,101 @@ export MAX_THINKING_TOKENS=31999
 
 ### Obsidian 連携
 
-Claude Code の作業ログを Obsidian Vault に記録する機能。
+Claude Code の作業内容を Obsidian Vault に自動・手動で記録する機能。
+作業ログ、調査メモ、ブログドラフトを Vault 内に Markdown で保存し、Obsidian のタグやリンク機能で後から振り返れる。
 
 **セットアップ:**
 
+1. `chezmoi init` で「Obsidian 連携を使いますか」に `y` と回答する（既に回答済みなら不要）
+2. 環境変数 `OBSIDIAN_VAULT` に Vault のパスを設定する：
+
 ```bash
-# ~/.zshrc.local に追記
+# 環境変数に追加（~/.zshrc.local や ~/.bashrc など）
 export OBSIDIAN_VAULT="/path/to/your/vault"
 ```
 
-**保存先フォルダ:**
+> **WSL の場合:** Windows 側の Vault を使うにはシンボリックリンクを作成する：
+> ```bash
+> ln -s /mnt/c/Users/<username>/ObsidianVault ~/ObsidianVault
+> export OBSIDIAN_VAULT="$HOME/ObsidianVault"
+> ```
+
+**使い方:**
+
+| コマンド | 説明 | 使いどころ |
+|----------|------|------------|
+| `/obsidian-log` | 作業履歴を記録 | セッションの区切りに。「今日の作業を記録して」でも OK |
+| `/obsidian-resource` | 調査結果・参考リンクを保存 | 「この調査結果をメモして」 |
+| `/obsidian-blog` | ブログ記事のドラフトを作成 | テーマ指定 or `auto` でセッション内容から自動生成 |
+
+**自動記録:**
+
+コンテキストが圧縮される直前に、Claude が未記録の作業内容を自動で `/obsidian-log` に記録する。長いセッションでもログが漏れない。
+
+**保存先フォルダ（自動作成される）:**
 
 | フォルダ | 内容 |
 |----------|------|
-| `$OBSIDIAN_VAULT/_claude/log/` | 作業履歴 |
-| `$OBSIDIAN_VAULT/_claude/resource/` | 調査結果・参考資料 |
-| `$OBSIDIAN_VAULT/_claude/blog/` | ブログドラフト |
+| `_claude/log/` | 作業履歴 |
+| `_claude/resource/` | 調査結果・参考資料 |
+| `_claude/blog/` | ブログドラフト |
+
+### ワークスペース管理
+
+複数のプロジェクトを 1 つのディレクトリにまとめて管理する機能。
+各プロジェクトの git ブランチ・未コミット変更・最終コミット日時を一覧で確認できる。
+
+**仕組み:**
+
+`WORKSPACE_DIR` に指定したディレクトリの直下に、各プロジェクトへの symlink を配置する。
+実際のプロジェクトはどこにあってもよく、symlink で一元管理する。
+
+```
+~/workspace/              ← WORKSPACE_DIR
+  ├── project-a/          ← 実体（直接配置）
+  ├── project-b → /path/to/project-b   ← symlink（別の場所にあるプロジェクト）
+  └── project-c → /path/to/project-c   ← symlink
+```
+
+**セットアップ:**
+
+1. `chezmoi init` で「ワークスペース管理を使いますか」に `y` と回答する（既に回答済みなら不要）
+2. 環境変数 `WORKSPACE_DIR` にワークスペースのパスを設定する：
+
+```bash
+# 環境変数に追加（~/.zshrc.local や ~/.bashrc など）
+export WORKSPACE_DIR="~/workspace"
+```
+
+3. プロジェクトのディレクトリで `/workspace-setup` を実行して登録する：
+
+```
+$ cd /path/to/my-project
+$ claude
+> /workspace-setup
+
+✓ プロジェクトを登録しました
+
+  my-project → /path/to/my-project
+
+/workspace-list で一覧を確認できます。
+```
+
+**使い方:**
+
+| コマンド | 説明 |
+|----------|------|
+| `/workspace-setup` | カレントディレクトリのプロジェクトをワークスペースに登録 |
+| `/workspace-list` | 登録済みプロジェクトの一覧と git 状態を表示 |
+
+`/workspace-list` の出力例：
+
+```
+| プロジェクト | ブランチ | 変更 | 最終コミット | コンテキスト |
+|---|---|---|---|---|
+| project-a | main | — | 2026-02-12 | ✓ |
+| project-b → /path/to/project-b | feature/auth | 3 files | 2026-02-11 | — |
+```
 
 ## chezmoi の使い方
 
@@ -148,10 +227,3 @@ Vault 本体は Windows の `C:\Users\<username>\ObsidianVault` に配置。
 - OneDrive で PC 間同期
 - メモの同期は Obsidian の git 拡張機能
 - `.obsidian` フォルダは各環境にコピー
-
-**WSL からのアクセス:**
-
-```bash
-ln -s /mnt/c/Users/<username>/ObsidianVault ~/ObsidianVault
-export OBSIDIAN_VAULT="$HOME/ObsidianVault"
-```
