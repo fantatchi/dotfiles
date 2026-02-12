@@ -22,5 +22,52 @@
     "document-skills@anthropic-agent-skills": true
   },
   "alwaysThinkingEnabled": true,
-  "hooks": {}
+  "hooks": {
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"require(require('os').homedir()+'/.claude/scripts/run-hook.js')('obsidian-log-hook')\"",
+            "timeout": 30,
+            "statusMessage": "作業ログを自動記録中..."
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"require(require('os').homedir()+'/.claude/scripts/run-hook.js')('context-save-hook')\"",
+            "timeout": 30,
+            "statusMessage": "コンテキストを自動保存中..."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"require(require('os').homedir()+'/.claude/scripts/run-hook.js')('stop-hook')\""
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "permission_prompt",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"require(require('os').homedir()+'/.claude/scripts/run-hook.js')('notification-hook')\""
+          }
+        ]
+      }
+    ]
+  }
 }
