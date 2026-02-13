@@ -60,13 +60,15 @@ Claude を介さないため、セッション内容（対話記録・判断メ�
 
 # コンテキストの保存・復帰
 
+保存先はプロジェクトルートの `.claude/context.md`。
+
 ## 手動操作
 
-- `/context-save` — 現在のプロジェクトコンテキストを保存
-- `/context-load` — 保存済みコンテキストを読み込み
+- `/context-save` — 現在のプロジェクトコンテキストを `.claude/context.md` に保存
+- `/context-load` — `.claude/context.md` からコンテキストを読み込み
 
 ## 自動保存
 
-`SessionEnd`（セッション終了時・`/clear` 時）のフックがシェルスクリプト（`~/.claude/scripts/context-save-hook.sh`）を直接実行し、git 状態（ブランチ・コミット・未コミット変更）をコンテキストファイルに保存する。
+`SessionEnd`（セッション終了時・`/clear` 時）のフックがシェルスクリプト（`~/.claude/scripts/context-save-hook.sh`）を直接実行し、git 状態（ブランチ・コミット・未コミット変更）をプロジェクトルートの `.claude/context.md` に保存する。
 Claude を介さないため `/clear` やセッション終了時にも確実に動作する。
 ただしセッション知識（判断メモ・次のステップ等）は保存できないため、必要に応じて手動で `/context-save` を実行すること。

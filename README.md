@@ -68,9 +68,9 @@ export MAX_THINKING_TOKENS=31999
 | `/obsidian-log` | 作業履歴を Obsidian に記録（自動記録にも対応） |
 | `/obsidian-resource` | 調査結果・参考リンクを Obsidian に保存 |
 | `/obsidian-blog` | ブログ記事のドラフトを作成 |
-| `/context-save` | プロジェクトの作業状態を保存 |
-| `/context-load` | 保存済みコンテキストを読み込み復帰 |
-| `/context-list` | 保存済みコンテキストの一覧表示 |
+| `/context-save` | プロジェクトの作業状態を `.claude/context.md` に保存 |
+| `/context-load` | `.claude/context.md` からコンテキストを読み込み復帰 |
+| `/session-save` | 作業ログ記録とコンテキスト保存をまとめて実行 |
 | `/ks-review` | KS-Value 向け：コーディング規約に基づくコードレビュー |
 | `/ks-naming` | KS-Value 向け：日本語から識別子名を生成 |
 
