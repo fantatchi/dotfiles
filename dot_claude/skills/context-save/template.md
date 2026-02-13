@@ -1,5 +1,5 @@
 ---
-project: プロジェクト識別子
+project: リポジトリ名
 git_remote: https://github.com/user/repo.git
 branch: feature/xxx
 updated: YYYY-MM-DDTHH:mm:ss

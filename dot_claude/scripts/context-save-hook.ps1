@@ -10,8 +10,6 @@ $ErrorActionPreference = 'Stop'
 # stdin を消費して閉じる（フックが JSON を渡すが本スクリプトでは不要）
 try { $null = [Console]::In.ReadToEnd() } catch {}
 
-$ContextDir = Join-Path $HOME '.claude' 'context'
-
 # git リポジトリ外なら何もしない
 $null = git rev-parse --is-inside-work-tree 2>$null
 if ($LASTEXITCODE -ne 0) { exit 0 }
@@ -57,8 +55,9 @@ $Commits- **未コミットの変更**: $Uncommitted
 "@
 if ($StatusSection -ne '') { $StateSection += "`n$StatusSection" }
 
-if (-not (Test-Path $ContextDir)) { New-Item -ItemType Directory -Path $ContextDir -Force | Out-Null }
-$ContextFile = Join-Path $ContextDir "$ProjectId.md"
+$ClaudeDir = Join-Path $RepoRoot '.claude'
+if (-not (Test-Path $ClaudeDir)) { New-Item -ItemType Directory -Path $ClaudeDir -Force | Out-Null }
+$ContextFile = Join-Path $ClaudeDir 'context.md'
 
 # --- 既存ファイルの更新 ---
 if (Test-Path $ContextFile) {

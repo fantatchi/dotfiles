@@ -10,8 +10,6 @@ set -euo pipefail
 # フックは stdin に JSON を受け取るが、本スクリプトでは使わないので閉じる
 exec < /dev/null
 
-CONTEXT_DIR="${HOME}/.claude/context"
-
 # git リポジトリ外なら何もしない
 git rev-parse --is-inside-work-tree &>/dev/null || exit 0
 
@@ -49,8 +47,8 @@ STATE_SECTION="## 現在の状態
 ${COMMITS}- **未コミットの変更**: ${UNCOMMITTED}"
 [ -n "$STATUS_LINES" ] && STATE_SECTION="${STATE_SECTION}"$'\n'"${STATUS_LINES}"
 
-mkdir -p "$CONTEXT_DIR"
-CONTEXT_FILE="${CONTEXT_DIR}/${PROJECT_ID}.md"
+mkdir -p "${REPO_ROOT}/.claude"
+CONTEXT_FILE="${REPO_ROOT}/.claude/context.md"
 
 # --- 既存ファイルの更新 ---
 if [ -f "$CONTEXT_FILE" ]; then

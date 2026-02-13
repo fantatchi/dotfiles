@@ -1,9 +1,8 @@
 ---
 name: context-load
 description: 保存済みのプロジェクトコンテキストを読み込み、前回の作業状態を復帰する。セッション開始時に使う。
-argument-hint: [project-id]
 disable-model-invocation: true
-allowed-tools: Read, Glob, Grep, Bash(git *), Bash(echo *), Bash(basename *), Bash(ls *)
+allowed-tools: Read, Glob, Grep, Bash(git *), Bash(echo *), Bash(basename *)
 ---
 
 # コンテキスト読み込み
@@ -12,33 +11,22 @@ allowed-tools: Read, Glob, Grep, Bash(git *), Bash(echo *), Bash(basename *), Ba
 
 ## 読み込み元
 
-`~/.claude/context/{project-id}.md`
+プロジェクトルートの `.claude/context.md`
 
-- 読み込み時は `$HOME/.claude/context/` を使うこと
-- **ファイル名（拡張子なし）がプロジェクト ID の正**。frontmatter の `project` ではなくファイル名で識別する
+### プロジェクトルートの決定
 
-## プロジェクトの選択
+1. `git rev-parse --show-toplevel` でリポジトリルートを取得
+2. git リポジトリ外の場合は CWD をプロジェクトルートとする
 
-### 引数あり
+### ファイルが存在しない場合
 
-`$ARGUMENTS` で指定された値をプロジェクト識別子として使う。
-`~/.claude/context/` 内の既存ファイル名で部分一致検索する。
-一意に特定できればそのまま読み込む（例: `ict` → `ict-pf.md`）。
-複数マッチした場合は候補を AskUserQuestion で提示する。
-
-### 引数なし
-
-`~/.claude/context/` 内のコンテキストファイル一覧を AskUserQuestion の選択肢として提示する。
-- 各コンテキストファイルの frontmatter から `project`、`updated`、`branch` を読み取り、選択肢のラベルと説明に使う
-- 例: `ict-pf` — 最終更新: 2025-02-10, ブランチ: feature/xxx
-- git リポジトリ内にいる場合は、現在のリポジトリに対応するプロジェクトを推奨（選択肢の先頭に配置）
-- コンテキストファイルが存在するプロジェクトが 0 件の場合は「保存済みコンテキストがありません」と案内
+「コンテキストが保存されていません。`/context-save` で保存してください。」と案内して終了。
 
 ## 読み込み処理
 
 ### 1. コンテキストファイルの読み込み
 
-`$HOME/.claude/context/{project-id}.md` を読み込み、内容を把握する。
+`{project-root}/.claude/context.md` を読み込み、内容を把握する。
 
 ### 2. 現在の git 状態との比較
 
@@ -53,7 +41,7 @@ allowed-tools: Read, Glob, Grep, Bash(git *), Bash(echo *), Bash(basename *), Ba
 読み込んだ情報を整理して提示する：
 
 ```
-## 前回のコンテキスト: {project-id}
+## 前回のコンテキスト
 
 **最終更新**: YYYY-MM-DD HH:mm
 **ブランチ**: feature/xxx
@@ -67,7 +55,7 @@ allowed-tools: Read, Glob, Grep, Bash(git *), Bash(echo *), Bash(basename *), Ba
 ### 次のステップ
 （次のアクション）
 
-### ⚠️ 状態の変化（差分がある場合のみ）
+### 状態の変化（差分がある場合のみ）
 （差分の詳細）
 
 ```

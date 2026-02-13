@@ -1,9 +1,8 @@
 ---
 name: session-save
 description: セッションの作業ログ記録とコンテキスト保存をまとめて実行する。「作業を保存して」「セッション終わり」「まとめて保存」といった依頼で使う。
-argument-hint: [project-id]
 disable-model-invocation: true
-allowed-tools: Read, Write, Edit, Glob, Bash(git *), Bash(echo *), Bash(mkdir *), Bash(basename *), Bash(date *), Bash(ls *)
+allowed-tools: Read, Write, Edit, Glob, Bash(git *), Bash(echo *), Bash(mkdir *), Bash(basename *), Bash(date *)
 ---
 
 # セッション保存
@@ -16,18 +15,15 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git *), Bash(echo *), Bash(mkdir *)
 
 `../obsidian-log/SKILL.md` の手順に従って作業ログを記録する。
 
-- 書き出し先: `{obsidian_vault}/_claude/log/`
+- 書き出し先: `../obsidian-log/SKILL.md` に従う
 - フォーマット: `../obsidian-log/template.md` に従う
 - タグ: `claude-log` + 自動生成タグ
-- 引数が渡された場合でも、ログのタグには使わない（引数は context-save の project-id として扱う）
 
 ### ステップ 2: コンテキスト保存
 
 `../context-save/SKILL.md` の手順に従ってコンテキストを保存する。
 
-- 引数（`$ARGUMENTS`）があればプロジェクト識別子として使う
-- 引数がなければ context-save の「引数なし」フローに従う
-- 書き出し先: `$HOME/.claude/context/{project-id}.md`
+- 書き出し先: プロジェクトルートの `.claude/context.md`
 - フォーマット: `../context-save/template.md` に従う
 
 ### ステップ 3: 完了報告
@@ -37,7 +33,7 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git *), Bash(echo *), Bash(mkdir *)
 ```
 セッションを保存しました:
 - 作業ログ: {ログファイル名}
-- コンテキスト: {project-id}
+- コンテキスト: .claude/context.md
 ```
 
 ## 注意事項

@@ -1,9 +1,8 @@
 ---
 name: context-save
 description: プロジェクトの作業状態を保存し、次回セッションで復帰可能にする。セッション終了時や作業の区切りで使う。
-argument-hint: [project-id]
 disable-model-invocation: true
-allowed-tools: Read, Write, Edit, Glob, Bash(git *), Bash(echo *), Bash(mkdir *), Bash(basename *), Bash(date *), Bash(ls *)
+allowed-tools: Read, Write, Edit, Glob, Bash(git *), Bash(echo *), Bash(mkdir *), Bash(basename *), Bash(date *)
 ---
 
 # コンテキスト保存
@@ -12,30 +11,16 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git *), Bash(echo *), Bash(mkdir *)
 
 ## 書き出し先
 
-`~/.claude/context/{project-id}.md`（上書き保存）
+プロジェクトルートの `.claude/context.md`（上書き保存）
 
-- 書き出し時は `$HOME/.claude/context/` を使うこと。ディレクトリが存在しなければ `mkdir -p` で作成すること
-- **ファイル名（拡張子なし）がプロジェクト ID の正**。frontmatter の `project` もファイル名と一致させること
+### プロジェクトルートの決定
 
-## プロジェクトの選択
+1. `git rev-parse --show-toplevel` でリポジトリルートを取得
+2. git リポジトリ外の場合は CWD をプロジェクトルートとする
 
-### 引数あり
+### ディレクトリの確認
 
-`$ARGUMENTS` で指定された値をプロジェクト識別子として使う。
-`~/.claude/context/` 内の既存ファイル名で部分一致検索する。
-一意に特定できればそのまま使う。複数マッチした場合は候補を AskUserQuestion で提示する。
-該当なしの場合は新規プロジェクトとして作成する。
-
-### 引数なし
-
-以下の優先順でプロジェクトを決定する：
-
-1. **セッション中に `/context-load` で読み込んだプロジェクトがある場合** → そのプロジェクトをデフォルトとして提示（会話履歴から判断する）
-2. git リポジトリ内の場合 → リポジトリ名を推奨として提示
-3. 上記いずれでもない場合 → `~/.claude/context/` 内の既存コンテキスト一覧を AskUserQuestion で提示
-
-いずれの場合も、別のプロジェクトを選べるよう一覧も選択肢に含める（新規作成も選べる）。
-新規作成が選ばれた場合 → プロジェクト名を通常のメッセージで聞く。
+- `.claude/` ディレクトリが存在しなければ `mkdir -p` で作成する
 
 ## 保存内容
 
@@ -45,6 +30,7 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git *), Bash(echo *), Bash(mkdir *)
 
 以下の情報を収集してテンプレートに埋める：
 
+- **project**: リポジトリのディレクトリ名（`basename` で取得）
 - **git リモート URL**: `git remote get-url origin`（取得できない場合は空欄）
 - **現在のブランチ**: `git branch --show-current`
 - **git 状態**: `git status --short` の要約
