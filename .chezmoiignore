@@ -5,4 +5,4 @@ Thumbs.db
 *.swp
 *.swo
 *~
-.claude/context/
+.claude/context.md
