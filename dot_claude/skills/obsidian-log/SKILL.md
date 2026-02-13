@@ -16,7 +16,7 @@ allowed-tools: Read, Write, Glob, Bash(echo *), Bash(mkdir *), Bash(date *)
 パスの取得手順:
 1. `$HOME/.claude/config.json` を Read ツールで読み込む
 2. JSON から `obsidian_vault` の値を取得する（値は絶対パス）
-3. `{obsidian_vault}/_claude/log/` に書き出す
+3. `{obsidian_vault}/_claude/log/YYYYMM/` に書き出す（YYYYMM は現在の年月、例: 202602）
 
 ※ `obsidian_vault` キーが存在しない場合は以下を案内して終了：
 

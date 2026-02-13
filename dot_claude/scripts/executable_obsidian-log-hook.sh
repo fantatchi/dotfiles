@@ -59,7 +59,7 @@ while IFS= read -r line; do
 done < <(git log --oneline -5 2>/dev/null || true)
 
 # 書き出し先
-LOG_DIR="${VAULT}/_claude/log"
+LOG_DIR="${VAULT}/_claude/log/${TIMESTAMP:0:6}"
 mkdir -p "$LOG_DIR"
 LOG_FILE="${LOG_DIR}/${TIMESTAMP}_auto-git-diff.md"
 

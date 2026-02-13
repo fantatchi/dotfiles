@@ -62,7 +62,7 @@ if ($CommitLines) {
 }
 
 # 書き出し先
-$LogDir = Join-Path $Vault '_claude' 'log'
+$LogDir = Join-Path $Vault '_claude' 'log' $Timestamp.Substring(0, 6)
 if (-not (Test-Path $LogDir)) { New-Item -ItemType Directory -Path $LogDir -Force | Out-Null }
 $LogFile = Join-Path $LogDir "${Timestamp}_auto-git-diff.md"
 
