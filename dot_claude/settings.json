@@ -6,23 +6,17 @@
       "WebSearch",
       "Bash(git:*)",
       "Bash(ls:*)",
-      "Bash(cat:*)",
       "Bash(mkdir:*)",
       "Bash(cp:*)",
       "Bash(mv:*)",
       "Bash(chezmoi:*)",
-      "Bash(cd:*)",
       "Bash(test:*)",
-      "Bash(pwd:*)",
       "Bash(which:*)",
       "Bash(command:*)",
       "Bash(wc:*)",
       "Bash(stat:*)",
       "Bash(file:*)",
-      "Bash(head:*)",
-      "Bash(tail:*)",
       "Bash(date:*)",
-      "Bash(hostname:*)",
       "Bash(tree:*)",
       "Bash(echo:*)",
       "Bash(printenv:*)"
@@ -83,7 +77,6 @@
     ]
   },
   "enabledPlugins": {
-    "example-skills@anthropic-agent-skills": true,
     "document-skills@anthropic-agent-skills": true
   },
   "alwaysThinkingEnabled": true

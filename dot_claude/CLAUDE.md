@@ -30,45 +30,13 @@
 - 方針の分岐や想定外の結果が出たら停止して質問する
 - 主要ステップごとに進捗を報告する
 
-# やらないこと
+# スキルコマンド
 
-- mainブランチへの直接push
-- 確認なしの破壊的変更（rm -rf など）
-
-# 作業ログの記録
-
-作業ログは Obsidian Vault に記録する。
-
-前提条件：
-- `~/.claude/config.json` に `obsidian_vault` が設定されていること
-- 設定されていない場合は機能を使用せず、設定方法を案内すること
-
-ルール：
-- 書き出し先・フォーマット・タグ等の詳細は `/obsidian-log` スキル（`.claude/skills/obsidian-log/SKILL.md`）に従う
-- 書き出し先ディレクトリが存在しない場合は作成すること
-
-## 手動記録
-
-ユーザーが `/obsidian-log` を実行したときに記録する。
-
-## 自動記録（フォールバック）
-
-`PreCompact`（コンテキスト圧縮前）のフックがシェルスクリプト（`~/.claude/scripts/obsidian-log-hook.sh`）を直接実行し、git diff ベースの簡易ログを Obsidian Vault に記録する。
-Claude を介さないため、セッション内容（対話記録・判断メモ等）は含まれず、git 由来の変更情報のみ。
-手動 `/obsidian-log` の補完（忘れたとき用のフォールバック）として機能する。
-未コミット変更がない場合はスキップする。
-
-# コンテキストの保存・復帰
-
-保存先はプロジェクトルートの `.claude/context.md`。
-
-## 手動操作
-
-- `/context-save` — 現在のプロジェクトコンテキストを `.claude/context.md` に保存
-- `/context-load` — `.claude/context.md` からコンテキストを読み込み
-
-## 自動保存
-
-`SessionEnd`（セッション終了時・`/clear` 時）のフックがシェルスクリプト（`~/.claude/scripts/context-save-hook.sh`）を直接実行し、git 状態（ブランチ・コミット・未コミット変更）をプロジェクトルートの `.claude/context.md` に保存する。
-Claude を介さないため `/clear` やセッション終了時にも確実に動作する。
-ただしセッション知識（判断メモ・次のステップ等）は保存できないため、必要に応じて手動で `/context-save` を実行すること。
+- `/obsidian-log` — 作業ログを Obsidian Vault に記録
+- `/obsidian-blog` — ブログドラフトを Obsidian Vault に作成
+- `/obsidian-resource` — 調査メモを Obsidian Vault に保存
+- `/context-save` — プロジェクトコンテキストを `.claude/context.md` に保存
+- `/context-load` — `.claude/context.md` からコンテキストを復帰
+- `/session-save` — `/obsidian-log` + `/context-save` を一括実行
+- `/ks-review` — コーディング規約に基づくコードレビュー
+- `/ks-naming` — 土木業界向け識別子名の生成
