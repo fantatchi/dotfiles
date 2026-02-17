@@ -3,12 +3,13 @@
     "allow": [
       "Read",
       "Write",
-      "Bash(git *)",
-      "Bash(ls *)",
-      "Bash(cat *)",
-      "Bash(mkdir *)",
-      "Bash(cp *)",
-      "Bash(mv *)"
+      "Bash(git:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(chezmoi:*)"
     ],
     "deny": [
       "Read(**/.env)",
@@ -17,11 +18,6 @@
     ]
   },
   "model": "opus",
-  "enabledPlugins": {
-    "example-skills@anthropic-agent-skills": true,
-    "document-skills@anthropic-agent-skills": true
-  },
-  "alwaysThinkingEnabled": true,
   "hooks": {
     "PreCompact": [
       {
@@ -69,5 +65,10 @@
         ]
       }
     ]
-  }
+  },
+  "enabledPlugins": {
+    "example-skills@anthropic-agent-skills": true,
+    "document-skills@anthropic-agent-skills": true
+  },
+  "alwaysThinkingEnabled": true
 }
