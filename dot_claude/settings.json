@@ -79,7 +79,8 @@
   "enabledPlugins": {
     "document-skills@anthropic-agent-skills": true,
     "context7@claude-plugins-official": true,
-    "feature-dev@claude-plugins-official": true
+    "feature-dev@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true
   },
   "alwaysThinkingEnabled": true
 }
