@@ -32,11 +32,6 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply fantatchi
 マシンごとに異なる環境変数は、シェルの設定ファイルに記述する（chezmoi 管理外）。
 zsh の場合は `~/.zshrc.local`（`.zshrc` から自動読み込み）が使える。
 
-```bash
-# 環境変数の設定例
-export MAX_THINKING_TOKENS=31999
-```
-
 Obsidian Vault のパスは `~/.claude/config.json` で管理する（`chezmoi init` で設定）。
 
 ## オプション機能
@@ -58,12 +53,6 @@ Obsidian Vault のパスは `~/.claude/config.json` で管理する（`chezmoi i
 | `context7@claude-plugins-official` | ライブラリドキュメント参照 |
 | `feature-dev@claude-plugins-official` | ガイド付き機能開発 |
 | `claude-md-management@claude-plugins-official` | CLAUDE.md の監査・改善 |
-
-**ultrathink（最大の思考深度）を使う場合:**
-
-```bash
-export MAX_THINKING_TOKENS=31999
-```
 
 セッション中のモデル切り替えは `/model sonnet` などを使用。
 
