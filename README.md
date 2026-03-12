@@ -28,7 +28,7 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply fantatchi
 | zsh | `.zshrc`, `.zsh/` | oh-my-zsh（プラグイン: git のみ） |
 | vim | `.vimrc`, `.vim/` | プラグインレス |
 | tmux | `.tmux.conf` | TPM でプラグイン管理 |
-| Claude Code | `.claude/` | 設定・スキル・config.json |
+| Claude Code | `.claude/` | 設定・スキル・MCP・スクリプト |
 
 ## 環境別設定
 
@@ -53,6 +53,15 @@ Obsidian Vault のパスは `~/.claude/config.json` で管理する（`chezmoi i
 | `model` | `opus` | デフォルトで Opus を使用 |
 | `alwaysThinkingEnabled` | `true` | Extended Thinking を常に有効化 |
 
+**有効化済みプラグイン:**
+
+| プラグイン | 説明 |
+|-----------|------|
+| `document-skills@anthropic-agent-skills` | ドキュメント作成系スキル集 |
+| `context7@claude-plugins-official` | ライブラリドキュメント参照 |
+| `feature-dev@claude-plugins-official` | ガイド付き機能開発 |
+| `claude-md-management@claude-plugins-official` | CLAUDE.md の監査・改善 |
+
 **ultrathink（最大の思考深度）を使う場合:**
 
 ```bash
@@ -73,6 +82,7 @@ export MAX_THINKING_TOKENS=31999
 | `/session-save` | 作業ログ記録とコンテキスト保存をまとめて実行 |
 | `/ks-review` | KS-Value 向け：コーディング規約に基づくコードレビュー |
 | `/ks-naming` | KS-Value 向け：日本語から識別子名を生成 |
+| `/consistency-check` | CLAUDE.md・テンプレート・設定ファイル間の整合性チェック |
 
 ### Obsidian 連携
 
