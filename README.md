@@ -19,15 +19,12 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply fantatchi
 | GitHub MCP を使うか | Claude Code から GitHub API を使う場合は y → PAT を入力 |
 | Obsidian Vault のパス | 作業ログを Obsidian に記録する場合はパスを入力 |
 
-セットアップ後、tmux 内で `prefix + I` を実行してプラグインをインストール。
-
 ## 含まれるもの
 
 | 対象 | ファイル | 備考 |
 |------|---------|------|
 | zsh | `.zshrc`, `.zsh/` | oh-my-zsh（プラグイン: git のみ） |
 | vim | `.vimrc`, `.vim/` | プラグインレス |
-| tmux | `.tmux.conf` | TPM でプラグイン管理 |
 | Claude Code | `.claude/` | 設定・スキル・MCP・スクリプト |
 
 ## 環境別設定
