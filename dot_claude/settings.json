@@ -19,7 +19,8 @@
       "Bash(date:*)",
       "Bash(tree:*)",
       "Bash(echo:*)",
-      "Bash(printenv:*)"
+      "Bash(printenv:*)",
+      "Bash(basename:*)"
     ],
     "deny": [
       "Read(**/.env)",
