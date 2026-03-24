@@ -45,5 +45,4 @@
 - `/context-save` — プロジェクトコンテキストを `.claude/context.md` に保存
 - `/context-load` — `.claude/context.md` からコンテキストを復帰
 - `/session-save` — `/obsidian-log` + `/context-save` を一括実行
-- `/ks-review` — コーディング規約に基づくコードレビュー
 - `/ks-naming` — 土木業界向け識別子名の生成
