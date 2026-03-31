@@ -75,11 +75,13 @@ wsl -d Ubuntu -- bash -c "ls /home/at-kato/ObsidianVault/"
 ### 3a. コミット
 
 ```bash
-gh api '/search/commits?q=author:kentem-at-kato+committer-date:TARGET_DATE&sort=committer-date&order=desc&per_page=100' \
+gh api '/search/commits?q=author:kentem-at-kato+committer-date:TARGET_DATE&sort=committer-date&order=asc&per_page=100' \
   --header 'Accept: application/vnd.github.cloak-preview+json'
 ```
 
 抽出: sha（先頭7文字）、コミットメッセージ（1行目のみ）、リポジトリ名（full_name）
+
+※ `order=asc` で時系列順（古い→新しい）にソートする。
 
 ### 3b. PR（作成）
 
