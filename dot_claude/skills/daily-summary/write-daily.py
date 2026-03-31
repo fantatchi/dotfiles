@@ -1,0 +1,180 @@
+#!/usr/bin/env python3
+"""
+デイリーサマリーの書き込みヘルパー。
+
+stdin から JSON を受け取り、デイリーノートにサマリーセクションを書き込む。
+シェルの多段エスケープ問題を回避するため、ファイル I/O を Python に集約する。
+
+使い方:
+  echo '{"vault": "...", "target_date": "2026-03-31", ...}' | python3 write-daily.py
+"""
+
+import json
+import os
+import re
+import sys
+from datetime import datetime, timezone, timedelta
+
+JST = timezone(timedelta(hours=9))
+
+# --- テンプレート ---
+
+DAILY_TEMPLATE = """\
+---
+created: {created}(UTC +09:00)
+aliases: [{alias_slash},{alias_jp}]
+tags: [Daily,{target_date}]
+author: at-kato
+---
+
+[[{year_month}]]
+[[DailyNotes]]
+
+---
+"""
+
+SUMMARY_TEMPLATE = """\
+## デイリーサマリー
+
+> [!info] 自動生成: {timestamp}
+
+### GitHub アクティビティ
+
+#### コミット
+
+{commits}
+
+#### PR
+
+{prs}
+
+### 作業ログ
+
+{logs}
+
+### 今日の要約
+
+{summary}"""
+
+
+def build_summary(data: dict) -> str:
+    """JSON データからサマリーセクションの Markdown を生成する。"""
+    now = datetime.now(JST)
+    timestamp = now.strftime("%Y-%m-%d %H:%M")
+
+    # コミット
+    commits_list = data.get("commits", [])
+    if commits_list:
+        lines = []
+        for c in commits_list:
+            lines.append(f"- `{c['repo']}` — {c['message']} (`{c['sha']}`)")
+        commits = "\n".join(lines)
+    else:
+        commits = "なし"
+
+    # PR（重複排除済みのリスト）
+    prs_list = data.get("prs", [])
+    if prs_list:
+        lines = []
+        for p in prs_list:
+            labels = "・".join(p.get("labels", []))
+            lines.append(f"- [{p['title']}]({p['url']}) — {labels}")
+        prs = "\n".join(lines)
+    else:
+        prs = "なし"
+
+    # 作業ログ
+    logs_list = data.get("logs", [])
+    if logs_list:
+        lines = []
+        for log in logs_list:
+            lines.append(f"- **{log['project']}**: {log['summary']}")
+        logs = "\n".join(lines)
+    else:
+        logs = "作業ログの記録なし"
+
+    summary_text = data.get("summary_text", "特筆事項なし")
+
+    return SUMMARY_TEMPLATE.format(
+        timestamp=timestamp,
+        commits=commits,
+        prs=prs,
+        logs=logs,
+        summary=summary_text,
+    )
+
+
+def build_daily_note(target_date: str) -> str:
+    """デイリーノートの frontmatter 部分を生成する。"""
+    dt = datetime.strptime(target_date, "%Y-%m-%d")
+    now = datetime.now(JST)
+
+    created = now.strftime("%Y-%m-%dT%H:%M:%S")
+    alias_slash = dt.strftime("%Y/%m/%d")
+    alias_jp = f"{dt.year}年{dt.month}月{dt.day}日"
+    year_month = dt.strftime("%Y-%m")
+
+    return DAILY_TEMPLATE.format(
+        created=created,
+        alias_slash=alias_slash,
+        alias_jp=alias_jp,
+        target_date=target_date,
+        year_month=year_month,
+    )
+
+
+def write_daily(data: dict) -> str:
+    """メイン処理。デイリーノートにサマリーを書き込む。"""
+    vault = data["vault"]
+    target_date = data["target_date"]
+    yyyymm = target_date.replace("-", "")[:6]
+
+    daily_dir = os.path.join(vault, "_daily", yyyymm)
+    daily_path = os.path.join(daily_dir, f"{target_date}.md")
+
+    summary_section = build_summary(data)
+
+    if not os.path.exists(daily_path):
+        # ケース 1: ファイルが存在しない → 新規作成
+        os.makedirs(daily_dir, exist_ok=True)
+        content = build_daily_note(target_date) + "\n" + summary_section + "\n"
+        with open(daily_path, "w", encoding="utf-8") as f:
+            f.write(content)
+        return f"created:{daily_path}"
+
+    with open(daily_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    if "## デイリーサマリー" not in content:
+        # ケース 2: サマリーなし → 末尾に追記
+        if not content.endswith("\n"):
+            content += "\n"
+        content += "\n" + summary_section + "\n"
+        with open(daily_path, "w", encoding="utf-8") as f:
+            f.write(content)
+        return f"appended:{daily_path}"
+
+    # ケース 3: サマリーあり → 上書き
+    # "## デイリーサマリー" から次の "## " (同レベル) またはファイル末尾まで置換
+    pattern = r"## デイリーサマリー.*"
+    content_new = re.sub(pattern, summary_section, content, flags=re.DOTALL)
+    # 末尾の改行を正規化
+    content_new = content_new.rstrip("\n") + "\n"
+    with open(daily_path, "w", encoding="utf-8") as f:
+        f.write(content_new)
+    return f"replaced:{daily_path}"
+
+
+def main():
+    raw = sys.stdin.read()
+    if not raw.strip():
+        print("ERROR: stdin is empty", file=sys.stderr)
+        sys.exit(1)
+
+    data = json.loads(raw)
+    result = write_daily(data)
+    print(result)
+
+
+if __name__ == "__main__":
+    main()

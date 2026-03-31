@@ -46,3 +46,4 @@
 - `/context-load` — `.claude/context.md` からコンテキストを復帰
 - `/session-save` — `/obsidian-log` + `/context-save` を一括実行
 - `/ks-naming` — 土木業界向け識別子名の生成
+- `/daily-summary` — GitHub アクティビティと作業ログからデイリーサマリーを生成
