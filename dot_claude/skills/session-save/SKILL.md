@@ -73,3 +73,4 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git *), Bash(echo *), Bash(mkdir *)
 
 - ステップ 1 が失敗しても（obsidian_vault 未設定など）、ステップ 2 以降は実行する
 - 各ステップの詳細な仕様は個別のスキル定義を参照すること
+- 同セッションの作業ログが既に存在する場合は、新規作成せず既存ファイルを上書き更新する

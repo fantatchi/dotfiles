@@ -3,6 +3,7 @@
     "allow": [
       "Read",
       "Write",
+      "Edit",
       "WebSearch",
       "Bash(git:*)",
       "Bash(ls:*)",
@@ -20,7 +21,8 @@
       "Bash(tree:*)",
       "Bash(echo:*)",
       "Bash(printenv:*)",
-      "Bash(basename:*)"
+      "Bash(basename:*)",
+      "Bash(gh:*)"
     ],
     "deny": [
       "Read(**/.env)",
