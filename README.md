@@ -42,7 +42,6 @@ Obsidian Vault のパスは `~/.claude/config.json` で管理する（`chezmoi i
 
 | 設定 | 値 | 説明 |
 |------|-----|------|
-| `model` | `opus` | デフォルトで Opus を使用 |
 | `alwaysThinkingEnabled` | `true` | Extended Thinking を常に有効化 |
 
 **有効化済みプラグイン:**
@@ -66,7 +65,8 @@ Obsidian Vault のパスは `~/.claude/config.json` で管理する（`chezmoi i
 | `/context-save` | プロジェクトの作業状態を `.claude/context.md` に保存 |
 | `/context-load` | `.claude/context.md` からコンテキストを読み込み復帰 |
 | `/session-save` | 作業ログ記録とコンテキスト保存をまとめて実行 |
-| `/ks-review` | KS-Value 向け：コーディング規約に基づくコードレビュー |
+| `/session-review` | セッション振り返り（権限・CLAUDE.md・スキルの整理） |
+| `/daily-summary` | GitHub アクティビティと作業ログからデイリーサマリーを生成 |
 | `/ks-naming` | KS-Value 向け：日本語から識別子名を生成 |
 | `/consistency-check` | CLAUDE.md・テンプレート・設定ファイル間の整合性チェック |
 
@@ -120,6 +120,7 @@ ln -s /mnt/c/Users/<username>/ObsidianVault ~/ObsidianVault
 | `_claude/log/` | 作業履歴 |
 | `_claude/resource/` | 調査結果・参考資料 |
 | `_claude/blog/` | ブログドラフト |
+| `_daily/` | デイリーサマリー（`/daily-summary` で生成） |
 
 ## chezmoi の使い方
 
