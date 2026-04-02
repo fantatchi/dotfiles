@@ -53,20 +53,26 @@ wsl -d Ubuntu -- bash -c "ls /home/at-kato/ObsidianVault/"
 `$HOME/.claude/config.json` を Read で読み込み、以下の値を取得する:
 
 - `obsidian_vault`: Vault の絶対パス（WSL Linux パス形式）
-- `wsl_distro`: WSL ディストリビューション名（Windows 環境でのみ使用）
+- `obsidian_vault_win`: Vault の絶対パス（Windows パス形式、Windows 環境用）
+- `wsl_distro`: WSL ディストリビューション名（Windows + wsl コマンド経由の場合のみ使用）
 
-いずれのキーが存在しない場合は以下を案内して終了:
+### Vault パスの決定
+
+プラットフォーム（ステップ 0 の結果）に応じて:
+
+- **Windows（Msys/Cygwin）**: `obsidian_vault_win` があればそのパスを直接使う（`wsl` 不要）。なければ `obsidian_vault` + `wsl` コマンド経由
+- **WSL / Linux**: `obsidian_vault` を直接使う
+
+※ パスのハードコード禁止。
+※ キーが存在しない場合は以下を案内して終了:
 
 ```
 必要な設定が見つかりません。
 ~/.claude/config.json に以下を追加してください：
   "obsidian_vault": "/path/to/vault",
+  "obsidian_vault_win": "C:/Users/xxx/ObsidianVault",
   "wsl_distro": "Ubuntu"
 ```
-
-※ パスのハードコード禁止。
-
-以降、WSL ディストリビューション名を `DISTRO` として参照する。
 
 ## 3. GitHub データ収集
 

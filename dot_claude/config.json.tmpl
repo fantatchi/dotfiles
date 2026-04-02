@@ -5,6 +5,10 @@
 {{- end -}}
 {
 {{- if ne $obsidian "" }}
-  "obsidian_vault": {{ $obsidian | quote }}
+  "obsidian_vault": {{ $obsidian | quote }},
 {{- end }}
+{{- if ne (.obsidian_vault_win | default "") "" }}
+  "obsidian_vault_win": {{ .obsidian_vault_win | quote }},
+{{- end }}
+  "wsl_distro": {{ .wsl_distro | default "Ubuntu" | quote }}
 }

@@ -11,20 +11,24 @@ allowed-tools: Read, Write, Glob, Bash(echo *), Bash(mkdir *), Bash(date *)
 
 ## 書き出し先
 
-設定ファイル `$HOME/.claude/config.json` の `obsidian_vault` の値を Vault パスとして使う。
+設定ファイル `$HOME/.claude/config.json` の Vault パスを使う。
 
 パスの取得手順:
 1. `$HOME/.claude/config.json` を Read ツールで読み込む
-2. JSON から `obsidian_vault` の値を取得する（値は絶対パス）
-3. `{obsidian_vault}/_claude/log/YYYYMM/` に書き出す（YYYYMM は現在の年月、例: 202602）
+2. プラットフォームに応じてキーを選択する:
+   - Windows（win32）: `obsidian_vault_win` を優先、なければ `obsidian_vault`
+   - それ以外: `obsidian_vault`
+3. 取得したパスが実際にアクセス可能か確認する（`ls` 等で）
+4. `{vault_path}/_claude/log/YYYYMM/` に書き出す（YYYYMM は現在の年月、例: 202602）
 
-※ `obsidian_vault` キーが存在しない場合は以下を案内して終了：
+※ キーが存在しない場合は以下を案内して終了：
 
 ```
 obsidian_vault が設定されていません。
 ~/.claude/config.json に以下を追加してください：
 
   "obsidian_vault": "/path/to/vault"
+  "obsidian_vault_win": "C:/Users/xxx/ObsidianVault"  // Windows の場合
 
 chezmoi を使っている場合は `chezmoi init` で設定できます。
 ```
