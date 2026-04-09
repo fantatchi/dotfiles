@@ -22,7 +22,9 @@
       "Bash(echo:*)",
       "Bash(printenv:*)",
       "Bash(basename:*)",
-      "Bash(gh:*)"
+      "Bash(gh:*)",
+      "Bash(uname:*)",
+      "Bash(wsl:*)"
     ],
     "deny": [
       "Read(**/.env)",
@@ -39,13 +41,7 @@
             "command": "node -e \"require(require('os').homedir()+'/.claude/scripts/run-hook.js')('obsidian-log-hook')\"",
             "timeout": 30,
             "statusMessage": "作業ログを自動記録中..."
-          }
-        ]
-      }
-    ],
-    "SessionEnd": [
-      {
-        "hooks": [
+          },
           {
             "type": "command",
             "command": "node -e \"require(require('os').homedir()+'/.claude/scripts/run-hook.js')('context-save-hook')\"",
