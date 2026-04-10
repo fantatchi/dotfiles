@@ -20,6 +20,8 @@
       "Bash(date:*)",
       "Bash(tree:*)",
       "Bash(echo:*)",
+      "Bash(cat:*)",
+      "Bash(python3:*)",
       "Bash(printenv:*)",
       "Bash(basename:*)",
       "Bash(gh:*)",

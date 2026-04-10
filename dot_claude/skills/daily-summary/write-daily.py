@@ -54,7 +54,11 @@ SUMMARY_TEMPLATE = """\
 
 ### 今日の要約
 
-{summary}"""
+{summary}
+
+### 明日以降のタスク
+
+{upcoming_tasks}"""
 
 
 def build_summary(data: dict) -> str:
@@ -95,12 +99,27 @@ def build_summary(data: dict) -> str:
 
     summary_text = data.get("summary_text", "特筆事項なし")
 
+    # 明日以降のタスク（Next / Waiting）
+    upcoming_list = data.get("upcoming_tasks", [])
+    if upcoming_list:
+        lines = []
+        for t in upcoming_list:
+            section = t.get("section", "Next")
+            marker = " ⏳" if section == "Waiting" else ""
+            project = t.get("project", "")
+            project_str = f" `#{project}`" if project else ""
+            lines.append(f"- [ ]{project_str} {t['title']}{marker}")
+        upcoming_tasks = "\n".join(lines)
+    else:
+        upcoming_tasks = "予定タスクなし"
+
     return SUMMARY_TEMPLATE.format(
         timestamp=timestamp,
         commits=commits,
         prs=prs,
         logs=logs,
         summary=summary_text,
+        upcoming_tasks=upcoming_tasks,
     )
 
 

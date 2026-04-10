@@ -156,6 +156,25 @@ ls {vault}/_claude/log/{YYYYMM}/{YYYYMMDD}*.md 2>/dev/null
 
 context-log が 0 件の場合は「作業ログの記録なし」とする。
 
+## 4b. tasks.md からの予定タスク収集
+
+`~/.claude/tasks.md` を Read で読み、`## Next` と `## Waiting` セクションのタスクを抽出する。
+
+### 抽出ルール
+
+- タスク行のフォーマット: `- [ ] #project/<name> タイトル [メタデータ]`
+- 各タスクから以下を取り出す:
+  - `section`: `"Next"` または `"Waiting"`
+  - `project`: `#project/<name>` の `<name>` 部分（タグなしなら空文字）
+  - `title`: タグとチェックボックスを除いた本文
+- 全プロジェクト横断で収集する（フィルタなし）
+- タスクが 0 件の場合、または tasks.md が存在しない場合は空配列 `[]` とする
+
+### 注意
+
+- **ユーザーに確認を求めない**。このスキルは自動実行される前提なので、収集結果をそのまま JSON に詰めて進む
+- 読み込み専用。tasks.md は変更しない
+
 ## 5. サマリーデータの組み立て
 
 収集したデータを以下の JSON 形式に組み立てる:
@@ -173,11 +192,15 @@ context-log が 0 件の場合は「作業ログの記録なし」とする。
   "logs": [
     {"project": "project-name", "summary": "作業概要"}
   ],
+  "upcoming_tasks": [
+    {"section": "Next", "project": "claude-config", "title": "gtd-list スキルの実装"},
+    {"section": "Waiting", "project": "mlit", "title": "APIキー発行待ち @since:2026-04-08"}
+  ],
   "summary_text": "GitHub アクティビティと作業ログを総合した 1-3 行の自然言語サマリー"
 }
 ```
 
-- `commits`, `prs`, `logs` が 0 件の場合は空配列 `[]` にする
+- `commits`, `prs`, `logs`, `upcoming_tasks` が 0 件の場合は空配列 `[]` にする
 - `summary_text` は全データを総合して LLM が生成する
 
 ## 6. デイリーノートへの書き込み

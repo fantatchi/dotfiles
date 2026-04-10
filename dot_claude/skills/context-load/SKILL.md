@@ -2,7 +2,7 @@
 name: context-load
 description: 保存済みのプロジェクトコンテキストを読み込み、前回の作業状態を復帰する。セッション開始時に使う。
 disable-model-invocation: true
-allowed-tools: Read, Glob, Grep, Bash(git *), Bash(echo *), Bash(basename *)
+allowed-tools: Read, Glob, Grep, Bash(git *), Bash(echo *), Bash(basename *), Bash(pwd)
 ---
 
 # コンテキスト読み込み
@@ -28,6 +28,15 @@ allowed-tools: Read, Glob, Grep, Bash(git *), Bash(echo *), Bash(basename *)
 
 `{project-root}/.claude/context.md` を読み込み、内容を把握する。
 
+### 1-b. タスクの読み込み
+
+`~/.claude/tasks.md` を読み込み、現在プロジェクトのタスクを抽出する：
+
+1. プロジェクトタグを決定: `#project/<basename of git toplevel>`（または CWD ベース名）
+2. `## Next` / `## Waiting` セクションから該当プロジェクトタグを持つタスクを抽出
+3. 存在すれば「次のステップ」として提示に含める（ステップ 3 参照）
+4. tasks.md が存在しない、または該当タスクが 0 件の場合は「次のステップなし」とする
+
 ### 2. 現在の git 状態との比較
 
 保存時と現在の状態を比較し、差分があれば警告する：
@@ -52,15 +61,20 @@ allowed-tools: Read, Glob, Grep, Bash(git *), Bash(echo *), Bash(basename *)
 ### 進行中の作業
 （作業内容）
 
-### 次のステップ
-（次のアクション）
+### 次のステップ（tasks.md より）
+- [ ] （Next から抽出したタスク）
+- [ ] （Waiting から抽出したタスク） ⏳ 待ち
 
 ### 状態の変化（差分がある場合のみ）
 （差分の詳細）
 
 ```
 
+- 「次のステップ」は `~/.claude/tasks.md` から読み込んだ該当プロジェクトのタスクを表示する
+- Waiting のタスクには ⏳ マーカーを付けて区別する
+- タスクが 0 件の場合は「次のステップなし。`/gtd-add` で追加できます。」と表示
+
 ## 注意事項
 
-- 読み込み専用。コンテキストファイルを変更しない
+- 読み込み専用。コンテキストファイルと tasks.md を変更しない
 - パスはプロジェクトルートからの相対パスで記録されているため、現在のマシンのパスと異なる場合がある

@@ -1,7 +1,6 @@
 ---
 name: session-save
 description: セッションの作業ログ記録とコンテキスト保存をまとめて実行する。「作業を保存して」「セッション終わり」「まとめて保存」といった依頼で使う。
-disable-model-invocation: true
 allowed-tools: Read, Write, Edit, Glob, Bash(git *), Bash(echo *), Bash(mkdir *), Bash(basename *), Bash(date *)
 ---
 

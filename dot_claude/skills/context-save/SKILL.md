@@ -2,7 +2,7 @@
 name: context-save
 description: プロジェクトの作業状態を保存し、次回セッションで復帰可能にする。セッション終了時や作業の区切りで使う。
 disable-model-invocation: true
-allowed-tools: Read, Write, Edit, Glob, Bash(git *), Bash(echo *), Bash(mkdir *), Bash(basename *), Bash(date *)
+allowed-tools: Read, Write, Edit, Glob, Bash(git *), Bash(echo *), Bash(mkdir *), Bash(basename *), Bash(date *), Bash(pwd)
 ---
 
 # コンテキスト保存
@@ -38,8 +38,9 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git *), Bash(echo *), Bash(mkdir *)
 - **プロジェクト概要**: セッション中の作業内容から簡潔にまとめる
 - **進行中の作業**: 現在取り組んでいるタスクや未完了の作業
 - **判断メモ**: セッション中に行った重要な判断とその理由
-- **次のステップ**: 次回セッションで着手すべきこと
 - **重要ファイル**: 作業に関連する主要ファイル（プロジェクトルートからの相対パス）
+
+**次のステップについて**: 次回セッションで着手すべきタスクは context.md には書かず、`~/.claude/tasks.md` の `## Next` セクションに `#project/<name>` タグ付きで追記する（手順は下記「tasks.md への書き出し」参照）。
 
 ### 既存ファイルの扱い
 
@@ -48,6 +49,28 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git *), Bash(echo *), Bash(mkdir *)
 - `## プロジェクト概要` は既存の内容を引き継ぎつつ、必要なら更新
 - それ以外のセクション（ブランチ・状態、進行中の作業など）は最新情報で上書き
 - `updated` の日時を更新する
+- 過去に `## 次のステップ` セクションが残っている場合は**削除**する（タスクは tasks.md に一本化）
+
+## tasks.md への書き出し
+
+次回セッションで着手すべきタスクは `~/.claude/tasks.md` の `## Next` セクションに追記する。フォーマットは `~/.claude/skills/shared/tasks-format.md` を参照。
+
+### 手順
+
+1. `~/.claude/tasks.md` を Read で読む（なければ初期テンプレートで作成）
+2. 現在プロジェクトのタグを決定: `#project/<basename of git toplevel>`
+3. セッション中に発生した「次に着手すべきアクション」を抽出し、`## Next` セクションに以下の形式で追記：
+   ```
+   - [ ] #project/<name> タスクタイトル
+   ```
+4. 既に同内容のタスクが `## Inbox` / `## Next` / `## Waiting` に存在する場合は**重複追加しない**（部分一致で判定）
+5. Edit ツールで書き戻す
+
+### 追加対象の判断基準
+
+- 明確に「次にやること」として合意されたアクションのみ追加する
+- 推測や「やったほうがいいかも」レベルは追加しない（Inbox への手動追加に委ねる）
+- タスクが発生していない場合はスキップしてよい
 
 ## 注意事項
 

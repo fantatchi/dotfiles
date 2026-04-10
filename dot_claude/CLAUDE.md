@@ -64,3 +64,6 @@ GOをもらってから進める。
 - `/session-review` — セッション振り返り（権限・CLAUDE.md・スキルの整理）
 - `/ks-naming` — 土木業界向け識別子名の生成
 - `/daily-summary` — GitHub アクティビティと作業ログからデイリーサマリーを生成
+- `/gtd-add` — `~/.claude/tasks.md` の Inbox にタスクを追加
+- `/gtd-list` — `~/.claude/tasks.md` からタスクを表示（デフォルト: 現在プロジェクトの Inbox + Next）
+- `/gtd-done` — 指定タスクを完了にし Done セクションへ移動
