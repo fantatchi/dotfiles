@@ -65,6 +65,10 @@ allowed-tools: Read, Glob, Grep, Bash(git *), Bash(echo *), Bash(basename *), Ba
 - [ ] （Next から抽出したタスク）
 - [ ] （Waiting から抽出したタスク） ⏳ 待ち
 
+### 関連リポジトリ（context.md に該当セクションがある場合のみ）
+- **dotfiles (chezmoi)**: `<git remote URL>`
+  - 直近のコミット: `<コミットサマリ>`
+
 ### 状態の変化（差分がある場合のみ）
 （差分の詳細）
 
@@ -73,6 +77,7 @@ allowed-tools: Read, Glob, Grep, Bash(git *), Bash(echo *), Bash(basename *), Ba
 - 「次のステップ」は `~/.claude/tasks.md` から読み込んだ該当プロジェクトのタスクを表示する
 - Waiting のタスクには ⏳ マーカーを付けて区別する
 - タスクが 0 件の場合は「次のステップなし。`/gtd-add` で追加できます。」と表示
+- 「関連リポジトリ」は context.md に `## 関連リポジトリ` セクションがある場合のみ表示する。ない場合はセクションごと省略する
 
 ## 注意事項
 

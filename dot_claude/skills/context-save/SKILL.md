@@ -39,7 +39,7 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git *), Bash(echo *), Bash(mkdir *)
 - **進行中の作業**: 現在取り組んでいるタスクや未完了の作業
 - **判断メモ**: セッション中に行った重要な判断とその理由
 - **重要ファイル**: 作業に関連する主要ファイル（プロジェクトルートからの相対パス）
-- **関連リポジトリ履歴**（ホームワークスペース用）: `chezmoi source-path` で chezmoi source dir を取得できた場合、そこで `git log --oneline -n 5` を実行し、「関連リポジトリ」セクションに埋め込む。コマンドが存在しない / 失敗した場合はスキップ
+- **関連リポジトリ履歴**（ホームワークスペース用）: `chezmoi source-path` でパスを取得し、`git -C <path> log --oneline -n 5` と `git -C <path> remote get-url origin` を「関連リポジトリ」セクションに埋め込む。コマンド失敗時はスキップ
 
 **次のステップについて**: 次回セッションで着手すべきタスクは context.md には書かず、`~/.claude/tasks.md` の `## Next` セクションに `#project/<name>` タグ付きで追記する（手順は下記「tasks.md への書き出し」参照）。
 
