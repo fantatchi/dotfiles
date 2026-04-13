@@ -34,10 +34,11 @@ allowed-tools: Read, Bash(git *), Bash(basename *), Bash(pwd)
 
 ### 2. 現在プロジェクトの推定（引数なしの場合）
 
-1. `git rev-parse --show-toplevel` でリポジトリルートを取得
-2. 取得できた場合: `basename` でディレクトリ名を取り `<name>` とする
-3. git リポジトリ外の場合: `basename "$(pwd)"` を使う
-4. タグ `#project/<name>` でフィルタリング
+1. **ホーム判定**: `[ "$(pwd -P)" = "$HOME" ]` が真なら `<name>` を `global` とする（プロジェクト非依存タスク）。以降の手順はスキップ
+2. `git rev-parse --show-toplevel` でリポジトリルートを取得
+3. 取得できた場合: `basename` でディレクトリ名を取り `<name>` とする
+4. git リポジトリ外の場合: `basename "$(pwd)"` を使う
+5. タグ `#project/<name>` でフィルタリング
 
 ### 3. フィルタリングと表示
 

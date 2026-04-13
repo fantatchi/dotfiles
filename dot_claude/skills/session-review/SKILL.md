@@ -19,7 +19,7 @@ allowed-tools: Read, Edit, Write, Glob, Grep
 | フェーズ | 実行条件 | 詳細手順 |
 |---------|---------|---------|
 | 1. 権限レビュー | 手動で承認/拒否したツール呼び出しが1件以上 | `references/permission-review.md` |
-| 2. CLAUDE.md更新 | コマンド・パターン・設定の発見やgotchaがあった | `references/claude-md-update.md` |
+| 2. CLAUDE.md更新 | コマンド・パターン・設定の発見やgotchaがあった | `references/claude-md-update.md`（実作業は `/claude-md-management:revise-claude-md` スキルに委譲する） |
 | 3. スキル洗練 | 既存スキルの不備発見、繰り返しワークフロー、新スキル候補 | `references/skill-refine.md` |
 
 ### Step 2: 提案の一括提示

@@ -24,10 +24,11 @@ allowed-tools: Read, Write, Edit, Bash(git *), Bash(basename *), Bash(pwd)
 
 引数に既に `#project/xxx` が含まれている場合はそれを使う。含まれていない場合は CWD から推定する：
 
-1. `git rev-parse --show-toplevel` でリポジトリルートを取得
-2. 取得できた場合: `basename` でディレクトリ名を取り、`#project/<name>` を作る
-3. git リポジトリ外の場合: `basename "$(pwd)"` を使う
-4. どちらも取れない場合: `#project/unknown` とし、ユーザーに後で修正するよう伝える
+1. **ホーム判定**: `[ "$(pwd -P)" = "$HOME" ]` が真なら `#project/global` を使う（プロジェクト非依存タスク）。以降の手順はスキップ
+2. `git rev-parse --show-toplevel` でリポジトリルートを取得
+3. 取得できた場合: `basename` でディレクトリ名を取り、`#project/<name>` を作る
+4. git リポジトリ外の場合: `basename "$(pwd)"` を使う
+5. どれも取れない場合: `#project/unknown` とし、ユーザーに後で修正するよう伝える
 
 ### 3. tasks.md の読み込み
 
