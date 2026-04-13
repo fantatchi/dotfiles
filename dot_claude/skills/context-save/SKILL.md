@@ -2,7 +2,7 @@
 name: context-save
 description: プロジェクトの作業状態を保存し、次回セッションで復帰可能にする。セッション終了時や作業の区切りで使う。
 disable-model-invocation: true
-allowed-tools: Read, Write, Edit, Glob, Bash(git *), Bash(echo *), Bash(mkdir *), Bash(basename *), Bash(date *), Bash(pwd)
+allowed-tools: Read, Write, Edit, Glob, Bash(git *), Bash(echo *), Bash(mkdir *), Bash(basename *), Bash(date *), Bash(pwd), Bash(chezmoi source-path)
 ---
 
 # コンテキスト保存
@@ -39,6 +39,7 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git *), Bash(echo *), Bash(mkdir *)
 - **進行中の作業**: 現在取り組んでいるタスクや未完了の作業
 - **判断メモ**: セッション中に行った重要な判断とその理由
 - **重要ファイル**: 作業に関連する主要ファイル（プロジェクトルートからの相対パス）
+- **関連リポジトリ履歴**（ホームワークスペース用）: `chezmoi source-path` で chezmoi source dir を取得できた場合、そこで `git log --oneline -n 5` を実行し、「関連リポジトリ」セクションに埋め込む。コマンドが存在しない / 失敗した場合はスキップ
 
 **次のステップについて**: 次回セッションで着手すべきタスクは context.md には書かず、`~/.claude/tasks.md` の `## Next` セクションに `#project/<name>` タグ付きで追記する（手順は下記「tasks.md への書き出し」参照）。
 
@@ -77,3 +78,4 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git *), Bash(echo *), Bash(mkdir *)
 - パスはプロジェクトルートからの相対パスで記録する（マシン非依存）
 - git リモート URL を frontmatter に記録する（マシン間でのプロジェクト同定用）
 - セッション全体を振り返ってからまとめること
+- PR 番号・Issue 番号など外部の可変識別子を文字列で記録する場合は、**ブランチ名・タイトル・最終確認日** も併記する。番号だけだと次セッションで中身を誤認しやすく、実態と食い違った状態でコンテキストが復帰されるリスクがある
