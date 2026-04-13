@@ -151,3 +151,11 @@ Vault 本体は Windows の `C:\Users\<username>\ObsidianVault` に配置。
 - OneDrive で PC 間同期
 - メモの同期は Obsidian の git 拡張機能
 - `.obsidian` フォルダは各環境にコピー
+
+### WSL / Windows 共有構成
+
+`.claude` は Windows 側から WSL 側へのシンボリックリンクで共有している
+（`C:\Users\<username>\.claude` → `\\wsl.localhost\Ubuntu\home\<username>\.claude`）。
+そのため **chezmoi は WSL 側からのみ実行する**こと。Windows 側で
+`chezmoi apply` を走らせるとシンボリックリンクを実体ディレクトリに
+置き換えてしまい、共有構成が壊れる。
