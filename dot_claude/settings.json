@@ -80,7 +80,18 @@
     "document-skills@anthropic-agent-skills": true,
     "context7@claude-plugins-official": true,
     "feature-dev@claude-plugins-official": true,
-    "claude-md-management@claude-plugins-official": true
+    "claude-md-management@claude-plugins-official": true,
+    "dotnet@dotnet-agent-skills": true,
+    "dotnet-aspnet@dotnet-agent-skills": true,
+    "microsoft-docs@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "dotnet-agent-skills": {
+      "source": {
+        "source": "github",
+        "repo": "dotnet/skills"
+      }
+    }
   },
   "alwaysThinkingEnabled": true,
   "autoUpdatesChannel": "latest"
