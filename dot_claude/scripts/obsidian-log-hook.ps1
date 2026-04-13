@@ -10,14 +10,10 @@ $ErrorActionPreference = 'Stop'
 # stdin を消費して閉じる（フックが JSON を渡すが本スクリプトでは不要）
 try { $null = [Console]::In.ReadToEnd() } catch {}
 
-$ConfigFile = Join-Path $HOME '.claude' 'config.json'
+$Vault = Join-Path $HOME 'ObsidianVault'
 
-# config.json から obsidian_vault を読み取る
-if (-not (Test-Path $ConfigFile)) { exit 0 }
-
-$Config = Get-Content $ConfigFile -Raw -Encoding UTF8 | ConvertFrom-Json
-$Vault = $Config.obsidian_vault
-if ([string]::IsNullOrEmpty($Vault)) { exit 0 }
+# Vault が存在しなければ何もしない（静かに終了）
+if (-not (Test-Path $Vault)) { exit 0 }
 
 # git リポジトリ外なら何もしない
 $null = git rev-parse --is-inside-work-tree 2>$null

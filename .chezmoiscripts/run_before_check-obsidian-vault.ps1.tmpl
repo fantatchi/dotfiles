@@ -1,0 +1,9 @@
+# chezmoi apply 前に %USERPROFILE%\ObsidianVault の存在を確認する。
+# 未配置の場合は apply を中断する。
+$ErrorActionPreference = 'Stop'
+
+$Vault = Join-Path $HOME 'ObsidianVault'
+if (-not (Test-Path $Vault)) {
+    Write-Error "ERROR: $Vault が存在しません。ユーザーホーム直下に ObsidianVault を配置してください。"
+    exit 1
+}

@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+# chezmoi apply 前に ~/ObsidianVault の存在を確認する。
+# 未配置の場合は apply を中断する。
+set -eu
+
+VAULT="${HOME}/ObsidianVault"
+if [ ! -d "$VAULT" ]; then
+    echo "ERROR: $VAULT が存在しません。" >&2
+    echo "ユーザーホーム直下に ObsidianVault を配置してください。" >&2
+    echo "WSL 環境では Windows 側 Vault へのシンボリックリンクでも可:" >&2
+    echo "  ln -s /mnt/c/Users/<you>/ObsidianVault \"$VAULT\"" >&2
+    exit 1
+fi

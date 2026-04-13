@@ -12,30 +12,18 @@ disable-model-invocation: true
 
 ## 書き出し先
 
-設定ファイル `$HOME/.claude/config.json` の Vault パスを使う。
+Vault パスはユーザーホーム直下の `~/ObsidianVault` 固定。
 
-パスの取得手順:
-1. `$HOME/.claude/config.json` を Read ツールで読み込む
-2. プラットフォームに応じてキーを選択する:
-   - Windows（win32）: `obsidian_vault_win` を優先、なければ `obsidian_vault`
-   - それ以外: `obsidian_vault`
-3. 取得したパスが実際にアクセス可能か確認する（`ls` 等で）
-4. `{vault_path}/_claude/blog/YYYYMM/` に書き出す（YYYYMM は現在の年月、例: 202602）
-
-※ キーが存在しない場合は以下を案内して終了：
+1. `~/ObsidianVault` が存在することを確認する（`ls ~/ObsidianVault` 等）
+2. 存在しなければ以下を案内して終了：
 
 ```
-obsidian_vault が設定されていません。
-~/.claude/config.json に以下を追加してください：
-
-  "obsidian_vault": "/path/to/vault"
-  "obsidian_vault_win": "C:/Users/xxx/ObsidianVault"  // Windows の場合
-
-chezmoi を使っている場合は `chezmoi init` で設定できます。
+~/ObsidianVault が見つかりません。
+ユーザーホーム直下に ObsidianVault を配置してください（WSL ではシンボリックリンクでも可）。
 ```
 
-※ パスの推測・ハードコード禁止。
-※ ディレクトリが存在しなければ `mkdir -p` で作成すること。
+3. `~/ObsidianVault/_claude/blog/YYYYMM/` に書き出す（YYYYMM は現在の年月、例: 202602）
+4. ディレクトリが存在しなければ `mkdir -p` で作成する
 
 ## ファイル名
 

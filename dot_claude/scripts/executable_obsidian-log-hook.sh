@@ -10,15 +10,10 @@ set -euo pipefail
 # フックは stdin に JSON を受け取るが、本スクリプトでは使わないので閉じる
 exec < /dev/null
 
-CONFIG_FILE="${HOME}/.claude/config.json"
+VAULT="${HOME}/ObsidianVault"
 
-# config.json から obsidian_vault を読み取る
-if [ ! -f "$CONFIG_FILE" ]; then
-    exit 0
-fi
-
-VAULT=$(jq -r '.obsidian_vault // empty' "$CONFIG_FILE" 2>/dev/null || echo "")
-if [ -z "$VAULT" ]; then
+# Vault が存在しなければ何もしない（静かに終了）
+if [ ! -d "$VAULT" ]; then
     exit 0
 fi
 
