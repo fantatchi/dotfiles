@@ -2,7 +2,9 @@
 
 [chezmoi](https://www.chezmoi.io/) で管理する dotfiles。
 
-**対象環境:** Linux / macOS / WSL
+**対象環境:** Linux (Ubuntu) / macOS / WSL
+
+macOS では事前に [Homebrew](https://brew.sh/) が必要（hook 依存の `jq` を `brew install` で入れるため）。
 
 ## クイックスタート
 

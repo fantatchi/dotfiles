@@ -1,30 +1,42 @@
-{{- if ne .chezmoi.os "linux" -}}
-{{- /* Linux 以外では実行しない（空出力でスキップ） */ -}}
+{{- if and (ne .chezmoi.os "linux") (ne .chezmoi.os "darwin") -}}
+{{- /* Linux / macOS 以外では実行しない（空出力でスキップ） */ -}}
 {{- else -}}
 #!/bin/bash
 set -euo pipefail
 
 echo "=== Claude Code hook の依存チェック ==="
 
-# --- Linux 依存 ---
-echo ""
-echo "[Linux]"
+OS="{{ .chezmoi.os }}"
 
 install_if_missing() {
     local cmd="$1"
     local pkg="${2:-$1}"
     if command -v "$cmd" &>/dev/null; then
         echo "  [OK] $cmd"
-    else
-        echo "  [INSTALL] $cmd (apt: $pkg)"
-        sudo apt-get update -qq && sudo apt-get install -y -qq "$pkg"
+        return
     fi
+    case "$OS" in
+        linux)
+            echo "  [INSTALL] $cmd (apt: $pkg)"
+            sudo apt-get update -qq && sudo apt-get install -y -qq "$pkg"
+            ;;
+        darwin)
+            if ! command -v brew &>/dev/null; then
+                echo "  [ERROR] $cmd が無く、Homebrew も見つかりません。先に Homebrew をインストールしてください。" >&2
+                exit 1
+            fi
+            echo "  [INSTALL] $cmd (brew: $pkg)"
+            brew install "$pkg"
+            ;;
+    esac
 }
 
+echo ""
+echo "[$OS]"
 install_if_missing jq
 
 # --- Windows 依存（WSL 環境のみ） ---
-if command -v powershell.exe &>/dev/null; then
+if [ "$OS" = "linux" ] && command -v powershell.exe &>/dev/null; then
     echo ""
     echo "[Windows via WSL interop]"
 
