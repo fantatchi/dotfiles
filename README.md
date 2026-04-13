@@ -16,7 +16,6 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply fantatchi
 
 | 質問 | 説明 |
 |------|------|
-| GitHub MCP を使うか | Claude Code から GitHub API を使う場合は y → PAT を入力 |
 | Obsidian Vault のパス | 作業ログを Obsidian に記録する場合はパスを入力 |
 
 ## 含まれるもの
@@ -25,7 +24,7 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply fantatchi
 |------|---------|------|
 | zsh | `.zshrc`, `.zsh/` | oh-my-zsh（プラグイン: git のみ） |
 | vim | `.vimrc`, `.vim/` | プラグインレス |
-| Claude Code | `.claude/` | 設定・スキル・MCP・スクリプト |
+| Claude Code | `.claude/` | 設定・スキル・スクリプト |
 
 ## 環境別設定
 

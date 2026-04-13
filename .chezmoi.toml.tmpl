@@ -1,8 +1,7 @@
-{{- $use_github_mcp := eq (lower (promptStringOnce . "use_github_mcp" "GitHub MCP を使いますか [y/N]")) "y" -}}
 {{- $obsidian_vault := promptStringOnce . "obsidian_vault" "Obsidian Vault のパス (Enter でスキップ)" -}}
+{{- $obsidian_vault_win := promptStringOnce . "obsidian_vault_win" "Obsidian Vault の Windows パス (WSL 利用時、Enter でスキップ)" -}}
+{{- $wsl_distro := promptStringOnce . "wsl_distro" "WSL ディストリビューション名 (例: Ubuntu、非 WSL なら Enter)" -}}
 [data]
-  use_github_mcp = {{ $use_github_mcp }}
-{{- if $use_github_mcp }}
-  github_token = {{ promptStringOnce . "github_token" "GitHub Personal Access Token" | quote }}
-{{- end }}
   obsidian_vault = {{ $obsidian_vault | quote }}
+  obsidian_vault_win = {{ $obsidian_vault_win | quote }}
+  wsl_distro = {{ $wsl_distro | quote }}
