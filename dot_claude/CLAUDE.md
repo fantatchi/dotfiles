@@ -53,6 +53,10 @@ GOをもらってから進める。
 - まず原因を特定・説明し、対処方針を提示してから修正に入る
 - 同一エラーに対して2回修正しても解消しない場合は、状況を整理して方針を相談する
 
+# 作業 Tips
+
+- **別ブランチのファイルを checkout せずに読む**: PR レビュー時など、現在のブランチを維持したまま別ブランチの内容を読むには `git fetch origin <branch>` した上で `git show FETCH_HEAD:<path>` または `git show origin/<branch>:<path>` を使う。作業中のブランチを崩さずに済む
+
 # スキルコマンド
 
 - `/obsidian-log` — 作業ログを Obsidian Vault に記録
