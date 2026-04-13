@@ -66,6 +66,7 @@ GOをもらってから進める。
 - `/context-load` — `.claude/context.md` からコンテキストを復帰
 - `/session-save` — `/obsidian-log` + `/context-save` を一括実行
 - `/session-review` — セッション振り返り（権限・CLAUDE.md・スキルの整理）
+- `/consistency-check` — プロジェクト内の CLAUDE.md・テンプレート・設定ファイル間の整合性を検証
 - `/ks-naming` — 土木業界向け識別子名の生成
 - `/daily-summary` — GitHub アクティビティと作業ログからデイリーサマリーを生成
 - `/gtd-add` — `~/.claude/tasks.md` の Inbox にタスクを追加
