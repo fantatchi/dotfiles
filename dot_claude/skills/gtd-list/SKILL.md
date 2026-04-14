@@ -2,7 +2,7 @@
 name: gtd-list
 description: ~/.claude/tasks.md からタスクを読み込み、指定条件で表示する。「タスク一覧」「TODO を見せて」といった依頼、または他スキルからのタスク参照で使う。
 argument-hint: [--all|--inbox|--next|--waiting|--someday|--done [N]|--project <name>]
-allowed-tools: Read, Bash(git:*), Bash(basename:*), Bash(pwd)
+allowed-tools: Read, Edit, Bash(git:*), Bash(basename:*), Bash(pwd), Bash(date:*)
 ---
 
 # タスク一覧表示
@@ -31,6 +31,28 @@ allowed-tools: Read, Bash(git:*), Bash(basename:*), Bash(pwd)
 ### 1. tasks.md の読み込み
 
 `~/.claude/tasks.md` を Read で読む。存在しない場合は「タスクが登録されていません。`/gtd-add` で追加してください。」と案内して終了。
+
+### 1.5. Done セクションの剪定（副作用）
+
+表示処理の前に、`## Done` セクションから**1 ヶ月以上前のエントリを削除**する。tasks.md は直近の Done だけを保持する運用（古い完了タスクは明示的にアーカイブせず捨てる）。
+
+#### 手順
+
+1. しきい値日付を取得: `date -d "1 month ago" +%Y-%m-%d`（Linux / WSL）または `date -v-1m +%Y-%m-%d`（macOS / BSD）。どちらも失敗した場合は剪定をスキップして通常の表示処理に進む
+2. `## Done` セクションの各行を走査し、`- [x] YYYY-MM-DD` 形式で始まる行の日付部分を抽出
+3. 抽出した日付がしきい値日付より**厳密に前**（`< threshold`）の行を削除対象とする
+4. 削除対象があれば Edit で該当行を削除し、削除件数を記憶する
+5. 日付が付いていない行・日付を抽出できない行はスキップ（削除しない）
+
+#### 表示への反映
+
+剪定で 1 件以上削除した場合、通常の表示の末尾に 1 行で報告する：
+
+```
+（Done から N 件の古いエントリを剪定しました）
+```
+
+削除が 0 件なら何も報告しない。
 
 ### 2. 現在プロジェクトの推定（引数なしの場合）
 
@@ -78,5 +100,6 @@ Inbox と Next の両方が 0 件の場合は「現在プロジェクト `<name>
 
 ## 注意事項
 
-- 読み込み専用。tasks.md は変更しない
+- 基本は読み込み専用だが、**Done セクションの剪定（ステップ 1.5）のみ書き込みがある**
+- 剪定以外の目的で tasks.md を変更しない（タスクの並び替え・修正は `gtd-add` / `gtd-done` の役割）
 - tasks.md は `~/.claude/tasks.md`（グローバル固定）
