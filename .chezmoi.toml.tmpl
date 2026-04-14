@@ -1,4 +1,4 @@
 [data]
-# 機密情報を追加する場合は平文で書かず、chezmoi のテンプレート関数を使うこと。
-# 例: {{ (onepasswordRead "op://Vault/Item/field") }}
-#     {{ (bitwarden "item" "name").login.password }}
+# 機密情報を追加する場合は平文で書かず、chezmoi のテンプレート関数
+# （onepasswordRead / bitwarden / pass 等）を使うこと。詳細は chezmoi
+# のドキュメント「Password managers」を参照。
