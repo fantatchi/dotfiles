@@ -7,7 +7,7 @@ allowed-tools: Read, Bash(gh:*), Bash(date:*), Bash(python3:*), Bash(cat:*), Bas
 
 # デイリーサマリーの生成
 
-その日の GitHub アクティビティと Obsidian 作業ログ（context-log）を収集し、デイリーノートにサマリーを追記する。
+その日の GitHub アクティビティと Obsidian 作業ログ（作業ログ）を収集し、デイリーノートにサマリーを追記する。
 
 ## 1. 対象日の決定
 
@@ -83,7 +83,7 @@ gh api '/search/issues?q=reviewed-by:kentem-at-kato+type:pr+updated:TARGET_DATE&
 
 例: `labels: ["作成", "マージ"]`
 
-## 4. context-log の収集
+## 4. 作業ログ の収集
 
 Bash の ls コマンドでファイル一覧を取得し、各ファイルを Read ツールで読む:
 
@@ -95,7 +95,7 @@ ls ~/ObsidianVault/_claude/log/{YYYYMM}/{YYYYMMDD}*.md 2>/dev/null
 1. frontmatter の `project` を取得
 2. `## 概要` セクションのテキスト（1-2行）を取得
 
-context-log が 0 件の場合は「作業ログの記録なし」とする。
+作業ログ が 0 件の場合は「作業ログの記録なし」とする。
 
 ## 4b. tasks.md からの予定タスク収集
 
@@ -173,6 +173,6 @@ echo -n "$JSON_DATA" | base64 -w0 | base64 -d | python3 ~/.claude/skills/daily-s
 ## 注意事項
 
 - GitHub API の日付は UTC ベースだが、`committer-date` はコミッターのローカルタイムで評価されるため通常は問題ない
-- context-log のファイル名はタイムスタンプ（JST）ベースなので、`YYYYMMDD` の前方一致で正しくフィルタできる
+- 作業ログ のファイル名はタイムスタンプ（JST）ベースなので、`YYYYMMDD` の前方一致で正しくフィルタできる
 - Obsidian のリンク記法（`[[]]`）やコールアウト（`> [!info]`）を活用する
 - Windows 環境で `python3` が無い場合は Python 3 をインストールしてから実行すること

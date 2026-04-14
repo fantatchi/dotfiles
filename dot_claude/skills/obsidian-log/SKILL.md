@@ -2,7 +2,7 @@
 name: obsidian-log
 description: セッション中の作業内容をObsidian Vaultに記録する。「作業ログを書いて」「今日の作業を記録」といった依頼で使う。
 argument-hint: [タグ...]
-allowed-tools: Read, Write, Glob, Bash(echo *), Bash(mkdir *), Bash(date *)
+allowed-tools: Read, Write, Glob, Bash(echo:*), Bash(mkdir:*), Bash(date:*)
 ---
 
 # 作業履歴の記録

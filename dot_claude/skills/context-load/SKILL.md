@@ -2,7 +2,7 @@
 name: context-load
 description: 保存済みのプロジェクトコンテキストを読み込み、前回の作業状態を復帰する。セッション開始時に使う。
 disable-model-invocation: true
-allowed-tools: Read, Glob, Grep, Bash(git *), Bash(echo *), Bash(basename *), Bash(pwd)
+allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(echo:*), Bash(basename:*), Bash(pwd)
 ---
 
 # コンテキスト読み込み

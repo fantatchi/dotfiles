@@ -2,7 +2,7 @@
 name: consistency-check
 description: プロジェクトの CLAUDE.md・テンプレート・設定ファイル間の整合性をチェックする。
 argument-hint: [カテゴリ...]
-allowed-tools: Read, Glob, Grep, Bash(date *), Bash(wc *)
+allowed-tools: Read, Glob, Grep, Bash(date:*), Bash(wc:*)
 ---
 
 # 整合性チェック

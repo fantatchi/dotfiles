@@ -2,7 +2,7 @@
 name: gtd-list
 description: ~/.claude/tasks.md からタスクを読み込み、指定条件で表示する。「タスク一覧」「TODO を見せて」といった依頼、または他スキルからのタスク参照で使う。
 argument-hint: [--all|--inbox|--next|--waiting|--someday|--done [N]|--project <name>]
-allowed-tools: Read, Bash(git *), Bash(basename *), Bash(pwd)
+allowed-tools: Read, Bash(git:*), Bash(basename:*), Bash(pwd)
 ---
 
 # タスク一覧表示
