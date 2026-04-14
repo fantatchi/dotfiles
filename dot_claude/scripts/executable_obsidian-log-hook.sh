@@ -36,7 +36,7 @@ DIFF_STAT=$(git diff --stat 2>/dev/null || echo "")
 DIFF_STAGED=$(git diff --cached --stat 2>/dev/null || echo "")
 
 # 変更ファイル数
-FILES_CHANGED=$(git status --short 2>/dev/null | wc -l | tr -d ' ')
+FILES_CHANGED=$(git status --short 2>/dev/null | awk 'END{print NR}')
 
 # 変更ファイル一覧（テーブル行）
 FILE_TABLE=""

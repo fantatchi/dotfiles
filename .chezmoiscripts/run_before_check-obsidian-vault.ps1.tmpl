@@ -1,3 +1,6 @@
+{{- if ne .chezmoi.os "windows" -}}
+{{- /* Windows 以外では実行しない（空出力でスキップ） */ -}}
+{{- else -}}
 # chezmoi apply 前に %USERPROFILE%\ObsidianVault の存在を確認する。
 # 未配置の場合は apply を中断する。
 $ErrorActionPreference = 'Stop'
@@ -7,3 +10,4 @@ if (-not (Test-Path $Vault)) {
     Write-Error "ERROR: $Vault が存在しません。ユーザーホーム直下に ObsidianVault を配置してください。"
     exit 1
 }
+{{- end -}}

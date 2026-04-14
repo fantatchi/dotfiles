@@ -6,8 +6,3 @@ Thumbs.db
 *.swo
 *~
 .claude/context.md
-{{ if eq .chezmoi.os "windows" -}}
-.chezmoiscripts/check-obsidian-vault.sh
-{{ else -}}
-.chezmoiscripts/check-obsidian-vault.ps1
-{{ end -}}

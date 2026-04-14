@@ -4,10 +4,7 @@ export LC_CTYPE=ja_JP.UTF-8
 export LC_MESSAGES=en_US.UTF-8
 export LESSCHARSET=utf-8
 
-# テーマ
-autoload promptinit
-promptinit
-prompt walters
+# テーマは oh-my-zsh の ZSH_THEME で管理するためここでは設定しない
 
 # エイリアス
 case "${OSTYPE}" in

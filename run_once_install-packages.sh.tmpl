@@ -1,3 +1,4 @@
+{{- if ne .chezmoi.os "windows" -}}
 #!/bin/bash
 
 set -e
@@ -5,6 +6,8 @@ set -e
 echo "=== dotfiles セットアップを開始します ==="
 
 ## === oh-my-zsh のインストール ===
+# 公式インストーラ: https://github.com/ohmyzsh/ohmyzsh
+# スクリプト内容の確認・差分監視は上記リポジトリで行う
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
     echo "oh-my-zsh をインストール中..."
     RUNZSH=no CHSH=no sh -c \
@@ -14,6 +17,9 @@ else
 fi
 
 ## === Claude Code のインストール ===
+# 公式インストーラ: https://claude.ai/install.sh
+# settings.json の autoUpdatesChannel: "latest" を使うためネイティブインストーラを使用
+# （npm 等のパッケージマネージャ経由では自動更新チャンネルが機能しない）
 if ! command -v claude &> /dev/null; then
     echo "Claude Code をインストール中..."
     if ! curl -fsSL https://claude.ai/install.sh | bash; then
@@ -24,3 +30,4 @@ else
 fi
 
 echo "=== セットアップ完了！ ==="
+{{- end -}}
