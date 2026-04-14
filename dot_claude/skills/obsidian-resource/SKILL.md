@@ -10,27 +10,9 @@ allowed-tools: Read, Write, Glob, Bash(echo:*), Bash(mkdir:*), Bash(date:*)
 
 Claude に調べてもらった内容や、参考になるリソースを Obsidian Vault に記録してください。
 
-## 書き出し先
+## 書き出し先・ファイル名
 
-Vault パスはユーザーホーム直下の `~/ObsidianVault` 固定。
-
-1. `~/ObsidianVault` が存在することを確認する（`ls ~/ObsidianVault` 等）
-2. 存在しなければ以下を案内して終了：
-
-```
-~/ObsidianVault が見つかりません。
-ユーザーホーム直下に ObsidianVault を配置してください（WSL ではシンボリックリンクでも可）。
-```
-
-3. `~/ObsidianVault/_claude/resource/YYYYMM/` に書き出す（YYYYMM は現在の年月、例: 202602）
-4. ディレクトリが存在しなければ `mkdir -p` で作成する
-
-## ファイル名
-
-`YYYYMMDDHHmmss_簡潔なタイトル.md`
-
-※ タイムスタンプは **`date +%Y%m%d%H%M%S` で取得**すること（`HHmmss` まで必須）。
-（日本語OK、スペースはハイフンに置換）
+`~/.claude/skills/shared/vault-init.md` の手順に従うこと（サブディレクトリ名は `resource`）。タイトル部分は内容を簡潔に表す名前にする。
 
 ## 引数の扱い
 
