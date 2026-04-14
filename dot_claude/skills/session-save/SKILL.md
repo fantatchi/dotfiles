@@ -12,18 +12,11 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git:*), Bash(echo:*), Bash(mkdir:*)
 
 ### ステップ 1: 作業ログの記録
 
-`../obsidian-log/SKILL.md` の手順に従って作業ログを記録する。
-
-- 書き出し先: `../obsidian-log/SKILL.md` に従う
-- フォーマット: `../obsidian-log/template.md` に従う
-- タグ: `claude-log` + 自動生成タグ
+`../obsidian-log/SKILL.md` の手順に完全に従う。書き出し先・フォーマット・タグ等の詳細は SKILL.md 側が正であり、このファイルでは再定義しない（齟齬防止のため）。
 
 ### ステップ 2: コンテキスト保存
 
-`../context-save/SKILL.md` の手順に従ってコンテキストを保存する。
-
-- 書き出し先: プロジェクトルートの `.claude/context.md`
-- フォーマット: `../context-save/template.md` に従う
+`../context-save/SKILL.md` の手順に完全に従う。書き出し先・フォーマット等は SKILL.md 側が正。
 
 ### ステップ 3: アウトプット提案
 

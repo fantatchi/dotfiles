@@ -32,23 +32,7 @@ allowed-tools: Read, Write, Edit, Bash(git:*), Bash(basename:*), Bash(pwd)
 
 ### 3. tasks.md の読み込み
 
-`~/.claude/tasks.md` を Read で読む。ファイルが存在しない場合は以下の初期テンプレートを作成する：
-
-```markdown
-# Tasks
-
-GTD ベースのタスクストア。各 PC ローカル（他PC非同期）。
-
-## Inbox
-
-## Next
-
-## Waiting
-
-## Someday
-
-## Done
-```
+`~/.claude/tasks.md` を Read で読む。ファイルが存在しない場合は `~/.claude/skills/shared/tasks-format.md` の「初期テンプレート」セクションに従って作成する。
 
 ### 4. Inbox セクションに追記
 
