@@ -2,7 +2,7 @@
 name: daily-view
 description: 保存済みの Obsidian デイリーノートを読み込み、デイリーサマリーを Claude Code 上に表示する。「昨日のサマリー」「今日のまとめ見せて」といった依頼で使う。
 argument-hint: [YYYY-MM-DD|yesterday|today]
-allowed-tools: Read, Bash(date:*)
+allowed-tools: Read, Bash(date:+%Y-%m-%d), Bash(date:-d yesterday +%Y-%m-%d)
 ---
 
 # デイリーサマリーの表示
