@@ -169,3 +169,13 @@ Vault 本体は Windows の `C:\Users\<username>\ObsidianVault` に配置。
 そのため **chezmoi は WSL 側からのみ実行する**こと。Windows 側で
 `chezmoi apply` を走らせるとシンボリックリンクを実体ディレクトリに
 置き換えてしまい、共有構成が壊れる。
+
+### Windows セットアップ時の注意
+
+新しい Windows 環境では、CurrentUser の PowerShell 実行ポリシーを
+`RemoteSigned` に変更しておくこと。デフォルトの `Restricted` のままだと
+Claude Code の Stop hook（BurntToast トースト通知）が起動しない。
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+```
