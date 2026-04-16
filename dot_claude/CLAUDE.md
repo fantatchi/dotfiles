@@ -73,6 +73,8 @@ GOをもらってから進める。
 - `/gtd-add` — `~/.claude/tasks.md` の Inbox にタスクを追加
 - `/gtd-list` — `~/.claude/tasks.md` からタスクを表示（デフォルト: 現在プロジェクトの Inbox + Next）
 - `/gtd-done` — 指定タスクを完了にし Done セクションへ移動
+- `/cloud-solution-architect` — Azure Architecture Center ベースのクラウドソリューションアーキテクト視点で設計・レビュー（自動起動対応）
+- `/m365-agents-ts` — Microsoft 365 Agents SDK (TypeScript) の実装ガイド（自動起動対応）
 
 ## スキル共通リソース
 
