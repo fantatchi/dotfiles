@@ -45,6 +45,14 @@ allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(echo:*), Bash(basename:*), Ba
 - 未コミットの変更がある場合: 注意喚起
 - 保存時以降に新しいコミットがある場合: その旨を表示
 
+### 2-b. 進捗マップの読み込み
+
+`{project-root}/.claude/progress.md` を読み込み、進捗マップとして扱う。
+
+- ファイルが存在しない場合はスキップ
+- 抽出した内容は提示（ステップ 3）に含める
+- 後方互換: `.claude/progress.md` がなく、かつ `{project-root}/CLAUDE.md` に `## 進捗マップ` セクションがある場合は、そこから抽出する（旧形式）
+
 ### 3. コンテキストの提示
 
 読み込んだ情報を整理して提示する：
@@ -57,6 +65,9 @@ allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(echo:*), Bash(basename:*), Ba
 
 ### プロジェクト概要
 （概要）
+
+### 進捗マップ（.claude/progress.md より）
+（progress.md の内容をそのまま表示）
 
 ### 進行中の作業
 （作業内容）
@@ -74,6 +85,7 @@ allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(echo:*), Bash(basename:*), Ba
 
 ```
 
+- 「進捗マップ」は `.claude/progress.md`（優先）または CLAUDE.md の `## 進捗マップ` セクション（後方互換）がある場合のみ表示する。どちらもない場合はセクションごと省略する
 - 「次のステップ」は `~/.claude/tasks.md` から読み込んだ該当プロジェクトのタスクを表示する
 - Waiting のタスクには ⏳ マーカーを付けて区別する
 - タスクが 0 件の場合は「次のステップなし。`/gtd-add` で追加できます。」と表示
@@ -81,5 +93,5 @@ allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(echo:*), Bash(basename:*), Ba
 
 ## 注意事項
 
-- 読み込み専用。コンテキストファイルと tasks.md を変更しない
+- 読み込み専用。コンテキストファイル・tasks.md・progress.md を変更しない
 - パスはプロジェクトルートからの相対パスで記録されているため、現在のマシンのパスと異なる場合がある
