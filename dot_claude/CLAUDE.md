@@ -61,21 +61,21 @@ GOをもらってから進める。
 
 # スキルコマンド
 
-- `/obsidian-log` — 作業ログを Obsidian Vault に記録
-- `/obsidian-blog` — ブログドラフトを Obsidian Vault に作成
-- `/obsidian-resource` — 調査メモを Obsidian Vault に保存
-- `/context-save` — プロジェクトコンテキストを `.claude/context.md` に保存
-- `/context-load` — `.claude/context.md` からコンテキストを復帰
-- `/session-save` — `/obsidian-log` + `/context-save` を一括実行し、アウトプット提案（ブログ・リソース候補）も行う
-- `/session-review` — セッション振り返り（権限・CLAUDE.md・スキルの整理）
-- `/consistency-check` — プロジェクト内の CLAUDE.md・テンプレート・設定ファイル間の整合性を検証
-- `/ks-naming` — 土木業界向け識別子名の生成
-- `/obsidian-daily` — GitHub アクティビティと作業ログからデイリーサマリーを生成
-- `/gtd-add` — `~/.claude/tasks.md` の Inbox にタスクを追加
-- `/gtd-list` — `~/.claude/tasks.md` からタスクを表示（デフォルト: 現在プロジェクトの Inbox + Next）
-- `/gtd-done` — 指定タスクを完了にし Done セクションへ移動
 - `/cloud-solution-architect` — Azure Architecture Center ベースのクラウドソリューションアーキテクト視点で設計・レビュー（自動起動対応）
+- `/consistency-check` — プロジェクト内の CLAUDE.md・テンプレート・設定ファイル間の整合性を検証
+- `/context-load` — `.claude/context.md` からコンテキストを復帰
+- `/context-save` — プロジェクトコンテキストを `.claude/context.md` に保存
+- `/gtd-add` — `~/.claude/tasks.md` の Inbox にタスクを追加
+- `/gtd-done` — 指定タスクを完了にし Done セクションへ移動
+- `/gtd-list` — `~/.claude/tasks.md` からタスクを表示（デフォルト: 現在プロジェクトの Inbox + Next）
+- `/ks-naming` — 土木業界向け識別子名の生成
 - `/m365-agents-ts` — Microsoft 365 Agents SDK (TypeScript) の実装ガイド（自動起動対応）
+- `/obsidian-blog` — ブログドラフトを Obsidian Vault に作成
+- `/obsidian-daily` — GitHub アクティビティと作業ログからデイリーサマリーを生成
+- `/obsidian-log` — 作業ログを Obsidian Vault に記録
+- `/obsidian-resource` — 調査メモを Obsidian Vault に保存
+- `/session-review` — セッション振り返り（権限・CLAUDE.md・スキルの整理）
+- `/session-save` — `/obsidian-log` + `/context-save` を一括実行し、アウトプット提案（ブログ・リソース候補）も行う
 
 ## スキル共通リソース
 
