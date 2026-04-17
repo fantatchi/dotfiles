@@ -1,5 +1,5 @@
 ---
-name: daily-summary
+name: obsidian-daily
 description: GitHub アクティビティと作業ログからデイリーサマリーを生成し、Obsidian デイリーノートに追記する。「今日のまとめ」「デイリーサマリー」といった依頼で使う。
 argument-hint: [YYYY-MM-DD]
 allowed-tools: Read, Bash(gh:*), Bash(date:*), Bash(python3:*), Bash(cat:*), Bash(ls:*), Bash(echo:*)
@@ -146,7 +146,7 @@ ls ~/ObsidianVault/_claude/log/{YYYYMM}/{YYYYMMDD}*.md 2>/dev/null
 
 ## 6. デイリーノートへの書き込み
 
-`~/.claude/skills/daily-summary/write-daily.py` を使ってデイリーノートに書き込む。
+`~/.claude/skills/obsidian-daily/write-daily.py` を使ってデイリーノートに書き込む。
 このスクリプトは stdin から JSON を受け取り、以下を自動判定して処理する:
 
 - ファイルが存在しない → 新規作成（frontmatter + サマリー）
@@ -156,14 +156,14 @@ ls ~/ObsidianVault/_claude/log/{YYYYMM}/{YYYYMMDD}*.md 2>/dev/null
 実行:
 
 ```bash
-echo -n "$JSON_DATA" | python3 ~/.claude/skills/daily-summary/write-daily.py
+echo -n "$JSON_DATA" | python3 ~/.claude/skills/obsidian-daily/write-daily.py
 ```
 
 JSON にバッククォートやダブルクォートが含まれる場合、シェルエスケープを避けるため
 ヒアドキュメントか base64 経由で渡す:
 
 ```bash
-echo -n "$JSON_DATA" | base64 -w0 | base64 -d | python3 ~/.claude/skills/daily-summary/write-daily.py
+echo -n "$JSON_DATA" | base64 -w0 | base64 -d | python3 ~/.claude/skills/obsidian-daily/write-daily.py
 ```
 
 ## 7. 完了報告

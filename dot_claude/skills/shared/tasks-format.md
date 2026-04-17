@@ -1,6 +1,6 @@
 # tasks.md フォーマット仕様
 
-タスク管理スキル（`gtd-add`, `gtd-list`, `gtd-done`）および `context-save`, `context-load`, `daily-summary` が共通で参照するフォーマット定義。
+タスク管理スキル（`gtd-add`, `gtd-list`, `gtd-done`）および `context-save`, `context-load`, `obsidian-daily` が共通で参照するフォーマット定義。
 
 ## 場所
 

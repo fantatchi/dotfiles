@@ -70,8 +70,7 @@ GOをもらってから進める。
 - `/session-review` — セッション振り返り（権限・CLAUDE.md・スキルの整理）
 - `/consistency-check` — プロジェクト内の CLAUDE.md・テンプレート・設定ファイル間の整合性を検証
 - `/ks-naming` — 土木業界向け識別子名の生成
-- `/daily-summary` — GitHub アクティビティと作業ログからデイリーサマリーを生成
-- `/daily-view` — 保存済みデイリーノートのサマリーを表示（デフォルト: 昨日）
+- `/obsidian-daily` — GitHub アクティビティと作業ログからデイリーサマリーを生成
 - `/gtd-add` — `~/.claude/tasks.md` の Inbox にタスクを追加
 - `/gtd-list` — `~/.claude/tasks.md` からタスクを表示（デフォルト: 現在プロジェクトの Inbox + Next）
 - `/gtd-done` — 指定タスクを完了にし Done セクションへ移動
@@ -84,7 +83,7 @@ GOをもらってから進める。
 
 ## スキルの種類と frontmatter 方針
 
-- **操作型スキル**（obsidian-*, gtd-*, daily-*, session-*, context-* など）: 特定のコマンドやファイル操作を行うため、`allowed-tools` で使用ツールを具体的に列挙する
+- **操作型スキル**（obsidian-*, gtd-*, session-*, context-* など）: 特定のコマンドやファイル操作を行うため、`allowed-tools` で使用ツールを具体的に列挙する
 - **ロール変換型スキル**（cloud-solution-architect, m365-agents-ts など）: エージェントを特定の専門家役に変身させ、その後の作業全般を導くため、`allowed-tools` を**指定しない**（指定するとトリガー後の実作業で権限不足になる）
 
 # Agent Teams の使い所
