@@ -61,7 +61,6 @@ GOをもらってから進める。
 
 # スキルコマンド
 
-- `/cloud-solution-architect` — Azure Architecture Center ベースのクラウドソリューションアーキテクト視点で設計・レビュー（自動起動対応）
 - `/consistency-check` — プロジェクト内の CLAUDE.md・テンプレート・設定ファイル間の整合性を検証
 - `/context-load` — `.claude/context.md` からコンテキストを復帰
 - `/context-save` — プロジェクトコンテキストを `.claude/context.md` に保存
@@ -69,7 +68,6 @@ GOをもらってから進める。
 - `/gtd-done` — 指定タスクを完了にし Done セクションへ移動
 - `/gtd-list` — `~/.claude/tasks.md` からタスクを表示（デフォルト: 現在プロジェクトの Inbox + Next）
 - `/ks-naming` — 土木業界向け識別子名の生成
-- `/m365-agents-ts` — Microsoft 365 Agents SDK (TypeScript) の実装ガイド（自動起動対応）
 - `/obsidian-blog` — ブログドラフトを Obsidian Vault に作成
 - `/obsidian-daily` — GitHub アクティビティと作業ログからデイリーサマリーを生成
 - `/obsidian-log` — 作業ログを Obsidian Vault に記録
@@ -84,7 +82,7 @@ GOをもらってから進める。
 ## スキルの種類と frontmatter 方針
 
 - **操作型スキル**（obsidian-*, gtd-*, session-*, context-* など）: 特定のコマンドやファイル操作を行うため、`allowed-tools` で使用ツールを具体的に列挙する
-- **ロール変換型スキル**（cloud-solution-architect, m365-agents-ts など）: エージェントを特定の専門家役に変身させ、その後の作業全般を導くため、`allowed-tools` を**指定しない**（指定するとトリガー後の実作業で権限不足になる）
+- **ロール変換型スキル**（market プラグイン由来の cloud-solution-architect, m365-agents-ts など）: エージェントを特定の専門家役に変身させ、その後の作業全般を導くため、`allowed-tools` を**指定しない**（指定するとトリガー後の実作業で権限不足になる）
 
 # Agent Teams の使い所
 
