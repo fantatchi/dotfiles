@@ -160,9 +160,8 @@ chezmoi apply
 
 Vault 本体は Windows の `C:\Users\<username>\ObsidianVault` に配置。
 
-- OneDrive で PC 間同期
-- メモの同期は Obsidian の git 拡張機能
-- `.obsidian` フォルダは各環境にコピー
+- メモの同期は Obsidian の git 拡張機能（obsidian-git プラグイン）
+- `.obsidian` フォルダは別リポジトリ（`fantatchi/obsidian-config`）で管理・同期
 
 ### WSL / Windows 共有構成
 
