@@ -182,6 +182,34 @@ tags:
 - 相対パスで記録する（マシン非依存にするため）
 - PR 番号・Issue 番号だけでは次回誤認しやすいので、ブランチ名・タイトル・最終確認日もセットで記録する
 
+### ホームワークスペース運用
+
+ユーザーホーム (`~/`) は「**ホームワークスペース**」として扱う。プロジェクト単位で完結しない作業（スキル編集・tasks 管理・Obsidian 書き込み・個人 TODO 等）をここで行う場として位置付けている。
+
+**CWD = `$HOME` のときの挙動:**
+
+- `/gtd-*` はプロジェクトタグに **`#project/global`** を自動付与する（`$HOME` 完全一致で判定）
+  - プロジェクト非依存のタスク（個人 TODO、環境整備、PC 固有の設定作業など）を集約する予約タグ
+- コンテキストは `~/.claude/context.md` に保存される（通常プロジェクトと同じ `/context-save` / `/context-load` で扱える）
+
+**dotfiles 作業との関心事分離:**
+
+`~/` と `~/.local/share/chezmoi`（chezmoi source dir）は**別リポジトリ扱い**で、作業の起点を使い分ける。
+
+| 作業対象 | CWD | git 履歴の正本 |
+|---------|-----|---------------|
+| スキル編集・tasks 管理・Obsidian 書き込みなど | `~/` | （tasks.md は非 git、それ以外は chezmoi source） |
+| `.chezmoiroot` / テンプレート / hook スクリプトなど dotfiles 本体 | `~/` のまま | `~/.local/share/chezmoi` |
+
+- **`cd` は使わず `git -C ~/.local/share/chezmoi ...` で操作する**。CWD は `~/` のまま維持する
+- `~/.claude/context.md` の `## 関連リポジトリ` セクションに chezmoi 側の直近コミットを埋め込むことで、ホームワークスペース側から dotfiles の履歴も追えるようにしている
+
+**`~/.claude` の live 編集ルール:**
+
+- `~/.claude/` 配下は chezmoi 管理下だが **live 編集してよい**（スキル修正・`settings.json` 更新など）
+- 反映は同一セッション内で一気通貫: live 編集 → `chezmoi re-add` → `git -C ~/.local/share/chezmoi commit/push`
+- `~/.claude/tasks.md` と `~/.claude/settings.local.json` は **chezmoi 非管理**（前者は各 PC ローカル、後者はローカル権限/実験 env）
+
 ### Obsidian 連携
 
 Claude Code の作業内容を Obsidian Vault に自動・手動で記録する機能。
