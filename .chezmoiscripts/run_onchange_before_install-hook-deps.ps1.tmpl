@@ -3,6 +3,14 @@
 {{- else -}}
 Write-Host "=== Claude Code hook の依存チェック ==="
 
+# --- PowerShell ExecutionPolicy 確認 ---
+# Restricted / Undefined だと Claude Code の Stop hook（BurntToast 通知）が起動しない。
+$policy = Get-ExecutionPolicy -Scope CurrentUser
+if ($policy -in @('Restricted', 'Undefined')) {
+    Write-Warning "CurrentUser の ExecutionPolicy が $policy です。Claude Code の Stop hook（BurntToast 通知）が起動しない可能性があります。"
+    Write-Warning "以下を実行してください: Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned"
+}
+
 # --- Windows 依存 ---
 Write-Host ""
 Write-Host "[Windows]"
