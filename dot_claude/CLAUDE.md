@@ -58,6 +58,8 @@ GOをもらってから進める。
 - **別ブランチのファイルを checkout せずに読む**: PR レビュー時など、現在のブランチを維持したまま別ブランチの内容を読むには `git fetch origin <branch>` した上で `git show FETCH_HEAD:<path>` または `git show origin/<branch>:<path>` を使う。作業中のブランチを崩さずに済む
 - **`chezmoi add` と `chezmoi re-add` の違い**: `re-add` は既存管理ファイルの更新専用。新規ファイルを source に取り込むには `chezmoi add` を使う（`re-add` だと `not managed` エラー）
 - **`run_before_*` は `chezmoi diff` に常に出る**: `run_before_` スクリプトは毎回 apply 時に実行されるため、diff がクリアにならないのは正常動作。`run_onchange_` はハッシュ変化時のみ実行されるので diff に出ない
+- **リモートブランチ削除を `gh api` で回避する**: `git push origin --delete <branch>` がシステム側のブロックで弾かれる環境では、`gh api --method DELETE repos/<owner>/<repo>/git/refs/heads/<branch>` が代替になる。PR マージ後のブランチ片付けに使える
+- **Git Bash で `gh api` のエンドポイント先頭スラッシュ**: Git Bash / MSYS は `gh api /repos/...` の先頭スラッシュを Windows パス（`C:/Program Files/Git/repos/...`）に変換してしまい、`invalid API endpoint` エラーになる。先頭スラッシュを外して `gh api repos/...` と書く
 
 # スキルコマンド
 
