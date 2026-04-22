@@ -15,6 +15,13 @@ import re
 import sys
 from datetime import datetime, timezone, timedelta
 
+# Windows の stdin/stdout はデフォルトで cp932 等になり UnicodeEncodeError
+# (surrogates not allowed) を起こすことがあるため UTF-8 に固定する。
+# 呼び出し側の PYTHONIOENCODING 設定に依存しないようにするのが目的。
+sys.stdin.reconfigure(encoding="utf-8")
+sys.stdout.reconfigure(encoding="utf-8")
+sys.stderr.reconfigure(encoding="utf-8")
+
 JST = timezone(timedelta(hours=9))
 
 # --- テンプレート ---
@@ -144,7 +151,9 @@ def build_daily_note(target_date: str) -> str:
 
 def write_daily(data: dict) -> str:
     """メイン処理。デイリーノートにサマリーを書き込む。"""
-    vault = data["vault"]
+    # Python は `~` を自動展開しないため明示的に expanduser する。
+    # これを省くと `~/ObsidianVault` が literal `~` ディレクトリとして作成されてしまう。
+    vault = os.path.expanduser(data["vault"])
     target_date = data["target_date"]
     yyyymm = target_date.replace("-", "")[:6]
 

@@ -176,3 +176,5 @@ echo -n "$JSON_DATA" | base64 -w0 | base64 -d | python3 ~/.claude/skills/obsidia
 - 作業ログ のファイル名はタイムスタンプ（JST）ベースなので、`YYYYMMDD` の前方一致で正しくフィルタできる
 - Obsidian のリンク記法（`[[]]`）やコールアウト（`> [!info]`）を活用する
 - Windows 環境で `python3` が無い場合は Python 3 をインストールしてから実行すること
+- **Windows 環境の stdin 文字コード**: cp932 既定で動くと UnicodeEncodeError (`surrogates not allowed`) が出る。`write-daily.py` 側で `sys.stdin.reconfigure(encoding="utf-8")` を呼んで吸収済みなので、呼び出し側で `PYTHONIOENCODING=utf-8` を付ける必要はない
+- **`vault` の `~` 展開**: Python は `~` を自動展開しないため、`write-daily.py` 側で `os.path.expanduser()` を通している。JSON の `vault` には `~/ObsidianVault` のようなチルダ込みパスをそのまま渡してよい（渡さないと literal `~` ディレクトリが作られるバグを過去に踏んだ）
