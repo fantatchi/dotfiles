@@ -30,11 +30,12 @@ $ARGUMENTS で分岐する。
 
 - スペース区切りでそれぞれを tags に追加する
 - 例: `/obsidian-resource api auth` → tags: claude-resource, api, auth, ...
-- 対話で内容を整理するかは状況に応じて判断する
+- 記録する内容がセッション内に明確にある場合はそのまま保存、不明確な場合は内容・タイトル案を提示して確認を取る
 
 ### 引数なしの場合 — 内容をもとに自動タグで記録
 
-- `claude-resource` と自動生成タグのみで記録する
+- `claude-resource` と自動生成タグのみで記録する（「タグの自動生成」ルールに従い、`claude-resource` を除いて最大 5 個）
+- 引数に `auto` を指定するとセッション内容からドラフトを自動生成できる旨を 1 行案内する
 
 ## 出力フォーマット
 
@@ -45,7 +46,7 @@ $ARGUMENTS で分岐する。
 - `title`: 記事タイトル（内容から生成）
 - `date`: 作成日
 - `tags`: 3〜5 個。引数タグ＋自動生成タグ（`claude-resource` は常に含める、5 個カウントには含めない）
-- `categories`: 1 つ。[references/categories.md](references/categories.md) から選ぶ。該当なしなら新規追加して一覧も更新する
+- `categories`: 1 つ。`~/.claude/skills/obsidian-resource/references/categories.md` から選ぶ。該当なしなら新規追加して一覧も更新する
 - `draft: true`: 常に付与（Hugo 公開時に手動で false に切り替える）
 
 ### タグの自動生成
@@ -81,3 +82,7 @@ $ARGUMENTS で分岐する。
 - ユーザーが記録を依頼した内容を整理して書くこと
 - 書き出し先ディレクトリが存在しない場合は作成すること
 - 既存ファイルがある場合は上書きせず確認する
+- ファイル書き込みは Write ツールで直書きする（`shared/vault-write.py` は obsidian-daily 専用のため使用しない）
+- Hugo 公開は別途 Hugo リポジトリへのコピー・リンク設定が必要。本スキルは ObsidianVault への下書き保存のみを担う
+- ブログドラフトを含むすべてのリソースを `_claude/resource/` に統一している（旧 `_claude/blog/` は廃止方向。既存 15 件は Vault 内にそのまま保持）
+- 既存 resource ファイル 39 件は旧形式（`title` / `categories` / `draft` なし）と混在する。Dataview 等でクエリする場合は `WHERE file.frontmatter.categories != null` のようにガードを入れる

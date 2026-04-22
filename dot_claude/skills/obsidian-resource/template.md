@@ -3,7 +3,7 @@ title: "記事/メモのタイトル"
 date: YYYY-MM-DD
 tags:
   - claude-resource
-  - （自動生成タグ・引数タグをここに追加）
+  - （引数タグ＋自動生成タグを追加。claude-resource を除いて最大 5 個）
 categories:
   - カテゴリ
 draft: true
