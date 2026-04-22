@@ -147,24 +147,36 @@ ls ~/ObsidianVault/_claude/log/{YYYYMM}/{YYYYMMDD}*.md 2>/dev/null
 ## 6. デイリーノートへの書き込み
 
 `~/.claude/skills/obsidian-daily/write-daily.py` を使ってデイリーノートに書き込む。
-このスクリプトは stdin から JSON を受け取り、以下を自動判定して処理する:
+スクリプトは以下を自動判定して処理する:
 
 - ファイルが存在しない → 新規作成（frontmatter + サマリー）
 - `## デイリーサマリー` がない → 末尾に追記
 - `## デイリーサマリー` がある → そのセクションを上書き
 
-実行:
+### 実行手順（必ずファイル経由）
+
+JSON をシェル経由（`echo` / `cat <<EOF` / 環境変数展開）で Python に流すと、
+Windows の Git Bash 環境では locale が cp932 のため Python に届く前に
+日本語が Shift-JIS 化けする。`sys.stdin.reconfigure` では救えない。
+したがって **必ず UTF-8 で一時ファイルに書き出してからパス引数で渡す**。
 
 ```bash
-echo -n "$JSON_DATA" | python3 ~/.claude/skills/obsidian-daily/write-daily.py
+python3 - <<'PY'
+import json, os
+data = { ... }  # ステップ 5 で組み立てた JSON 構造
+path = os.path.expanduser('~/tmp_daily_summary.json')
+with open(path, 'w', encoding='utf-8') as f:
+    json.dump(data, f, ensure_ascii=False)
+print(path)
+PY
+
+python3 ~/.claude/skills/obsidian-daily/write-daily.py ~/tmp_daily_summary.json
+rm ~/tmp_daily_summary.json
 ```
 
-JSON にバッククォートやダブルクォートが含まれる場合、シェルエスケープを避けるため
-ヒアドキュメントか base64 経由で渡す:
-
-```bash
-echo -n "$JSON_DATA" | base64 -w0 | base64 -d | python3 ~/.claude/skills/obsidian-daily/write-daily.py
-```
+**一時ファイルはホーム直下に置く**: `/tmp/` は Git Bash と WSL でパス解釈が
+異なるため避ける。`~/tmp_daily_summary.json` 固定名で運用する（このスキルは
+単発対話で呼ばれる前提なので同時実行の競合は考慮しない）。
 
 ## 7. 完了報告
 
@@ -176,5 +188,5 @@ echo -n "$JSON_DATA" | base64 -w0 | base64 -d | python3 ~/.claude/skills/obsidia
 - 作業ログ のファイル名はタイムスタンプ（JST）ベースなので、`YYYYMMDD` の前方一致で正しくフィルタできる
 - Obsidian のリンク記法（`[[]]`）やコールアウト（`> [!info]`）を活用する
 - Windows 環境で `python3` が無い場合は Python 3 をインストールしてから実行すること
-- **Windows 環境の stdin 文字コード**: cp932 既定で動くと UnicodeEncodeError (`surrogates not allowed`) が出る。`write-daily.py` 側で `sys.stdin.reconfigure(encoding="utf-8")` を呼んで吸収済みなので、呼び出し側で `PYTHONIOENCODING=utf-8` を付ける必要はない
+- **JSON は必ずファイル経由で渡す**: `echo "$JSON" | python3 ...` / `cat <<EOF | python3 ...` / シェル変数展開は Windows (Git Bash) で cp932 化けを起こす。`sys.stdin.reconfigure` では救えない（Python 到達前にシェルが bytes 化しているため）。ステップ 6 の手順（Python ヒアドキュメントで UTF-8 ファイルに書き出し → パス引数）を必ず踏むこと
 - **`vault` の `~` 展開**: Python は `~` を自動展開しないため、`write-daily.py` 側で `os.path.expanduser()` を通している。JSON の `vault` には `~/ObsidianVault` のようなチルダ込みパスをそのまま渡してよい（渡さないと literal `~` ディレクトリが作られるバグを過去に踏んだ）

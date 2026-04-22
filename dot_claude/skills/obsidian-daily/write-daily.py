@@ -194,12 +194,21 @@ def write_daily(data: dict) -> str:
 
 
 def main():
-    raw = sys.stdin.read()
-    if not raw.strip():
-        print("ERROR: stdin is empty", file=sys.stderr)
-        sys.exit(1)
+    if len(sys.argv) >= 2:
+        # ファイル経由（推奨）: Windows (Git Bash) では locale が cp932 のため
+        # シェル変数 / ヒアドキュメント / pipe 経由で Python に渡すと JSON が
+        # Python 到達前に cp932 bytes 化して化ける。stdin.reconfigure では
+        # 救えないので、UTF-8 で書かれたファイルを直接読む経路を用意する。
+        with open(sys.argv[1], "r", encoding="utf-8") as f:
+            data = json.load(f)
+    else:
+        # stdin 経由（Linux/macOS/WSL のみ動作保証）
+        raw = sys.stdin.read()
+        if not raw.strip():
+            print("ERROR: stdin is empty", file=sys.stderr)
+            sys.exit(1)
+        data = json.loads(raw)
 
-    data = json.loads(raw)
     result = write_daily(data)
     print(result)
 
