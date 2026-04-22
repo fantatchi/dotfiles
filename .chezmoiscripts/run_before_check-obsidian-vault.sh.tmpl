@@ -2,14 +2,14 @@
 {{- /* Windows では .ps1 版を使うためこちらは空出力でスキップ */ -}}
 {{- else -}}
 #!/usr/bin/env sh
-# chezmoi apply 前に ~/ObsidianVault の存在を確認する。
-# 未配置の場合は apply を中断する。
+# chezmoi apply 前に ~/ObsidianVault の存在を警告確認する。
+# 未配置でも apply は継続する（obsidian-* スキル側で存在チェックあり）。
 set -eu
 
 VAULT="${HOME}/ObsidianVault"
 if [ ! -d "$VAULT" ]; then
-    echo "ERROR: $VAULT が存在しません。" >&2
-    echo "ユーザーホーム直下に ObsidianVault を配置してください。" >&2
+    echo "WARNING: $VAULT が存在しません。/obsidian-* スキルは使用できません。" >&2
+    echo "使う場合はユーザーホーム直下に ObsidianVault を配置してください。" >&2
     if uname -r 2>/dev/null | grep -qi microsoft; then
         echo "WSL: Windows 側 Vault へのシンボリックリンクで代用できます:" >&2
         echo "  ln -s /mnt/c/Users/<you>/ObsidianVault \"$VAULT\"" >&2
@@ -17,6 +17,5 @@ if [ ! -d "$VAULT" ]; then
         echo "macOS: iCloud Drive 等の Vault へのシンボリックリンクで代用できます:" >&2
         echo "  ln -s \"/Users/<you>/Library/Mobile Documents/iCloud~md~obsidian/Documents/ObsidianVault\" \"$VAULT\"" >&2
     fi
-    exit 1
 fi
 {{- end -}}

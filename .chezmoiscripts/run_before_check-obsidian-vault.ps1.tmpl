@@ -1,13 +1,10 @@
 {{- if ne .chezmoi.os "windows" -}}
 {{- /* Windows 以外では実行しない（空出力でスキップ） */ -}}
 {{- else -}}
-# chezmoi apply 前に %USERPROFILE%\ObsidianVault の存在を確認する。
-# 未配置の場合は apply を中断する。
-$ErrorActionPreference = 'Stop'
-
+# chezmoi apply 前に %USERPROFILE%\ObsidianVault の存在を警告確認する。
+# 未配置でも apply は継続する（obsidian-* スキル側で存在チェックあり）。
 $Vault = Join-Path $HOME 'ObsidianVault'
 if (-not (Test-Path $Vault)) {
-    Write-Error "ERROR: $Vault が存在しません。ユーザーホーム直下に ObsidianVault を配置してください。"
-    exit 1
+    Write-Warning "$Vault が存在しません。/obsidian-* スキルを使う場合はユーザーホーム直下に ObsidianVault を配置してください。"
 }
 {{- end -}}
