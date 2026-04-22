@@ -281,8 +281,7 @@ Vault が未配置でも `chezmoi apply` は警告を出して継続するが、
 | フォルダ | 内容 |
 |----------|------|
 | `_claude/log/` | 作業履歴 |
-| `_claude/resource/` | 調査結果・参考資料 |
-| `_claude/blog/` | ブログドラフト |
+| `_claude/resource/` | 調査メモ・参考リンク・ブログドラフト |
 | `_daily/` | デイリーサマリー（`/obsidian-daily` で生成） |
 
 ## 環境セットアップの注意点（Windows / WSL）
