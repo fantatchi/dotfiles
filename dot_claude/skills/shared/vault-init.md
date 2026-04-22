@@ -1,10 +1,10 @@
 # Obsidian Vault 初期化手順
 
-`obsidian-log` / `obsidian-blog` / `obsidian-resource` 等、Obsidian Vault へ書き出すスキルが共通で参照する手順。
+`obsidian-log` / `obsidian-resource` 等、Obsidian Vault へ書き出すスキルが共通で参照する手順。
 
 ## 前提
 
-呼び出し元スキルは **サブディレクトリ名** を決めておくこと（例: `log` / `blog` / `resource`）。以降の手順では `<サブ>` と表記する。
+呼び出し元スキルは **サブディレクトリ名** を決めておくこと（例: `log` / `resource`）。以降の手順では `<サブ>` と表記する。
 
 ## 1. Vault 存在確認
 

@@ -44,7 +44,7 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git:*), Bash(echo:*), Bash(mkdir:*)
 - [ブログ] {トピックの概要}（理由: {なぜブログ向きか}）
 - [リソース] {トピックの概要}（理由: {なぜリソース向きか}）
 
-作成する場合は `/obsidian-blog` または `/obsidian-resource` を実行してください。
+作成する場合は `/obsidian-resource` を実行してください（ブログ・リソースいずれも対応。引数 `auto` でセッション内容から自動ドラフト化）。
 ```
 
 該当なしの場合は何も出力しない（提案がないことを報告する必要はない）。
