@@ -70,10 +70,9 @@ GOをもらってから進める。
 - `/gtd-done` — 指定タスクを完了にし Done セクションへ移動
 - `/gtd-list` — `~/.claude/tasks.md` からタスクを表示（デフォルト: 現在プロジェクトの Inbox + Next）
 - `/ks-naming` — 土木業界向け識別子名の生成
-- `/obsidian-blog` — ブログドラフトを Obsidian Vault に作成
 - `/obsidian-daily` — GitHub アクティビティと作業ログからデイリーサマリーを生成
 - `/obsidian-log` — 作業ログを Obsidian Vault に記録
-- `/obsidian-resource` — 調査メモを Obsidian Vault に保存
+- `/obsidian-resource` — 調査メモ・ブログドラフトを Obsidian Vault に保存（引数 `auto` でセッションから自動ドラフト化）
 - `/session-review` — セッション振り返り（権限・CLAUDE.md・スキルの整理）
 - `/session-save` — `/obsidian-log` + `/context-save` を一括実行し、アウトプット提案（ブログ・リソース候補）も行う
 
