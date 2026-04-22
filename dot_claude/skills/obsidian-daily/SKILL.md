@@ -122,7 +122,7 @@ ls ~/ObsidianVault/_claude/log/{YYYYMM}/{YYYYMMDD}*.md 2>/dev/null
 
 ```json
 {
-  "vault": "/home/at-kato/ObsidianVault",
+  "vault": "~/ObsidianVault",
   "target_date": "2026-03-31",
   "commits": [
     {"sha": "a3d1f9f", "message": "コミットメッセージ", "repo": "owner/repo"}
