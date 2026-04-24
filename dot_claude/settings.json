@@ -32,7 +32,8 @@
       "Read(**/.env)",
       "Read(**/.env.*)",
       "Read(**/secrets/**)"
-    ]
+    ],
+    "defaultMode": "auto"
   },
   "hooks": {
     "PreCompact": [
@@ -94,5 +95,7 @@
     }
   },
   "alwaysThinkingEnabled": true,
-  "autoUpdatesChannel": "latest"
+  "autoUpdatesChannel": "latest",
+  "skipAutoPermissionPrompt": true,
+  "tui": "fullscreen"
 }
