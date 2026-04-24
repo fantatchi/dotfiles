@@ -74,7 +74,7 @@ GOをもらってから進める。
 - `/obsidian-log` — 作業ログを Obsidian Vault に記録
 - `/obsidian-resource` — 調査メモ・参考リンク・ブログドラフトを Obsidian Vault に保存（引数 `auto` でセッションから自動ドラフト化）
 - `/session-review` — セッション振り返り（権限・CLAUDE.md・スキルの整理）
-- `/session-save` — `/obsidian-log` + `/context-save` を一括実行し、アウトプット提案（ブログ・リソース候補）も行う
+- `/session-save` — `/obsidian-log` + `/context-save` を一括実行し、アウトプット候補の提案も行う
 
 ## スキル共通リソース
 
