@@ -53,6 +53,24 @@ GOをもらってから進める。
 - まず原因を特定・説明し、対処方針を提示してから修正に入る
 - 同一エラーに対して2回修正しても解消しない場合は、状況を整理して方針を相談する
 
+# Claude Code 設定ファイルの使い分け
+
+`~/.claude/settings.json` と `~/.claude/settings.local.json` は Claude Code がマージして読む。新しい permission や設定を追加するときはどちらに書くかを必ず判断する。
+
+- **settings.json（chezmoi 管理、全マシン共通）** に入れるもの:
+  - `hooks`（obsidian-log / context-save / stop / notification など）
+  - `enabledPlugins`、`extraKnownMarketplaces`
+  - UI/挙動の共通設定: `permissions.defaultMode`、`skipAutoPermissionPrompt`、`tui`、`alwaysThinkingEnabled`、`autoUpdatesChannel`
+  - 全マシンで必要な共通 permissions（基本 Bash 系、`deny` の secrets 系など）
+
+- **settings.local.json（chezmoi 管理外、マシン固有）** に入れるもの:
+  - プロジェクト固有 permissions（例: `Bash(npm run typecheck)`）
+  - マシン固有の MCP / WebFetch permissions（例: `mcp__growi__*`、社内ドメインの `WebFetch`）
+  - 特定 PC のパスを参照する `Bash` / `Read` permissions
+  - マシン固有の `env`
+
+迷ったら settings.local.json に入れる。後で全マシンで必要だと分かったら settings.json に昇格させる（= settings.local.json から該当項目を削除し、settings.json に追記 → `chezmoi re-add` で source に反映）。
+
 # 作業 Tips
 
 - **別ブランチのファイルを checkout せずに読む**: PR レビュー時など、現在のブランチを維持したまま別ブランチの内容を読むには `git fetch origin <branch>` した上で `git show FETCH_HEAD:<path>` または `git show origin/<branch>:<path>` を使う。作業中のブランチを崩さずに済む
