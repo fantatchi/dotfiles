@@ -81,7 +81,7 @@ GOをもらってから進める。
 
 # スキルコマンド
 
-- `/consistency-check` — プロジェクト内の CLAUDE.md・テンプレート・設定ファイル間の整合性を検証
+- `/consistency-check` — **画像生成プロジェクト専用** の整合性チェック（マニフェスト `.claude/consistency.json` 駆動で `members.age` / `visual_identity.hair` 等の構造化チェック）。**一般プロジェクトのドキュメント・設計書整合性確認には使えない** ので、その用途では Explore サブエージェント委譲を使う（例: kabuto で設計書本体と guide/ 配下の整合性比較を Explore に投げる運用）
 - `/context-load` — `.claude/context.md` からコンテキストを復帰
 - `/context-save` — プロジェクトコンテキストを `.claude/context.md` に保存
 - `/gtd-add` — `~/.claude/tasks.md` の Inbox にタスクを追加
