@@ -57,3 +57,4 @@ $ARGUMENTS が渡される。
 - diffの羅列ではなく、人間が後から読んで文脈がわかるように書くこと
 - 書き出し先ディレクトリが存在しない場合は作成すること
 - frontmatter の `files_changed` はセッション中に変更したファイル数を数えて記入すること（`git status --short | wc -l` 等で取得）
+- frontmatter の `source: claude-log` / `generation: 0` は固定（再帰要約劣化対策のメタ。セッション原文に近い記録なので一次情報扱い）

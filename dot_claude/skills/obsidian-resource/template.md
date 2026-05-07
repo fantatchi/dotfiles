@@ -7,6 +7,9 @@ tags:
 categories:
   - カテゴリ
 draft: true
+source: claude-resource
+generation: 0
+# auto モードのみ summary_of を追加（元 session-log への [[wiki-link]] リスト）
 ---
 
 ## 概要

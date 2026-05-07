@@ -48,6 +48,9 @@ $ARGUMENTS で分岐する。
 - `tags`: 3〜5 個。引数タグ＋自動生成タグ（`claude-resource` は常に含める、5 個カウントには含めない）
 - `categories`: 1 つ。`~/.claude/skills/obsidian-resource/references/categories.md` から選ぶ。該当なしなら新規追加して一覧も更新する
 - `draft: true`: 常に付与（Hugo 公開時に手動で false に切り替える）
+- `source` / `generation` / `summary_of`: 再帰要約劣化対策メタ。引数モードで出し分ける:
+  - **手動 / 引数あり / 引数なし**: `source: claude-resource`, `generation: 0`（一次資料相当）。`summary_of` は付けない
+  - **`auto` モード**: `source: claude-summary`, `generation: 1`, `summary_of: ["[[元 session-log の wiki-link]]", ...]`（セッションログの要約なので要約扱い）。元 session-log が `~/ObsidianVault/_claude/log/` に存在する場合はその basename を `[[...]]` で並べる。存在しない場合は `summary_of: ["session"]` のような汎用ラベル 1 件で OK
 
 ### タグの自動生成
 

@@ -92,10 +92,13 @@ ls ~/ObsidianVault/_claude/log/{YYYYMM}/{YYYYMMDD}*.md 2>/dev/null
 ```
 
 各ファイルから以下を抽出する:
-1. frontmatter の `project` を取得
-2. `## 概要` セクションのテキスト（1-2行）を取得
+1. ファイルパス（vault 相対、例: `_claude/log/202604/20260423-foo.md`）
+2. frontmatter の `project` を取得
+3. `## 概要` セクションのテキスト（1-2行）を取得
 
 作業ログ が 0 件の場合は「作業ログの記録なし」とする。
+
+`path` は `summary_of`（再帰要約劣化対策の一次情報源リンク）に使うため、必ず含める。
 
 ## 4b. tasks.md からの予定タスク収集
 
@@ -131,7 +134,7 @@ ls ~/ObsidianVault/_claude/log/{YYYYMM}/{YYYYMMDD}*.md 2>/dev/null
     {"title": "PR タイトル", "url": "https://...", "labels": ["作成", "マージ"]}
   ],
   "logs": [
-    {"project": "project-name", "summary": "作業概要"}
+    {"path": "_claude/log/202604/20260423-foo.md", "project": "project-name", "summary": "作業概要"}
   ],
   "upcoming_tasks": [
     {"section": "Next", "project": "claude-config", "title": "gtd-list スキルの実装"},
@@ -143,6 +146,7 @@ ls ~/ObsidianVault/_claude/log/{YYYYMM}/{YYYYMMDD}*.md 2>/dev/null
 
 - `commits`, `prs`, `logs`, `upcoming_tasks` が 0 件の場合は空配列 `[]` にする
 - `summary_text` は全データを総合して LLM が生成する
+- `logs[].path` は vault 相対パス。`write-daily.py` がこれを wiki-link 化して `summary_of` に展開する（再帰要約劣化対策）
 
 ## 6. デイリーノートへの書き込み
 

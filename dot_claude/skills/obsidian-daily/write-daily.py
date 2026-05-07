@@ -43,7 +43,12 @@ author: at-kato
 SUMMARY_TEMPLATE = """\
 ## デイリーサマリー
 
-> [!info] 自動生成: {timestamp}
+> [!info] 自動生成
+> - timestamp: {timestamp}
+> - source: claude-summary
+> - generation: 1
+> - summary_of:
+{summary_of}
 
 ### GitHub アクティビティ
 
@@ -68,10 +73,37 @@ SUMMARY_TEMPLATE = """\
 {upcoming_tasks}"""
 
 
+def build_summary_of(data: dict) -> str:
+    """summary_of リスト（一次情報源）を Obsidian callout 用に整形する。
+
+    再帰要約劣化対策: このサマリーが何を要約したものかを示すメタ。
+    将来の上位サマリースキルが一次情報まで遡れるよう wiki-link / ラベルで残す。
+    """
+    items = []
+    for log in data.get("logs", []):
+        path = log.get("path")
+        if path:
+            base = os.path.basename(path)
+            name = os.path.splitext(base)[0]
+            items.append(f"[[{name}]]")
+        else:
+            project = log.get("project", "?")
+            items.append(f"work-log:{project}")
+    if data.get("commits"):
+        items.append("github-api:commits")
+    if data.get("prs"):
+        items.append("github-api:prs")
+    if not items:
+        return ">   - なし"
+    return "\n".join(f">   - {item}" for item in items)
+
+
 def build_summary(data: dict) -> str:
     """JSON データからサマリーセクションの Markdown を生成する。"""
     now = datetime.now(JST)
     timestamp = now.strftime("%Y-%m-%d %H:%M")
+
+    summary_of = build_summary_of(data)
 
     # コミット
     commits_list = data.get("commits", [])
@@ -122,6 +154,7 @@ def build_summary(data: dict) -> str:
 
     return SUMMARY_TEMPLATE.format(
         timestamp=timestamp,
+        summary_of=summary_of,
         commits=commits,
         prs=prs,
         logs=logs,

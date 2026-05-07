@@ -5,6 +5,8 @@ tags:
 date: YYYY-MM-DD
 project: プロジェクト名
 files_changed: 0
+source: claude-log
+generation: 0
 ---
 
 ## 概要
