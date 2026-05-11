@@ -61,13 +61,14 @@
         ]
       }
     ],
-    "Stop": [
+    "UserPromptSubmit": [
       {
         "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "node -e \"require(require('os').homedir()+'/.claude/scripts/run-hook.js')('stop-hook')\""
+            "command": "node -e \"require(require('os').homedir()+'/.claude/scripts/run-hook.js')('context-save-reminder')\"",
+            "timeout": 10
           }
         ]
       }
