@@ -1,6 +1,6 @@
 ---
 name: obsidian-mail
-description: Obsidian デイリーノートの「## デイリーサマリー」セクションをメール向けに再構成して Gmail SMTP で送信する。日報（指定日 1 日分）・週報（指定日を含む月〜日 7 日分）の 2 モード。「日報メールして」「週報メール送って」「サマリーをメールで」「日次サマリーを送信」「週次サマリーを送信」といった依頼で使う。
+description: Obsidian デイリーノートの「## デイリーサマリー」セクションをメール向けに再構成して Gmail SMTP で送信する。日報・週報 2 モード。**自動発火しない設計**（`disable-model-invocation: true`）のため、Claude.app ローカルルーティーンまたは `/obsidian-mail daily|weekly [YYYY-MM-DD]` の明示呼び出しが必要。利用シーン: 日報メール送信、週報メール送信、サマリーをメールで配信（「日報メールして」「週報メール送って」「サマリーをメールで」等の依頼で想起）。
 argument-hint: daily|weekly [YYYY-MM-DD]
 disable-model-invocation: true
 allowed-tools: Read, Bash(date:*), Bash(python3:*), Bash(ls:*), Bash(test:*), Bash(printenv:*)
@@ -169,3 +169,4 @@ python3 ~/.claude/skills/obsidian-mail/send-summary.py "$MODE" "$TARGET_DATE"
 - HTML レンダリングは `markdown` ライブラリの `extra` + `sane_lists` 拡張を使用（`nl2br` は外した。再構成後の本文は段落ベースなので `<br>` が増えすぎるとレイアウトが崩れる）。`### 今日の要約` 直下の `<p>` は HTML 後処理で `.tldr` 青ボックスに包む
 - TL;DR が複数段落の場合、メールでは **最初の段落のみ** 採用する（残りは Obsidian で見る前提）。全文を残すと `.tldr` ボックス外にこぼれてレイアウトが崩れる
 - アプリパスワードは Google 側でいつでも revoke できる。漏洩した場合は `https://myaccount.google.com/apppasswords` で削除し、settings.local.json も更新する
+- **Message-ID の domain は `obsidian-mail.local`**。リネーム前は `@obsidian-summary.local` だったため、Gmail で `from:` や `rfc822msgid:` の domain ベースのフィルタを組んでいる場合は **filter rule の更新が必要**。スレッディングは日次/週次の独立メールで連続性が薄いため副作用は軽微だが、Gmail 検索（`from:obsidian-summary.local`）が効かなくなる点に注意
