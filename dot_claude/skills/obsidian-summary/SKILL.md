@@ -1,6 +1,6 @@
 ---
 name: obsidian-summary
-description: Obsidian デイリーノートの「## デイリーサマリー」セクションをメール向けに再構成して Gmail SMTP で送信する。日報（指定日 1 日分）・週報（指定日を含む月〜日 7 日分）の 2 モード。「日報メールして」「週報メール送って」「サマリーをメールで」といった依頼で使う。
+description: Obsidian デイリーノートの「## デイリーサマリー」セクションをメール向けに再構成して Gmail SMTP で送信する。日報（指定日 1 日分）・週報（指定日を含む月〜日 7 日分）の 2 モード。「日報メールして」「週報メール送って」「サマリーをメールで」「日次サマリーを送信」「週次サマリーを送信」といった依頼で使う。
 argument-hint: daily|weekly [YYYY-MM-DD]
 disable-model-invocation: true
 allowed-tools: Read, Bash(date:*), Bash(python3:*), Bash(ls:*), Bash(test:*), Bash(printenv:*)
