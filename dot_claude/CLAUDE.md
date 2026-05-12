@@ -85,7 +85,7 @@ GOをもらってから進める。
 
 - `/context-load` — `.claude/context.md` からコンテキストを復帰
 - `/context-save` — プロジェクトコンテキストを `.claude/context.md` に保存
-- `/dashboard-design` — デジタル庁ダッシュボードデザインガイドブックに基づく設計支援。手動呼び出し可だが「ダッシュボード作って」「KPI 画面の構成相談」「グラフ種の選択」等で自動発動するロール変換型スキル
+- `/dashboard-design` — デジタル庁ダッシュボードデザインガイドブックに基づく設計支援。ダッシュボード/KPI 画面に加えて **md ベース仕様書の HTML 補足ページ**（サマリー / 概況 / 比較）の視覚設計（配色・タイポ・装飾原則・アクセシビリティ）も対象。「ダッシュボード作って」「KPI 画面の構成相談」「グラフ種の選択」「HTML 補足ページのデザイン」等で自動発動するロール変換型スキル。spec-design と補完関係
 - `/gtd-add` — `~/.claude/tasks.md` の Inbox にタスクを追加
 - `/gtd-done` — 指定タスクを完了にし Done セクションへ移動
 - `/gtd-list` — `~/.claude/tasks.md` からタスクを表示（デフォルト: 現在プロジェクトの Inbox + Next）
@@ -97,7 +97,7 @@ GOをもらってから進める。
 - `/obsidian-summary` — Obsidian デイリーノートの「## デイリーサマリー」セクションをメール向けに再構成して Gmail SMTP で送信（日報・週報）。`/obsidian-summary daily|weekly [YYYY-MM-DD]` で明示呼び出し（自動発火しない、ローカル routine から呼ぶ前提）
 - `/session-review` — セッション振り返り（権限・CLAUDE.md・スキルの整理）
 - `/session-save` — `/obsidian-log` + `/context-save` を一括実行し、アウトプット候補の提案も行う
-- `/spec-writing` — 仕様書を書く・レビュー・改善するロール変換型スキル（読み手別の入口・図種判断軸・ADR・用語集・要件レベル語）。「仕様書」「設計ドキュメント」「ADR」等で自動発動
+- `/spec-design` — 仕様書（specification / 設計ドキュメント / requirements / architecture）を書く・レビュー・改善するロール変換型スキル。判断軸（読み手別の入口・図種判断軸・ADR・用語集・要件レベル語）+ 「全体像・なぜ・用語」の 3 点を手厚くカバーする具体テンプレ（README / ADR Nygard・MADR / C4 / glossary）。出力は md メイン、サマリー・概況・比較系のみ HTML 補足（視覚設計は dashboard-design と連携）。「仕様書」「設計ドキュメント」「ADR」「C4 図」「README」「オンボーディング資料」等で自動発動
 
 ## 新スキル追加・削除時のチェックリスト
 
