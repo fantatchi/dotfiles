@@ -87,33 +87,22 @@ def extract_section(md: str) -> str | None:
 
 
 def strip_meta_callout(body: str) -> str:
-    """Remove leading auto-generated callout (`> [!info] 自動生成` block)."""
+    """Remove leading auto-generated callout block.
+
+    obsidian-daily が生成する `> [!info] 自動生成 ...` callout を冒頭から落とす。
+    規約上「## デイリーサマリー」セクションの先頭にあるのは自動生成 callout のみ
+    なので、「先頭の空行 + 連続する `>` 行」を一括で skip すれば十分。
+    手書きの callout が先頭に混ざる運用は想定しない（規約縛り）。
+    """
     lines = body.splitlines()
-    out: list[str] = []
-    skipping = False
-    skipped_first_block = False
-    for line in lines:
-        if not skipped_first_block and not skipping:
-            if re.match(r"^>\s*\[!\w+\]\s*自動生成", line):
-                skipping = True
-                continue
-            if line.strip():
-                # Non-blank, non-callout line: meta callout is past (or absent).
-                skipped_first_block = True
-                out.append(line)
-                continue
-            # blank line before content
-            out.append(line)
-            continue
-        if skipping:
-            if line.startswith(">"):
-                continue
-            skipping = False
-            skipped_first_block = True
-            out.append(line)
-            continue
-        out.append(line)
-    return "\n".join(out).strip()
+    i = 0
+    # 先頭の空行をスキップ
+    while i < len(lines) and not lines[i].strip():
+        i += 1
+    # 先頭が callout（`>` 始まり）なら連続する行をすべて skip
+    while i < len(lines) and lines[i].startswith(">"):
+        i += 1
+    return "\n".join(lines[i:]).strip()
 
 
 def split_by_h3(body: str) -> dict[str, str]:
@@ -154,8 +143,12 @@ def first_sentence(text: str) -> str:
     return m.group(1).strip() if m else text.strip()
 
 
+GH_SUBSECTION_COMMITS = "コミット"
+GH_SUBSECTION_PRS = "PR"
+
+
 def parse_github(text: str) -> tuple[list[str], list[dict]]:
-    """Parse '#### コミット' / '#### PR' subsections."""
+    """Parse '#### コミット' / '#### PR' subsections under '### GitHub アクティビティ'."""
     commits: list[str] = []
     prs: list[dict] = []
     current: str | None = None
@@ -164,9 +157,9 @@ def parse_github(text: str) -> tuple[list[str], list[dict]]:
         s = raw.rstrip()
         if s.startswith("#### "):
             head = s[5:].strip()
-            if head.startswith("コミット"):
+            if head.startswith(GH_SUBSECTION_COMMITS):
                 current = "commits"
-            elif head.startswith("PR"):
+            elif head.startswith(GH_SUBSECTION_PRS):
                 current = "prs"
             else:
                 current = None
@@ -211,8 +204,7 @@ def parse_tasks(text: str) -> list[dict]:
         m = _TASK_RE.match(line)
         if not m:
             continue
-        project = m.group(1).strip().lstrip("project/")
-        # `lstrip("project/")` は文字集合扱いなので使えない → 個別処理
+        # `lstrip("project/")` は文字集合扱いになって誤動作するため、startswith で個別処理
         proj = m.group(1).strip()
         if proj.startswith("project/"):
             proj = proj[len("project/"):]
@@ -286,7 +278,10 @@ def render_github(commits: list[str], prs: list[dict]) -> list[str]:
     return out
 
 
-def render_tasks(tasks: list[dict], top_n: int = 5) -> list[str]:
+MAX_TASKS_IN_DAILY = 5  # 日報「明日のタスク」セクションの抜粋件数
+
+
+def render_tasks(tasks: list[dict], top_n: int = MAX_TASKS_IN_DAILY) -> list[str]:
     active = [t for t in tasks if not t["waiting"]]
     waiting = [t for t in tasks if t["waiting"]]
     if not active and not waiting:
@@ -334,7 +329,7 @@ def render_daily_body(target: dt.date, parsed: dict) -> str:
     return "\n".join(parts).rstrip() + "\n"
 
 
-PROJECT_TOP_N = 3  # プロジェクト別ハイライトの 1 プロジェクト最大表示件数
+MAX_BULLETS_PER_PROJECT = 3  # 週報「プロジェクト別ハイライト」の各プロジェクト最大表示件数
 
 
 def render_weekly_body(monday: dt.date, sunday: dt.date,
@@ -384,10 +379,10 @@ def render_weekly_body(monday: dt.date, sunday: dt.date,
         for proj, bullets in proj_sorted:
             parts.append(f"### {proj} · {len(bullets)} 件")
             parts.append("")
-            for b in bullets[:PROJECT_TOP_N]:
+            for b in bullets[:MAX_BULLETS_PER_PROJECT]:
                 mmdd = b["date"].strftime("%m-%d")
                 parts.append(f"- [{mmdd}] {b['summary']}")
-            rest = len(bullets) - PROJECT_TOP_N
+            rest = len(bullets) - MAX_BULLETS_PER_PROJECT
             if rest > 0:
                 parts.append(f"- …ほか {rest} 件")
             parts.append("")
@@ -398,12 +393,13 @@ def render_weekly_body(monday: dt.date, sunday: dt.date,
 # ---------- HTML conversion -------------------------------------------------
 
 def md_to_html(md_text: str) -> str:
-    # 「今日のひとこと」直下の段落を .tldr で強調するため、簡易プリプロセス
     body_html = markdown.markdown(
         md_text,
         extensions=["extra", "sane_lists"],
     )
-    # h2「今日のひとこと」直後の <p>...</p> に class を付与
+    # h2「今日のひとこと」直後の <p>...</p> に class を付与して青ボックス化。
+    # re.DOTALL は parse_summary で 1 段落に絞っているはずでも、markdown が段落内改行を
+    # <p>...\n...</p> のように展開した場合に拾えるよう保険として残す。
     body_html = re.sub(
         r"(<h2>今日のひとこと</h2>)\s*<p>(.*?)</p>",
         r'\1<div class="tldr"><p>\2</p></div>',
