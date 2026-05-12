@@ -1,5 +1,35 @@
 # 社内用語集
 
+## 命名上の注記
+
+### 「確認」の使い分け（cloud-dsc 文脈）
+
+- **段階確認**（業務行為としての確認）→ `StepConfirmation`
+- **確認ステータス**（列挙値の遷移単位）→ `ConfirmationStatus`
+- **確認動作**（汎用的に「確認する」/メール確認等）→ `Confirm` / `Acknowledge`
+
+### 「計測」の使い分け
+
+- **計測値**（個別の数値）→ `MeasuredValue`
+- **計測結果**（業務的な結果セット）→ `MeasurementResult`
+- **計測レコード**（不変履歴の 1 単位、cloud-dsc では `StepConfirmationRevision` クラスに相当）→ `StepConfirmationRevision`
+- **段階確認エンティティ**（`degKshId` で一意、可変ステータスを持つ長命集約ルート）→ `StepConfirmation`
+
+### enum メンバ命名
+
+- **状態形を選ぶ**（動詞形は曖昧 → 過去分詞・形容詞）: `Pass / Fail` ではなく `Passed / Failed`、`Approve` ではなく `Approved`
+- **否定接頭辞は `Un-` で統一**: `Unmeasured` / `Unconfirmed`（`NotMeasured` ではない）
+- **保留状態は `Pending` を優先**: `Undetermined` より短く意図明瞭
+
+### 標準型との衝突回避
+
+- glossary 上の `Standard` / `Reference` / `Construction` は業務概念の英訳として保持
+- 実装型では `StandardValue` / `ReferenceValue` / `ConstructionProject` 等にエスケープ（CA1716 予防）
+
+### `Standard` の同名衝突（既知の課題）
+
+- 「規格値」と「規格」（重機）が同じ `Standard`。実装時は **規格値 → `SpecValue`**、**規格（重機）→ `Spec`** で分離推奨（glossary 本体の整理は将来 PR）
+
 ## 基本用語
 
 | 日本語 | 英語 |
@@ -18,6 +48,51 @@
 | 規格値 | Standard |
 | 基準値 | Reference |
 | 社内規格値 | Company |
+
+## 計測・データ・判定
+
+| 日本語 | 英語 |
+|--------|------|
+| 計測値 | MeasuredValue |
+| 判定（結果） | ComplianceResult |
+| 合格 | Passed |
+| 不合格 | Failed |
+| 確認ステータス | ConfirmationStatus |
+| 未確認 | Unconfirmed |
+| 未測定 | Unmeasured |
+| 未判定 | Pending |
+| 差分値 | Deviation |
+
+## ドキュメント・帳票
+
+| 日本語 | 英語 |
+|--------|------|
+| 測定結果一覧 | MeasurementResultListView |
+| 再提出 | Resubmission |
+| 提出 | Submission |
+| 自動提出 | AutomaticSubmission |
+
+## 業務フロー・接続
+
+| 日本語 | 英語 |
+|--------|------|
+| 招待 | Invitation |
+| 内部 API | InternalApi |
+| push（計測データ送信） | DataPush |
+
+## 権限・ロール
+
+| 日本語 | 英語 |
+|--------|------|
+| 監理技術者（受注者側で施工統括、建設業法 26 条） | ChiefEngineer |
+| 工事監督員（発注者側の現場監督） | ConstructionSupervisor |
+
+## データモデル
+
+| 日本語 | 英語 |
+|--------|------|
+| マージビュー | MergedView |
+| 不変履歴モデル | ImmutableHistory |
 
 ## 施工体制
 
