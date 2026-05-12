@@ -50,7 +50,7 @@ def fail(msg: str, code: int = 2) -> None:
 
 def run_extract(mode: str, date_str: str) -> dict:
     res = subprocess.run(
-        ["python3", EXTRACT_SCRIPT, mode, date_str],
+        [sys.executable, EXTRACT_SCRIPT, mode, date_str],
         capture_output=True,
         text=True,
         encoding="utf-8",
