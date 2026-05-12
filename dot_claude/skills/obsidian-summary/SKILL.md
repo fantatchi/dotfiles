@@ -1,6 +1,6 @@
 ---
 name: obsidian-summary
-description: Obsidian デイリーノートの「## デイリーサマリー」セクションを抽出して Gmail SMTP で送信する。日報（指定日 1 日分）・週報（指定日を含む月〜日 7 日分）の 2 モード。「日報メールして」「週報メール送って」「サマリーをメールで」といった依頼で使う。
+description: Obsidian デイリーノートの「## デイリーサマリー」セクションをメール向けに再構成して Gmail SMTP で送信する。日報（指定日 1 日分）・週報（指定日を含む月〜日 7 日分）の 2 モード。「日報メールして」「週報メール送って」「サマリーをメールで」といった依頼で使う。
 argument-hint: daily|weekly [YYYY-MM-DD]
 disable-model-invocation: true
 allowed-tools: Read, Bash(date:*), Bash(python3:*), Bash(ls:*), Bash(test:*), Bash(printenv:*)
@@ -8,7 +8,7 @@ allowed-tools: Read, Bash(date:*), Bash(python3:*), Bash(ls:*), Bash(test:*), Ba
 
 # obsidian-summary — デイリーサマリーをメール送信
 
-Obsidian デイリーノートに既に書き込まれた「## デイリーサマリー」セクションを抽出し、HTML 整形して Gmail SMTP で指定アドレスに送信する。
+Obsidian デイリーノートの「## デイリーサマリー」セクションを **構造化パース → メール向けに再構成**して Gmail SMTP で送信する。Obsidian ノート形式をそのまま流すのではなく、「今日のひとこと → ハイライト → GitHub → 明日のタスク」の読み物形式にする。
 
 ## 引数仕様
 
@@ -69,10 +69,34 @@ python3 ~/.claude/skills/obsidian-summary/send-summary.py "$MODE" "$TARGET_DATE"
 
 `send-summary.py` は内部で:
 
-1. `extract-summary.py` を呼んでサマリーを抽出（plain Markdown + HTML 両方生成）
+1. `extract-summary.py` を呼んでサマリーを抽出 → 構造化パース → メール向けに再構成（plain Markdown + HTML 両方生成）
 2. `empty: true` の場合: 送信せず `{"sent": false, "reason": "empty"}` を返す
 3. それ以外: multipart/alternative メッセージを構築 → `smtp.gmail.com:465`（SSL）でログイン → 送信
 4. 結果 JSON を stdout に出力
+
+### 2-b. メール本文の構成（再構成ロジック）
+
+`extract-summary.py` は「## デイリーサマリー」セクションを以下の規約セクションに分解してパースし、メール向けに再構成する:
+
+| 入力（規約セクション） | 出力（メール） |
+|---|---|
+| `> [!info] 自動生成` callout | **除去**（メタ情報、内部リンク `[[...]]` も除去） |
+| `### 今日の要約` | `## 今日のひとこと`（青ボックス `.tldr`、複数段落なら最初の 1 段落のみ） |
+| `### 作業ログ` の `- **project**: body` bullet | `## ハイライト` — 各 bullet を 1 行に圧縮（body の最初の句のみ） |
+| `### GitHub アクティビティ` の `#### コミット` / `#### PR` | `## GitHub` — 集計行（コミット N / PR M（作成 X, マージ Y, レビュー Z））+ PR リンク一覧 |
+| `### 明日以降のタスク` の `- [ ] #project body` | `## 明日のタスク` — 件数 + プロジェクト別内訳 + 抜粋 5 件 + `…ほか N 件` + `_待ち N 件は省略_` |
+
+### 2-c. 規約縛り（手書き追加コンテンツは静かに捨てる）
+
+このスキルは **obsidian-daily が出力する規約フォーマット** に依存する。以下は意図的に捨てる:
+
+- `## デイリーサマリー` セクションの **外** にあるもの（先頭の手書きメモ、別 h2 セクション）
+- `## デイリーサマリー` 内の **規約 4 セクション以外の `### xxx`**（手書きで追加した雑記など）
+- `### 作業ログ` 内の `- **project**: body` 形式以外の bullet
+- `### 明日以降のタスク` 内の `- [ ] #project body` 形式以外の bullet
+- `### GitHub アクティビティ` 内の `#### コミット` / `#### PR` 以外の小見出し
+
+手書きで追加した情報をメールに届けたい場合は Obsidian で直接見るか、本スキルの拡張（未参照セクションを「その他」として末尾追加）を検討する。
 
 ### 3. 「対象なし」スキップ判定
 
@@ -92,6 +116,30 @@ python3 ~/.claude/skills/obsidian-summary/send-summary.py "$MODE" "$TARGET_DATE"
   対象: <available_dates の件数>/<期待件数> 日分
   欠落: <missing_dates>（あれば）
 ```
+
+### 5. 週報の構成
+
+`weekly` モードは各日の構造化パース結果を **プロジェクト軸で集約** する（日別の縦並びは取らない）:
+
+```
+# YYYY-MM-DD 〜 YYYY-MM-DD 週報
+
+取得済み: N/7 日分（欠落: ...）
+
+## 週次集計
+- 動いたプロジェクト: N
+- GitHub: コミット N / PR M
+- 明日タスク累計: N 件
+
+## プロジェクト別ハイライト
+
+### {プロジェクト名} · N 件
+- [MM-DD] worklog の最初の句
+- [MM-DD] ...
+- …ほか N 件（1 プロジェクト最大 3 件表示、残りは件数のみ）
+```
+
+プロジェクトの並び順は活動件数の多い順 → アルファベット。各プロジェクトの bullet は worklog の `- **proj**: body` を `first_sentence(body)` で 1 行に圧縮し、日付付きで列挙する（最大 `PROJECT_TOP_N=3` 件、残りは件数表示）。週報では TL;DR / 個別タスクは出さない（俯瞰のための圧縮優先）。
 
 ## エラー処理
 
@@ -114,5 +162,6 @@ python3 ~/.claude/skills/obsidian-summary/send-summary.py "$MODE" "$TARGET_DATE"
 - このスキルは Claude.app の **ローカルルーティーン**から呼ばれる前提。`disable-model-invocation: true` で自動発火しないため、routine プロンプトに `/obsidian-summary daily` のように明示記述する
 - `obsidian-daily` 側のハングで対象が無い場合は単純スキップする（ユーザー判断）。気付くためには `_daily/` を時々目視するか、週報で欠落日表示を確認する
 - 週報は欠落日があっても残った日数（例: `5/7 日分`）で送信する。本文冒頭に欠落日を明記する
-- HTML レンダリングは `markdown` ライブラリの `extra` + `sane_lists` + `nl2br` 拡張を使用。Obsidian の `> [!info]` callout は前処理で `> **ℹ️ Info**` に変換してから markdown 化
+- HTML レンダリングは `markdown` ライブラリの `extra` + `sane_lists` 拡張を使用（`nl2br` は外した。再構成後の本文は段落ベースなので `<br>` が増えすぎるとレイアウトが崩れる）。`### 今日の要約` 直下の `<p>` は HTML 後処理で `.tldr` 青ボックスに包む
+- TL;DR が複数段落の場合、メールでは **最初の段落のみ** 採用する（残りは Obsidian で見る前提）。全文を残すと `.tldr` ボックス外にこぼれてレイアウトが崩れる
 - アプリパスワードは Google 側でいつでも revoke できる。漏洩した場合は `https://myaccount.google.com/apppasswords` で削除し、settings.local.json も更新する
