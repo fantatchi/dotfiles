@@ -97,6 +97,7 @@ GOをもらってから進める。
 - `/obsidian-summary` — Obsidian デイリーノートの「## デイリーサマリー」セクションをメール向けに再構成して Gmail SMTP で送信（日報・週報）。`/obsidian-summary daily|weekly [YYYY-MM-DD]` で明示呼び出し（自動発火しない、ローカル routine から呼ぶ前提）
 - `/session-review` — セッション振り返り（権限・CLAUDE.md・スキルの整理）
 - `/session-save` — `/obsidian-log` + `/context-save` を一括実行し、アウトプット候補の提案も行う
+- `/spec-writing` — 仕様書を書く・レビュー・改善するロール変換型スキル（読み手別の入口・図種判断軸・ADR・用語集・要件レベル語）。「仕様書」「設計ドキュメント」「ADR」等で自動発動
 
 ## 新スキル追加・削除時のチェックリスト
 
