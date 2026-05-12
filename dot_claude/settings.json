@@ -21,7 +21,7 @@
       "Bash(tree:*)",
       "Bash(echo:*)",
       "Bash(cat:*)",
-      "Bash(python3:*)",
+      "Bash(python:*)",
       "Bash(printenv:*)",
       "Bash(basename:*)",
       "Bash(gh:*)",

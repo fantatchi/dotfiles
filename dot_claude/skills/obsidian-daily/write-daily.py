@@ -227,12 +227,14 @@ def write_daily(data: dict) -> str:
 
 
 def main():
+    input_path = None
     if len(sys.argv) >= 2:
         # ファイル経由（推奨）: Windows (Git Bash) では locale が cp932 のため
         # シェル変数 / ヒアドキュメント / pipe 経由で Python に渡すと JSON が
         # Python 到達前に cp932 bytes 化して化ける。stdin.reconfigure では
         # 救えないので、UTF-8 で書かれたファイルを直接読む経路を用意する。
-        with open(sys.argv[1], "r", encoding="utf-8") as f:
+        input_path = sys.argv[1]
+        with open(input_path, "r", encoding="utf-8") as f:
             data = json.load(f)
     else:
         # stdin 経由（Linux/macOS/WSL のみ動作保証）
@@ -244,6 +246,14 @@ def main():
 
     result = write_daily(data)
     print(result)
+
+    # 一時 JSON ファイルのクリーンアップ（書き込み成功後のみ）。
+    # シェル側で rm を呼ばずに済ませることで Bash(rm:*) 権限要求を回避する。
+    if input_path is not None:
+        try:
+            os.remove(input_path)
+        except OSError:
+            pass
 
 
 if __name__ == "__main__":
