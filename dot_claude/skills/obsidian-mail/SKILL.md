@@ -46,6 +46,8 @@ $ARGUMENTS:
 - `OBSIDIAN_SUMMARY_MAIL_TO`: 送信先アドレス（デフォルト: `SMTP_USER` と同じ）
 - `OBSIDIAN_SUMMARY_MAIL_FROM`: 送信元アドレス（デフォルト: `SMTP_USER` と同じ）
 
+> **env 変数名の命名について（重要）**: スキル名は `obsidian-mail` だが env 変数 prefix は `OBSIDIAN_SUMMARY_*` のまま据置している。これは旧スキル名 `obsidian-summary` 時代の命名で、settings.local.json が chezmoi 非管理（各マシンで個別設定）のため、リネームに合わせて env 名も変えると **全マシンで既存値の再設定が必要** になる移行コストを避けるための backward compat 措置。新規セットアップでも `OBSIDIAN_SUMMARY_*` で設定すること。将来統一する場合は send-summary.py 側で新旧両方の名前を check → 旧名を deprecated 扱いに、という段階移行が必要。
+
 ### 3. Python 依存
 
 `markdown` ライブラリが必要（`pip3 install --user markdown`）。
@@ -156,6 +158,8 @@ python3 ~/.claude/skills/obsidian-mail/send-summary.py "$MODE" "$TARGET_DATE"
 | Weekly summary mail | 月 8:00 | `/obsidian-mail weekly` |
 
 注: 既存「Daily summary」（平日 18:00 の `/obsidian-daily`）はそのまま残す。本スキルは送信専用で、書き込みは触らない。
+
+> **リネーム時のルーティーン書き換え必須（重要）**: スキル名やプロンプトを変更した場合、Claude.app の **ローカルルーティーン側は自動更新されない**。旧プロンプト（例: `/obsidian-summary daily`）を登録したままだと次回発火時に「コマンド不明」で **サイレント失敗**（メールが来ない以外にエラー通知がない）する。スキルリネーム時は必ず Claude.app UI でルーティーンの slash command 文字列も書き換えること。気付くのは「メール来ないな」と能動的に思い出した時のみ、というのが地雷。
 
 ## 実装メモ
 
