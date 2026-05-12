@@ -1,12 +1,12 @@
 ---
-name: obsidian-summary
+name: obsidian-mail
 description: Obsidian デイリーノートの「## デイリーサマリー」セクションをメール向けに再構成して Gmail SMTP で送信する。日報（指定日 1 日分）・週報（指定日を含む月〜日 7 日分）の 2 モード。「日報メールして」「週報メール送って」「サマリーをメールで」「日次サマリーを送信」「週次サマリーを送信」といった依頼で使う。
 argument-hint: daily|weekly [YYYY-MM-DD]
 disable-model-invocation: true
 allowed-tools: Read, Bash(date:*), Bash(python3:*), Bash(ls:*), Bash(test:*), Bash(printenv:*)
 ---
 
-# obsidian-summary — デイリーサマリーをメール送信
+# obsidian-mail — デイリーサマリーをメール送信
 
 Obsidian デイリーノートの「## デイリーサマリー」セクションを **構造化パース → メール向けに再構成**して Gmail SMTP で送信する。Obsidian ノート形式をそのまま流すのではなく、「今日のひとこと → ハイライト → GitHub → 明日のタスク」の読み物形式にする。
 
@@ -26,7 +26,7 @@ $ARGUMENTS:
 
 1. https://myaccount.google.com/security で **2 段階認証プロセス**が有効であることを確認
 2. https://myaccount.google.com/apppasswords にアクセス
-3. アプリ名: `obsidian-summary` 等の任意名 → 「作成」
+3. アプリ名: `obsidian-mail` 等の任意名 → 「作成」
 4. 表示された 16 文字のパスワード（スペースなし）を控える
 
 ### 2. ~/.claude/settings.local.json への env 設定
@@ -64,7 +64,7 @@ $ARGUMENTS:
 ### 2. 送信スクリプト実行
 
 ```bash
-python3 ~/.claude/skills/obsidian-summary/send-summary.py "$MODE" "$TARGET_DATE"
+python3 ~/.claude/skills/obsidian-mail/send-summary.py "$MODE" "$TARGET_DATE"
 ```
 
 `send-summary.py` は内部で:
@@ -152,14 +152,14 @@ python3 ~/.claude/skills/obsidian-summary/send-summary.py "$MODE" "$TARGET_DATE"
 
 | 名前 | スケジュール | プロンプト |
 |---|---|---|
-| Daily summary mail | 火〜土 8:00 | `/obsidian-summary daily` |
-| Weekly summary mail | 月 8:00 | `/obsidian-summary weekly` |
+| Daily summary mail | 火〜土 8:00 | `/obsidian-mail daily` |
+| Weekly summary mail | 月 8:00 | `/obsidian-mail weekly` |
 
 注: 既存「Daily summary」（平日 18:00 の `/obsidian-daily`）はそのまま残す。本スキルは送信専用で、書き込みは触らない。
 
 ## 実装メモ
 
-- このスキルは Claude.app の **ローカルルーティーン**から呼ばれる前提。`disable-model-invocation: true` で自動発火しないため、routine プロンプトに `/obsidian-summary daily` のように明示記述する
+- このスキルは Claude.app の **ローカルルーティーン**から呼ばれる前提。`disable-model-invocation: true` で自動発火しないため、routine プロンプトに `/obsidian-mail daily` のように明示記述する
 - `obsidian-daily` 側のハングで対象が無い場合は単純スキップする（ユーザー判断）。気付くためには `_daily/` を時々目視するか、週報で欠落日表示を確認する
 - 週報は欠落日があっても残った日数（例: `5/7 日分`）で送信する。本文冒頭に欠落日を明記する
 - HTML レンダリングは `markdown` ライブラリの `extra` + `sane_lists` 拡張を使用（`nl2br` は外した。再構成後の本文は段落ベースなので `<br>` が増えすぎるとレイアウトが崩れる）。`### 今日の要約` 直下の `<p>` は HTML 後処理で `.tldr` 青ボックスに包む

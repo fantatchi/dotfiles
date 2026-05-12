@@ -66,10 +66,10 @@ def run_extract(mode: str, date_str: str) -> dict:
 def build_message(data: dict, mail_from: str, mail_to: str) -> EmailMessage:
     msg = EmailMessage()
     msg["Subject"] = data["subject"]
-    msg["From"] = formataddr(("Obsidian Summary", mail_from))
+    msg["From"] = formataddr(("Obsidian Mail", mail_from))
     msg["To"] = mail_to
     msg["Date"] = formatdate(localtime=True)
-    msg["Message-ID"] = make_msgid(domain="obsidian-summary.local")
+    msg["Message-ID"] = make_msgid(domain="obsidian-mail.local")
     msg.set_content(data["body_markdown"])
     msg.add_alternative(data["body_html"], subtype="html")
     return msg
