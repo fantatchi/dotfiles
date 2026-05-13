@@ -97,7 +97,7 @@ GOをもらってから進める。
 - `/obsidian-mail` — Obsidian デイリーノートの「## デイリーサマリー」セクションをメール向けに再構成して Gmail SMTP で送信（日報・週報）。`/obsidian-mail daily|weekly [YYYY-MM-DD]` で明示呼び出し（自動発火しない、ローカル routine から呼ぶ前提）
 - `/session-review` — セッション振り返り（権限・CLAUDE.md・スキルの整理）
 - `/session-save` — `/obsidian-log` + `/context-save` を一括実行し、アウトプット候補の提案も行う
-- `/spec-design` — 仕様書（specification / 設計ドキュメント / requirements / architecture）を書く・レビュー・改善するロール変換型スキル。判断軸（読み手別の入口・図種判断軸・ADR・用語集・要件レベル語）+ 「全体像・なぜ・用語」の 3 点を手厚くカバーする具体テンプレ（README / ADR Nygard・MADR / C4 / glossary）。出力は md メイン、サマリー・概況・比較系のみ HTML 補足（視覚設計は dashboard-design と連携）。「仕様書」「設計ドキュメント」「ADR」「C4 図」「README」「オンボーディング資料」等で自動発動
+- `/spec-design` — 仕様書（specification / 設計ドキュメント / requirements / architecture）を書く・レビュー・改善するロール変換型スキル。判断軸（読み手別の入口・図種判断軸・ADR・用語集・要件レベル語）+ 「全体像・なぜ・用語」の 3 点を手厚くカバーする具体テンプレ（README / ADR Nygard・MADR / C4 / glossary）。出力は md メイン、サマリー・概況・比較系のみ HTML 補足。HTML / PDF の視覚デザイン指針も内蔵: **ベースカラーは Blue 系列デフォルト + 切り替え運用**（共通リソース `shared/base-color-mapping.md`）、**「伝わるデザイン」12 原則**（整列・近接・反復・ジャンプ率・タイポグラフィ等）。配色は dashboard-design と連携。「仕様書」「設計ドキュメント」「ADR」「C4 図」「README」「オンボーディング資料」「HTML 補足ページ」「PDF 仕様書」「カラーパレット選定」「ベースカラー」「伝わるデザイン」等で自動発動
 
 ## 新スキル追加・削除時のチェックリスト
 
@@ -116,6 +116,15 @@ GOをもらってから進める。
 - [ ] `~/.claude/CLAUDE.md` の「# スキルコマンド」セクションから該当行を削除
 - [ ] `~/.local/share/chezmoi/README.md` の「**スキル一覧:**」テーブルから該当行を削除
 - [ ] README の「使いどころ」テーブルや他セクションの言及箇所を削除
+
+**既存スキル機能拡張時（追加・削除ではない、機能のスコープが広がる場合）:**
+
+過去 `spec-design` に「ベースカラー Blue デフォルト / 伝わるデザイン原則 / 階調マッピング」を追加した時、`/spec-design` の説明文が古いままで「カラーパレット選定」「伝わるデザイン」のトリガー語が抜け、ユーザーから「機能が拡張されていることがリストから見えない」指摘を受けた。以下を確認する:
+
+- [ ] `~/.claude/CLAUDE.md` の「# スキルコマンド」の該当行の説明文に新機能の概要が反映されているか
+- [ ] `~/.local/share/chezmoi/README.md` の「**スキル一覧:**」テーブルの該当行も同様に反映されているか
+- [ ] SKILL.md の `description` に新機能のトリガー語（「○○について」で呼び出されるべき語）を追加したか
+- [ ] references を新規追加した場合、SKILL.md 本文から **明示的に参照誘導**（「詳細は references/X.md 参照」）が書かれているか（参照誘導なしだと LLM が references を読まずに進む過去事例あり）
 
 **コミット粒度:** スキル本体の変更とドキュメント反映は **1 コミット 1 意図** で揃える（コミット `75b64c2` `multi-persona-review` 追加時の慣例）。
 
