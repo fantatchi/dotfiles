@@ -5,12 +5,18 @@
 # ブロックを出力し、Claude に /context-save の実行を促す。閾値未満なら無音 exit 0。
 #
 # セッション開始基準: 各 session_id ごとに `~\.claude\.session-markers\<session_id>`
-# を作成し、その LastWriteTime を「このセッションの初回プロンプト時刻」として扱う。
+# を作成する。マーカーには:
+#   - 内容（1 行目）  : そのセッション開始 epoch（fresh で作成 / resume 検出時に更新）
+#   - LastWriteTime : 最終プロンプト時刻（毎回更新）
+# を保持し、前回プロンプトからの gap が長い場合は resume とみなしてセッション開始を
+# リセットする。これにより `claude --continue` / IDE Resume で session_id が再利用
+# されても古い「初回プロンプト時刻」を基準にせず済む。
 
 $ErrorActionPreference = 'SilentlyContinue'
 [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
 
 $thresholdMin = 120
+$resumeDetectMin = 30   # 前回プロンプトからこの分数以上空いていたら resume とみなす
 $markerDir = Join-Path $env:USERPROFILE '.claude\.session-markers'
 $markerTtlDays = 7
 
@@ -46,17 +52,46 @@ if ($sessionId) {
     if ($safeId.Length -gt 128) { $safeId = $safeId.Substring(0, 128) }
     $markerFile = Join-Path $markerDir $safeId
 
+    $nowEpoch = [int][double]::Parse((Get-Date -UFormat %s))
+
     if (-not (Test-Path $markerFile)) {
         # このセッションの初回プロンプト。マーカーを作って何も出さずに終了。
-        try { New-Item -ItemType File -Path $markerFile -Force | Out-Null } catch {}
+        # 1 行目にセッション開始 epoch を書き、LastWriteTime は作成で NOW になる。
+        try { Set-Content -Path $markerFile -Value $nowEpoch -Encoding ASCII -NoNewline } catch {}
         exit 0
     }
 
+    # LastWriteTime = 最終プロンプト時刻、内容 1 行目 = セッション開始 epoch
+    $lastPrompt = $null
+    try { $lastPrompt = (Get-Item $markerFile).LastWriteTime } catch {}
+
+    $sessionStartEpoch = $null
     try {
-        $sessionStart = (Get-Item $markerFile).LastWriteTime
-    } catch {
-        $sessionStart = $null
+        $firstLine = (Get-Content $markerFile -TotalCount 1 -ErrorAction Stop)
+        if ($firstLine -match '^\s*(\d+)\s*$') { $sessionStartEpoch = [int]$matches[1] }
+    } catch {}
+
+    # 旧フォーマット（空ファイル）からの移行: 内容が無ければ mtime を採用
+    if (-not $sessionStartEpoch -and $lastPrompt) {
+        $sessionStartEpoch = [int][double]::Parse((Get-Date $lastPrompt -UFormat %s))
     }
+    if ($sessionStartEpoch) {
+        $sessionStart = (Get-Date "1970-01-01Z").ToLocalTime().AddSeconds($sessionStartEpoch)
+    }
+
+    # 前回プロンプトから resumeDetectMin 以上空いていたら resume とみなし、
+    # セッション開始 epoch を NOW に書き直して silent exit。
+    if ($lastPrompt) {
+        $idleMin = ((Get-Date) - $lastPrompt).TotalMinutes
+        if ($idleMin -ge $resumeDetectMin) {
+            try { Set-Content -Path $markerFile -Value $nowEpoch -Encoding ASCII -NoNewline } catch {}
+            exit 0
+        }
+    }
+
+    # アクティブなセッションの継続: LastWriteTime を更新して最終プロンプト時刻を記録。
+    # セッション開始 epoch（内容）は触らない。
+    try { (Get-Item $markerFile).LastWriteTime = Get-Date } catch {}
 }
 
 # git リポジトリ外なら exit 0

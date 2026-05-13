@@ -10,11 +10,17 @@
 # ユーザーの prompt に注入する仕様。
 #
 # セッション開始基準: 各 session_id ごとに `~/.claude/.session-markers/<session_id>`
-# を作成し、その mtime を「このセッションの初回プロンプト時刻」として扱う。
+# を作成する。マーカーには:
+#   - 内容（1 行目）: そのセッション開始 epoch（fresh で作成 / resume 検出時に更新）
+#   - mtime         : 最終プロンプト時刻（毎回 touch）
+# を保持し、前回プロンプトからの gap が長い場合は resume とみなしてセッション開始を
+# リセットする。これにより `claude --continue` / IDE Resume で session_id が再利用
+# されても古い「初回プロンプト時刻」を基準にせず済む。
 
 set -uo pipefail
 
 THRESHOLD_MIN=120
+RESUME_DETECT_MIN=30   # 前回プロンプトからこの分数以上空いていたら resume とみなす
 MARKER_DIR="${HOME}/.claude/.session-markers"
 MARKER_TTL_DAYS=7
 
@@ -46,13 +52,33 @@ if [ -n "$SESSION_ID" ]; then
 
     if [ ! -f "$MARKER_FILE" ]; then
         # このセッションの初回プロンプト。マーカーを作って何も出さずに終了。
-        : > "$MARKER_FILE" 2>/dev/null || true
+        # 1 行目にセッション開始 epoch を書き、mtime はファイル作成で NOW になる。
+        echo "$NOW_EPOCH" > "$MARKER_FILE" 2>/dev/null || true
         exit 0
     fi
 
-    SESSION_START_EPOCH=$(stat -c '%Y' "$MARKER_FILE" 2>/dev/null \
+    # mtime = 最終プロンプト時刻、内容 1 行目 = セッション開始 epoch
+    LAST_PROMPT_EPOCH=$(stat -c '%Y' "$MARKER_FILE" 2>/dev/null \
         || stat -f '%m' "$MARKER_FILE" 2>/dev/null \
         || echo 0)
+    SESSION_START_EPOCH=$(head -n1 "$MARKER_FILE" 2>/dev/null \
+        | tr -cd '0-9' | head -c 20)
+    # 旧フォーマット（空ファイル）からの移行: 内容が無ければ mtime を採用
+    if [ -z "$SESSION_START_EPOCH" ]; then
+        SESSION_START_EPOCH=$LAST_PROMPT_EPOCH
+    fi
+
+    # 前回プロンプトから RESUME_DETECT_MIN 以上空いていたら resume とみなし、
+    # セッション開始 epoch を NOW に書き直して silent exit。
+    if [ "$LAST_PROMPT_EPOCH" -gt 0 ] \
+        && [ $(( (NOW_EPOCH - LAST_PROMPT_EPOCH) / 60 )) -ge "$RESUME_DETECT_MIN" ]; then
+        echo "$NOW_EPOCH" > "$MARKER_FILE" 2>/dev/null || true
+        exit 0
+    fi
+
+    # アクティブなセッションの継続: mtime を更新して最終プロンプト時刻を記録。
+    # セッション開始 epoch（内容）は触らない。
+    touch -m "$MARKER_FILE" 2>/dev/null || true
 fi
 
 # git リポジトリ外なら何もしない
