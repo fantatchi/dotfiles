@@ -10,7 +10,7 @@
 $ErrorActionPreference = 'SilentlyContinue'
 [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
 
-$thresholdMin = 30
+$thresholdMin = 120
 $markerDir = Join-Path $env:USERPROFILE '.claude\.session-markers'
 $markerTtlDays = 7
 

@@ -14,7 +14,7 @@
 
 set -uo pipefail
 
-THRESHOLD_MIN=30
+THRESHOLD_MIN=120
 MARKER_DIR="${HOME}/.claude/.session-markers"
 MARKER_TTL_DAYS=7
 
