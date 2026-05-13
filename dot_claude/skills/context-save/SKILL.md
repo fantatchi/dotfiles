@@ -1,7 +1,6 @@
 ---
 name: context-save
-description: プロジェクトの作業状態を保存し、次回セッションで復帰可能にする。セッション終了時や作業の区切りで使う。
-disable-model-invocation: true
+description: プロジェクトの作業状態を保存し、次回セッションで復帰可能にする。セッション終了時や作業の区切りで使う。UserPromptSubmit hook（`context-save-reminder.sh`、しきい値 120 分）からモデルが自律実行することを前提とした設定（`disable-model-invocation` を意図的に外している）。
 allowed-tools: Read, Write, Edit, Glob, Bash(git:*), Bash(echo:*), Bash(mkdir:*), Bash(basename:*), Bash(date:*), Bash(pwd), Bash(chezmoi source-path)
 ---
 
