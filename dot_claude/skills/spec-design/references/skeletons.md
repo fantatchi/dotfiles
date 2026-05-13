@@ -21,7 +21,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{タイトル}}</title>
 <style>
-  :root { --bg:#fafaf9; --surface:#fff; --text:#1c1917; --muted:#57534e; --border:#e7e5e4; --accent:#6d28d9; --accent-bg:#ede9fe; }
+  :root { --bg:#fafaf9; --surface:#fff; --text:#1c1917; --muted:#57534e; --border:#e7e5e4; --accent:#0017C1; --accent-bg:#D9E6FF; }
   body { margin:0; background:var(--bg); color:var(--text); font-family:system-ui,sans-serif; line-height:1.65; }
   main { max-width:1000px; margin:0 auto; padding:40px 24px; }
   header.page { border-bottom:1px solid var(--border); padding-bottom:24px; margin-bottom:32px; }
