@@ -91,7 +91,7 @@ GOをもらってから進める。
 - `/gtd-list` — `~/.claude/tasks.md` からタスクを表示（デフォルト: 現在プロジェクトの Inbox + Next）
 - `/ks-naming` — 土木業界向け識別子名の生成
 - `/multi-persona-review` — 3〜5 人の専門ペルソナを並列 Agent で起動して読取専用レビューを実施し、見落とし・別仮説・推奨アクションを統合
-- `/obsidian-daily` — GitHub アクティビティと作業ログからデイリーサマリーを生成
+- `/obsidian-daily` — GitHub アクティビティと作業ログから Obsidian デイリーノートにサマリーを追記（冒頭 KPI 行・「今日の要約」上配置・コミットのリポ別グルーピング・作業ログ折り畳み callout の構成）
 - `/obsidian-log` — 作業ログを Obsidian Vault に記録
 - `/obsidian-resource` — 調査メモ・参考リンク・ブログドラフトを Obsidian Vault に保存（引数 `auto` でセッションから自動ドラフト化）
 - `/obsidian-mail` — Obsidian デイリーノートの「## デイリーサマリー」セクションをメール向けに再構成して Gmail SMTP で送信（日報・週報）。`/obsidian-mail daily|weekly [YYYY-MM-DD]` で明示呼び出し（自動発火しない、ローカル routine から呼ぶ前提）

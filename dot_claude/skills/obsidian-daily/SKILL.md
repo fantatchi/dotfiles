@@ -1,6 +1,6 @@
 ---
 name: obsidian-daily
-description: GitHub アクティビティと作業ログからデイリーサマリーを生成し、Obsidian デイリーノートに追記する。「今日のまとめ」「デイリーサマリー」といった依頼で使う。
+description: GitHub アクティビティと作業ログから Obsidian デイリーノートの「## デイリーサマリー」セクションを生成・追記する。冒頭 KPI 行（commits / PRs / logs 件数）・「今日の要約」上配置・コミットのリポ別グルーピング・作業ログ折り畳み callout の構成。「今日のまとめ」「デイリーサマリー」「KPI」「リポ別コミット」「概況」といった依頼で使う。
 argument-hint: [YYYY-MM-DD]
 allowed-tools: Read, Bash(gh:*), Bash(date:*), Bash(python:*), Bash(cat:*), Bash(ls:*), Bash(echo:*)
 ---
@@ -190,6 +190,14 @@ Microsoft Store のスタブランチャー (`AppData\Local\Microsoft\WindowsApp
 **一時ファイルはホーム直下に置く**: `/tmp/` は Git Bash と WSL でパス解釈が
 異なるため避ける。`~/tmp_daily_summary.json` 固定名で運用する（このスキルは
 単発対話で呼ばれる前提なので同時実行の競合は考慮しない）。
+
+**出力フォーマットの SSOT（Single Source of Truth）**: 「## デイリーサマリー」セクションの
+具体的な構造（KPI 行・collapsible meta callout・「今日の要約」配置・コミットのリポ別
+グルーピング・作業ログのフラット件数 + callout）は `write-daily.py` の `SUMMARY_TEMPLATE`
+および `build_kpi_line` / `build_commits_grouped` / `build_logs_section` が実装上の正本。
+`template.md` は読み手向けの参考写しなので、両者にズレがある場合は実装側が正。
+出力規約は `obsidian-mail` の reader 契約（`obsidian-mail/SKILL.md §2-b`）にも反映されているため、
+出力フォーマットを変更する際は reader 側の `_BULLET_RE` 等の依存を必ず確認すること。
 
 ## 7. 完了報告
 

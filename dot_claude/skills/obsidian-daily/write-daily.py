@@ -43,12 +43,18 @@ author: at-kato
 SUMMARY_TEMPLATE = """\
 ## デイリーサマリー
 
-> [!info] 自動生成
+{kpi_line}
+
+> [!info]- 自動生成（メタデータ）
 > - timestamp: {timestamp}
 > - source: claude-summary
 > - generation: 1
 > - summary_of:
 {summary_of}
+
+### 今日の要約
+
+{summary}
 
 ### GitHub アクティビティ
 
@@ -62,15 +68,99 @@ SUMMARY_TEMPLATE = """\
 
 ### 作業ログ
 
-{logs}
-
-### 今日の要約
-
-{summary}
+{logs_section}
 
 ### 明日以降のタスク
 
 {upcoming_tasks}"""
+
+
+def build_kpi_line(data: dict) -> str:
+    """概況 KPI 行を組み立てる（視線最上段に置く全体指標）。
+
+    例: **今日の活動**: commits **27** (4 repos) / PRs **6** (作成 5・マージ 4) / logs **10**
+
+    全件 0 でも行は出す（活動なし日であることが一目で分かる）。
+    """
+    commits = data.get("commits", [])
+    prs = data.get("prs", [])
+    logs = data.get("logs", [])
+
+    repos = {c["repo"] for c in commits if c.get("repo")}
+    n_commits = len(commits)
+    repos_part = f" ({len(repos)} repos)" if repos else ""
+
+    n_prs = len(prs)
+    label_counts: dict[str, int] = {}
+    for p in prs:
+        for lbl in p.get("labels", []) or []:
+            label_counts[lbl] = label_counts.get(lbl, 0) + 1
+    if label_counts:
+        ordered = ["作成", "マージ", "レビュー"]
+        breakdown_parts = [f"{k} {label_counts[k]}" for k in ordered if k in label_counts]
+        for k, v in label_counts.items():
+            if k not in ordered:
+                breakdown_parts.append(f"{k} {v}")
+        pr_str = f"**{n_prs}** ({'・'.join(breakdown_parts)})"
+    else:
+        pr_str = f"**{n_prs}**"
+
+    return (
+        f"**今日の活動**: commits **{n_commits}**{repos_part}"
+        f" / PRs {pr_str}"
+        f" / logs **{len(logs)}**"
+    )
+
+
+def build_commits_grouped(commits_list: list) -> str:
+    """コミットをリポジトリ軸でグルーピングして整形する。
+
+    リポは件数大の順、同件数はリポ名昇順。同一リポ内は入力順（時系列）を保持。
+    リポ別小見出しを出した上で、各コミット行からは repo prefix を除く（冗長排除）。
+    """
+    if not commits_list:
+        return "なし"
+
+    by_repo: dict[str, list] = {}
+    for c in commits_list:
+        repo = c.get("repo", "(unknown)")
+        by_repo.setdefault(repo, []).append(c)
+
+    sorted_repos = sorted(by_repo.items(), key=lambda kv: (-len(kv[1]), kv[0]))
+
+    parts: list[str] = []
+    for repo, commits in sorted_repos:
+        parts.append(f"##### {repo} ({len(commits)})")
+        parts.append("")
+        for c in commits:
+            parts.append(f"- {c['message']} (`{c['sha']}`)")
+        parts.append("")
+    return "\n".join(parts).rstrip()
+
+
+def build_logs_section(logs_list: list) -> str:
+    """作業ログを「プロジェクト × 件数」フラットサマリー + collapsible callout で整形する。
+
+    件数があるときは:
+        1. 折り畳み**外**に「プロジェクト別件数: proj-A 4 / proj-B 2 / ...」の 1 行サマリー
+           （PDF Export 時に折り畳み内が消える Obsidian の挙動と、forward 互換性の保険を兼ねる）
+        2. `> [!note]- 詳細（作業ログ N 件）` callout の中に詳細 bullet（要約との重複を視覚階層で解消）
+    0 件のときは plain text で「作業ログの記録なし」とする。
+    """
+    if not logs_list:
+        return "作業ログの記録なし"
+
+    counts: dict[str, int] = {}
+    for log in logs_list:
+        proj = log.get("project") or "(unknown)"
+        counts[proj] = counts.get(proj, 0) + 1
+    sorted_counts = sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))
+    breakdown = "プロジェクト別件数: " + " / ".join(f"{p} {n}" for p, n in sorted_counts)
+
+    lines = [breakdown, "", f"> [!note]- 詳細（作業ログ {len(logs_list)} 件）"]
+    for log in logs_list:
+        lines.append(f"> - **{log['project']}**: {log['summary']}")
+    return "\n".join(lines)
 
 
 def build_summary_of(data: dict) -> str:
@@ -104,16 +194,10 @@ def build_summary(data: dict) -> str:
     timestamp = now.strftime("%Y-%m-%d %H:%M")
 
     summary_of = build_summary_of(data)
+    kpi_line = build_kpi_line(data)
 
-    # コミット
-    commits_list = data.get("commits", [])
-    if commits_list:
-        lines = []
-        for c in commits_list:
-            lines.append(f"- `{c['repo']}` — {c['message']} (`{c['sha']}`)")
-        commits = "\n".join(lines)
-    else:
-        commits = "なし"
+    # コミット（リポ軸でグルーピング）
+    commits = build_commits_grouped(data.get("commits", []))
 
     # PR（重複排除済みのリスト）
     prs_list = data.get("prs", [])
@@ -126,15 +210,8 @@ def build_summary(data: dict) -> str:
     else:
         prs = "なし"
 
-    # 作業ログ
-    logs_list = data.get("logs", [])
-    if logs_list:
-        lines = []
-        for log in logs_list:
-            lines.append(f"- **{log['project']}**: {log['summary']}")
-        logs = "\n".join(lines)
-    else:
-        logs = "作業ログの記録なし"
+    # 作業ログ（collapsible callout で畳む）
+    logs_section = build_logs_section(data.get("logs", []))
 
     summary_text = data.get("summary_text", "特筆事項なし")
 
@@ -154,10 +231,11 @@ def build_summary(data: dict) -> str:
 
     return SUMMARY_TEMPLATE.format(
         timestamp=timestamp,
+        kpi_line=kpi_line,
         summary_of=summary_of,
         commits=commits,
         prs=prs,
-        logs=logs,
+        logs_section=logs_section,
         summary=summary_text,
         upcoming_tasks=upcoming_tasks,
     )

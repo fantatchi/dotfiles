@@ -87,12 +87,14 @@ def extract_section(md: str) -> str | None:
 
 
 def strip_meta_callout(body: str) -> str:
-    """Remove leading auto-generated callout block.
+    """Skip leading meta content (auto-generated callout, if any).
 
-    obsidian-daily が生成する `> [!info] 自動生成 ...` callout を冒頭から落とす。
-    規約上「## デイリーサマリー」セクションの先頭にあるのは自動生成 callout のみ
-    なので、「先頭の空行 + 連続する `>` 行」を一括で skip すれば十分。
-    手書きの callout が先頭に混ざる運用は想定しない（規約縛り）。
+    旧フォーマット (〜2026-04) では `## デイリーサマリー` セクション先頭が
+    `> [!info] 自動生成` callout だったため、本関数で「先頭の空行 + 連続する `>` 行」を
+    skip していた。新フォーマット (2026-05〜) では先頭が KPI 行 `**今日の活動**: ...`
+    になり `>` 連続が崩れるため、本関数は実質的に何も skip しないが、後段の
+    `split_by_h3` が `### ` 前のコンテンツを破棄するため機能的にはセーフ。
+    旧 daily note を読む後方互換のために本関数は残す。
     """
     lines = body.splitlines()
     i = 0
@@ -124,11 +126,20 @@ def split_by_h3(body: str) -> dict[str, str]:
     return sections
 
 
-_BULLET_RE = re.compile(r"^\s*-\s*\*\*([^*]+)\*\*\s*[:：]\s*(.+)$")
+# `> ` 接頭辞は callout 内バレットを許容するためのもので、`> ` の後に空白 1 つ以上を必須に
+# している（`>-` のような Markdown 不正形式は誤マッチさせない）。callout 内外いずれの形式でも
+# 抽出する設計（obsidian-mail/SKILL.md §2-b と §2-c に同期）。
+_BULLET_RE = re.compile(r"^\s*(?:>\s+)?-\s*\*\*([^*]+)\*\*\s*[:：]\s*(.+)$")
 
 
 def parse_worklog(text: str) -> list[dict]:
-    """Parse `- **project**: body` bullets."""
+    """Parse `- **project**: body` bullets.
+
+    契約: `obsidian-mail/SKILL.md §2-b` の規約テーブルと同期。
+    `### 作業ログ` 配下の `[> ]- **project**: body` 形式 bullet を抽出する。
+    callout 内（`> [!note]-` 配下の `> - **proj**: body`）でも callout 外でも、
+    形式が合致すれば採用する（callout の内外を区別しない）。
+    """
     out: list[dict] = []
     for line in text.splitlines():
         m = _BULLET_RE.match(line)
@@ -148,7 +159,12 @@ GH_SUBSECTION_PRS = "PR"
 
 
 def parse_github(text: str) -> tuple[list[str], list[dict]]:
-    """Parse '#### コミット' / '#### PR' subsections under '### GitHub アクティビティ'."""
+    """Parse '#### コミット' / '#### PR' subsections under '### GitHub アクティビティ'.
+
+    契約: `obsidian-mail/SKILL.md §2-b` の規約テーブルと同期。
+    `##### owner/repo (N)` のリポ別小見出し（`#### ` ではないので h4 判定を素通り）は
+    無視し、bullet をリポ横断でフラットに集計する。
+    """
     commits: list[str] = []
     prs: list[dict] = []
     current: str | None = None
@@ -198,7 +214,11 @@ _TASK_RE = re.compile(
 
 
 def parse_tasks(text: str) -> list[dict]:
-    """Parse `- [ ] #project body` lines."""
+    """Parse `- [ ] #project body` lines.
+
+    契約: `obsidian-mail/SKILL.md §2-b` の規約テーブルと同期。
+    末尾 ⏳ または `@waiting` を含む行は `waiting: True`。
+    """
     out: list[dict] = []
     for line in text.splitlines():
         m = _TASK_RE.match(line)
