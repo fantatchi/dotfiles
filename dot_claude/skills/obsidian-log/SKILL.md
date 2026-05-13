@@ -58,3 +58,4 @@ $ARGUMENTS が渡される。
 - 書き出し先ディレクトリが存在しない場合は作成すること
 - frontmatter の `files_changed` はセッション中に変更したファイル数を数えて記入すること（`git status --short | wc -l` 等で取得）
 - frontmatter の `source: claude-log` / `generation: 0` は固定（再帰要約劣化対策のメタ。セッション原文に近い記録なので一次情報扱い）
+- frontmatter の `project` は `"[[<プロジェクト名>]]"` の **wiki-link 形式** で書くこと。Obsidian の Graph View は frontmatter のリンクプロパティのみエッジとして認識するため、プレーン文字列だとプロジェクトノードがハブ化されず孤立する。ダブルクォートで囲むのは YAML パーサ対策（`[[ ... ]]` のみだとパース時に flow sequence と誤解される可能性があるため）。スラッシュ区切りなど複数プロジェクトに跨る場合は値そのものを揺れたまま 1 つの link にしてよい（正規化はスコープ外）

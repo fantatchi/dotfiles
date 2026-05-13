@@ -93,7 +93,7 @@ ls ~/ObsidianVault/_claude/log/{YYYYMM}/{YYYYMMDD}*.md 2>/dev/null
 
 各ファイルから以下を抽出する:
 1. ファイルパス（vault 相対、例: `_claude/log/202604/20260423-foo.md`）
-2. frontmatter の `project` を取得
+2. frontmatter の `project` を取得（`"[[xxx]]"` の wiki-link 形式の場合は `xxx` を取り出してプレーン文字列として扱う。例: `"[[u-veil]]"` → `u-veil`。スラッシュ区切りなど内部に複数値が入る場合もそのまま 1 つの文字列として保持）
 3. `## 概要` セクションのテキスト（1-2行）を取得
 
 作業ログ が 0 件の場合は「作業ログの記録なし」とする。

@@ -3,7 +3,7 @@ tags:
   - claude-log
   - （自動生成タグ・引数タグをここに追加）
 date: YYYY-MM-DD
-project: プロジェクト名
+project: "[[プロジェクト名]]"
 files_changed: 0
 source: claude-log
 generation: 0
