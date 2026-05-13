@@ -140,12 +140,17 @@ ls ~/ObsidianVault/_claude/log/{YYYYMM}/{YYYYMMDD}*.md 2>/dev/null
     {"section": "Next", "project": "claude-config", "title": "gtd-list スキルの実装"},
     {"section": "Waiting", "project": "mlit", "title": "APIキー発行待ち @since:2026-04-08"}
   ],
-  "summary_text": "GitHub アクティビティと作業ログを総合した 1-3 行の自然言語サマリー"
+  "summary_text": "- toto-predictor: Phase 2.2 完走 (Brier 0.7761)\n- kabuto: Phase 6-α ゲート 2/10 達成\n- cloud-dsc: PR #38-42 を 5 本作成・4 本マージ"
 }
 ```
 
 - `commits`, `prs`, `logs`, `upcoming_tasks` が 0 件の場合は空配列 `[]` にする
-- `summary_text` は全データを総合して LLM が生成する
+- `summary_text` は全データを総合して LLM が**プロジェクト軸の箇条書き 2-4 行**で生成する
+  - 形式: `- <project>: <その日の核心 1 行>`
+  - プロジェクトは作業ログ / commits / PRs を総合して「動いたプロジェクト」を抽出
+  - 1 プロジェクト 1 行、長文ベタ書きは避ける（ジャンプ率を KPI 行と揃え、認知負荷を抑える）
+  - 全プロジェクトを羅列するのではなく、その日の **核心 2-4 件** に絞る
+  - 活動なし日（commits / PRs / logs すべて空）の場合のみ「特筆事項なし」を 1 行で出す
 - `logs[].path` は vault 相対パス。`write-daily.py` がこれを wiki-link 化して `summary_of` に展開する（再帰要約劣化対策）
 
 ## 6. デイリーノートへの書き込み
@@ -194,8 +199,7 @@ Microsoft Store のスタブランチャー (`AppData\Local\Microsoft\WindowsApp
 **出力フォーマットの SSOT（Single Source of Truth）**: 「## デイリーサマリー」セクションの
 具体的な構造（KPI 行・collapsible meta callout・「今日の要約」配置・コミットのリポ別
 グルーピング・作業ログのフラット件数 + callout）は `write-daily.py` の `SUMMARY_TEMPLATE`
-および `build_kpi_line` / `build_commits_grouped` / `build_logs_section` が実装上の正本。
-`template.md` は読み手向けの参考写しなので、両者にズレがある場合は実装側が正。
+および `build_kpi_line` / `build_grouped_commits` / `build_logs_section` が実装上の唯一の正本。
 出力規約は `obsidian-mail` の reader 契約（`obsidian-mail/SKILL.md §2-b`）にも反映されているため、
 出力フォーマットを変更する際は reader 側の `_BULLET_RE` 等の依存を必ず確認すること。
 

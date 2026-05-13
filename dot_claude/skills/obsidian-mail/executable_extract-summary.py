@@ -34,8 +34,44 @@ import json
 import os
 import re
 import sys
+from typing import TypedDict
 
 import markdown  # pip3 install --user markdown
+
+
+class WorklogEntry(TypedDict):
+    """`### 作業ログ` 配下の `- **project**: body` 行を抽出した 1 件。"""
+    project: str
+    body: str
+
+
+class PREntry(TypedDict):
+    """`### GitHub アクティビティ` 配下の PR リンク行を抽出した 1 件。
+
+    `type` は kind 文字列から派生したカテゴリ ("authored" / "merged" /
+    "authored_merged" / "review" / "other")。
+    """
+    title: str
+    url: str
+    kind: str
+    type: str
+
+
+class TaskEntry(TypedDict):
+    """`### 明日以降のタスク` 配下の `- [ ] #project body` 行を抽出した 1 件。"""
+    project: str
+    body: str
+    waiting: bool
+
+
+class ParsedSummary(TypedDict):
+    """`parse_summary()` の戻り値。obsidian-mail/SKILL.md §2-b の規約と同期。"""
+    tldr: str
+    worklog: list[WorklogEntry]
+    gh_commits: list[str]
+    gh_prs: list[PREntry]
+    tasks: list[TaskEntry]
+
 
 VAULT = os.path.expanduser("~/ObsidianVault")
 SECTION_HEADER = "## デイリーサマリー"
@@ -48,6 +84,8 @@ h3 { margin-top: 1.4em; color: #1f2328; font-size: 1.05em; }
 p { margin: .6em 0; }
 .tldr { background: #ddf4ff; border-left: 4px solid #0969da; padding: .8em 1em; border-radius: 0 6px 6px 0; margin: .6em 0 1.4em; }
 .tldr p { margin: .3em 0; }
+.tldr ul { margin: .2em 0; padding-left: 1.4em; }
+.tldr li { margin: .15em 0; }
 code { background: #f6f8fa; padding: .15em .4em; border-radius: 3px; font-family: 'SFMono-Regular', Consolas, monospace; font-size: .88em; }
 ul { padding-left: 1.4em; margin: .6em 0; }
 li { margin: .3em 0; }
@@ -129,18 +167,43 @@ def split_by_h3(body: str) -> dict[str, str]:
 # `> ` 接頭辞は callout 内バレットを許容するためのもので、`> ` の後に空白 1 つ以上を必須に
 # している（`>-` のような Markdown 不正形式は誤マッチさせない）。callout 内外いずれの形式でも
 # 抽出する設計（obsidian-mail/SKILL.md §2-b と §2-c に同期）。
+#
+# 動作確認:
+# >>> bool(_BULLET_RE.match("- **proj**: body"))
+# True
+# >>> bool(_BULLET_RE.match("> - **proj**: body"))
+# True
+# >>> bool(_BULLET_RE.match("  > - **proj**: body"))
+# True
+# >>> bool(_BULLET_RE.match(">- **proj**: body"))  # `>` 直後にスペースなし → 拒否
+# False
+# >>> bool(_BULLET_RE.match("> 普通の引用文"))  # bullet でない → 拒否
+# False
+# >>> bool(_BULLET_RE.match("- proj: body"))  # `**` なし → 拒否
+# False
 _BULLET_RE = re.compile(r"^\s*(?:>\s+)?-\s*\*\*([^*]+)\*\*\s*[:：]\s*(.+)$")
 
 
-def parse_worklog(text: str) -> list[dict]:
+def parse_worklog(text: str) -> list[WorklogEntry]:
     """Parse `- **project**: body` bullets.
 
     契約: `obsidian-mail/SKILL.md §2-b` の規約テーブルと同期。
     `### 作業ログ` 配下の `[> ]- **project**: body` 形式 bullet を抽出する。
     callout 内（`> [!note]-` 配下の `> - **proj**: body`）でも callout 外でも、
     形式が合致すれば採用する（callout の内外を区別しない）。
+
+    >>> parse_worklog("- **alpha**: body-a\\n> - **beta**: body-b")
+    [{'project': 'alpha', 'body': 'body-a'}, {'project': 'beta', 'body': 'body-b'}]
+    >>> parse_worklog("")
+    []
+    >>> parse_worklog("プロジェクト別件数: alpha 2 / beta 1")  # 件数行は拾わない
+    []
+    >>> parse_worklog(">- **proj**: body")  # `>` 直後にスペースなし → 拒否
+    []
+    >>> parse_worklog("> 普通の引用文 **重要**: なんとか")  # bullet ではない → 拒否
+    []
     """
-    out: list[dict] = []
+    out: list[WorklogEntry] = []
     for line in text.splitlines():
         m = _BULLET_RE.match(line)
         if m:
@@ -158,15 +221,37 @@ GH_SUBSECTION_COMMITS = "コミット"
 GH_SUBSECTION_PRS = "PR"
 
 
-def parse_github(text: str) -> tuple[list[str], list[dict]]:
+def parse_github(text: str) -> tuple[list[str], list[PREntry]]:
     """Parse '#### コミット' / '#### PR' subsections under '### GitHub アクティビティ'.
 
     契約: `obsidian-mail/SKILL.md §2-b` の規約テーブルと同期。
     `##### owner/repo (N)` のリポ別小見出し（`#### ` ではないので h4 判定を素通り）は
     無視し、bullet をリポ横断でフラットに集計する。
+
+    >>> text = '''#### コミット
+    ...
+    ... ##### o/repo-a (2)
+    ...
+    ... - msg-a1 (`a1`)
+    ... - msg-a2 (`a2`)
+    ...
+    ... ##### o/repo-b (1)
+    ...
+    ... - msg-b (`b1`)
+    ...
+    ... #### PR
+    ...
+    ... - [title-1](https://x/1) — 作成・マージ
+    ... - [title-2](https://x/2) — レビュー
+    ... '''
+    >>> commits, prs = parse_github(text)
+    >>> len(commits), len(prs)
+    (3, 2)
+    >>> prs[0]['type'], prs[1]['type']
+    ('authored_merged', 'review')
     """
     commits: list[str] = []
-    prs: list[dict] = []
+    prs: list[PREntry] = []
     current: str | None = None
     pr_link_re = re.compile(r"\[([^\]]+)\]\(([^)]+)\)\s*[—-]\s*(.+)$")
     for raw in text.splitlines():
@@ -213,13 +298,21 @@ _TASK_RE = re.compile(
 )
 
 
-def parse_tasks(text: str) -> list[dict]:
+def parse_tasks(text: str) -> list[TaskEntry]:
     """Parse `- [ ] #project body` lines.
 
     契約: `obsidian-mail/SKILL.md §2-b` の規約テーブルと同期。
     末尾 ⏳ または `@waiting` を含む行は `waiting: True`。
+
+    >>> tasks = parse_tasks("- [ ] `#alpha` task 1\\n- [ ] `#beta` task 2 ⏳")
+    >>> tasks[0] == {'project': 'alpha', 'body': 'task 1', 'waiting': False}
+    True
+    >>> tasks[1] == {'project': 'beta', 'body': 'task 2', 'waiting': True}
+    True
+    >>> parse_tasks("")
+    []
     """
-    out: list[dict] = []
+    out: list[TaskEntry] = []
     for line in text.splitlines():
         m = _TASK_RE.match(line)
         if not m:
@@ -249,8 +342,93 @@ def strip_wikilinks(text: str) -> str:
     return re.sub(r"\[\[([^\]]+)\]\]", repl, text)
 
 
-def parse_summary(body: str) -> dict:
-    """Top-level parser for a daily summary section body."""
+def parse_summary(body: str) -> ParsedSummary:
+    """Top-level parser for a daily summary section body.
+
+    新フォーマット (2026-05〜) と旧フォーマット (〜2026-04) を両方扱う
+    golden snapshot doctest を兼ねる（writer 出力の規約変更時にここで検知される）。
+
+    新フォーマット例（KPI 行 + collapsible callout + callout 内 worklog）:
+
+    >>> body_new = '''
+    ... **今日の活動**: commits **1** (1 repos) / PRs **1** (作成 1) / logs **2**
+    ...
+    ... > [!info]- 自動生成（メタデータ）
+    ... > - timestamp: 2026-05-12 23:07
+    ...
+    ... ### 今日の要約
+    ...
+    ... 新形式の要約テキスト。
+    ...
+    ... ### GitHub アクティビティ
+    ...
+    ... #### コミット
+    ...
+    ... ##### o/repo-a (1)
+    ...
+    ... - new msg (`a1`)
+    ...
+    ... #### PR
+    ...
+    ... - [new PR](https://x/1) — 作成
+    ...
+    ... ### 作業ログ
+    ...
+    ... プロジェクト別件数: alpha 1 / beta 1
+    ...
+    ... > [!note]- 詳細（作業ログ 2 件）
+    ... > - **alpha**: aaa
+    ... > - **beta**: bbb
+    ...
+    ... ### 明日以降のタスク
+    ...
+    ... - [ ] `#alpha` t1
+    ... - [ ] `#beta` t2 ⏳
+    ... '''
+    >>> p = parse_summary(body_new)
+    >>> p['tldr']
+    '新形式の要約テキスト。'
+    >>> len(p['worklog']), len(p['gh_commits']), len(p['gh_prs']), len(p['tasks'])
+    (2, 1, 1, 2)
+    >>> [t['waiting'] for t in p['tasks']]
+    [False, True]
+
+    旧フォーマット例（callout なし / worklog は callout 外 bullet）:
+
+    >>> body_old = '''
+    ... > [!info] 自動生成
+    ... > - timestamp: 2026-05-08
+    ...
+    ... ### GitHub アクティビティ
+    ...
+    ... #### コミット
+    ...
+    ... - `o/repo-a` — old msg (`a1`)
+    ...
+    ... #### PR
+    ...
+    ... - [old PR](https://x/2) — マージ
+    ...
+    ... ### 作業ログ
+    ...
+    ... - **alpha**: 旧形式の bullet
+    ...
+    ... ### 今日の要約
+    ...
+    ... 旧形式の要約。
+    ...
+    ... ### 明日以降のタスク
+    ...
+    ... - [ ] `#alpha` t1
+    ... '''
+    >>> p_old = parse_summary(body_old)
+    >>> p_old['tldr']
+    '旧形式の要約。'
+    >>> p_old['worklog']
+    [{'project': 'alpha', 'body': '旧形式の bullet'}]
+    >>> len(p_old['gh_commits']), len(p_old['gh_prs']), len(p_old['tasks'])
+    (1, 1, 1)
+    """
     cleaned = strip_meta_callout(body)
     cleaned = strip_wikilinks(cleaned)
     sections = split_by_h3(cleaned)
@@ -273,7 +451,7 @@ def parse_summary(body: str) -> dict:
 
 # ---------- Renderer --------------------------------------------------------
 
-def render_github(commits: list[str], prs: list[dict]) -> list[str]:
+def render_github(commits: list[str], prs: list[PREntry]) -> list[str]:
     if not commits and not prs:
         return []
     out = ["## GitHub", ""]
@@ -301,7 +479,7 @@ def render_github(commits: list[str], prs: list[dict]) -> list[str]:
 MAX_TASKS_IN_DAILY = 5  # 日報「明日のタスク」セクションの抜粋件数
 
 
-def render_tasks(tasks: list[dict], top_n: int = MAX_TASKS_IN_DAILY) -> list[str]:
+def render_tasks(tasks: list[TaskEntry], top_n: int = MAX_TASKS_IN_DAILY) -> list[str]:
     active = [t for t in tasks if not t["waiting"]]
     waiting = [t for t in tasks if t["waiting"]]
     if not active and not waiting:
@@ -328,7 +506,7 @@ def render_tasks(tasks: list[dict], top_n: int = MAX_TASKS_IN_DAILY) -> list[str
     return out
 
 
-def render_daily_body(target: dt.date, parsed: dict) -> str:
+def render_daily_body(target: dt.date, parsed: ParsedSummary) -> str:
     parts: list[str] = []
     weekday = "月火水木金土日"[target.weekday()]
     parts.append(f"# {target.isoformat()}（{weekday}）日報")
@@ -413,16 +591,30 @@ def render_weekly_body(monday: dt.date, sunday: dt.date,
 # ---------- HTML conversion -------------------------------------------------
 
 def md_to_html(md_text: str) -> str:
+    """Convert markdown body to styled HTML (mail-ready).
+
+    `## 今日のひとこと` 直後のブロックを `.tldr` で wrap し青ボックス化する。
+    obsidian-daily SKILL.md §5 仕様変更（プロジェクト軸の箇条書き化）に追従し、
+    `<p>` だけでなく `<ul>` も wrap 対象とする。
+
+    >>> html_p = md_to_html("## 今日のひとこと\\n\\nplain text")
+    >>> '<div class="tldr"><p>plain text</p></div>' in html_p
+    True
+    >>> html_ul = md_to_html("## 今日のひとこと\\n\\n- proj-a: x\\n- proj-b: y")
+    >>> '<div class="tldr">' in html_ul and '<ul>' in html_ul and '<li>proj-a: x</li>' in html_ul
+    True
+    """
     body_html = markdown.markdown(
         md_text,
         extensions=["extra", "sane_lists"],
     )
-    # h2「今日のひとこと」直後の <p>...</p> に class を付与して青ボックス化。
-    # re.DOTALL は parse_summary で 1 段落に絞っているはずでも、markdown が段落内改行を
-    # <p>...\n...</p> のように展開した場合に拾えるよう保険として残す。
+    # h2「今日のひとこと」直後の <p>...</p> または <ul>...</ul> に class を付与して
+    # 青ボックス化。obsidian-daily SKILL.md §5 の summary_text 仕様（プロジェクト軸の
+    # 箇条書き 2-4 行）では bullet → <ul> に変換されるため、両ブロックを受ける。
+    # re.DOTALL は markdown が段落内改行を <p>...\n...</p> 展開した場合の保険。
     body_html = re.sub(
-        r"(<h2>今日のひとこと</h2>)\s*<p>(.*?)</p>",
-        r'\1<div class="tldr"><p>\2</p></div>',
+        r"(<h2>今日のひとこと</h2>)\s*(<p>.*?</p>|<ul>.*?</ul>)",
+        r'\1<div class="tldr">\2</div>',
         body_html,
         count=1,
         flags=re.DOTALL,
