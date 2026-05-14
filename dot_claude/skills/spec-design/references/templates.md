@@ -294,7 +294,16 @@ sequenceDiagram
 
 HTML 補足ページは **サマリー / 概況 / 比較・対比 / 配色で意味を伝える表** など、視覚情報が主役のページに限定して使う。視覚設計の判断は `dashboard-design` スキルを必ず参照すること。
 
-### サマリーページの最小骨格
+### 採用パターン
+
+| 状況 | 採用するパターン |
+|---|---|
+| HTML 補足ページが **1 本のみ**（単発） | 本ファイルの最小骨格。`<style>` 内に最小装飾を直書きしてよい |
+| HTML 補足ページが **2 本以上 or 増える見込み** | 共通 CSS 集約型。[`html-css-centralization.md`](./html-css-centralization.md) を必ず参照し、`<link>` で共通 CSS を参照し各 HTML の `<style>` は `:root` 固有変数のみに収める |
+
+以下のサマリー / 比較ページ骨格は **共通 CSS 集約型** で示す（複数ページ前提の推奨パターン）。単一 HTML の場合は `<link>` 参照を外して `<style>` 内に必要装飾を直書きしてよい。
+
+### サマリーページの最小骨格（共通 CSS 集約型）
 
 ```html
 <!DOCTYPE html>
@@ -302,57 +311,102 @@ HTML 補足ページは **サマリー / 概況 / 比較・対比 / 配色で意
 <head>
   <meta charset="UTF-8">
   <title>[システム名] サマリー</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="../_shared/spec-page.css">
   <style>
+    /* ===== summary.html 固有 CSS 変数のみ =====
+     * その他のスタイルは ../_shared/spec-page.css の body.page-summary scope に集約。
+     */
     :root {
-      /* dashboard-design ガイドの配色パレットから選定 */
-      --bg: #FFFFFF;
-      --surface: #F5F5F5;
-      --text: #1A1A1A;
-      --muted: #6B7280;
-      --accent: #2563EB;
-      --warn: #D97706;
-      --critical: #DC2626;
+      --kpi-positive: #059669;
+      --kpi-positive-bg: #d1fae5;
+      --kpi-warn: #d97706;
+      --kpi-warn-bg: #fef3c7;
     }
-    body { font-family: system-ui, sans-serif; color: var(--text); background: var(--bg); margin: 0; padding: 24px; }
-    header.page { border-bottom: 1px solid var(--muted); padding-bottom: 16px; margin-bottom: 24px; }
-    nav.breadcrumb { color: var(--muted); font-size: 14px; }
-    h1 { margin: 8px 0 4px; }
-    .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
-    .card { background: var(--surface); padding: 16px; border-radius: 8px; }
-    .card h3 { margin: 0 0 8px; font-size: 14px; color: var(--muted); text-transform: uppercase; }
-    .card .value { font-size: 28px; font-weight: bold; }
   </style>
 </head>
-<body>
+<body class="page-summary">
   <header class="page">
-    <nav class="breadcrumb"><a href="../">Docs</a> / Summary</nav>
+    <p class="breadcrumb"><a href="../">Docs</a> / Summary</p>
     <h1>[システム名]: 全体サマリー</h1>
-    <p>このページで何が分かるかを 1 行で</p>
+    <p class="subtitle">このページで何が分かるかを 1 行で</p>
   </header>
 
-  <section class="summary-grid">
-    <div class="card">
-      <h3>主要指標 1</h3>
-      <div class="value">123</div>
-    </div>
-    <div class="card">
-      <h3>主要指標 2</h3>
-      <div class="value">45%</div>
-    </div>
-    <!-- 全体指標を左上に、詳細は右下に配置 -->
-  </section>
+  <main>
+    <section>
+      <div class="tldr">
+        <span class="label">TL;DR</span>
+        主要指標と現状サマリーを 2〜3 行で
+      </div>
+    </section>
 
-  <footer>
-    <nav class="page-nav">
-      <a href="./detail-a.html">詳細 A</a> |
-      <a href="./detail-b.html">詳細 B</a>
-    </nav>
-  </footer>
+    <section>
+      <h2>主要指標</h2>
+      <!-- ページ固有レイアウト .summary-grid / .card は共通 CSS の
+           body.page-summary scope で定義する -->
+      <div class="summary-grid">
+        <div class="card">
+          <h3>主要指標 1</h3>
+          <div class="value">123</div>
+        </div>
+        <div class="card">
+          <h3>主要指標 2</h3>
+          <div class="value">45%</div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="page">
+      <nav class="page-nav">
+        <div>
+          <span class="label-row">前のページ</span>
+          <a href="./overview.html">概要</a>
+        </div>
+        <div>
+          <span class="label-row">次のページ</span>
+          <a href="./detail-a.html">詳細 A</a>
+        </div>
+      </nav>
+    </footer>
+  </main>
 </body>
 </html>
 ```
 
-### 比較・対比ページの最小骨格
+共通 CSS 側（`_shared/spec-page.css`）には以下を `body.page-summary` scope で追加する:
+
+```css
+body.page-summary .summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+body.page-summary .card {
+  background: var(--surface);
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+body.page-summary .card h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+body.page-summary .card .value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+}
+```
+
+### 比較・対比ページの最小骨格（共通 CSS 集約型）
 
 ```html
 <!DOCTYPE html>
@@ -360,52 +414,76 @@ HTML 補足ページは **サマリー / 概況 / 比較・対比 / 配色で意
 <head>
   <meta charset="UTF-8">
   <title>[項目] 比較</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="../_shared/spec-page.css">
   <style>
+    /* ===== compare.html 固有 CSS 変数のみ ===== */
     :root {
-      --bg: #FFFFFF;
-      --surface: #F5F5F5;
-      --text: #1A1A1A;
-      --muted: #6B7280;
-      --positive: #059669;
-      --negative: #DC2626;
-      --neutral: #6B7280;
+      --verdict-yes: #15803d;
+      --verdict-no: #b91c1c;
+      --verdict-partial: #6b7280;
     }
-    body { font-family: system-ui, sans-serif; color: var(--text); padding: 24px; }
-    table.compare { width: 100%; border-collapse: collapse; }
-    table.compare th, table.compare td { padding: 12px; text-align: left; border-bottom: 1px solid var(--surface); }
-    table.compare th { background: var(--surface); }
-    .verdict.yes { color: var(--positive); font-weight: bold; }
-    .verdict.no { color: var(--negative); font-weight: bold; }
-    .verdict.partial { color: var(--neutral); }
   </style>
 </head>
-<body>
-  <h1>[項目] の比較</h1>
-  <p>何を判断するための比較表か（読み手のための一行）</p>
+<body class="page-compare">
+  <header class="page">
+    <p class="breadcrumb"><a href="../">Docs</a> / Compare</p>
+    <h1>[項目] の比較</h1>
+    <p class="subtitle">何を判断するための比較表か（読み手のための 1 行）</p>
+  </header>
 
-  <table class="compare">
-    <thead>
-      <tr>
-        <th>観点</th>
-        <th>選択肢 A</th>
-        <th>選択肢 B</th>
-        <th>選択肢 C</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>導入コスト</td>
-        <td><span class="verdict yes">低</span></td>
-        <td><span class="verdict partial">中</span></td>
-        <td><span class="verdict no">高</span></td>
-      </tr>
-      <!-- 色だけで分類せず、テキスト（低/中/高）と色を二重符号化 -->
-    </tbody>
-  </table>
+  <main>
+    <section>
+      <table class="compare zebra">
+        <thead>
+          <tr>
+            <th>観点</th>
+            <th>選択肢 A</th>
+            <th>選択肢 B</th>
+            <th>選択肢 C</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>導入コスト</td>
+            <td><span class="verdict yes">低</span></td>
+            <td><span class="verdict partial">中</span></td>
+            <td><span class="verdict no">高</span></td>
+          </tr>
+          <!-- 色だけで分類せず、テキスト（低/中/高）と色の二重符号化 -->
+        </tbody>
+      </table>
 
-  <p><strong>結論</strong>: ... （比較から得られる推奨を 1〜2 行）</p>
+      <p><strong>結論</strong>: ... （比較から得られる推奨を 1〜2 行）</p>
+    </section>
+  </main>
 </body>
 </html>
 ```
 
-**注意**: HTML 補足ページの配色・コントラスト比・色数制約・装飾排除・アクセシビリティの詳細は `dashboard-design` スキル + [`dashboard-design/references/visual-encoding.md`](../../dashboard-design/references/visual-encoding.md) を参照。本テンプレはあくまで最小骨格。
+共通 CSS 側に `body.page-compare` scope で:
+
+```css
+body.page-compare table.compare {
+  width: 100%;
+}
+
+body.page-compare .verdict.yes {
+  color: var(--verdict-yes);
+  font-weight: 700;
+}
+
+body.page-compare .verdict.no {
+  color: var(--verdict-no);
+  font-weight: 700;
+}
+
+body.page-compare .verdict.partial {
+  color: var(--verdict-partial);
+}
+```
+
+**注意**:
+- HTML 補足ページの配色・コントラスト比・色数制約・装飾排除・アクセシビリティの詳細は `dashboard-design` スキル + [`dashboard-design/references/visual-encoding.md`](../../dashboard-design/references/visual-encoding.md) を参照
+- 共通 CSS の最小骨格・`:root` 変数命名規則・ページ別 scope の書き方・段階的移行手順は [`html-css-centralization.md`](./html-css-centralization.md) を参照
+- 単一 HTML 完結で書きたい場合は `<link>` 参照を外し、上記の `body.page-X scope` で示した CSS を `<style>` 内にインライン展開してよい
