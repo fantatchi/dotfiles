@@ -22,16 +22,9 @@ allowed-tools: Read, Bash(gh:*), Bash(date:*), Bash(python:*), Bash(cat:*), Bash
 
 ## 2. Vault パスの決定
 
-Vault パスはユーザーホーム直下の `~/ObsidianVault` 固定。
-WSL / Windows (Git Bash) いずれからも同じ相対パスで解決される。
+`~/.claude/skills/shared/vault-init.md` の **§1「Vault 存在確認」を実行** する（`~/ObsidianVault` の存在チェックと、未配置時の案内メッセージ）。WSL / Windows (Git Bash) いずれからも同じ相対パスで解決される前提も shared 側に集約済み。
 
-1. `ls ~/ObsidianVault` で存在確認
-2. 存在しなければ以下を案内して終了:
-
-```
-~/ObsidianVault が見つかりません。
-ユーザーホーム直下に ObsidianVault を配置してください（WSL ではシンボリックリンクでも可）。
-```
+本スキルは Vault 内へのファイル書き出しを `write-daily.py` が `~/ObsidianVault/_daily/YYYYMM/YYYY-MM-DD.md` に直接行う設計のため、shared/vault-init.md の §2「書き出し先ディレクトリ」/ §3「ファイル名」規約は使用しない（その 2 つは obsidian-log / obsidian-resource 用）。
 
 ## 3. GitHub データ収集
 

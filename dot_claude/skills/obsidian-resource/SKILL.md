@@ -85,7 +85,7 @@ $ARGUMENTS で分岐する。
 - ユーザーが記録を依頼した内容を整理して書くこと
 - 書き出し先ディレクトリが存在しない場合は作成すること
 - 既存ファイルがある場合は上書きせず確認する
-- ファイル書き込みは Write ツールで直書きする（`shared/vault-write.py` は obsidian-daily 専用のため使用しない）
+- ファイル書き込みは Write ツールで直書きする（書き出し用の補助スクリプトは持たない。テンプレ展開・frontmatter 組み立てを Claude 自身が行う設計）
 - Hugo 公開は別途 Hugo リポジトリへのコピー・リンク設定が必要。本スキルは ObsidianVault への下書き保存のみを担う
 - ブログドラフトを含むすべてのリソースを `_claude/resource/` に統一している（旧 `_claude/blog/` は廃止方向。既存 15 件は Vault 内にそのまま保持）
 - 既存 resource ファイル 39 件は旧形式（`title` / `categories` / `draft` なし）と混在する。Dataview 等でクエリする場合は `WHERE file.frontmatter.categories != null` のようにガードを入れる
