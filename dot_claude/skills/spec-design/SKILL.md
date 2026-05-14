@@ -1,6 +1,6 @@
 ---
 name: spec-design
-description: 仕様書（specification / 設計ドキュメント / requirements / architecture）の設計・作成・レビューを担うロール変換型スキル。判断軸（読み手別の入口設計、UML/C4/BPMN の図種選択、ADR で意思決定を分離、用語集を唯一の出典に格上げ、MUST/SHOULD/MAY の要件レベル語）と、誰でも詰まる「全体像・なぜ・用語」の 3 点を手厚くカバーする具体テンプレート（README / ADR Nygard・MADR / C4 / glossary）を提供。出力は md をメイン（GitHub 管理の Docs as Code）、サマリー・概況・比較系の視覚情報が主役のページは HTML 補足。HTML / PDF 生成時の視覚デザイン指針（ベースカラーは Blue 系列デフォルト、カラーパレット切り替え運用、「伝わるデザイン」12 原則の整列・近接・反復・ジャンプ率・タイポグラフィ）も内蔵。**HTML 補足ページを複数作る場合は共通 CSS への集約方針（個別 HTML は `:root` 固有変数のみ + `body.page-X` scope で衝突回避）を必須化** し、フォント・h1 サイズ・配色が全ページで揃う視覚一貫性を担保する。「仕様書」「specification」「設計ドキュメント」「ドキュメントレビュー」「ADR」「アーキテクチャ図」「C4 図」「設計書のテンプレート」「READMEを充実」「オンボーディング資料」「HTML 補足ページ」「PDF 仕様書」「カラーパレット選定」「ベースカラー」「伝わるデザイン」「CSS 集約」「共通スタイルシート」「HTML CSS 共通化」等で自動起動。HTML 補足ページの視覚設計は dashboard-design と連携。**棲み分け**: 対話的に文章を共著するワークフローは doc-coauthoring、本スキルは構造・判断軸・テンプレを与えて「仕様書ロール」に変換する。単発の図描画（コードレビュー補助図・スケッチ用途）には起動しない。
+description: 仕様書（specification / 設計ドキュメント / requirements / architecture）の設計・作成・レビューを担うロール変換型スキル。判断軸（読み手別の入口、UML/C4/BPMN の図種選択、ADR で意思決定分離、用語集を唯一の出典に、MUST/SHOULD/MAY の要件レベル語）+「全体像・なぜ・用語」3 点を手厚くカバーする具体テンプレ（README / ADR Nygard・MADR / C4 / glossary）。出力は md がメイン（Docs as Code）、視覚情報が主役のページのみ HTML 補足。HTML / PDF の視覚デザイン指針も内蔵: **ベースカラー Blue 系列デフォルト + 切り替え運用**（`shared/base-color-mapping.md`）、**「伝わるデザイン」12 原則**（整列・近接・反復・ジャンプ率・タイポグラフィ）、**HTML 補足ページが複数あるときは共通 CSS への集約 SHOULD**（個別 HTML は `:root` 固有変数のみ + `body.page-X` scope で衝突回避、`references/html-css-centralization.md`）。「仕様書」「specification」「設計ドキュメント」「ドキュメントレビュー」「ADR」「アーキテクチャ図」「C4 図」「設計書のテンプレート」「READMEを充実」「オンボーディング資料」「HTML 補足ページ」「PDF 仕様書」「カラーパレット選定」「ベースカラー」「伝わるデザイン」「HTML 補足ページの CSS 集約」「仕様書 HTML の共通スタイル」「補足 HTML の共通 CSS 化」等で自動起動。HTML 補足ページの配色・タイポ・装飾原則は dashboard-design と連携。**棲み分け**: 対話的な文章共著は doc-coauthoring、本スキルは構造・判断軸・テンプレを与えて「仕様書ロール」に変換する。単発の図描画（コードレビュー補助図・スケッチ用途）には起動しない。
 ---
 
 # 仕様書設計ロール
@@ -127,22 +127,25 @@ HTML やその他文書（PDF / スライド等）を新規に生成する際の
 
 色を変える必要が出た場合（プロジェクトのブランドカラーが緑系、危険系領域で赤主体、など）は ADR に「ベースカラー選定」を残す（テンプレは [references/adr-format.md](references/adr-format.md) の「## ベースカラー選定 ADR テンプレ」）。
 
-### HTML 補足ページの CSS 集約方針（複数ページ作成時は必須）
+### HTML 補足ページの CSS 集約方針（複数ページ作成時 SHOULD）
 
-HTML 補足ページを **複数作る場合**、装飾 CSS は共通スタイルシート 1 つに集約する。個別 HTML の `<style>` は `:root` 固有変数のみとし、レイアウト・装飾は書かない。
+HTML 補足ページの本数に応じて要件レベルを切り替える:
 
-**必須ルール**:
+| 状況 | 要件レベル | 採用パターン |
+|---|---|---|
+| 補足ページが **2 本以上 or 増える見込み** | **SHOULD**（強く推奨） | 共通 CSS 集約型（下記ルール） |
+| 補足ページが **1 本のみ**（単発） | **MAY** | `<style>` 内に最小装飾を直書きしてよい（[references/templates.md](references/templates.md) の骨格） |
+
+**共通 CSS 集約型のルール**（SHOULD 採用時）:
 
 - 各 HTML に `<link rel="stylesheet" href="path/to/_shared/spec-page.css">` を追加
 - 各 HTML の `<style>` は `:root` 固有変数のみ（10-30 行程度）。`html, body { ... }` や `.toc { ... }` などのレイアウトは書かない
 - 各 HTML の `<body>` に `class="page-X"`（X はファイル名 kebab-case）を付与
 - 共通 CSS 側で `body.page-X .selector { ... }` の scope を付ける形で各ページ固有レイアウトを集約
 
-**理由**: 個別ファイル内 `<style>` で共通 CSS を上書きしてしまう事故を防ぐ。複数ファイルでの視覚一貫性（フォント・h1 サイズ・配色）を保証する。「伝わるデザイン」原則 3（反復）の最終的な担保でもある（[references/communicative-design.md](references/communicative-design.md) 参照）。
+**理由**: 個別ファイル内 `<style>` で共通 CSS を上書きしてしまう事故を防ぎ、複数ファイルでの視覚一貫性（フォント・h1 サイズ・配色）を保証する。「伝わるデザイン」原則 3（反復）の最終的な担保（[references/communicative-design.md](references/communicative-design.md) 参照）。
 
-**実証例**: cloud-dsc プロジェクトの `docs/_html/_shared/spec-page.css`（約 3000 行、ファイル別 scope で全レイアウト統合済み）。各 HTML の `<style>` は 10-30 行（`:root` 固有変数のみ）。
-
-**単一 HTML ページの場合**: 共通 CSS を作る価値が薄いため、[references/templates.md](references/templates.md) のサマリー / 比較ページ骨格をそのまま使い、`<style>` 内に必要最小限の装飾を直書きしてよい。後で複数ページに拡張するときに共通 CSS 化を検討する。
+**実証例**: cloud-dsc プロジェクトの `docs/_html/_shared/spec-page.css`（3072 行、2026-05-14 時点、ファイル別 scope で全レイアウト統合済み）。各 HTML の `<style>` は 10-30 行（`:root` 固有変数のみ）。
 
 具体的な共通 CSS の最小骨格・移行手順・`:root` 変数命名規則・ページ別 scope の書き方は [references/html-css-centralization.md](references/html-css-centralization.md) を参照。
 

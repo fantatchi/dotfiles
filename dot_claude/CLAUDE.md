@@ -97,7 +97,7 @@ GOをもらってから進める。
 - `/obsidian-mail` — Obsidian デイリーノートの「## デイリーサマリー」セクションをメール向けに再構成して Gmail SMTP で送信（日報・週報）。`/obsidian-mail daily|weekly [YYYY-MM-DD]` で明示呼び出し（自動発火しない、ローカル routine から呼ぶ前提）
 - `/session-review` — セッション振り返り（権限・CLAUDE.md・スキルの整理）
 - `/session-save` — `/obsidian-log` + `/context-save` を一括実行し、アウトプット候補の提案も行う
-- `/spec-design` — 仕様書（specification / 設計ドキュメント / requirements / architecture）を書く・レビュー・改善するロール変換型スキル。判断軸（読み手別の入口・図種判断軸・ADR・用語集・要件レベル語）+ 「全体像・なぜ・用語」の 3 点を手厚くカバーする具体テンプレ（README / ADR Nygard・MADR / C4 / glossary）。出力は md メイン、サマリー・概況・比較系のみ HTML 補足。HTML / PDF の視覚デザイン指針も内蔵: **ベースカラーは Blue 系列デフォルト + 切り替え運用**（共通リソース `shared/base-color-mapping.md`）、**「伝わるデザイン」12 原則**（整列・近接・反復・ジャンプ率・タイポグラフィ等）、**HTML 補足ページが複数あるときは共通 CSS への集約必須**（個別 HTML は `:root` 固有変数のみ + `body.page-X` scope で衝突回避、cloud-dsc Phase 7c 実証、references/html-css-centralization.md）。配色は dashboard-design と連携。「仕様書」「設計ドキュメント」「ADR」「C4 図」「README」「オンボーディング資料」「HTML 補足ページ」「PDF 仕様書」「カラーパレット選定」「ベースカラー」「伝わるデザイン」「CSS 集約」「共通スタイルシート」等で自動発動
+- `/spec-design` — 仕様書（specification / 設計ドキュメント / requirements / architecture）を書く・レビュー・改善するロール変換型スキル。判断軸（読み手別の入口・図種判断軸・ADR・用語集・要件レベル語）+ 「全体像・なぜ・用語」の 3 点を手厚くカバーする具体テンプレ（README / ADR Nygard・MADR / C4 / glossary）。出力は md メイン、視覚情報が主役のページのみ HTML 補足。HTML / PDF の視覚デザイン指針も内蔵: **ベースカラーは Blue 系列デフォルト + 切り替え運用**（共通リソース `shared/base-color-mapping.md`）、**「伝わるデザイン」12 原則**（整列・近接・反復・ジャンプ率・タイポグラフィ等）、**HTML 補足ページが複数あるときは共通 CSS への集約 SHOULD**（個別 HTML は `:root` 固有変数のみ + `body.page-X` scope で衝突回避、`references/html-css-centralization.md`）。配色・タイポ・装飾原則は dashboard-design と連携。「仕様書」「設計ドキュメント」「ADR」「C4 図」「README」「オンボーディング資料」「HTML 補足ページ」「PDF 仕様書」「カラーパレット選定」「ベースカラー」「伝わるデザイン」「HTML 補足ページの CSS 集約」「仕様書 HTML の共通スタイル」等で自動発動
 
 ## 新スキル追加・削除時のチェックリスト
 

@@ -53,7 +53,7 @@
 - **やる**: 同種要素（注意ブロック・コード例・図キャプション）には同じ書式パターンを繰り返し適用する
 - **やらない**: 同じ意味の要素を章ごとに違う見た目で表現しない
 - **仕様書への適用例**: ADR の各 entry を必ず同じ見出し階層・同じプロパティ順で記述。HTML では `.note`, `.warn`, `.example` といったクラスを定義し全章で使い回す
-- **CSS 集約による視覚一貫性の担保（HTML 補足ページが複数ある場合は必須）**: 各 HTML が個別 `<style>` に装飾を書くと配色・タイポ・余白が微妙にズレる。共通 CSS（例: `_shared/spec-page.css`）に集約して各 HTML は `:root` 固有変数のみとするのが反復原則の最終的な担保。ベースカラー / UD フォント / h1 サイズなど共通 CSS の値が全ページに反映され、1 ファイル変更で全ページに伝播する。詳細手順は [`html-css-centralization.md`](./html-css-centralization.md) 参照
+- **CSS 集約による視覚一貫性の担保（HTML 補足ページ複数時は SHOULD）**: 装飾を共通 CSS（例: `_shared/spec-page.css`）に集約し、各 HTML は `:root` 固有変数のみとする。1 ファイル変更で全ページに伝播。詳細手順は [`html-css-centralization.md`](./html-css-centralization.md) 参照
 - **出典**: <https://tsutawarudesign.com/miyasuku4.html>
 
 ### 4. ジャンプ率・コントラスト・視覚的階層 3 段まで
