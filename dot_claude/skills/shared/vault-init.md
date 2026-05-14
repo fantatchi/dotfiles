@@ -1,6 +1,6 @@
 # Obsidian Vault 初期化手順
 
-`obsidian-log` / `obsidian-resource` 等、Obsidian Vault へ書き出すスキルが共通で参照する手順。
+**shared ライブラリ**: `~/.claude/skills/shared/` 配下、`name:` 付きスキルではない（自動起動対象外）。Obsidian Vault へ書き出すスキル（`obsidian-log` / `obsidian-resource` / `obsidian-daily`）が共通で参照する手順。Vault パス決定・サブディレクトリ作成・frontmatter 規約を集約。
 
 ## 前提
 

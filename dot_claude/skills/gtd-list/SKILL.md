@@ -1,6 +1,6 @@
 ---
 name: gtd-list
-description: ~/.claude/tasks.md からタスクを読み込み、指定条件で表示する。「タスク一覧」「TODO を見せて」といった依頼、または他スキルからのタスク参照で使う。
+description: ~/.claude/tasks.md からタスクを読み込み、指定条件で **表示** する操作型スキル。動詞は「表示」専用（追加は gtd-add、完了は gtd-done）。「タスク一覧」「TODO を見せて」「Inbox 確認」「進捗確認」「タスク表示」といった依頼、または他スキルからのタスク参照で使う。
 argument-hint: [--all|--inbox|--next|--waiting|--someday|--done [N]|--project <name>]
 allowed-tools: Read, Edit, Bash(git:*), Bash(basename:*), Bash(pwd), Bash(date:*)
 ---

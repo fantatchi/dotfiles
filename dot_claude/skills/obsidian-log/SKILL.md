@@ -1,6 +1,6 @@
 ---
 name: obsidian-log
-description: セッション中の作業内容をObsidian Vaultに記録する。「作業ログを書いて」「今日の作業を記録」といった依頼で使う。
+description: セッション中の作業内容を Obsidian Vault に **単発** で記録する操作型スキル。包括的なセッション保存（作業ログ + コンテキスト + アウトプット候補の提案までまとめて実行）は `/session-save` が内包しているので、まとめて保存したい時はそちらを使う。本スキルは「作業ログだけ残したい」「単発で記録したい」ケース専用。「作業ログだけ残して」「単発でログ記録」「Obsidian に作業メモ追記」といった依頼で使う。「今日のまとめ」は obsidian-daily（デイリーサマリー生成）が担うので本スキルからは除外。
 argument-hint: [タグ...]
 allowed-tools: Read, Write, Glob, Bash(echo:*), Bash(mkdir:*), Bash(date:*)
 ---

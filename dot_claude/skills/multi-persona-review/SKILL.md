@@ -1,7 +1,7 @@
 ---
 name: multi-persona-review
 description: 3〜5 人の専門ペルソナを並列 Agent で起動して読取専用レビューを行い、見落とし・別仮説・推奨アクションを統合する。コードレビュー / 設計判断 / 障害分析 / runbook 監査 / セキュリティレビューで使う。「3 人ペルソナ作ってレビュー」「並列で別観点も見て」「セルフレビューに別の目を」「死角を潰したい」といった依頼で発動
-allowed-tools: Agent, Read, Glob, Grep, Bash(git log:*), Bash(git diff:*), Bash(git show:*)
+allowed-tools: Agent, Read, Glob, Grep, Bash(git:*)
 argument-hint: [レビュー対象の概要]
 ---
 

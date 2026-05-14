@@ -1,6 +1,7 @@
 ---
 name: session-review
-description: セッション完了時に振り返りを行い、権限追加・CLAUDE.md更新・スキル洗練を一括で行う。手動で `/session-review` を実行して発動する。
+description: セッション完了時に振り返りを行い、権限追加・CLAUDE.md更新・スキル洗練を一括で行う。**手動で `/session-review` を実行して発動**（`disable-model-invocation: true` で自動起動しない）。
+disable-model-invocation: true
 allowed-tools: Read, Edit, Write, Glob, Grep
 ---
 

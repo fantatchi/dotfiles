@@ -1,6 +1,6 @@
 ---
 name: gtd-done
-description: ~/.claude/tasks.md の指定タスクを完了にし Done セクションへ移動する。「タスク完了」「あれ終わった」といった依頼、または他スキルからのタスク完了要求で使う。
+description: ~/.claude/tasks.md の指定タスクを **完了** にし Done セクションへ移動する操作型スキル。動詞は「完了」専用（追加は gtd-add、表示は gtd-list）。「タスク完了」「あれ終わった」「完了マーク」「終わった」「タスク消化」といった依頼、または他スキルからのタスク完了要求で使う。
 argument-hint: <タスクタイトルの部分一致文字列>
 allowed-tools: Read, Write, Edit, Bash(date:*)
 ---

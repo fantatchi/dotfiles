@@ -1,6 +1,6 @@
 ---
 name: gtd-add
-description: タスクを ~/.claude/tasks.md の Inbox セクションに追加する。「タスクを追加」「TODO として残して」といった依頼、または他スキルからのタスク追加要求で使う。
+description: タスクを ~/.claude/tasks.md の Inbox セクションに **追加** する操作型スキル。動詞は「追加」専用（完了は gtd-done、表示は gtd-list）。「タスクを追加」「TODO として残して」「思いつき記録」「Inbox にメモ」「タスク登録」といった依頼、または他スキルからのタスク追加要求で使う。
 argument-hint: [タスクタイトル]
 allowed-tools: Read, Write, Edit, Bash(git:*), Bash(basename:*), Bash(pwd)
 ---

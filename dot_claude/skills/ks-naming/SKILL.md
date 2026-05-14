@@ -1,6 +1,6 @@
 ---
 name: ks-naming
-description: 日本語から土木業界向けの識別子名（変数・クラス・関数・型など）を生成する。命名規則や名前の相談、「この日本語を変数名にしたい」「クラス名どうする？」といった質問に使う。
+description: 日本語から土木業界向けの識別子名（変数・クラス・関数・型など）を生成する。**`/ks-naming` での手動呼び出し専用**（`disable-model-invocation: true` で自動起動しない）。土木プロジェクト（cloud-dsc / ks-*）で実装フェーズに入ったタイミングで利用する想定。命名規則や名前の相談、「この日本語を変数名にしたい」「クラス名どうする？」といった質問は `/ks-naming` で明示的に呼び出すこと。
 argument-hint: [日本語の用語や概念]
 disable-model-invocation: true
 allowed-tools: Read, Grep, Glob, WebFetch, WebSearch

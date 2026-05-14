@@ -85,7 +85,7 @@ GOをもらってから進める。
 
 - `/context-load` — `.claude/context.md` からコンテキストを復帰
 - `/context-save` — プロジェクトコンテキストを `.claude/context.md` に保存
-- `/dashboard-design` — デジタル庁ダッシュボードデザインガイドブックに基づく設計支援。ダッシュボード/KPI 画面に加えて **md ベース仕様書の HTML 補足ページ**（サマリー / 概況 / 比較）の視覚設計（配色・タイポ・装飾原則・アクセシビリティ）も対象。「ダッシュボード作って」「KPI 画面の構成相談」「グラフ種の選択」「HTML 補足ページのデザイン」等で自動発動するロール変換型スキル。spec-design と補完関係
+- `/dashboard-design` — デジタル庁ダッシュボードデザインガイドブックに基づく**視覚設計レイヤー**のロール変換型スキル。ダッシュボード / KPI 画面 + md ベース仕様書の HTML 補足ページ（サマリー / 概況 / 比較）の視覚設計（配色・タイポ・装飾原則・アクセシビリティ）が対象。**視覚設計系のトリガー語は本スキルに集約**（「ダッシュボード作って」「KPI 画面の構成相談」「グラフ種の選択」「HTML 補足ページのデザイン」「カラーパレット選定」「ベースカラー何にする」「伝わるデザイン」「文書の配色・タイポグラフィ」等）。spec-design とは補完関係（spec-design は構造・章立て・用語・ADR・CSS 集約方針を担当）
 - `/gtd-add` — `~/.claude/tasks.md` の Inbox にタスクを追加
 - `/gtd-done` — 指定タスクを完了にし Done セクションへ移動
 - `/gtd-list` — `~/.claude/tasks.md` からタスクを表示（デフォルト: 現在プロジェクトの Inbox + Next）
@@ -97,7 +97,7 @@ GOをもらってから進める。
 - `/obsidian-mail` — Obsidian デイリーノートの「## デイリーサマリー」セクションをメール向けに再構成して Gmail SMTP で送信（日報・週報）。`/obsidian-mail daily|weekly [YYYY-MM-DD]` で明示呼び出し（自動発火しない、ローカル routine から呼ぶ前提）
 - `/session-review` — セッション振り返り（権限・CLAUDE.md・スキルの整理）
 - `/session-save` — `/obsidian-log` + `/context-save` を一括実行し、アウトプット候補の提案も行う
-- `/spec-design` — 仕様書（specification / 設計ドキュメント / requirements / architecture）を書く・レビュー・改善するロール変換型スキル。判断軸（読み手別の入口・図種判断軸・ADR・用語集・要件レベル語）+ 「全体像・なぜ・用語」の 3 点を手厚くカバーする具体テンプレ（README / ADR Nygard・MADR / C4 / glossary）。出力は md メイン、視覚情報が主役のページのみ HTML 補足。HTML / PDF の視覚デザイン指針も内蔵: **ベースカラーは Blue 系列デフォルト + 切り替え運用**（共通リソース `shared/base-color-mapping.md`）、**「伝わるデザイン」12 原則**（整列・近接・反復・ジャンプ率・タイポグラフィ等）、**HTML 補足ページが複数あるときは共通 CSS への集約 SHOULD**（個別 HTML は `:root` 固有変数のみ + `body.page-X` scope で衝突回避、`references/html-css-centralization.md`）。配色・タイポ・装飾原則は dashboard-design と連携。「仕様書」「設計ドキュメント」「ADR」「C4 図」「README」「オンボーディング資料」「HTML 補足ページ」「PDF 仕様書」「カラーパレット選定」「ベースカラー」「伝わるデザイン」「HTML 補足ページの CSS 集約」「仕様書 HTML の共通スタイル」等で自動発動
+- `/spec-design` — 仕様書（specification / 設計ドキュメント / requirements / architecture）を書く・レビュー・改善するロール変換型スキル。判断軸（読み手別の入口・図種判断軸・ADR・用語集・要件レベル語）+ 「全体像・なぜ・用語」の 3 点を手厚くカバーする具体テンプレ（README / ADR Nygard・MADR / C4 / glossary）。出力は md メイン、視覚情報が主役のページのみ HTML 補足。仕様書文脈での視覚設計判断も内蔵: ベースカラー Blue 系列デフォルト（`shared/base-color-mapping.md`）、「伝わるデザイン」12 原則の参照誘導、**HTML 補足ページ複数時は共通 CSS への集約 SHOULD**（`:root` 固有変数のみ + `body.page-X` scope、`references/html-css-centralization.md`）。「仕様書」「設計ドキュメント」「ADR」「C4 図」「README」「オンボーディング資料」「PDF 仕様書」「HTML 補足ページの CSS 集約」「仕様書 HTML の共通スタイル」「補足 HTML の共通 CSS 化」等で自動発動。**視覚設計の入口**（カラーパレット選定 / ベースカラー何にする / 伝わるデザイン / HTML 補足ページのデザイン / 文書の配色・タイポグラフィ）は dashboard-design に集約
 
 ## 新スキル追加・削除時のチェックリスト
 
