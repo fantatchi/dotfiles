@@ -150,7 +150,7 @@ ls ~/ObsidianVault/_claude/log/{YYYYMM}/{YYYYMMDD}*.md 2>/dev/null
 
 ## 4b. tasks.md からの予定タスク収集
 
-`~/.claude/tasks.md` を Read で読み、`## Next` と `## Waiting` セクションのタスクを抽出する。
+`~/ObsidianVault/_claude/tasks.md` を Read で読み、`## Next` と `## Waiting` セクションのタスクを抽出する。
 
 ### 抽出ルール
 

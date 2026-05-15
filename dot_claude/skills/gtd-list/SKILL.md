@@ -1,13 +1,13 @@
 ---
 name: gtd-list
-description: ~/.claude/tasks.md からタスクを読み込み、指定条件で **表示** する操作型スキル。動詞は「表示」専用（追加は gtd-add、完了は gtd-done）。「タスク一覧」「TODO を見せて」「Inbox 確認」「進捗確認」「タスク表示」といった依頼、または他スキルからのタスク参照で使う。
+description: ~/ObsidianVault/_claude/tasks.md からタスクを読み込み、指定条件で **表示** する操作型スキル。動詞は「表示」専用（追加は gtd-add、完了は gtd-done）。「タスク一覧」「TODO を見せて」「Inbox 確認」「進捗確認」「タスク表示」といった依頼、または他スキルからのタスク参照で使う。
 argument-hint: [--all|--inbox|--next|--waiting|--someday|--done [N]|--project <name>]
 allowed-tools: Read, Edit, Bash(git:*), Bash(basename:*), Bash(pwd), Bash(date:*)
 ---
 
 # タスク一覧表示
 
-`~/.claude/tasks.md` からタスクを読み込み、条件に応じて表示する。
+`~/ObsidianVault/_claude/tasks.md` からタスクを読み込み、条件に応じて表示する。
 
 ## フォーマット仕様
 
@@ -30,7 +30,7 @@ allowed-tools: Read, Edit, Bash(git:*), Bash(basename:*), Bash(pwd), Bash(date:*
 
 ### 1. tasks.md の読み込み
 
-`~/.claude/tasks.md` を Read で読む。存在しない場合は「タスクが登録されていません。`/gtd-add` で追加してください。」と案内して終了。
+`~/ObsidianVault/_claude/tasks.md` を Read で読む。存在しない場合は「タスクが登録されていません。`/gtd-add` で追加してください。」と案内して終了。
 
 ### 1.5. Done セクションの剪定（副作用）
 
@@ -102,4 +102,4 @@ Inbox と Next の両方が 0 件の場合は「現在プロジェクト `<name>
 
 - 基本は読み込み専用だが、**Done セクションの剪定（ステップ 1.5）のみ書き込みがある**
 - 剪定以外の目的で tasks.md を変更しない（タスクの並び替え・修正は `gtd-add` / `gtd-done` の役割）
-- tasks.md は `~/.claude/tasks.md`（グローバル固定）
+- tasks.md は `~/ObsidianVault/_claude/tasks.md`（グローバル固定）

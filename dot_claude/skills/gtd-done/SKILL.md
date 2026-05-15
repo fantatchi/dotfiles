@@ -1,6 +1,6 @@
 ---
 name: gtd-done
-description: ~/.claude/tasks.md の指定タスクを **完了** にし Done セクションへ移動する操作型スキル。動詞は「完了」専用（追加は gtd-add、表示は gtd-list）。「タスク完了」「あれ終わった」「完了マーク」「終わった」「タスク消化」といった依頼、または他スキルからのタスク完了要求で使う。
+description: ~/ObsidianVault/_claude/tasks.md の指定タスクを **完了** にし Done セクションへ移動する操作型スキル。動詞は「完了」専用（追加は gtd-add、表示は gtd-list）。「タスク完了」「あれ終わった」「完了マーク」「終わった」「タスク消化」といった依頼、または他スキルからのタスク完了要求で使う。
 argument-hint: <タスクタイトルの部分一致文字列>
 allowed-tools: Read, Write, Edit, Bash(date:*)
 ---
@@ -21,7 +21,7 @@ allowed-tools: Read, Write, Edit, Bash(date:*)
 
 ### 2. tasks.md の読み込み
 
-`~/.claude/tasks.md` を Read で読む。存在しない場合は「タスクが登録されていません。」と案内して終了。
+`~/ObsidianVault/_claude/tasks.md` を Read で読む。存在しない場合は「タスクが登録されていません。」と案内して終了。
 
 ### 3. タスク検索
 
@@ -84,6 +84,6 @@ b. 次に Done セクションに追加する（`old_string`: `## Done\n`, `new_
 
 ## 注意事項
 
-- tasks.md は `~/.claude/tasks.md`（グローバル固定）
+- tasks.md は `~/ObsidianVault/_claude/tasks.md`（グローバル固定）
 - 既に Done のタスクは検索対象外（二重完了を防ぐ）
 - Done への挿入位置は Done セクションの先頭（新しい完了が上）

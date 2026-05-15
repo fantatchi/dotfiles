@@ -4,8 +4,8 @@
 
 ## 場所
 
-- **正本**: `~/.claude/tasks.md`（グローバル、各 PC ローカル）
-- **同期**: なし（他 PC と共有しない）
+- **正本**: `~/ObsidianVault/_claude/tasks.md`（グローバル、Vault 配下）
+- **同期**: Obsidian Sync で全 PC リアルタイム共通（モバイル含む）
 
 ## セクション構造
 
@@ -86,7 +86,7 @@ Done に移動する際、タイトル先頭に完了日（`YYYY-MM-DD`）を付
 ```markdown
 # Tasks
 
-GTD ベースのタスクストア。各 PC ローカル（他PC非同期）。
+GTD ベースのタスクストア。Obsidian Sync で全 PC 共通同期。
 
 ## Inbox
 
