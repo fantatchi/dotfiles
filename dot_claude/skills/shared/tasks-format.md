@@ -43,7 +43,8 @@
   - `<name>` はリポジトリのディレクトリ名（`basename $(git rev-parse --show-toplevel)`）が基本
   - `#project/global` は予約タグで、**プロジェクト非依存のタスク**（個人 TODO、環境整備など）を表す。ユーザーホームディレクトリ（`$HOME` 完全一致）で gtd-* を実行した場合に自動で割り当てられる
   - タグなしのタスクをスキルが検出した場合、警告する
-- **タイトルは短く保つ** (1 行 80-150 文字目安、長くても 200 文字以内)
+- **MUST: タイトルは短く保つ** (1 行 60-100 文字を中心とし、**150 文字を絶対上限**とする)
+  - 150 文字超のタイトルを書き込んではならない。スキル (`gtd-add` / `context-save`) は書き込み前に文字数チェック (タイトル本体部分の文字長) を実施し、超過時は短縮するまで書き込みを中止する
   - tasks.md は**タスク管理用**であり、進捗ログ / 判断メモ / コミット履歴を書く場所ではない
   - 詳細は別場所に逃がす:
     - 進行中の作業状態・判断メモ → 各プロジェクトの `.claude/context.md` / `.claude/progress.md`
@@ -74,6 +75,15 @@ obsidian://adv-uri?vault=<iOS の Vault 名>&filepath=_claude%2Ftasks.md&command
 ```
 
 モバイル追加分は `#project/global` 固定（プロジェクト非依存タスク扱い）。業務系プロジェクト等のタスクはモバイル追加せず PC で `gtd-add` を使う。
+
+#### `@captured-on-mobile` メタによる滞留可視化
+
+QuickAdd choice の format には末尾に `@captured-on-mobile` メタを自動付与する（例: `- [ ] #project/global {{VALUE}} @captured-on-mobile  \n`）。これにより:
+
+- モバイル捕捉タスクは PC 側で `gtd-list` 実行時に「Inbox に N 件滞留中」として検出され表示末尾に警告される
+- 整理時（プロジェクトタグの振り直し）には `@captured-on-mobile` メタを削除する運用
+
+GTD の「収集 (Capture)」と「整理 (Clarify)」フェーズ分離理論に対応する仕組み。
 
 ### モバイルでの完了
 
