@@ -73,9 +73,11 @@ obsidian://adv-uri?vault=<iOS の Vault 名>&filepath=_claude%2Ftasks.md&command
 
 タスク行先頭の `- [ ]` を `- [x]` にチェックするだけで完了扱い。日付付与は不要。次に PC で `gtd-list` を実行すると **自動的に Done セクションへ移動** する（完了日は gtd-list 実行日）。
 
-### gtd-list 側の自動修復
+### QuickAdd Capture format の改行必須
 
-QuickAdd の Insert 動作で `## Section` 直前の改行が欠落する事象がある（例: `- [ ] xxx## Next`）。`gtd-list` 実行時のステップ 1.3 で自動検出・修復するため運用上の問題はない。
+QuickAdd の Capture choice では `format.format` の末尾に **改行を必ず含める** こと（例: `- [ ] #project/global {{VALUE}}\n`）。改行がないと挿入位置直後の既存行と連結する（QuickAdd の `insertTextAfterPositionInBody` は `text` の後ろに改行を補わない仕様、連続追加で 1 行に複数タスクが連結する事故が起きる）。
+
+UI 上では Capture format テキスト欄の末尾に **半角スペース 2 つ + Enter** で改行を入れる。半角スペースを置くと UI 側の trim 処理を回避でき、改行が `data.json` に保存される（参考: QuickAdd Issue #712）。
 
 ## 例
 
