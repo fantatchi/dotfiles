@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# Weekly snapshot backup of ObsidianVault to git remote(s).
+# Snapshot backup of ObsidianVault to git remote(s). Frequency-agnostic
+# (run via Task Scheduler/cron; daily recommended for RPO 24h on tasks.md,
+# weekly OK for lower frequency / heavier note edits only).
 # Backs up two repos: outer vault (obsidian-vault.git) + inner .obsidian (obsidian-config.git).
 # Register this in Task Scheduler (or cron) on ONE PC only — running on multiple
 # PCs simultaneously will cause git push conflicts.
@@ -21,7 +23,7 @@ backup_repo() {
     echo "no changes, skip commit"
     return 0
   fi
-  git commit -m "weekly snapshot $(date +%F)" || { echo "ERROR: git commit failed"; return 1; }
+  git commit -m "snapshot $(date +%F)" || { echo "ERROR: git commit failed"; return 1; }
   git push || { echo "ERROR: git push failed"; return 1; }
   echo "pushed"
 }
