@@ -57,6 +57,26 @@ Done に移動する際、タイトル先頭に完了日（`YYYY-MM-DD`）を付
 - [x] 2026-04-09 #project/claude-config タスク管理設計の合意
 ```
 
+## モバイル運用
+
+### Obsidian モバイルアプリからのクイック追加
+
+QuickAdd プラグインの `Quick Task` choice を Capture format `- [ ] #project/global {{VALUE}}` で設定し、`## Inbox` 直後に追記する。iOS では Advanced URI 経由でショートカット.app から 1 タップ起動可能：
+
+```
+obsidian://adv-uri?vault=<iOS の Vault 名>&filepath=_claude%2Ftasks.md&commandid=quickadd%3Achoice%3A<choice-id>
+```
+
+モバイル追加分は `#project/global` 固定（プロジェクト非依存タスク扱い）。業務系プロジェクト等のタスクはモバイル追加せず PC で `gtd-add` を使う。
+
+### モバイルでの完了
+
+タスク行先頭の `- [ ]` を `- [x]` にチェックするだけで完了扱い。日付付与は不要。次に PC で `gtd-list` を実行すると **自動的に Done セクションへ移動** する（完了日は gtd-list 実行日）。
+
+### gtd-list 側の自動修復
+
+QuickAdd の Insert 動作で `## Section` 直前の改行が欠落する事象がある（例: `- [ ] xxx## Next`）。`gtd-list` 実行時のステップ 1.3 で自動検出・修復するため運用上の問題はない。
+
 ## 例
 
 ```markdown
