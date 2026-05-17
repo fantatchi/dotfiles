@@ -87,5 +87,5 @@ $ARGUMENTS で分岐する。
 - 既存ファイルがある場合は上書きせず確認する
 - ファイル書き込みは Write ツールで直書きする（書き出し用の補助スクリプトは持たない。テンプレ展開・frontmatter 組み立てを Claude 自身が行う設計）
 - Hugo 公開は別途 Hugo リポジトリへのコピー・リンク設定が必要。本スキルは ObsidianVault への下書き保存のみを担う
-- すべてのリソースは `30_resource/` に保存する。過去のブログドラフト 15 件は `30_resource/blog/` サブフォルダに集約（旧 `_claude/blog/` を移動）
+- すべてのリソースは `30_resource/YYYYMM/` の月別フォルダに保存する。ブログドラフトと通常リソースを物理的に分離せず、frontmatter の `categories` / `tags` で区別する
 - 既存 resource ファイル 39 件は旧形式（`title` / `categories` / `draft` なし）と混在する。Dataview 等でクエリする場合は `WHERE file.frontmatter.categories != null` のようにガードを入れる
