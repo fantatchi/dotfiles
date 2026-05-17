@@ -24,7 +24,7 @@ allowed-tools: Read, Bash(gh:*), Bash(date:*), Bash(python:*), Bash(cat:*), Bash
 
 `~/.claude/skills/shared/vault-init.md` の **§1「Vault 存在確認」を実行** する（`~/ObsidianVault` の存在チェックと、未配置時の案内メッセージ）。WSL / Windows (Git Bash) いずれからも同じ相対パスで解決される前提も shared 側に集約済み。
 
-本スキルは Vault 内へのファイル書き出しを `write-daily.py` が `~/ObsidianVault/_daily/YYYYMM/YYYY-MM-DD.md` に直接行う設計のため、shared/vault-init.md の §2「書き出し先ディレクトリ」/ §3「ファイル名」規約は使用しない（その 2 つは obsidian-log / obsidian-resource 用）。
+本スキルは Vault 内へのファイル書き出しを `write-daily.py` が `~/ObsidianVault/10_daily/YYYYMM/YYYY-MM-DD.md` に直接行う設計のため、shared/vault-init.md の §2「書き出し先ディレクトリ」/ §3「ファイル名」規約は使用しない（その 2 つは obsidian-log / obsidian-resource 用）。
 
 ## 3. GitHub データ収集
 
@@ -136,11 +136,11 @@ gh api 'search/issues?q=reviewed-by:<ACCOUNT>+type:pr+updated:<TARGET_DATE>T00:0
 Bash の ls コマンドでファイル一覧を取得し、各ファイルを Read ツールで読む:
 
 ```bash
-ls ~/ObsidianVault/_claude/log/{YYYYMM}/{YYYYMMDD}*.md 2>/dev/null
+ls ~/ObsidianVault/20_log/{YYYYMM}/{YYYYMMDD}*.md 2>/dev/null
 ```
 
 各ファイルから以下を抽出する:
-1. ファイルパス（vault 相対、例: `_claude/log/202604/20260423-foo.md`）
+1. ファイルパス（vault 相対、例: `20_log/202604/20260423-foo.md`）
 2. frontmatter の `project` を取得（`"[[xxx]]"` の wiki-link 形式の場合は `xxx` を取り出してプレーン文字列として扱う。例: `"[[u-veil]]"` → `u-veil`。スラッシュ区切りなど内部に複数値が入る場合もそのまま 1 つの文字列として保持）
 3. `## 概要` セクションのテキスト（1-2行）を取得
 
@@ -150,7 +150,7 @@ ls ~/ObsidianVault/_claude/log/{YYYYMM}/{YYYYMMDD}*.md 2>/dev/null
 
 ## 4b. tasks.md からの予定タスク収集
 
-`~/ObsidianVault/_claude/tasks.md` を Read で読み、`## Next` と `## Waiting` セクションのタスクを抽出する。
+`~/ObsidianVault/00_meta/tasks.md` を Read で読み、`## Next` と `## Waiting` セクションのタスクを抽出する。
 
 ### 抽出ルール
 
@@ -182,7 +182,7 @@ ls ~/ObsidianVault/_claude/log/{YYYYMM}/{YYYYMMDD}*.md 2>/dev/null
     {"title": "PR タイトル", "url": "https://...", "labels": ["作成", "マージ"]}
   ],
   "logs": [
-    {"path": "_claude/log/202604/20260423-foo.md", "project": "project-name", "summary": "作業概要"}
+    {"path": "20_log/202604/20260423-foo.md", "project": "project-name", "summary": "作業概要"}
   ],
   "upcoming_tasks": [
     {"section": "Next", "project": "claude-config", "title": "gtd-list スキルの実装"},

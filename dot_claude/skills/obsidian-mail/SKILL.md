@@ -165,7 +165,7 @@ python3 ~/.claude/skills/obsidian-mail/send-summary.py "$MODE" "$TARGET_DATE"
 ## 実装メモ
 
 - このスキルは Claude.app の **ローカルルーティーン**から呼ばれる前提。`disable-model-invocation: true` で自動発火しないため、routine プロンプトに `/obsidian-mail daily` のように明示記述する
-- `obsidian-daily` 側のハングで対象が無い場合は単純スキップする（ユーザー判断）。気付くためには `_daily/` を時々目視するか、週報で欠落日表示を確認する
+- `obsidian-daily` 側のハングで対象が無い場合は単純スキップする（ユーザー判断）。気付くためには `10_daily/` を時々目視するか、週報で欠落日表示を確認する
 - 週報は欠落日があっても残った日数（例: `5/7 日分`）で送信する。本文冒頭に欠落日を明記する
 - HTML レンダリングは `markdown` ライブラリの `extra` + `sane_lists` 拡張を使用（`nl2br` は外した。再構成後の本文は段落ベースなので `<br>` が増えすぎるとレイアウトが崩れる）。`### 今日の要約` 直下の `<p>` は HTML 後処理で `.tldr` 青ボックスに包む
 - TL;DR が複数段落の場合、メールでは **最初の段落のみ** 採用する（残りは Obsidian で見る前提）。全文を残すと `.tldr` ボックス外にこぼれてレイアウトが崩れる

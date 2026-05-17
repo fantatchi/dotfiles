@@ -30,7 +30,7 @@ allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(echo:*), Bash(basename:*), Ba
 
 ### 1-b. タスクの読み込み
 
-`~/ObsidianVault/_claude/tasks.md` を読み込み、現在プロジェクトのタスクを抽出する：
+`~/ObsidianVault/00_meta/tasks.md` を読み込み、現在プロジェクトのタスクを抽出する：
 
 1. プロジェクトタグを決定: `#project/<basename of git toplevel>`（または CWD ベース名）
 2. `## Next` / `## Waiting` セクションから該当プロジェクトタグを持つタスクを抽出
@@ -86,7 +86,7 @@ allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(echo:*), Bash(basename:*), Ba
 ```
 
 - 「進捗マップ」は `.claude/progress.md`（優先）または CLAUDE.md の `## 進捗マップ` セクション（後方互換）がある場合のみ表示する。どちらもない場合はセクションごと省略する
-- 「次のステップ」は `~/ObsidianVault/_claude/tasks.md` から読み込んだ該当プロジェクトのタスクを表示する
+- 「次のステップ」は `~/ObsidianVault/00_meta/tasks.md` から読み込んだ該当プロジェクトのタスクを表示する
 - Waiting のタスクには ⏳ マーカーを付けて区別する
 - タスクが 0 件の場合は「次のステップなし。`/gtd-add` で追加できます。」と表示
 - 「関連リポジトリ」は context.md に `## 関連リポジトリ` セクションがある場合のみ表示する。ない場合はセクションごと省略する

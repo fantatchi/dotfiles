@@ -41,7 +41,7 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git:*), Bash(echo:*), Bash(mkdir:*)
 - **重要ファイル**: 作業に関連する主要ファイル（プロジェクトルートからの相対パス）
 - **関連リポジトリ履歴**（ホームワークスペース用）: `chezmoi source-path` でパスを取得し、`git -C <path> log --oneline -n 5` と `git -C <path> remote get-url origin` を「関連リポジトリ」セクションに埋め込む。コマンド失敗時はスキップ
 
-**次のステップについて**: 次回セッションで着手すべきタスクは context.md には書かず、`~/ObsidianVault/_claude/tasks.md` の `## Next` セクションに `#project/<name>` タグ付きで追記する（手順は下記「tasks.md への書き出し」参照）。
+**次のステップについて**: 次回セッションで着手すべきタスクは context.md には書かず、`~/ObsidianVault/00_meta/tasks.md` の `## Next` セクションに `#project/<name>` タグ付きで追記する（手順は下記「tasks.md への書き出し」参照）。
 
 ### 既存ファイルの扱い
 
@@ -54,11 +54,11 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git:*), Bash(echo:*), Bash(mkdir:*)
 
 ## tasks.md への書き出し
 
-次回セッションで着手すべきタスクは `~/ObsidianVault/_claude/tasks.md` の `## Next` セクションに追記する。フォーマットは `~/.claude/skills/shared/tasks-format.md` を参照。
+次回セッションで着手すべきタスクは `~/ObsidianVault/00_meta/tasks.md` の `## Next` セクションに追記する。フォーマットは `~/.claude/skills/shared/tasks-format.md` を参照。
 
 ### 手順
 
-1. `~/ObsidianVault/_claude/tasks.md` を Read で読む（なければ初期テンプレートで作成）
+1. `~/ObsidianVault/00_meta/tasks.md` を Read で読む（なければ初期テンプレートで作成）
 2. 現在プロジェクトのタグを決定: `#project/<basename of git toplevel>`
 3. セッション中に発生した「次に着手すべきアクション」を抽出し、以下の形式で追記対象を組み立てる：
    ```

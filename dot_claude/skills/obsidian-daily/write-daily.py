@@ -381,7 +381,7 @@ def write_daily(data: SummaryInput) -> str:
     target_date = data["target_date"]
     yyyymm = target_date.replace("-", "")[:6]
 
-    daily_dir = os.path.join(vault, "_daily", yyyymm)
+    daily_dir = os.path.join(vault, "10_daily", yyyymm)
     daily_path = os.path.join(daily_dir, f"{target_date}.md")
 
     summary_section = build_summary(data)

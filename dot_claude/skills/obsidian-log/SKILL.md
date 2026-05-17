@@ -11,7 +11,7 @@ allowed-tools: Read, Write, Glob, Bash(echo:*), Bash(mkdir:*), Bash(date:*)
 
 ## 書き出し先・ファイル名
 
-`~/.claude/skills/shared/vault-init.md` の手順に従うこと（サブディレクトリ名は `log`）。タイトル部分は「簡潔な作業概要」にする。
+`~/.claude/skills/shared/vault-init.md` の手順に従うこと（サブディレクトリ名は `20_log`）。タイトル部分は「簡潔な作業概要」にする。
 
 ## 引数の扱い
 

@@ -4,7 +4,7 @@
 
 ## 場所
 
-- **正本**: `~/ObsidianVault/_claude/tasks.md`（グローバル、Vault 配下）
+- **正本**: `~/ObsidianVault/00_meta/tasks.md`（グローバル、Vault 配下）
 - **同期**: Obsidian Sync で全 PC リアルタイム共通（モバイル含む）
 
 ## セクション構造
@@ -49,7 +49,7 @@
   - 詳細は別場所に逃がす:
     - 進行中の作業状態・判断メモ → 各プロジェクトの `.claude/context.md` / `.claude/progress.md`
     - 完了内容・コミット ID → git log / コミットメッセージ
-    - 調査記録 → Obsidian Vault のノート (`_claude/log/`, `_claude/resource/` 等)
+    - 調査記録 → Obsidian Vault のノート (`20_log/`, `30_resource/` 等)
   - 補足が必要なら短い修飾語のみ追加可（例: `(現 5/10、5/22 まで)`、`(plan: docs/xxx.md)` 等）
 - 任意メタデータ（`@key:value` 形式）を末尾に追加してよい
   - `@since:2026-04-08` — Waiting 開始日
@@ -71,7 +71,7 @@ Done に移動する際、タイトル先頭に完了日（`YYYY-MM-DD`）を付
 QuickAdd プラグインの `Quick Task` choice を Capture format `- [ ] #project/global {{VALUE}}` で設定し、`## Inbox` 直後に追記する。iOS では Advanced URI 経由でショートカット.app から 1 タップ起動可能：
 
 ```
-obsidian://adv-uri?vault=<iOS の Vault 名>&filepath=_claude%2Ftasks.md&commandid=quickadd%3Achoice%3A<choice-id>
+obsidian://adv-uri?vault=<iOS の Vault 名>&filepath=00_meta%2Ftasks.md&commandid=quickadd%3Achoice%3A<choice-id>
 ```
 
 モバイル追加分は `#project/global` 固定（プロジェクト非依存タスク扱い）。業務系プロジェクト等のタスクはモバイル追加せず PC で `gtd-add` を使う。

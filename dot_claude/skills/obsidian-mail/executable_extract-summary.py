@@ -103,7 +103,7 @@ hr { border: none; border-top: 1px solid #d0d7de; margin: 2.4em 0; }
 def daily_note_path(target: dt.date) -> str:
     yyyymm = target.strftime("%Y%m")
     fname = target.strftime("%Y-%m-%d.md")
-    return os.path.join(VAULT, "_daily", yyyymm, fname)
+    return os.path.join(VAULT, "10_daily", yyyymm, fname)
 
 
 def extract_section(md: str) -> str | None:
@@ -648,7 +648,7 @@ def build_daily(target: dt.date) -> dict:
         body_md = (
             f"# {target.isoformat()} 日報\n\n"
             f"対象日のサマリーセクションが見つかりませんでした。\n\n"
-            f"想定パス: `~/ObsidianVault/_daily/{target.strftime('%Y%m')}/{target.isoformat()}.md`\n"
+            f"想定パス: `~/ObsidianVault/10_daily/{target.strftime('%Y%m')}/{target.isoformat()}.md`\n"
         )
     else:
         parsed = parse_summary(section)

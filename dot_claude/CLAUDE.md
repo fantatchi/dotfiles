@@ -146,9 +146,9 @@ LOW: 変数名 `d` を `deliveryDate` に変えると可読性が上がります
 - `/context-load` — `.claude/context.md` からコンテキストを復帰
 - `/context-save` — プロジェクトコンテキストを `.claude/context.md` に保存
 - `/dashboard-design` — デジタル庁ガイドブック準拠の視覚設計レイヤー（配色・タイポ・チャート選択・アクセシビリティ）。視覚設計系トリガー語（ダッシュボード / KPI / グラフ種 / カラーパレット / 伝わるデザイン / HTML 補足ページのデザイン等）はここに集約。spec-design とは補完関係
-- `/gtd-add` — `~/ObsidianVault/_claude/tasks.md` の Inbox にタスクを追加（Obsidian Sync で全 PC 共通）
+- `/gtd-add` — `~/ObsidianVault/00_meta/tasks.md` の Inbox にタスクを追加（Obsidian Sync で全 PC 共通）
 - `/gtd-done` — 指定タスクを完了にし Done セクションへ移動
-- `/gtd-list` — `~/ObsidianVault/_claude/tasks.md` からタスクを表示（デフォルト: 現在プロジェクトの Inbox + Next）
+- `/gtd-list` — `~/ObsidianVault/00_meta/tasks.md` からタスクを表示（デフォルト: 現在プロジェクトの Inbox + Next）
 - `/ks-naming` — 土木業界向け識別子名の生成
 - `/multi-persona-review` — 3〜5 人の専門ペルソナを並列 Agent で起動して読取専用レビューを実施し、見落とし・別仮説・推奨アクションを統合
 - `/obsidian-daily` — GitHub アクティビティと作業ログから Obsidian デイリーノートにサマリーを追記。**複数 GH アカウント (`fantatchi` + `kentem-at-kato`) 対応**
