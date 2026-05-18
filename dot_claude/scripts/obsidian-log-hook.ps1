@@ -6,6 +6,9 @@
 # 未コミット変更がなければスキップする。
 
 $ErrorActionPreference = 'Stop'
+# PS 5.1 が native command 初回起動時に stderr へ吐く CLIXML progress record を抑止
+# （run-hook.js の stdio: 'inherit' 経由で Claude Code の stderr を汚さないため）
+$ProgressPreference = 'SilentlyContinue'
 
 # stdin を消費して閉じる（フックが JSON を渡すが本スクリプトでは不要）
 try { $null = [Console]::In.ReadToEnd() } catch {}

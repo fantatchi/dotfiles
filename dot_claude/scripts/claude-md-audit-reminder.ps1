@@ -8,6 +8,8 @@
 # 閾値: 環境変数 CLAUDE_MD_AUDIT_THRESHOLD_DAYS で上書き可（既定 7）
 
 $ErrorActionPreference = 'SilentlyContinue'
+# PS 5.1 が stderr に吐く CLIXML progress record を抑止（hook stderr 汚染対策）
+$ProgressPreference = 'SilentlyContinue'
 [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
 
 $thresholdDays = 7

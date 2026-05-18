@@ -13,6 +13,8 @@
 # されても古い「初回プロンプト時刻」を基準にせず済む。
 
 $ErrorActionPreference = 'SilentlyContinue'
+# PS 5.1 が stderr に吐く CLIXML progress record を抑止（hook stderr 汚染対策）
+$ProgressPreference = 'SilentlyContinue'
 [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
 
 $thresholdMin = 120
