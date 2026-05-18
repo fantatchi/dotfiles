@@ -158,8 +158,6 @@ python3 ~/.claude/skills/obsidian-mail/send-summary.py "$MODE" "$TARGET_DATE"
 | Daily summary mail | 火〜土 8:00 | `/obsidian-mail daily` |
 | Weekly summary mail | 月 8:00 | `/obsidian-mail weekly` |
 
-注: 既存「Daily summary」（平日 18:00 の `/obsidian-daily`）はそのまま残す。本スキルは送信専用で、書き込みは触らない。
-
 > **リネーム時のルーティーン書き換え必須（重要）**: スキル名やプロンプトを変更した場合、Claude.app の **ローカルルーティーン側は自動更新されない**。旧プロンプト（例: `/obsidian-summary daily`）を登録したままだと次回発火時に「コマンド不明」で **サイレント失敗**（メールが来ない以外にエラー通知がない）する。スキルリネーム時は必ず Claude.app UI でルーティーンの slash command 文字列も書き換えること。気付くのは「メール来ないな」と能動的に思い出した時のみ、というのが地雷。
 
 ## 実装メモ
