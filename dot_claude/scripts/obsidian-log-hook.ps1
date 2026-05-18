@@ -16,8 +16,15 @@ $Vault = Join-Path $HOME 'ObsidianVault'
 if (-not (Test-Path $Vault)) { exit 0 }
 
 # git リポジトリ外なら何もしない
-$null = git rev-parse --is-inside-work-tree 2>$null
-if ($LASTEXITCODE -ne 0) { exit 0 }
+# 注: 2>$null だけだと PS が native command stderr を NativeCommandError として拾い、
+# 冒頭の $ErrorActionPreference = 'Stop' と合わさって throw されるため、
+# 2>&1 で success stream にマージしつつ try/catch で二重防御する。
+try {
+    $null = git rev-parse --is-inside-work-tree 2>&1
+    if ($LASTEXITCODE -ne 0) { exit 0 }
+} catch {
+    exit 0
+}
 
 # 未コミット変更がなければスキップ
 $Status = (git status --short 2>$null) -join "`n"
