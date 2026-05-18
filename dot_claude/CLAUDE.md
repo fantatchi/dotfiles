@@ -153,7 +153,7 @@ LOW: 変数名 `d` を `deliveryDate` に変えると可読性が上がります
 - `/multi-persona-review` — 3〜5 人の専門ペルソナを並列 Agent で起動して読取専用レビューを実施し、見落とし・別仮説・推奨アクションを統合
 - `/obsidian-daily` — GitHub アクティビティと作業ログから Obsidian デイリーノートにサマリーを追記。**複数 GH アカウント (`fantatchi` + `kentem-at-kato`) 対応**
 - `/obsidian-log` — 作業ログを Obsidian Vault に記録
-- `/obsidian-resource` — 調査メモ・参考リンク・ブログドラフトを Obsidian Vault に保存（引数 `auto` でセッションから自動ドラフト化）
+- `/obsidian-resource` — 調査メモ・参考リンク・記事ドラフトを Obsidian Vault `30_resource/YYYYMM/` 配下に保存（引数 `auto` でセッションから自動ドラフト化）
 - `/obsidian-mail` — Obsidian デイリーノートのサマリーをメール向けに再構成して Gmail SMTP で送信（日報・週報、ローカル routine から呼ぶ前提）
 - `/session-review` — セッション振り返り（権限・CLAUDE.md・スキルの整理）
 - `/session-save` — `/obsidian-log` + `/context-save` を一括実行し、アウトプット候補の提案も行う
