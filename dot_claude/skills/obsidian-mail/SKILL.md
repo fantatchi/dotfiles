@@ -29,28 +29,44 @@ $ARGUMENTS:
 3. アプリ名: `obsidian-mail` 等の任意名 → 「作成」
 4. 表示された 16 文字のパスワード（スペースなし）を控える
 
-### 2. ~/.claude/settings.local.json への env 設定
+### 2. keyring に資格情報を登録（各 PC で 1 回ずつ）
 
-`settings.local.json` の `env` セクションに以下を追加（chezmoi 非管理＝マシンローカル）:
+`send-summary.py` は Python `keyring` ライブラリ経由で OS 資格情報マネージャから SMTP 認証情報を取得する。**平文ファイルは持たない設計**（旧 `settings.local.json` env 経路は廃止）。
 
-```json
-{
-  "env": {
-    "OBSIDIAN_SUMMARY_SMTP_USER": "fantatchi@gmail.com",
-    "OBSIDIAN_SUMMARY_SMTP_PASS": "xxxxxxxxxxxxxxxx"
-  }
-}
+**Windows** — claude.app ローカルルーティーンの本番経路:
+
+```powershell
+python -m keyring set obsidian-mail OBSIDIAN_SUMMARY_SMTP_USER
+# プロンプトで Gmail アドレスを入力（echo されない）
+python -m keyring set obsidian-mail OBSIDIAN_SUMMARY_SMTP_PASS
+# プロンプトで 16 文字のアプリパスワードを入力（echo されない）
 ```
+
+バックエンド: **Windows Credential Manager**（DPAPI per-user 暗号化、unattended アクセス可）。
+
+**WSL / Linux** — 手動テスト用途のみ（本番 routine は Windows 側で発火）:
+
+WSL の default backend (`fail.Keyring`) は無効化されているため、最も簡単なのは **環境変数で渡す**:
+
+```bash
+OBSIDIAN_SUMMARY_SMTP_USER='...' OBSIDIAN_SUMMARY_SMTP_PASS='...' \
+    python3 ~/.claude/skills/obsidian-mail/send-summary.py daily 2026-05-19
+```
+
+恒久ストレージが必要なら `pip3 install --user keyrings.alt` 後に `python3 -m keyring set ...` で暗号化ファイルバックエンドが使えるが、master password が毎回必要になり routine 用途には不向き。
+
+### 3. env 変数名の命名について（重要）
+
+スキル名は `obsidian-mail` だが env 変数 prefix（および keyring username）は `OBSIDIAN_SUMMARY_*` のまま据置している。これは旧スキル名 `obsidian-summary` 時代の命名で、リネームに合わせて変えると **全マシンで keyring 再登録が必要** になる移行コストを避けるための backward compat 措置。新規セットアップでも `OBSIDIAN_SUMMARY_*` で登録すること。
 
 オプション:
 - `OBSIDIAN_SUMMARY_MAIL_TO`: 送信先アドレス（デフォルト: `SMTP_USER` と同じ）
 - `OBSIDIAN_SUMMARY_MAIL_FROM`: 送信元アドレス（デフォルト: `SMTP_USER` と同じ）
 
-> **env 変数名の命名について（重要）**: スキル名は `obsidian-mail` だが env 変数 prefix は `OBSIDIAN_SUMMARY_*` のまま据置している。これは旧スキル名 `obsidian-summary` 時代の命名で、settings.local.json が chezmoi 非管理（各マシンで個別設定）のため、リネームに合わせて env 名も変えると **全マシンで既存値の再設定が必要** になる移行コストを避けるための backward compat 措置。新規セットアップでも `OBSIDIAN_SUMMARY_*` で設定すること。将来統一する場合は send-summary.py 側で新旧両方の名前を check → 旧名を deprecated 扱いに、という段階移行が必要。
+### 4. Python 依存
 
-### 3. Python 依存
-
-`markdown` ライブラリが必要（`pip3 install --user markdown`）。
+- `keyring`（`pip3 install --user keyring` / Windows は `pip install keyring`）— OS 資格情報マネージャアクセス
+- `markdown`（`pip3 install --user markdown`）— HTML 変換
 
 ## 動作
 

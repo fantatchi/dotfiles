@@ -5,13 +5,24 @@ Usage:
     python3 send-summary.py daily YYYY-MM-DD
     python3 send-summary.py weekly YYYY-MM-DD
 
-Required environment variables:
+Required credentials (resolved by keyring service "obsidian-mail"):
     OBSIDIAN_SUMMARY_SMTP_USER  Gmail address used for SMTP login
     OBSIDIAN_SUMMARY_SMTP_PASS  Google App Password (16 chars, no spaces)
 
 Optional:
     OBSIDIAN_SUMMARY_MAIL_TO    Recipient address (default: SMTP_USER)
     OBSIDIAN_SUMMARY_MAIL_FROM  From address (default: SMTP_USER)
+
+Setup (per machine, one-time):
+    Windows (keyring -> Windows Credential Manager):
+        python -m keyring set obsidian-mail OBSIDIAN_SUMMARY_SMTP_USER
+        python -m keyring set obsidian-mail OBSIDIAN_SUMMARY_SMTP_PASS
+    WSL/Linux (keyring backend unavailable by default):
+        Pass values via environment variable at invocation time. See override below.
+
+Override at runtime (テスト用; env が keyring より優先):
+    OBSIDIAN_SUMMARY_SMTP_USER=... OBSIDIAN_SUMMARY_SMTP_PASS=... \\
+        python3 send-summary.py ...
 
 Behavior:
     - Calls extract-summary.py to obtain subject / body_markdown / body_html
@@ -36,16 +47,57 @@ import sys
 from email.message import EmailMessage
 from email.utils import formataddr, formatdate, make_msgid
 
+import keyring
+import keyring.errors
+
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 EXTRACT_SCRIPT = os.path.join(SCRIPT_DIR, "extract-summary.py")
 
 SMTP_HOST = "smtp.gmail.com"
 SMTP_PORT = 465
 
+KEYRING_SERVICE = "obsidian-mail"
+
 
 def fail(msg: str, code: int = 2) -> None:
     print(msg, file=sys.stderr)
     sys.exit(code)
+
+
+def get_secret(name: str, required: bool = True) -> str:
+    """Resolve a secret in priority order:
+
+    1. Environment variable (ad-hoc CLI override / testing)
+    2. OS credential store via keyring
+       (Windows: WinCred / DPAPI per-user; WSL/Linux: only when a usable
+       backend is installed — default `fail.Keyring` returns None)
+
+    Returns "" for missing optional keys (caller decides default).
+    Fails with setup instructions if `required` and both sources empty.
+    """
+    val = os.environ.get(name, "").strip()
+    if val:
+        return val
+    try:
+        val = keyring.get_password(KEYRING_SERVICE, name)
+    except keyring.errors.KeyringError as e:
+        if required:
+            fail(
+                f"keyring backend エラー ({name}): {e}\n"
+                f"Windows: python -m keyring set {KEYRING_SERVICE} {name}\n"
+                f"WSL: 環境変数で渡すか keyrings.alt 等を導入"
+            )
+        return ""
+    if val:
+        return val.strip()
+    if required:
+        fail(
+            f"secret {name!r} が未登録です。以下で登録してください:\n"
+            f"  python3 -m keyring set {KEYRING_SERVICE} {name}\n"
+            f"(対話プロンプトで値を入力、echo されません)\n"
+            f"WSL で keyring backend が無い場合は環境変数経由で渡してください"
+        )
+    return ""
 
 
 def run_extract(mode: str, date_str: str) -> dict:
@@ -89,15 +141,10 @@ def main(argv: list[str]) -> int:
     if mode not in ("daily", "weekly"):
         fail(f"mode は daily / weekly のいずれか: {mode!r}")
 
-    smtp_user = os.environ.get("OBSIDIAN_SUMMARY_SMTP_USER", "").strip()
-    smtp_pass = os.environ.get("OBSIDIAN_SUMMARY_SMTP_PASS", "").strip()
-    if not smtp_user or not smtp_pass:
-        fail(
-            "環境変数 OBSIDIAN_SUMMARY_SMTP_USER / OBSIDIAN_SUMMARY_SMTP_PASS が未設定です。\n"
-            "Google アカウントでアプリパスワードを生成し、~/.claude/settings.local.json の env に保存してください。"
-        )
-    mail_to = os.environ.get("OBSIDIAN_SUMMARY_MAIL_TO", smtp_user).strip()
-    mail_from = os.environ.get("OBSIDIAN_SUMMARY_MAIL_FROM", smtp_user).strip()
+    smtp_user = get_secret("OBSIDIAN_SUMMARY_SMTP_USER")
+    smtp_pass = get_secret("OBSIDIAN_SUMMARY_SMTP_PASS")
+    mail_to = (get_secret("OBSIDIAN_SUMMARY_MAIL_TO", required=False) or smtp_user).strip()
+    mail_from = (get_secret("OBSIDIAN_SUMMARY_MAIL_FROM", required=False) or smtp_user).strip()
 
     data = run_extract(mode, date_str)
 
