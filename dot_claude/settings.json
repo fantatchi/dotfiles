@@ -102,7 +102,8 @@
     "claude-md-management@claude-plugins-official": true,
     "dotnet@dotnet-agent-skills": true,
     "dotnet-aspnet@dotnet-agent-skills": true,
-    "microsoft-docs@claude-plugins-official": true
+    "microsoft-docs@claude-plugins-official": true,
+    "codex@openai-codex": true
   },
   "extraKnownMarketplaces": {
     "dotnet-agent-skills": {
@@ -110,10 +111,16 @@
         "source": "github",
         "repo": "dotnet/skills"
       }
+    },
+    "openai-codex": {
+      "source": {
+        "source": "github",
+        "repo": "openai/codex-plugin-cc"
+      }
     }
   },
   "alwaysThinkingEnabled": true,
   "autoUpdatesChannel": "latest",
-  "skipAutoPermissionPrompt": true,
-  "tui": "fullscreen"
+  "tui": "fullscreen",
+  "skipAutoPermissionPrompt": true
 }
