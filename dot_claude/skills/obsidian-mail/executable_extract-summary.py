@@ -38,6 +38,13 @@ from typing import TypedDict
 
 import markdown  # pip3 install --user markdown
 
+# Windows のデフォルト stdout/stderr エンコーディング (cp932 等) では
+# 日本語 / ダッシュ "—" 等を書き出せず UnicodeEncodeError になるため UTF-8 に固定する。
+# scheduled-task / subprocess 経由での起動時に PYTHONIOENCODING が引き継がれないケースの保険。
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(encoding="utf-8")
+
 
 class WorklogEntry(TypedDict):
     """`### 作業ログ` 配下の `- **project**: body` 行を抽出した 1 件。"""

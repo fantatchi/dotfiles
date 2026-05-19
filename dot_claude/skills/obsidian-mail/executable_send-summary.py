@@ -50,6 +50,13 @@ from email.utils import formataddr, formatdate, make_msgid
 import keyring
 import keyring.errors
 
+# Windows のデフォルト stdout/stderr エンコーディング (cp932 等) では
+# 日本語や非 ASCII 記号を含む JSON 結果を書き出せず UnicodeEncodeError になるため UTF-8 に固定する。
+# scheduled-task / claude.app routine 起動時に PYTHONIOENCODING が引き継がれないケースの保険。
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(encoding="utf-8")
+
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 EXTRACT_SCRIPT = os.path.join(SCRIPT_DIR, "extract-summary.py")
 
