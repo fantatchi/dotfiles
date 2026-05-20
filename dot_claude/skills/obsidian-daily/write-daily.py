@@ -76,19 +76,14 @@ _NOISE_REPO_PATTERNS: tuple[str, ...] = ("vault", "backup")
 
 # --- テンプレート ---
 
-DAILY_TEMPLATE = """\
----
-created: {created}(UTC +09:00)
-aliases: [{alias_slash},{alias_jp}]
-tags: [Daily,{target_date}]
-author: at-kato
----
-
-[[{year_month}]]
-[[DailyNotes]]
-
----
-"""
+# Moment.js → Python strftime のマッピング（実テンプレートで使用される token のみ）。
+# Obsidian の `{{date:FORMAT}}` は Moment.js 形式で書かれているため、Python の
+# strftime に渡せる形に変換する。テンプレートに新しい token が出現したらここに追加する。
+_MOMENT_TOKEN_MAP: tuple[tuple[str, str], ...] = (
+    ("YYYY", "%Y"), ("YY", "%y"),
+    ("MM", "%m"), ("DD", "%d"),
+    ("HH", "%H"), ("mm", "%M"), ("ss", "%S"),
+)
 
 SUMMARY_TEMPLATE = """\
 ## デイリーサマリー
@@ -354,22 +349,60 @@ def build_summary(data: SummaryInput) -> str:
     )
 
 
-def build_daily_note(target_date: str) -> str:
-    """デイリーノートの frontmatter 部分を生成する。"""
-    dt = datetime.strptime(target_date, "%Y-%m-%d")
+def _render_moment(fmt: str, dt: datetime) -> str:
+    """Moment.js 形式の date format を Python strftime に変換して dt を整形する。
+
+    `M` / `D` の単独使用（ゼロ埋めなしの月日）は Windows strftime に `%-m` / `%-d`
+    が存在しないため、値文字列で先行置換してから strftime に渡す。
+
+    >>> dt = datetime(2026, 5, 20, 14, 30, 45)
+    >>> _render_moment("YYYY-MM-DD", dt)
+    '2026-05-20'
+    >>> _render_moment("YYYY/MM/DD", dt)
+    '2026/05/20'
+    >>> _render_moment("YYYY年M月D日", dt)
+    '2026年5月20日'
+    >>> _render_moment("YYYY-MM-DDTHH:mm:ss", dt)
+    '2026-05-20T14:30:45'
+    >>> _render_moment("YYYY-MM", dt)
+    '2026-05'
+    """
+    # 値で先行置換: 単独の M / D（前後がアルファベットでない位置）のみ
+    fmt = re.sub(r"(?<![A-Za-z])M(?![A-Za-z])", str(dt.month), fmt)
+    fmt = re.sub(r"(?<![A-Za-z])D(?![A-Za-z])", str(dt.day), fmt)
+    for moment, py in _MOMENT_TOKEN_MAP:
+        fmt = fmt.replace(moment, py)
+    return dt.strftime(fmt)
+
+
+def render_obsidian_template(vault: str, target_date: str) -> str:
+    """Obsidian Core Daily notes プラグインのテンプレートを読んで placeholder 展開する。
+
+    `<vault>/.obsidian/daily-notes.json` から template パスを取得し、
+    `{{date:FORMAT}}` を Moment.js として解釈して target_date + 現在時刻で展開する。
+
+    SSOT 化の目的: テンプレート定義を Vault 側 1 箇所に集約し、Python 側との
+    二重管理を排除する。Obsidian / Thino から作られたデイリーノートと同形になる。
+    """
+    config_path = os.path.join(vault, ".obsidian", "daily-notes.json")
+    with open(config_path, "r", encoding="utf-8") as f:
+        config = json.load(f)
+    tmpl_path = os.path.join(vault, config["template"] + ".md")
+    with open(tmpl_path, "r", encoding="utf-8") as f:
+        raw = f.read()
+
+    # date 成分は target_date、time 成分は現在時刻を使う（タグや alias は
+    # ノートが「いつの日」かを示すため target_date 寄り、created の時刻部分は
+    # 実際の生成時刻が自然なため）。
+    target_dt = datetime.strptime(target_date, "%Y-%m-%d")
     now = datetime.now(JST)
-
-    created = now.strftime("%Y-%m-%dT%H:%M:%S")
-    alias_slash = dt.strftime("%Y/%m/%d")
-    alias_jp = f"{dt.year}年{dt.month}月{dt.day}日"
-    year_month = dt.strftime("%Y-%m")
-
-    return DAILY_TEMPLATE.format(
-        created=created,
-        alias_slash=alias_slash,
-        alias_jp=alias_jp,
-        target_date=target_date,
-        year_month=year_month,
+    dt = target_dt.replace(
+        hour=now.hour, minute=now.minute, second=now.second
+    )
+    return re.sub(
+        r"\{\{date:([^}]+)\}\}",
+        lambda m: _render_moment(m.group(1), dt),
+        raw,
     )
 
 
@@ -388,8 +421,10 @@ def write_daily(data: SummaryInput) -> str:
 
     if not os.path.exists(daily_path):
         # ケース 1: ファイルが存在しない → 新規作成
+        # Obsidian テンプレート末尾の改行数に依存しないよう正規化（rstrip + "\n\n"）。
         os.makedirs(daily_dir, exist_ok=True)
-        content = build_daily_note(target_date) + "\n" + summary_section + "\n"
+        prefix = render_obsidian_template(vault, target_date).rstrip("\n") + "\n\n"
+        content = prefix + summary_section + "\n"
         with open(daily_path, "w", encoding="utf-8") as f:
             f.write(content)
         return f"created:{daily_path}"
@@ -407,9 +442,12 @@ def write_daily(data: SummaryInput) -> str:
         return f"appended:{daily_path}"
 
     # ケース 3: サマリーあり → 上書き
-    # "## デイリーサマリー" から次の "## " (同レベル) またはファイル末尾まで置換
-    pattern = r"## デイリーサマリー.*"
-    content_new = re.sub(pattern, summary_section, content, flags=re.DOTALL)
+    # "## デイリーサマリー" から次の "## " (level-2 見出し) 直前まで、
+    # 次の "## " がなければファイル末尾まで置換。Thino 等が後ろのセクションに
+    # エントリを書いた場合の保護が目的（旧実装は re.DOTALL で末尾まで貪欲マッチ
+    # していたためサマリー後ろの追記が消失していた）。
+    pattern = r"## デイリーサマリー.*?(?=\n## |\Z)"
+    content_new = re.sub(pattern, summary_section + "\n", content, flags=re.DOTALL)
     # 末尾の改行を正規化
     content_new = content_new.rstrip("\n") + "\n"
     with open(daily_path, "w", encoding="utf-8") as f:
