@@ -349,6 +349,33 @@ def build_summary(data: SummaryInput) -> str:
     )
 
 
+def _check_unknown_moment_tokens(fmt: str) -> None:
+    """連続同一英字 3 字以上を Moment.js トークンとみなし、未対応のものを stderr に警告する。
+
+    本実装が対応していない `MMM` (短月名) / `MMMM` (月名) / `dddd` (曜日名) / `ddd` (短曜日名)
+    などのトークンがテンプレートに含まれていると、`_render_moment` は silent break
+    （`MMM → 05M`、`MMMM → 0505` のような意味不明な出力）になる。将来のテンプレート変更で
+    そうしたトークンが入った時に気付けるよう、ここで警告する。
+
+    >>> import sys, io
+    >>> _, sys.stderr = sys.stderr, io.StringIO()
+    >>> _check_unknown_moment_tokens("YYYY-MM-DD")  # 既知のみ → 警告なし
+    >>> sys.stderr.getvalue()
+    ''
+    >>> _check_unknown_moment_tokens("YYYY年MMMM")
+    >>> "MMMM" in sys.stderr.getvalue()
+    True
+    """
+    known = {tok for tok, _ in _MOMENT_TOKEN_MAP}
+    for run, _letter in re.findall(r"(([A-Za-z])\2{2,})", fmt):
+        if run not in known:
+            print(
+                f"WARNING: 未対応の Moment.js トークン {run!r} を検出 (format: {fmt!r})。"
+                f"obsidian-daily の _MOMENT_TOKEN_MAP 拡張が必要。",
+                file=sys.stderr,
+            )
+
+
 def _render_moment(fmt: str, dt: datetime) -> str:
     """Moment.js 形式の date format を Python strftime に変換して dt を整形する。
 
@@ -367,6 +394,7 @@ def _render_moment(fmt: str, dt: datetime) -> str:
     >>> _render_moment("YYYY-MM", dt)
     '2026-05'
     """
+    _check_unknown_moment_tokens(fmt)
     # 値で先行置換: 単独の M / D（前後がアルファベットでない位置）のみ
     fmt = re.sub(r"(?<![A-Za-z])M(?![A-Za-z])", str(dt.month), fmt)
     fmt = re.sub(r"(?<![A-Za-z])D(?![A-Za-z])", str(dt.day), fmt)
@@ -383,17 +411,42 @@ def render_obsidian_template(vault: str, target_date: str) -> str:
 
     SSOT 化の目的: テンプレート定義を Vault 側 1 箇所に集約し、Python 側との
     二重管理を排除する。Obsidian / Thino から作られたデイリーノートと同形になる。
+
+    エラー時は呼び出し側が原因を切り分けられるよう `RuntimeError` にラップして re-raise する。
     """
     config_path = os.path.join(vault, ".obsidian", "daily-notes.json")
-    with open(config_path, "r", encoding="utf-8") as f:
-        config = json.load(f)
+    try:
+        with open(config_path, "r", encoding="utf-8") as f:
+            config = json.load(f)
+    except FileNotFoundError as e:
+        raise RuntimeError(
+            f"Obsidian Daily notes 設定が見つかりません: {config_path}。"
+            f"Obsidian の設定 → Daily notes を有効化してください。"
+        ) from e
+    except json.JSONDecodeError as e:
+        raise RuntimeError(
+            f"Obsidian Daily notes 設定の JSON が不正です: {config_path}: {e}"
+        ) from e
+
+    if "template" not in config or not config["template"]:
+        raise RuntimeError(
+            f"{config_path} に template フィールドがありません。"
+            f"Obsidian の Daily notes 設定で『テンプレートファイルの場所』を指定してください。"
+        )
+
     tmpl_path = os.path.join(vault, config["template"] + ".md")
-    with open(tmpl_path, "r", encoding="utf-8") as f:
-        raw = f.read()
+    try:
+        with open(tmpl_path, "r", encoding="utf-8") as f:
+            raw = f.read()
+    except FileNotFoundError as e:
+        raise RuntimeError(
+            f"Obsidian テンプレートファイルが見つかりません: {tmpl_path}。"
+            f"daily-notes.json の template フィールドが指す .md ファイルを配置してください。"
+        ) from e
 
     # date 成分は target_date、time 成分は現在時刻を使う（タグや alias は
     # ノートが「いつの日」かを示すため target_date 寄り、created の時刻部分は
-    # 実際の生成時刻が自然なため）。
+    # 実際の生成時刻が自然なため。月跨ぎ実行でも tag/alias は target_date に統一される）。
     target_dt = datetime.strptime(target_date, "%Y-%m-%d")
     now = datetime.now(JST)
     dt = target_dt.replace(

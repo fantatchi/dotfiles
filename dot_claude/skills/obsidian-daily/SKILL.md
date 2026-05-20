@@ -1,6 +1,6 @@
 ---
 name: obsidian-daily
-description: GitHub アクティビティと作業ログから Obsidian デイリーノートの「## デイリーサマリー」セクションを生成・追記する。冒頭 KPI 行（commits / PRs / logs 件数）・「今日の要約」上配置・コミットのリポ別グルーピング・作業ログ折り畳み callout の構成。複数 GH アカウント（`fantatchi` + `kentem-at-kato`）の活動を `gh auth switch` で順次切替しながら集約。「今日のまとめ」「デイリーサマリー」「KPI」「リポ別コミット」「概況」「複数アカウント」「両アカウント集約」「個人と業務を合算」「fantatchi の commit も含めて」といった依頼で使う。
+description: GitHub アクティビティと作業ログから Obsidian デイリーノートの「## デイリーサマリー」セクションを生成・追記する。冒頭 KPI 行（commits / PRs / logs 件数）・「今日の要約」上配置・コミットのリポ別グルーピング・作業ログ折り畳み callout の構成。複数 GH アカウント（`fantatchi` + `kentem-at-kato`）の活動を `gh auth switch` で順次切替しながら集約。「今日のまとめ」「デイリーサマリー」「KPI」「リポ別コミット」「概況」「複数アカウント」「両アカウント集約」「個人と業務を合算」「fantatchi の commit も含めて」といった依頼で使う。**Obsidian Core Daily notes プラグインのテンプレ（`90_config/templates/daily_notes.md`）を SSOT として読み込む設計**（テンプレ未配置では `RuntimeError` で停止、§6-a 参照）。Thino プラグインと共存できるよう `# Journal` セクション前提のテンプレを推奨。
 argument-hint: [YYYY-MM-DD]
 allowed-tools: Read, Bash(gh:*), Bash(date:*), Bash(python:*), Bash(cat:*), Bash(ls:*), Bash(echo:*)
 ---
@@ -252,6 +252,69 @@ Microsoft Store のスタブランチャー (`AppData\Local\Microsoft\WindowsApp
 および `build_kpi_line` / `build_grouped_commits` / `build_logs_section` が実装上の唯一の正本。
 出力規約は `obsidian-mail` の reader 契約（`obsidian-mail/SKILL.md §2-b`）にも反映されているため、
 出力フォーマットを変更する際は reader 側の `_BULLET_RE` 等の依存を必ず確認すること。
+
+## 6-a. Obsidian テンプレート前提
+
+`write-daily.py` は **Obsidian Core Daily notes プラグインのテンプレートを SSOT として動的に読む** 設計。
+独自テンプレートを Python 側に持たないため、以下の前提が成立している必要がある。
+
+### 必須要件
+
+1. **Obsidian Core Daily notes が有効**: `~/ObsidianVault/.obsidian/daily-notes.json` が存在し、
+   `template` フィールドが vault 相対のテンプレファイル名（拡張子なし、例: `90_config/templates/daily_notes`）を指していること
+2. **テンプレートファイル本体**: 上記 `template + ".md"` パスに `.md` ファイルが配置されていること
+3. **Frontmatter placeholder**: テンプレ内の `{{date:FORMAT}}` は Moment.js 形式として解釈される。
+   現在の対応 token は `YYYY` / `YY` / `MM` / `DD` / `HH` / `mm` / `ss` / 単独 `M` / 単独 `D`。
+   `MMM` (短月名) / `MMMM` (月名) / `dddd` (曜日名) 等の未対応 token を入れると stderr に警告を出すが
+   出力は壊れる（silent corruption ではないが正しい展開はされない）。新規 token を入れる場合は
+   `write-daily.py` の `_MOMENT_TOKEN_MAP` 拡張が必要
+
+### 推奨テンプレ構造
+
+Thino プラグイン (obsidian-memos) との共存を考慮し、`# Journal` セクションをサマリーより上に置く。
+Thino のデフォルト `InsertAfter: "# Journal"` 設定でメモが Journal セクション直下に挿入され、
+`obsidian-daily` のサマリー再生成（ケース 3 置換）でも Thino エントリが消えない設計
+（置換は次の `## ` 見出し直前で停止する非貪欲版）。
+
+```
+---
+created: {{date:YYYY-MM-DDTHH:mm:ss}}(UTC +09:00)
+aliases: [{{date:YYYY/MM/DD}},{{date:YYYY年M月D日}}]
+tags: [Daily,{{date:YYYY-MM-DD}}]
+author: at-kato
+---
+
+[[{{date:YYYY-MM}}]]
+[[DailyNotes]]
+
+---
+
+# Journal
+
+```
+
+### date / time の使い分け
+
+`{{date:FORMAT}}` の **date 成分は `target_date`、time 成分は実行時の現在時刻** で展開する。
+月跨ぎ実行（例: 5/1 早朝に 4/30 のサマリー生成）でも `tags: [Daily, 2026-04-30]` と
+`aliases: [2026/04/30, ...]` は target_date に統一され、`created` の時刻部分のみ実際の生成時刻を記録する。
+これは Obsidian 純正の `{{date}}` セマンティクス（常に now）とは異なる本実装固有の挙動。
+
+### エラー時の挙動
+
+以下の状況で `RuntimeError` を raise する（メッセージに対処方法を含む）:
+
+- `daily-notes.json` 不在 → 「Obsidian の設定 → Daily notes を有効化してください」
+- `daily-notes.json` の JSON が不正 → パースエラー詳細を含む
+- `template` フィールド欠落 → 「Daily notes 設定でテンプレートファイルの場所を指定してください」
+- テンプレートファイル不在 → 該当パスを表示
+
+### 将来拡張のメモ
+
+- **Periodic Notes plugin への移行**: 現在は Core Daily notes のみ対応。将来 Periodic Notes に移行する場合は
+  `.obsidian/plugins/periodic-notes/data.json` の `daily.template` を読むよう分岐追加が必要
+- **新規 Moment.js token 追加**: `MMMM`/`dddd` 等が必要になったら `_MOMENT_TOKEN_MAP` に
+  `("MMMM", "%B")` / `("dddd", "%A")` 等を追加する。Windows locale 依存があるため `LC_TIME` 設定要確認
 
 ## 7. 完了報告
 

@@ -165,7 +165,7 @@ LOW: 変数名 `d` を `deliveryDate` に変えると可読性が上がります
 - `/gtd-list` — `~/ObsidianVault/00_meta/tasks.md` からタスクを表示（デフォルト: 現在プロジェクトの Inbox + Next）
 - `/ks-naming` — 土木業界向け識別子名の生成
 - `/multi-persona-review` — 3〜5 人の専門ペルソナを並列 Agent で起動して読取専用レビューを実施し、見落とし・別仮説・推奨アクションを統合
-- `/obsidian-daily` — GitHub アクティビティと作業ログから Obsidian デイリーノートにサマリーを追記。**複数 GH アカウント (`fantatchi` + `kentem-at-kato`) 対応**
+- `/obsidian-daily` — GitHub アクティビティと作業ログから Obsidian デイリーノートにサマリーを追記。**複数 GH アカウント (`fantatchi` + `kentem-at-kato`) 対応**。Obsidian Core Daily notes テンプレ (`90_config/templates/daily_notes.md`) を SSOT として動的読み込み、Thino プラグインとの共存を考慮した `# Journal` セクション前提
 - `/obsidian-log` — 作業ログを Obsidian Vault に記録
 - `/obsidian-resource` — 調査メモ・参考リンク・記事ドラフトを Obsidian Vault `30_resource/YYYYMM/` 配下に保存（引数 `auto` でセッションから自動ドラフト化）
 - `/obsidian-mail` — Obsidian デイリーノートのサマリーをメール向けに再構成して Gmail SMTP で送信（日報・週報、ローカル routine から呼ぶ前提）
