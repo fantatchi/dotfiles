@@ -19,8 +19,8 @@
 
 set -uo pipefail
 
-THRESHOLD_MIN=120
-RESUME_DETECT_MIN=30   # 前回プロンプトからこの分数以上空いていたら resume とみなす
+THRESHOLD_MIN=240
+RESUME_DETECT_MIN=60   # 前回プロンプトからこの分数以上空いていたら resume とみなす
 MARKER_DIR="${HOME}/.claude/.session-markers"
 MARKER_TTL_DAYS=7
 

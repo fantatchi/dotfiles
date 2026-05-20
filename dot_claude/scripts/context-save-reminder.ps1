@@ -17,8 +17,8 @@ $ErrorActionPreference = 'SilentlyContinue'
 $ProgressPreference = 'SilentlyContinue'
 [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
 
-$thresholdMin = 120
-$resumeDetectMin = 30   # 前回プロンプトからこの分数以上空いていたら resume とみなす
+$thresholdMin = 240
+$resumeDetectMin = 60   # 前回プロンプトからこの分数以上空いていたら resume とみなす
 $markerDir = Join-Path $env:USERPROFILE '.claude\.session-markers'
 $markerTtlDays = 7
 
