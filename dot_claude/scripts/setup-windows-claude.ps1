@@ -1,4 +1,4 @@
-﻿﻿# Windows 側 ~/.claude を WSL ハイブリッド構成にする初回 setup スクリプト
+﻿# Windows 側 ~/.claude を WSL ハイブリッド構成にする初回 setup スクリプト
 #
 # Why: Claude Code plugin システムが known_marketplaces.json 等に Linux 絶対パスを
 #      ハードコードする (2026-05-22 判明)。~/.claude 全体を WSL への SymLink にすると
