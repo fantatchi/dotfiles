@@ -4,18 +4,33 @@
 
 **位置付け**: 本ファイルは `~/.claude/skills/shared/` 配下のライブラリ（`name:` 付きスキルではない、自動起動対象外）。配色パレットの HEX 値の正本は `~/.claude/skills/dashboard-design/references/visual-encoding.md` の「## カラーパレット（デジタル庁デザインシステム由来）」セクションを参照。本ファイルはその HEX 値を **「どう使い分けるか」のマッピングルール** に専念する。
 
+## SSOT としての位置付け（重要）
+
+各スキルの **デフォルト系統** はスキル本体に直書きしており、本ファイルの「§1 デフォルトのベースカラー: Blue」よりも優先される:
+
+| スキル | デフォルト系統 | 直書き場所 |
+|---|---|---|
+| `spec-design` (HTML 補足) | **Vercel link blue** (`#0070f3`) + Inter / IBM Plex Sans JP | `spec-design/references/html-css-centralization.md` |
+| `dashboard-design` (HTML / BI ツール / ダッシュボード) | **Blue 900** (`#0017C1`) + Noto Sans JP | `dashboard-design/SKILL.md` + `visual-encoding.md` |
+
+本ファイルは **別系統（Green / Orange / Light Blue / Cyan / Red）切替時の階調マッピング SSOT** として参照される。「§1 Blue デフォルト」は dashboard-design 視点の歴史的記述であり、spec-design の HTML 補足は本ファイルを直接の HEX 出典としては使わない（Vercel inspired を直書き採用）。
+
+同一プロジェクトで両スキルの成果物（仕様書 HTML 補足 + ダッシュボード）が並走する場合、両者は別 CSS ファイルで動くため `--accent` の値が異なっても CSS スコープ衝突は起きない。読み手の認知統一が必要なら、プロジェクト ADR で「両スキルの `--accent` をどちらかに揃える」決定を残す。
+
 **出典**: デジタル庁「ダッシュボードデザインの実践ガイドブック」第 4.3 節、カラーパレット <https://www.digital.go.jp/resources/dashboard-guidebook/color-palette>
 
 ---
 
-## 1. デフォルトのベースカラー: Blue（青）
+## 1. デフォルトのベースカラー: Blue（青） — dashboard-design 系統
 
-特に指定が無い新規プロジェクトでは **Blue 系列** を採用する。
+> **※ 本節は dashboard-design スキル系統のデフォルト記述** です。spec-design スキルの HTML 補足ページのデフォルトは **Vercel link blue (`#0070f3`)** で、本節の Blue 900 (`#0017C1`) ではありません (冒頭「SSOT としての位置付け」セクション参照)。本節は dashboard-design の利用時、または spec-design で別系統に切り替える際の参照として使う。
+
+dashboard-design のデフォルト・または別系統選択時の Blue 系列を採用する。
 
 優先順位:
 
 1. **プロジェクト固有指定がある場合**（CLAUDE.md / 既存仕様書のスタイル / ブランドガイド等）→ それを最優先で踏襲
-2. **指定がない・新規プロジェクト・既存スタイル無し** → Blue 系列をデフォルト採用
+2. **指定がない・dashboard-design 系統 (ダッシュボード / KPI 画面 / BI ツール) で既存スタイル無し** → Blue 系列をデフォルト採用
 
 ベースカラーを Blue 以外（Green / Orange / Light Blue / Cyan / Red）に変える場合は、後述の階調マッピングルールに従う + プロジェクトの ADR に「ベースカラー選定」を残す（`spec-design/references/adr-format.md` の ADR テンプレを参照）。
 

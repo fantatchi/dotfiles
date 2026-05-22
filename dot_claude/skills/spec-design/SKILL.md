@@ -1,6 +1,6 @@
 ---
 name: spec-design
-description: 仕様書（specification / 設計ドキュメント / requirements / architecture）の設計・作成・レビューを担うロール変換型スキル。判断軸（読み手別の入口、UML/C4/BPMN の図種選択、ADR で意思決定分離、用語集を唯一の出典に、MUST/SHOULD/MAY の要件レベル語）+「全体像・なぜ・用語」3 点を手厚くカバーする具体テンプレ（README / ADR Nygard・MADR / C4 / glossary）。出力は md がメイン（Docs as Code）、視覚情報が主役のページのみ HTML 補足。仕様書を書く文脈での視覚設計判断も内蔵: ベースカラー Blue 系列デフォルト（`shared/base-color-mapping.md` 参照）、「伝わるデザイン」12 原則の参照誘導、**HTML 補足ページが複数あるときは共通 CSS への集約 SHOULD**（`:root` 固有変数のみ + `body.page-X` scope で衝突回避、`references/html-css-centralization.md`）。「仕様書」「specification」「設計ドキュメント」「ドキュメントレビュー」「ADR」「アーキテクチャ図」「C4 図」「設計書のテンプレート」「READMEを充実」「オンボーディング資料」「PDF 仕様書」「HTML 補足ページの CSS 集約」「仕様書 HTML の共通スタイル」「補足 HTML の共通 CSS 化」等で自動起動。**棲み分け**: 視覚設計の入口（「ダッシュボード作って」「カラーパレット選定」「ベースカラー何にする」「伝わるデザイン」「HTML 補足ページのデザイン」「文書の配色・タイポグラフィ」）は dashboard-design、対話的な文章共著は doc-coauthoring、本スキルは構造・判断軸・テンプレで「仕様書ロール」に変換する。単発の図描画（コードレビュー補助図・スケッチ用途）には起動しない。
+description: 仕様書（specification / 設計ドキュメント / requirements / architecture）の設計・作成・レビューを担うロール変換型スキル。判断軸（読み手別の入口、UML/C4/BPMN の図種選択、ADR で意思決定分離、用語集を唯一の出典に、MUST/SHOULD/MAY の要件レベル語）+「全体像・なぜ・用語」3 点を手厚くカバーする具体テンプレ（README / ADR Nygard・MADR / C4 / glossary）。出力は md がメイン（Docs as Code）、視覚情報が主役のページのみ HTML 補足。仕様書を書く文脈での視覚設計判断も内蔵: HTML 補足のデフォルト CSS は Vercel inspired (`#0070f3` link blue + Inter / IBM Plex Sans JP、`references/html-css-centralization.md` 参照)、別系統 (Blue 900 / Green / Orange 等) への切替は `shared/base-color-mapping.md` の階調表、「伝わるデザイン」12 原則の参照誘導、**HTML 補足ページが複数あるときは共通 CSS への集約 SHOULD**（`:root` 固有変数のみ + `body.page-X` scope で衝突回避、`references/html-css-centralization.md`）。「仕様書」「specification」「設計ドキュメント」「ドキュメントレビュー」「ADR」「アーキテクチャ図」「C4 図」「設計書のテンプレート」「READMEを充実」「オンボーディング資料」「PDF 仕様書」「HTML 補足ページの CSS 集約」「仕様書 HTML の共通スタイル」「補足 HTML の共通 CSS 化」等で自動起動。**棲み分け**: 視覚設計の入口（「ダッシュボード作って」「カラーパレット選定」「ベースカラー何にする」「伝わるデザイン」「HTML 補足ページのデザイン」「文書の配色・タイポグラフィ」）は dashboard-design、対話的な文章共著は doc-coauthoring、本スキルは構造・判断軸・テンプレで「仕様書ロール」に変換する。単発の図描画（コードレビュー補助図・スケッチ用途）には起動しない。
 ---
 
 # 仕様書設計ロール
@@ -114,18 +114,32 @@ API 定義に OpenAPI 3.1、データモデルに Protobuf など厳格なスキ
 
 HTML / PDF / md いずれの媒体でも、配色以外のデザイン原則は **「伝わるデザイン」(<https://tsutawarudesign.com/>)** の考え方を意識して作成する。整列・近接・反復・ジャンプ率・余白・タイポグラフィ・箇条書き・表・図解など、誰が読んでも伝わりやすい視覚整理の 12 原則 + 約物ルールは [references/communicative-design.md](references/communicative-design.md) に集約しており、新規 HTML / PDF 出力時の設計判断・レビューチェックリストとして使う。配色のみ `dashboard-design` 側を参照する役割分担とする。
 
-### デフォルトのベースカラー: Blue（青）
+### デフォルト CSS テンプレートと配色（Vercel inspired）
 
-HTML やその他文書（PDF / スライド等）を新規に生成する際の **既定のベースカラーは Blue（青）系列** とする。出典: デジタル庁ダッシュボードデザインガイドブック「カラーパレット」（<https://www.digital.go.jp/resources/dashboard-guidebook/color-palette>）。
+HTML 補足ページを新規に生成する際の **既定のスタイルは Vercel inspired** とする。
+
+| 項目 | デフォルト値 | 出典・参照 |
+|---|---|---|
+| `--accent` (リンク / ハイライト) | `#0070f3` (Vercel link blue) | `references/html-css-centralization.md` |
+| `--accent-bg` (背景アクセント) | `#d3e5ff` | 同上 |
+| `--accent-ink` (CTA black bar) | `#171717` | 同上 |
+| 日本語フォント | IBM Plex Sans JP | 同上 |
+| ラテンフォント | Inter | 同上 |
+| 等幅フォント | IBM Plex Mono | 同上 |
+| UD 保険 fallback | BIZ UDPGothic | `references/communicative-design.md` 原則 7 |
+
+採用理由: Vercel の calm-technical aesthetic (stark monochrome + ink-blue link + stacked shadow) が技術ドキュメントと相性が良く、IBM Plex Sans JP は Inter とペアリングする企業グレード幾何学 sans として読みやすさを担保するため (詳細は `references/html-css-centralization.md` 冒頭)。
 
 優先順位:
 
 1. **プロジェクト固有指定がある場合**（CLAUDE.md / 既存仕様書のスタイル / ブランドガイド等）→ それを最優先で踏襲
-2. **指定がない・新規プロジェクト・既存スタイル無し** → Blue 系列をデフォルト採用
+2. **指定がない・新規プロジェクト・既存スタイル無し** → Vercel inspired をデフォルト採用
 
-採用する HEX 値・階調・用途別配色 / Blue 以外（Green / Orange / Light Blue / Cyan）への切り替えルール / コントラスト比マトリクス（**600 階調は色相依存で 3:1 を満たさないケースあり**）/ 共通固定要素（Negative=Red 固定、ただし Green/Orange ベース時の面塗りは MUST 禁止）/ 業種別選定指針 は **共通リソース** [`~/.claude/skills/shared/base-color-mapping.md`](../shared/base-color-mapping.md) に集約しています（spec-design と dashboard-design の両方が対等に参照する単一出典）。パレット HEX の全量（7 系統 × 6 階調）は `~/.claude/skills/dashboard-design/references/visual-encoding.md` の「## カラーパレット」セクション。
+**ベースカラーを別系統に切り替える場合**（プロジェクトのブランドカラーが緑系、危険系領域で赤主体、デジタル庁ガイド準拠の Blue 900 を採用したい、など）は、共通リソース [`~/.claude/skills/shared/base-color-mapping.md`](../shared/base-color-mapping.md) §3 の階調マッピング表から該当系統 (Blue / Green / Orange / Light Blue / Cyan / Red) の HEX を引き、`--accent` 値を差し替える。パレット HEX の全量（7 系統 × 6 階調）は `~/.claude/skills/dashboard-design/references/visual-encoding.md` の「## カラーパレット」セクション。
 
-色を変える必要が出た場合（プロジェクトのブランドカラーが緑系、危険系領域で赤主体、など）は ADR に「ベースカラー選定」を残す（テンプレは [references/adr-format.md](references/adr-format.md) の「## ベースカラー選定 ADR テンプレ」）。
+別系統に切り替えた場合は ADR に「ベースカラー選定」を残す（テンプレは [references/adr-format.md](references/adr-format.md) の「## ベースカラー選定 ADR テンプレ」）。
+
+**dashboard-design との関係**: dashboard-design スキルは引き続きデジタル庁ガイド準拠の Blue 900 (`#0017C1`) をデフォルトに使う。両スキルで `--accent` トークン名が同じだが値が異なる構造になるため、同一プロジェクトで両方の成果物を並べる際は **別 CSS ファイル** で並走する前提（CSS スコープ衝突は起きない）。**読み手の認知統一が必要な場合は SHOULD**: プロジェクト ADR で「両スキルの `--accent` をどちらかに揃える」決定を残す（テンプレは [references/adr-format.md](references/adr-format.md) の「## ベースカラー選定 ADR テンプレ」を流用）。
 
 ### HTML 補足ページの CSS 集約方針（複数ページ作成時 SHOULD）
 
@@ -145,7 +159,7 @@ HTML 補足ページの本数に応じて要件レベルを切り替える:
 
 **理由**: 個別ファイル内 `<style>` で共通 CSS を上書きしてしまう事故を防ぎ、複数ファイルでの視覚一貫性（フォント・h1 サイズ・配色）を保証する。「伝わるデザイン」原則 3（反復）の最終的な担保（[references/communicative-design.md](references/communicative-design.md) 参照）。
 
-**実証例**: cloud-dsc プロジェクトの `docs/_html/_shared/spec-page.css`（3072 行、2026-05-14 時点、ファイル別 scope で全レイアウト統合済み）。各 HTML の `<style>` は 10-30 行（`:root` 固有変数のみ）。
+**実証例（規模）**: cloud-dsc プロジェクトの `docs/_html/_shared/spec-page.css`（3072 行、2026-05-14 時点、ファイル別 scope で全レイアウト統合済み）。各 HTML の `<style>` は 10-30 行（`:root` 固有変数のみ）。**注**: cloud-dsc は本変更前の Blue 900 ベースで運用されているプロジェクトで「**規模・運用パターンの実証例**」として参照する。本スキルのデフォルト CSS の **スタイル骨格の出典は Vercel inspired**（cloud-dsc の配色そのものではない）。
 
 具体的な共通 CSS の最小骨格・移行手順・`:root` 変数命名規則・ページ別 scope の書き方は [references/html-css-centralization.md](references/html-css-centralization.md) を参照。
 
@@ -208,7 +222,7 @@ docs/
 
 ### Step 3: スタイルを既存に合わせる
 
-Step 1 で把握したスタイルを踏襲して生成。CSS / breadcrumb / footer / page-nav は **既存ファイルからほぼコピー** し、色変数（`--accent` 等）だけトピックに応じて選び直す。新規プロジェクトや既存スタイルが無い場合、`--accent` 系のベースカラーは Blue 系列（`#0017C1` = Blue 900）を採用する（§「デフォルトのベースカラー: Blue（青）」および `shared/base-color-mapping.md` 参照）。
+Step 1 で把握したスタイルを踏襲して生成。CSS / breadcrumb / footer / page-nav は **既存ファイルからほぼコピー** し、色変数（`--accent` 等）だけトピックに応じて選び直す。新規プロジェクトや既存スタイルが無い場合、`--accent` は Vercel link blue (`#0070f3`) を採用、フォントは Inter + IBM Plex Sans JP（§「デフォルト CSS テンプレートと配色（Vercel inspired）」および `references/html-css-centralization.md` 参照）。別系統 (Blue 900 / Green 等) を採用したい場合は `shared/base-color-mapping.md` §3 の階調表から HEX を引いて差し替え。
 
 新規プロジェクトで既存が無い場合は [references/skeletons.md](references/skeletons.md) の最小汎用骨格（HTML / Markdown / 用語集エントリ）、あるいは [references/templates.md](references/templates.md) の具体テンプレ（README / ADR Nygard・MADR / C4 PlantUML / 用語集）を fallback として使う。
 
