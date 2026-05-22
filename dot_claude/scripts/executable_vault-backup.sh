@@ -5,8 +5,9 @@
 # 重要な節目 (フォルダ刷新・大量編集後等) に手動で 1 snapshot を打つための補助経路。
 #
 # `.obsidian/` の git backup は本スクリプトでは扱わない。`.obsidian/` は per-PC 固有の config
-# (app.json / community-plugins.json 等) を含み、PC をまたいで上書きすると UI 設定が壊れるため。
-# .obsidian/ 配下の重要変更 (プラグイン追加等) を残したい時は別途手動 commit する。
+# (app.json / community-plugins.json 等) を含み、PC をまたいで上書きすると UI 設定が壊れる構造的
+# 問題があったため、2026-05-22 に `.obsidian/.git` + GitHub の obsidian-config.git remote を
+# 完全撤去した。.obsidian/ の multi-PC 同期は Obsidian Sync の Selective Sync に一本化。
 #
 # どの PC から実行しても安全になるよう、push 前に fetch + reset --hard で origin に追従し、
 # Obsidian Sync 由来の working tree を真実の出典として再 stage する。
