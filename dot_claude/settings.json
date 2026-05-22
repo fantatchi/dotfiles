@@ -103,7 +103,8 @@
     "dotnet@dotnet-agent-skills": true,
     "dotnet-aspnet@dotnet-agent-skills": true,
     "microsoft-docs@claude-plugins-official": true,
-    "codex@openai-codex": true
+    "codex@openai-codex": true,
+    "modern-web-guidance@googlechrome": true
   },
   "extraKnownMarketplaces": {
     "dotnet-agent-skills": {
@@ -116,7 +117,15 @@
       "source": {
         "source": "github",
         "repo": "openai/codex-plugin-cc"
-      }
+      },
+      "autoUpdate": true
+    },
+    "googlechrome": {
+      "source": {
+        "source": "github",
+        "repo": "GoogleChrome/modern-web-guidance"
+      },
+      "autoUpdate": true
     }
   },
   "alwaysThinkingEnabled": true,
