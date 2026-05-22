@@ -1,4 +1,4 @@
-# Windows 側 ~/.claude を WSL ハイブリッド構成にする初回 setup スクリプト
+﻿﻿# Windows 側 ~/.claude を WSL ハイブリッド構成にする初回 setup スクリプト
 #
 # Why: Claude Code plugin システムが known_marketplaces.json 等に Linux 絶対パスを
 #      ハードコードする (2026-05-22 判明)。~/.claude 全体を WSL への SymLink にすると
@@ -18,11 +18,13 @@
 #   powershell -ExecutionPolicy Bypass -File '\\wsl.localhost\Ubuntu\home\<wsl-user>\.claude\scripts\setup-windows-claude.ps1'
 #
 #   オプション:
-#     -WhatIf   実行内容を表示するだけ (実際の変更なし)
-#     -Force    ~/.claude が既に実ディレクトリでも続行 (中身は保持)
+#     -Distro <name>  WSL distro 名を指定 (デフォルト: Ubuntu)
+#     -WhatIf         実行内容を表示するだけ (実際の変更なし)
+#     -Force          ~/.claude が既に実ディレクトリでも続行 (中身は保持)
 
 [CmdletBinding()]
 param(
+    [string]$Distro = 'Ubuntu',
     [switch]$Force,
     [switch]$WhatIf
 )
@@ -42,24 +44,25 @@ $includeForLink = @(
 
 Write-Host "=== setup-windows-claude.ps1 ==="
 
-# 1. WSL distro + username を自動検出
-$wslInfo = wsl.exe -e bash -lc 'printf "%s\n%s\n" "$WSL_DISTRO_NAME" "$(whoami)"' 2>$null
-if (-not $wslInfo) {
-    Write-Error "WSL info not retrievable. WSL が起動しているか確認してください。"
+# 1. WSL username を検出 (whoami を WSL 内で実行)
+#    PS 5.1 の native command 引数渡しは \n エスケープが壊れるので、printf を使わず
+#    単純な wsl.exe whoami を使う。distro 名は引数 (デフォルト Ubuntu)。
+$whoamiOut = wsl.exe -d $Distro -e whoami 2>$null
+if (-not $whoamiOut) {
+    Write-Error "WSL ($Distro) で whoami の取得に失敗。WSL が起動しているか、-Distro 引数で正しい名前を指定しているか確認してください。"
     exit 1
 }
-$lines = $wslInfo -split "`n" | Where-Object { $_.Trim() -ne '' }
-if ($lines.Count -lt 2) {
-    Write-Error "WSL distro/user の取得に失敗しました: $wslInfo"
+$wslUser = ($whoamiOut | Out-String).Trim()
+if (-not $wslUser) {
+    Write-Error "WSL username が空。-Distro $Distro で whoami の結果を確認してください。"
     exit 1
 }
-$distro  = $lines[0].Trim()
-$wslUser = $lines[1].Trim()
-$wslClaudeRoot = "\\wsl.localhost\${distro}\home\${wslUser}\.claude"
+
+$wslClaudeRoot = "\\wsl.localhost\${Distro}\home\${wslUser}\.claude"
 $winClaudeRoot = "$env:USERPROFILE\.claude"
 
-Write-Host "WSL distro: $distro"
-Write-Host "WSL user:   $wslUser"
+Write-Host "WSL distro:   $Distro"
+Write-Host "WSL user:     $wslUser"
 Write-Host "WSL .claude:  $wslClaudeRoot"
 Write-Host "Win .claude:  $winClaudeRoot"
 Write-Host ""
@@ -75,7 +78,15 @@ if (Test-Path -LiteralPath $winClaudeRoot) {
     if ($item.LinkType -eq 'SymbolicLink' -or $item.LinkType -eq 'Junction') {
         Write-Host "既存 SymLink/Junction を削除: $winClaudeRoot -> $($item.Target)"
         if (-not $WhatIf) {
-            Remove-Item -LiteralPath $winClaudeRoot -Force
+            # PS 5.1 の Remove-Item -Force だと「子要素がある」確認プロンプトが出るので、
+            # .NET API で target を follow せずポインタのみ削除する。
+            # 第 2 引数 $false = recursive なし (SymLink/Junction 自体だけ削除、target 無事)
+            try {
+                [System.IO.Directory]::Delete($winClaudeRoot, $false)
+            } catch {
+                Write-Error "SymLink/Junction 削除に失敗: $_"
+                exit 1
+            }
         }
     } elseif (-not $Force) {
         Write-Error "$winClaudeRoot が既に実ディレクトリとして存在します。中身を保持して続行するなら -Force を付けて再実行してください。"
@@ -120,7 +131,7 @@ foreach ($name in $includeForLink) {
 
 if ($linkErrors.Count -gt 0) {
     Write-Host ""
-    Write-Error "SymLink 作成中にエラーが発生しました。Windows Developer Mode が有効か確認してください (Settings > Privacy & Security > For developers > Developer Mode を ON)。"
+    Write-Error "SymLink 作成中にエラーが発生しました。Windows Developer Mode が有効か確認してください (Settings > Privacy and Security > For developers > Developer Mode を ON)。"
     foreach ($e in $linkErrors) { Write-Host "  - $e" }
     exit 1
 }
@@ -136,5 +147,5 @@ if (-not $WhatIf) {
 Write-Host ""
 Write-Host "=== setup 完了 ==="
 Write-Host ""
-Write-Host "次回以降の PowerShell タブ起動時、欠けている SymLink は ~/.claude/scripts/powershell-utf8-profile.ps1"
-Write-Host "が自動補完します ($PROFILE で Invoke-Expression 経由読み込み済が前提)。"
+Write-Host "次回以降の PowerShell タブ起動時、欠けている SymLink は powershell-utf8-profile.ps1"
+Write-Host "が自動補完します。"

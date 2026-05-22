@@ -107,6 +107,13 @@
     "modern-web-guidance@googlechrome": true
   },
   "extraKnownMarketplaces": {
+    "anthropic-agent-skills": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/skills"
+      },
+      "autoUpdate": true
+    },
     "dotnet-agent-skills": {
       "source": {
         "source": "github",
