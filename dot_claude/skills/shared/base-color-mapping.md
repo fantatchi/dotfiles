@@ -10,7 +10,7 @@
 
 | スキル | デフォルト系統 | 直書き場所 |
 |---|---|---|
-| `spec-design` (HTML 補足) | **Vercel link blue** (`#0070f3`) + Inter / IBM Plex Sans JP | `spec-design/references/html-css-centralization.md` |
+| `spec-design` (HTML 補足) | **Vercel link blue** (`#0070f3`) + Inter / Noto Sans JP | `spec-design/references/html-css-centralization.md` |
 | `dashboard-design` (HTML / BI ツール / ダッシュボード) | **Blue 900** (`#0017C1`) + Noto Sans JP | `dashboard-design/SKILL.md` + `visual-encoding.md` |
 
 本ファイルは **別系統（Green / Orange / Light Blue / Cyan / Red）切替時の階調マッピング SSOT** として参照される。「§1 Blue デフォルト」は dashboard-design 視点の歴史的記述であり、spec-design の HTML 補足は本ファイルを直接の HEX 出典としては使わない（Vercel inspired を直書き採用）。

@@ -1,6 +1,6 @@
 ---
 name: spec-design
-description: 仕様書（specification / 設計ドキュメント / requirements / architecture）の設計・作成・レビューを担うロール変換型スキル。判断軸（読み手別の入口、UML/C4/BPMN の図種選択、ADR で意思決定分離、用語集を唯一の出典に、MUST/SHOULD/MAY の要件レベル語）+「全体像・なぜ・用語」3 点を手厚くカバーする具体テンプレ（README / ADR Nygard・MADR / C4 / glossary）。出力は md がメイン（Docs as Code）、視覚情報が主役のページのみ HTML 補足。仕様書を書く文脈での視覚設計判断も内蔵: HTML 補足のデフォルト CSS は Vercel inspired (`#0070f3` link blue + Inter / IBM Plex Sans JP、`references/html-css-centralization.md` 参照)、別系統 (Blue 900 / Green / Orange 等) への切替は `shared/base-color-mapping.md` の階調表、「伝わるデザイン」12 原則の参照誘導、**HTML 補足ページが複数あるときは共通 CSS への集約 SHOULD**（`:root` 固有変数のみ + `body.page-X` scope で衝突回避、`references/html-css-centralization.md`）。「仕様書」「specification」「設計ドキュメント」「ドキュメントレビュー」「ADR」「アーキテクチャ図」「C4 図」「設計書のテンプレート」「READMEを充実」「オンボーディング資料」「PDF 仕様書」「HTML 補足ページの CSS 集約」「仕様書 HTML の共通スタイル」「補足 HTML の共通 CSS 化」等で自動起動。**棲み分け**: 視覚設計の入口（「ダッシュボード作って」「カラーパレット選定」「ベースカラー何にする」「伝わるデザイン」「HTML 補足ページのデザイン」「文書の配色・タイポグラフィ」）は dashboard-design、対話的な文章共著は doc-coauthoring、本スキルは構造・判断軸・テンプレで「仕様書ロール」に変換する。単発の図描画（コードレビュー補助図・スケッチ用途）には起動しない。
+description: 仕様書（specification / 設計ドキュメント / requirements / architecture）の設計・作成・レビューを担うロール変換型スキル。判断軸（読み手別の入口、UML/C4/BPMN の図種選択、ADR で意思決定分離、用語集を唯一の出典に、MUST/SHOULD/MAY の要件レベル語）+「全体像・なぜ・用語」3 点を手厚くカバーする具体テンプレ（README / ADR Nygard・MADR / C4 / glossary）。出力は md がメイン（Docs as Code）、視覚情報が主役のページのみ HTML 補足。仕様書を書く文脈での視覚設計判断も内蔵: HTML 補足のデフォルト CSS は Vercel inspired (`#0070f3` link blue + Inter / Noto Sans JP、`references/html-css-centralization.md` 参照)、別系統 (Blue 900 / Green / Orange 等) への切替は `shared/base-color-mapping.md` の階調表、「伝わるデザイン」12 原則の参照誘導、**HTML 補足ページが複数あるときは共通 CSS への集約 SHOULD**（`:root` 固有変数のみ + `body.page-X` scope で衝突回避、`references/html-css-centralization.md`）。「仕様書」「specification」「設計ドキュメント」「ドキュメントレビュー」「ADR」「アーキテクチャ図」「C4 図」「設計書のテンプレート」「READMEを充実」「オンボーディング資料」「PDF 仕様書」「HTML 補足ページの CSS 集約」「仕様書 HTML の共通スタイル」「補足 HTML の共通 CSS 化」等で自動起動。**棲み分け**: 視覚設計の入口（「ダッシュボード作って」「カラーパレット選定」「ベースカラー何にする」「伝わるデザイン」「HTML 補足ページのデザイン」「文書の配色・タイポグラフィ」）は dashboard-design、対話的な文章共著は doc-coauthoring、本スキルは構造・判断軸・テンプレで「仕様書ロール」に変換する。単発の図描画（コードレビュー補助図・スケッチ用途）には起動しない。
 ---
 
 # 仕様書設計ロール
@@ -123,12 +123,12 @@ HTML 補足ページを新規に生成する際の **既定のスタイルは Ve
 | `--accent` (リンク / ハイライト) | `#0070f3` (Vercel link blue) | `references/html-css-centralization.md` |
 | `--accent-bg` (背景アクセント) | `#d3e5ff` | 同上 |
 | `--accent-ink` (CTA black bar) | `#171717` | 同上 |
-| 日本語フォント | IBM Plex Sans JP | 同上 |
+| 日本語フォント | Noto Sans JP | 同上 |
 | ラテンフォント | Inter | 同上 |
-| 等幅フォント | IBM Plex Mono | 同上 |
+| 等幅フォント | JetBrains Mono | 同上 |
 | UD 保険 fallback | BIZ UDPGothic | `references/communicative-design.md` 原則 7 |
 
-採用理由: Vercel の calm-technical aesthetic (stark monochrome + ink-blue link + stacked shadow) が技術ドキュメントと相性が良く、IBM Plex Sans JP は Inter とペアリングする企業グレード幾何学 sans として読みやすさを担保するため (詳細は `references/html-css-centralization.md` 冒頭)。
+採用理由: Vercel の calm-technical aesthetic (stark monochrome + ink-blue link + stacked shadow) が技術ドキュメントと相性が良く、Noto Sans JP は日本語コミュニティの事実上の標準で OS 横断で読みやすさを担保するため。JetBrains Mono は等幅で技術文書のコード/数値表示に向く (詳細は `references/html-css-centralization.md` 冒頭)。
 
 優先順位:
 
@@ -222,7 +222,7 @@ docs/
 
 ### Step 3: スタイルを既存に合わせる
 
-Step 1 で把握したスタイルを踏襲して生成。CSS / breadcrumb / footer / page-nav は **既存ファイルからほぼコピー** し、色変数（`--accent` 等）だけトピックに応じて選び直す。新規プロジェクトや既存スタイルが無い場合、`--accent` は Vercel link blue (`#0070f3`) を採用、フォントは Inter + IBM Plex Sans JP（§「デフォルト CSS テンプレートと配色（Vercel inspired）」および `references/html-css-centralization.md` 参照）。別系統 (Blue 900 / Green 等) を採用したい場合は `shared/base-color-mapping.md` §3 の階調表から HEX を引いて差し替え。
+Step 1 で把握したスタイルを踏襲して生成。CSS / breadcrumb / footer / page-nav は **既存ファイルからほぼコピー** し、色変数（`--accent` 等）だけトピックに応じて選び直す。新規プロジェクトや既存スタイルが無い場合、`--accent` は Vercel link blue (`#0070f3`) を採用、フォントは Inter + Noto Sans JP（「デフォルト CSS テンプレートと配色（Vercel inspired）」節および `references/html-css-centralization.md` 参照）。別系統 (Blue 900 / Green 等) を採用したい場合は `shared/base-color-mapping.md` の 3 節の階調表から HEX を引いて差し替え。
 
 新規プロジェクトで既存が無い場合は [references/skeletons.md](references/skeletons.md) の最小汎用骨格（HTML / Markdown / 用語集エントリ）、あるいは [references/templates.md](references/templates.md) の具体テンプレ（README / ADR Nygard・MADR / C4 PlantUML / 用語集）を fallback として使う。
 

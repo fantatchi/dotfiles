@@ -97,10 +97,10 @@
     sans-serif;
   ```
 
-  PDF も同系統で統一。Web 配信なら Google Fonts の `Noto Sans JP` を `@import` するのが OS 横断で最も安全（**注**: spec-design の HTML 補足ページのデフォルトは `IBM Plex Sans JP` + `Inter` を採用。`references/html-css-centralization.md` 参照。本節の Noto Sans JP は「UD フォント実務則の一般解説」として残し、スキルのデフォルトは別途指定）
+  PDF も同系統で統一。Web 配信なら Google Fonts の `Noto Sans JP` を `@import` するのが OS 横断で最も安全（**注**: spec-design の HTML 補足ページのデフォルトも `Inter` + `Noto Sans JP` を採用。`references/html-css-centralization.md` 参照）
 - **出典**: <https://tsutawarudesign.com/yomiyasuku1.html>, <https://tsutawarudesign.com/yomiyasuku2.html>, <https://tsutawarudesign.com/universal2.html>
 - **注記**: 原典は「游ゴシック / メイリオ」推奨で UD フォント指定は明示されていない。BIZ UDPGothic（Windows 同梱の UD フォント）/ Noto Sans JP（Google Fonts）の優先指定は **アクセシビリティ実務則** として本ガイドが追加した
-- **企業グレード幾何学 sans を採用する場合の運用則**: `references/html-css-centralization.md` のデフォルト CSS は IBM Plex Sans JP（IBM Plex ファミリーの日本語版）を採用。IBM Plex Sans JP は **UD 認定書体ではない** が、Vercel の Geist と同じ幾何学骨格で技術ドキュメントとの相性が良いため採用している。実務則 (UD 保険) として `BIZ UDPGothic` を fallback の 3 位以内に必ず残すこと、これにより Google Fonts CDN 遮断時 (社内 LAN proxy 等) は BIZ UDPGothic に落ちる構造を担保する
+- **運用則（CDN 遮断時の UD 保険）**: spec-design のデフォルト CSS は平時 Noto Sans JP で表示される。Google Fonts CDN が遮断される環境（社内 LAN proxy 等）では `BIZ UDPGothic` に fallback して UD 保険が発動する構造になっている。`--font-sans` の並び順で `BIZ UDPGothic` を Latin 系の直後 3 位以内に置くことでこの fallback chain を担保する
 
 ### 8. 行間・行長を可読域に収める
 

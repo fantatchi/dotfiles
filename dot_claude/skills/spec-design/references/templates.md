@@ -313,7 +313,7 @@ HTML 補足ページは **サマリー / 概況 / 比較・対比 / 配色で意
   <title>[システム名] サマリー</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Sans+JP:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
   <link rel="stylesheet" href="../_shared/spec-page.css">
   <style>
     /* ===== summary.html 固有 CSS 変数のみ =====
@@ -401,7 +401,7 @@ body.page-summary .card h3 {
 
 body.page-summary .card .value {
   font-size: 28px;
-  font-weight: 700;
+  font-weight: 600;             /* Vercel display ceiling = 600 (700 へ昇格しない) */
   color: var(--text);
 }
 ```
@@ -414,7 +414,7 @@ body.page-summary .card .value {
 <head>
   <meta charset="UTF-8">
   <title>[項目] 比較</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Sans+JP:wght@300;400;500;600&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
   <link rel="stylesheet" href="../_shared/spec-page.css">
   <style>
     /* ===== compare.html 固有 CSS 変数のみ ===== */
@@ -470,12 +470,12 @@ body.page-compare table.compare {
 
 body.page-compare .verdict.yes {
   color: var(--verdict-yes);
-  font-weight: 700;
+  font-weight: 600;             /* Vercel display ceiling = 600 */
 }
 
 body.page-compare .verdict.no {
   color: var(--verdict-no);
-  font-weight: 700;
+  font-weight: 600;             /* Vercel display ceiling = 600 */
 }
 
 body.page-compare .verdict.partial {
