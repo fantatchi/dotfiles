@@ -158,8 +158,8 @@ LOW: 変数名 `d` を `deliveryDate` に変えると可読性が上がります
 
 # スキルコマンド
 
-- `/context-load` — `.claude/context.md` からコンテキストを復帰
-- `/context-save` — プロジェクトコンテキストを `.claude/context.md` に保存
+- `/context-load` — `.claude/context.md` からコンテキストを復帰し、`tasks.md` の該当プロジェクト Next / Waiting も併せて提示
+- `/context-save` — プロジェクトコンテキストを `.claude/context.md` に保存。`## 進行中の作業` は日付プレフィックス付き entry で記録し 14 日でローテーション。セッションで生まれた次アクションを `tasks.md` の `## Next` に吸い上げ、`.claude/progress.md` があれば更新する
 - `/dashboard-design` — デジタル庁ガイドブック準拠の視覚設計レイヤー（配色・タイポ・チャート選択・アクセシビリティ）。視覚設計系トリガー語（ダッシュボード / KPI / グラフ種 / カラーパレット / 伝わるデザイン / HTML 補足ページのデザイン等）はここに集約。spec-design とは補完関係
 - `/gtd-add` — `~/ObsidianVault/00_meta/tasks.md` の Inbox にタスクを追加（Obsidian Sync で全 PC 共通）
 - `/gtd-done` — 指定タスクを完了にし Done セクションへ移動
