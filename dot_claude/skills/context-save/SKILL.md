@@ -42,7 +42,7 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git:*), Bash(echo:*), Bash(mkdir:*)
 - **重要ファイル**: 作業に関連する主要ファイル（プロジェクトルートからの相対パス）
 - **関連リポジトリ履歴**（ホームワークスペース用）: `chezmoi source-path` でパスを取得し、`git -C <path> log --oneline -n 5` と `git -C <path> remote get-url origin` を「関連リポジトリ」セクションに埋め込む。コマンド失敗時はスキップ
 
-**次のステップについて**: 次回セッションで着手すべきタスクは context.md には書かない。タスクの記録は本スキルの責務外（必要があれば呼び出し側で別途タスク管理の手段を実行する）。
+**次のステップについて**: 次回セッションで着手すべきタスクは context.md には書かず、`~/ObsidianVault/00_meta/tasks.md` の `## Next` セクションに `#project/<name>` タグ付きで追記する（手順は下記「tasks.md への書き出し」参照）。context.md がプロジェクト固有なのに対し tasks.md は全プロジェクト横断の共有ストアであり、context-save はその吸い上げ窓口となる責務を持つ。
 
 ### 既存ファイルの扱い
 
@@ -51,7 +51,7 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git:*), Bash(echo:*), Bash(mkdir:*)
 - `## プロジェクト概要` は既存の内容を引き継ぎつつ、必要なら更新
 - それ以外のセクション（ブランチ・状態、進行中の作業など）は最新情報で上書き
 - `updated` の日時を更新する
-- 過去に `## 次のステップ` セクションが残っている場合は**削除**する（タスクは別スキルで管理する責務）
+- 過去に `## 次のステップ` セクションが残っている場合は**削除**する（タスクは tasks.md に一本化、context.md には書かない）
 
 ## 進行中の作業のローテーション
 
@@ -77,6 +77,29 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git:*), Bash(echo:*), Bash(mkdir:*)
 - `## 判断メモ` セクションは時間でローテーションしない（再利用される普遍知見のため）。MEMORY.md への昇格判断は「情報の収集」セクションの **判断メモ** 項目を参照
 - `## 関連リポジトリ` の「直近のコミット」リストは保存ごとに最新 5-6 件に丸める（既存挙動）
 - 日付パースが失敗した entry（プレフィックスが想定形式と異なる）は **保守的に残す**（誤削除より誤残存を選ぶ）
+
+## tasks.md への書き出し
+
+セッション中に発生した「次回セッションで着手すべきアクション」を `~/ObsidianVault/00_meta/tasks.md` の `## Next` セクションに追記する。これは「context.md は project-local / tasks.md は cross-project の共有ストア」という分業の橋渡しが context-save の責務であるため。
+
+**フォーマット規約は `~/.claude/skills/shared/tasks-format.md` を SSOT として参照する**。タイトル文字数規則（60-100 文字中心、150 文字絶対上限）・タスク行構造・プロジェクトタグ規約はすべて shared 側に従う（本 SKILL.md で再掲しない）。`gtd-add` は同じ規約に従って Inbox へ書き、本スキルは Next へ書く、という書き込み先の違いだけの分業。
+
+### 手順
+
+1. `~/ObsidianVault/00_meta/tasks.md` を Read で読む
+   - **Vault 未配備の場合**（`~/ObsidianVault/.obsidian/` も存在しない）: 全手順スキップ（context.md 本体の保存・ローテーションには影響しない）
+   - **Vault 配備済みかつ tasks.md 不存在**: 初期テンプレ生成は本スキルでは行わない（責務外。`/gtd-add` 等で初期化してから再実行を案内）
+2. 現在プロジェクトのタグを決定: `#project/<basename of git toplevel>`（git 外なら CWD 名、`$HOME` 完全一致なら `#project/global`）
+3. セッション中に発生した「次に着手すべきアクション」を抽出
+4. shared/tasks-format.md の規則に従ってタイトル文字数チェック（150 文字超は書き込み禁止、短縮するまで中止）
+5. 既に同内容のタスクが `## Inbox` / `## Next` / `## Waiting` にある場合は重複追加しない（部分一致で判定）
+6. `## Next` セクションに `- [ ] #project/<name> タイトル` 形式で追記し、Edit で書き戻す
+
+### 追加対象の判断基準
+
+- 明確に「次にやること」として合意されたアクションのみ追加する
+- 推測や「やったほうがいいかも」レベルは追加しない（思いつき・未分類は Inbox 起きの判断として `gtd-add` 側に委ねる）
+- タスクが発生していない場合はスキップしてよい
 
 ## 進捗マップの更新
 

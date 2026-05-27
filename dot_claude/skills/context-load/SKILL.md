@@ -28,6 +28,19 @@ allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(echo:*), Bash(basename:*), Ba
 
 `{project-root}/.claude/context.md` を読み込み、内容を把握する。
 
+### 1-b. タスクの読み込み
+
+`~/ObsidianVault/00_meta/tasks.md` を読み込み、現在プロジェクトのタスクを抽出する。tasks.md は context-save が各セッションで吸い上げた「次のアクション」を全プロジェクト横断で集約する共有ストア。context-load 時にここを参照することで、セッション開始時に「前回までに次やる予定にしたこと」が即座に見える。
+
+フォーマット規約は `~/.claude/skills/shared/tasks-format.md` を参照（context-save と同じ SSOT）。
+
+1. tasks.md を Read で読む
+   - **Vault 未配備の場合**（`~/ObsidianVault/.obsidian/` も存在しない）または **tasks.md 不存在**: ステップ 1-b ごとスキップ（context.md 本体の読み込みには影響しない）
+2. プロジェクトタグを決定: `#project/<basename of git toplevel>`（または CWD 名、`$HOME` 完全一致なら `#project/global`）
+3. `## Next` / `## Waiting` セクションから該当プロジェクトタグを持つタスクを抽出
+4. 存在すれば「次のステップ」として提示に含める（ステップ 3 参照）
+5. 該当タスクが 0 件の場合は「次のステップなし」とする
+
 ### 2. 現在の git 状態との比較
 
 保存時と現在の状態を比較し、差分があれば警告する：
@@ -63,6 +76,10 @@ allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(echo:*), Bash(basename:*), Ba
 ### 進行中の作業
 （作業内容）
 
+### 次のステップ（tasks.md より）
+- [ ] （Next から抽出したタスク）
+- [ ] （Waiting から抽出したタスク） ⏳ 待ち
+
 ### 関連リポジトリ（context.md に該当セクションがある場合のみ）
 - **dotfiles (chezmoi)**: `<git remote URL>`
   - 直近のコミット: `<コミットサマリ>`
@@ -73,10 +90,12 @@ allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(echo:*), Bash(basename:*), Ba
 ```
 
 - 「進捗マップ」は `.claude/progress.md`（優先）または CLAUDE.md の `## 進捗マップ` セクション（後方互換）がある場合のみ表示する。どちらもない場合はセクションごと省略する
+- 「次のステップ」は `~/ObsidianVault/00_meta/tasks.md` から該当プロジェクトの Next / Waiting を抽出して表示する。Vault 未配備・tasks.md 不存在の場合はセクションごと省略
+- Waiting のタスクには ⏳ マーカーを付けて区別する
+- タスクが 0 件の場合は「次のステップなし。`/gtd-add` で追加できます。」と表示
 - 「関連リポジトリ」は context.md に `## 関連リポジトリ` セクションがある場合のみ表示する。ない場合はセクションごと省略する
-- **次のステップは表示しない**（タスク管理は本スキルの責務外）。セッション開始時にタスク確認が必要であれば、ユーザーが別途タスク表示の手段を呼ぶ
 
 ## 注意事項
 
-- 読み込み専用。コンテキストファイル・progress.md を変更しない
+- 読み込み専用。コンテキストファイル・tasks.md・progress.md を変更しない
 - パスはプロジェクトルートからの相対パスで記録されているため、現在のマシンのパスと異なる場合がある
