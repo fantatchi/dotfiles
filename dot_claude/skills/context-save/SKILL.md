@@ -42,7 +42,7 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git:*), Bash(echo:*), Bash(mkdir:*)
 - **重要ファイル**: 作業に関連する主要ファイル（プロジェクトルートからの相対パス）
 - **関連リポジトリ履歴**（ホームワークスペース用）: `chezmoi source-path` でパスを取得し、`git -C <path> log --oneline -n 5` と `git -C <path> remote get-url origin` を「関連リポジトリ」セクションに埋め込む。コマンド失敗時はスキップ
 
-**次のステップについて**: 次回セッションで着手すべきタスクは context.md には書かず、`~/ObsidianVault/00_meta/tasks.md` の `## Next` セクションに `#project/<name>` タグ付きで追記する（手順は下記「tasks.md への書き出し」参照）。
+**次のステップについて**: 次回セッションで着手すべきタスクは context.md には書かない。外部タスクストア（例: Obsidian Vault `~/ObsidianVault/00_meta/tasks.md`）を運用している場合のみ、そちらの `## Next` セクションに `#project/<name>` タグ付きで追記する（手順は下記「tasks.md への書き出し（オプション）」参照）。タスクストアがない環境ではこのステップごとスキップ。
 
 ### 既存ファイルの扱い
 
@@ -61,7 +61,7 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git:*), Bash(echo:*), Bash(mkdir:*)
 
 - **削除対象**: entry 先頭の日付（`- YYYY-MM-DD...` プレフィックス）が **今日から 14 日より古い** もの
 - **最低保証**: 削除後の entry 数が 3 件未満になる場合、新しい順に 3 件は必ず残す（時系列の連続性を保つための保険）
-- **情報源**: 削除した entry の本文は `~/ObsidianVault/_claude/log/YYYYMM/` 配下の作業ログに既に記録されているため、context.md からの削除で情報損失は発生しない。過去を参照したい場合は `grep -r <キーワード> ~/ObsidianVault/_claude/log/` で辿る
+- **情報源（前提）**: 削除した entry の本文は **外部の作業ログ**（Obsidian Vault `_claude/log/YYYYMM/`、git log、別途記録したメモ等）に残っている前提で動く。外部ログを併用していない環境では削除前に内容を確認するか、運用に合わせて閾値を伸ばす判断をユーザーに委ねる。context.md ローテーション自体は外部ログの有無に依存せず動作する
 
 ### 手順
 
@@ -70,7 +70,7 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git:*), Bash(echo:*), Bash(mkdir:*)
 3. 各 entry 先頭の日付（`- YYYY-MM-DD` 部分のみ、`（午後・完了）` 等は無視）をパースし、今日との日数差を計算
 4. 「14 日以内 (= 今日 − 14 日 以降)」の entry に加え、それでも 3 件未満なら新しい順に 3 件まで補充
 5. 残った entry を新しい順で並べ、書き戻す
-6. 削除した entry がある場合は、書き戻し後に「（古い N 件は `~/ObsidianVault/_claude/log/` に履歴あり）」と末尾に 1 行追記してもよい（推奨）
+6. 削除した entry がある場合は、書き戻し後に「（古い N 件は外部ログに履歴あり）」など 1 行の注記を末尾に追記してもよい（推奨、外部ログを併用している環境のみ）
 
 ### 注意
 
@@ -78,13 +78,15 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git:*), Bash(echo:*), Bash(mkdir:*)
 - `## 関連リポジトリ` の「直近のコミット」リストは保存ごとに最新 5-6 件に丸める（既存挙動）
 - 日付パースが失敗した entry（プレフィックスが想定形式と異なる）は **保守的に残す**（誤削除より誤残存を選ぶ）
 
-## tasks.md への書き出し
+## tasks.md への書き出し（オプション）
 
-次回セッションで着手すべきタスクは `~/ObsidianVault/00_meta/tasks.md` の `## Next` セクションに追記する。フォーマットは `~/.claude/skills/shared/tasks-format.md` を参照。
+**前提**: 外部タスクストアを運用している環境のみ動く。本リポジトリ標準は Obsidian Vault `~/ObsidianVault/00_meta/tasks.md` だが、別パス・別フォーマットでも構わない。ファイルが存在しない環境ではこのセクションごとスキップする（context.md 本体の保存・ローテーションには影響しない）。
+
+フォーマットは `~/.claude/skills/shared/tasks-format.md` を参照。
 
 ### 手順
 
-1. `~/ObsidianVault/00_meta/tasks.md` を Read で読む（なければ初期テンプレートで作成）
+1. タスクストア（既定: `~/ObsidianVault/00_meta/tasks.md`）を Read で読む。**ファイルが存在しなければ全手順スキップ**（自動作成しない。タスクストアの初期化はユーザー判断）
 2. 現在プロジェクトのタグを決定: `#project/<basename of git toplevel>`
 3. セッション中に発生した「次に着手すべきアクション」を抽出し、以下の形式で追記対象を組み立てる：
    ```
