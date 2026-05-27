@@ -41,3 +41,38 @@
 
 - **操作型スキル**（obsidian-*, gtd-*, session-*, context-* など）: 特定のコマンドやファイル操作を行うため、`allowed-tools` で使用ツールを具体的に列挙する
 - **ロール変換型スキル**: エージェントを特定の専門家役に変身させ、その後の作業全般を導くため、`allowed-tools` を**指定しない**（指定するとトリガー後の実作業で権限不足になる）
+
+## MEMORY.md（auto memory）への昇格運用
+
+`~/.claude/projects/<project>/memory/` 配下の **auto memory** システムは、ユーザー指示や Claude の自律判断で `feedback_*.md` / `user_*.md` / `project_*.md` / `reference_*.md` を保存し、`MEMORY.md` 索引から全セッションで参照される仕組み。
+
+context.md の判断メモが時間経過で肥大化するため、再利用性の高い知見は MEMORY.md に昇格させる運用ガイドを設ける（context-save SKILL.md からも参照する）。
+
+### 昇格判断の基準
+
+context.md の `## 判断メモ` に書いた項目のうち、以下のいずれかに該当するものは MEMORY.md への昇格を検討する：
+
+- **プロジェクト横断で再利用される**: 1 プロジェクトで得た知見が他プロジェクトでも有効（コミット粒度ルール、ツール固有の罠、ライブラリ選定基準、CLI フラグの落とし穴 etc.）
+- **2 回以上参照されている**: 同じ判断を別セッションで再度引用したことがある（再現性のあるパターン）
+- **環境前提が普遍的**: WSL ↔ Windows、Bash の罠、PowerShell の挙動など特定環境に依存しない知見
+- **ユーザー嗜好・運用ルール**: コミット/push の粒度ルール、Agent Teams を使う条件、レビュー粒度の好み等
+
+逆に **昇格しない（context.md に留める）** もの：
+
+- **特定プロジェクトのアーキテクチャ判断**: そのプロジェクト固有の設計理由（kabuto の Phase 6 戦略、cloud-dsc の認証フロー等）
+- **一過性のバグ修正経緯**: 特定 commit 由来の問題で再発しないもの
+- **作業の時系列ログ**: 「2026-MM-DD に X した」は context.md の進行中の作業セクション側
+
+### 昇格の手順
+
+1. context.md `## 判断メモ` で再利用候補を抽出
+2. memory 種別を判定（feedback / user / project / reference）
+3. `~/.claude/projects/<project>/memory/<type>_<slug>.md` を frontmatter 付き（`name` / `description` / `metadata.type`）で書く。本文は **Why** と **How to apply** を明示
+4. `~/.claude/projects/<project>/memory/MEMORY.md` 索引に 1 行追加（150 文字以内）
+5. context.md 側の元エントリは削除（移行完了）、または「→ MEMORY.md `<name>` 参照」と短縮
+
+### 注意
+
+- MEMORY.md は **`~/.claude/CLAUDE.md`** から auto memory システム指示で読み込まれる（claude code 起動時自動）。グローバル CLAUDE.md の指示と矛盾する内容は書かない
+- 「保存しない」とユーザーが言うものは保存しない（明示拒否を優先）
+- 機密・認証情報は絶対に書かない（CLAUDE.md「# 禁止パターン」準拠）

@@ -18,6 +18,8 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git:*), Bash(echo:*), Bash(mkdir:*)
 
 `../context-save/SKILL.md` の手順に完全に従う。書き出し先・フォーマット等は SKILL.md 側が正。
 
+**context-save は `.claude/context.md` の保存だけでなく、`## 進行中の作業` の 14 日ローテーション・`~/ObsidianVault/00_meta/tasks.md` の `## Next` への次アクション吸い上げ・`.claude/progress.md` の更新まで含む複合動作である**。session-save 経由でもこれら全てが実行される。詳細は context-save SKILL.md 側で管理されるので、本ファイルでは再記述しない（齟齬防止）。
+
 ### ステップ 3: アウトプット提案
 
 セッション全体を振り返り、アウトプットできそうなトピックがないか確認する。

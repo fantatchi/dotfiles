@@ -2,6 +2,21 @@
 
 タスク管理スキル（`gtd-add`, `gtd-list`, `gtd-done`）および `context-save`, `context-load`, `obsidian-daily` が共通で参照するフォーマット定義。
 
+## スキル別の書き込み・読み出し責務
+
+各スキルは本ファイルを SSOT として参照するが、書き込み先のセクションは責務ごとに分かれる：
+
+| スキル | 動詞 | 対象セクション | 役割 |
+|---|---|---|---|
+| `gtd-add` | 追加（write） | `## Inbox` | 思いつき・未分類タスクをまず Inbox に入れる |
+| `gtd-list` | 表示（read） | 全セクション | 条件に応じてフィルタ表示 |
+| `gtd-done` | 完了化（write） | `## Done` へ移動 | 完了行を Done セクションへ昇格 + 日付付与 |
+| `context-save` | 追加（write） | `## Next` | セッションで明確に合意された「次に着手するアクション」を Next に吸い上げ。`#project/<name>` タグ付き、context.md がプロジェクト固有なのに対し tasks.md は全プロジェクト横断の共有ストア、という分業の橋渡しを担う |
+| `context-load` | 表示（read） | `## Next` / `## Waiting` | セッション開始時に該当プロジェクトの Next / Waiting を提示 |
+| `obsidian-daily` | 表示（read） | 全セクション | 日報・サマリーへの集約 |
+
+**設計原則**: `gtd-add` と `context-save` は「同じ規約（本ファイル）に従う異なる書き込み先」の分業。Inbox / Next のセクション境界は固定で、Inbox から Next への昇格はユーザーまたは `gtd-done` 系の操作に委ねる（自動昇格は行わない）。本 SSOT がフォーマット規約（タスク行形式・文字数規則・タグ規則）の唯一の正本であり、各スキルはこれを再記述しない。
+
 ## 場所
 
 - **正本**: `~/ObsidianVault/00_meta/tasks.md`（グローバル、Vault 配下）
