@@ -134,7 +134,7 @@ LOW: 変数名 `d` を `deliveryDate` に変えると可読性が上がります
 `~/.claude/settings.json` と `~/.claude/settings.local.json` は Claude Code がマージして読む。新しい permission や設定を追加するときはどちらに書くかを必ず判断する。
 
 - **settings.json（chezmoi 管理、全マシン共通）** に入れるもの:
-  - `hooks`（obsidian-log / context-save / stop / notification など）
+  - `hooks`（context-save / claude-md-audit-reminder / notification など）
   - `enabledPlugins`、`extraKnownMarketplaces`
   - UI/挙動の共通設定: `permissions.defaultMode`、`skipAutoPermissionPrompt`、`tui`、`alwaysThinkingEnabled`、`autoUpdatesChannel`
   - 全マシンで必要な共通 permissions（基本 Bash 系、`deny` の secrets 系など）
