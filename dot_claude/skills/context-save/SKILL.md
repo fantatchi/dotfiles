@@ -91,7 +91,7 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git:*), Bash(echo:*), Bash(mkdir:*)
    - **Vault 配備済みかつ tasks.md 不存在**: 初期テンプレ生成は本スキルでは行わない（責務外。`/gtd-add` 等で初期化してから再実行を案内）
 2. 現在プロジェクトのタグを決定: `#project/<basename of git toplevel>`（git 外なら CWD 名、`$HOME` 完全一致なら `#project/global`）
 3. セッション中に発生した「次に着手すべきアクション」を抽出
-4. shared/tasks-format.md の規則に従ってタイトル文字数チェック（150 文字超は書き込み禁止、短縮するまで中止）
+4. shared/tasks-format.md の文字数規則に従ってタイトル長をチェックし、上限を超える場合は短縮するまで書き込みを中止する（具体的な閾値は shared 側を SSOT とし、本 SKILL.md に数値を再掲しない）
 5. 既に同内容のタスクが `## Inbox` / `## Next` / `## Waiting` にある場合は重複追加しない（部分一致で判定）
 6. `## Next` セクションに `- [ ] #project/<name> タイトル` 形式で追記し、Edit で書き戻す
 
