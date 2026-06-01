@@ -154,6 +154,7 @@ LOW: 変数名 `d` を `deliveryDate` に変えると可読性が上がります
 - **`run_before_*` は `chezmoi diff` に常に出る**: `run_before_` スクリプトは毎回 apply 時に実行されるため、diff がクリアにならないのは正常動作。`run_onchange_` はハッシュ変化時のみ実行されるので diff に出ない
 - **リモートブランチ削除を `gh api` で回避する**: `git push origin --delete <branch>` がシステム側のブロックで弾かれる環境では、`gh api --method DELETE repos/<owner>/<repo>/git/refs/heads/<branch>` が代替になる。PR マージ後のブランチ片付けに使える
 - **Git Bash で `gh api` のエンドポイント先頭スラッシュ**: Git Bash / MSYS は `gh api /repos/...` の先頭スラッシュを Windows パス（`C:/Program Files/Git/repos/...`）に変換してしまい、`invalid API endpoint` エラーになる。先頭スラッシュを外して `gh api repos/...` と書く
+- **`gh api search/...` のクエリ内 `+` エンコード**: `gh api "search/...?q=...committer-date:...T00:00:00+09:00.."` のように **TZ offset を生の `+` で書くと、GitHub Search が `+` をクエリ語の区切り（スペース）として解釈** し、日付範囲フィルタが壊れて **全件 0 で返る**（`q=` 内では qualifier 連結の `+` と日付値内の `+09:00` が同じ文字で衝突する）。TZ offset の `+` は必ず `%2B` にエンコードする（`T00:00:00%2B09:00`）。または `gh api search/issues --raw-field "q=author:X type:pr merged:...+09:00.."` で gh にエンコードさせる。検証: 生の `+09:00` → `total_count=0` / `%2B09:00` → 正しくヒット。2026-06-01 の `/obsidian-daily` で全 commit/PR が 0 件になった真因
 - **管理者権限が必要な Windows コマンドを UAC 経由で実行**: 通常 PS から `wevtutil sl ... /e:true` 等を打つと `Access denied (exit 5)` になる。`Start-Process powershell -Verb RunAs -WindowStyle Hidden -ArgumentList '-NoProfile','-Command','...' -Wait` で UAC 昇格すると、ユーザーが UAC ダイアログで「はい」を押すだけで管理者シェルから実行される。複数コマンドをまとめたい時は `-EncodedCommand` で base64 エンコードした 1 つの大きい command として渡すと改行・引用符のエスケープを気にせず済む。実行直後は `-Wait` で完了を待ち、結果は通常 PS 側で `wevtutil gl` 等を再実行して verify する運用
 
 # スキルコマンド

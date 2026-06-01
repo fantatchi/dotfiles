@@ -76,15 +76,23 @@ Git Bash 環境では `gh api '/search/...'` の **先頭スラッシュ** が W
 ユーザーは JST 帯で運用するため、各クエリの日付絞り込みは **必ず JST offset 付き range 構文** を使う:
 
 ```
-<FIELD>:<TARGET_DATE>T00:00:00+09:00..<TARGET_DATE>T23:59:59+09:00
+<FIELD>:<TARGET_DATE>T00:00:00%2B09:00..<TARGET_DATE>T23:59:59%2B09:00
 ```
 
 TZ offset を省くと GitHub Search は **UTC として解釈** するため、JST 0:00〜9:00 の commit が前日扱いになって漏れ、JST 翌 0:00〜9:00 の commit が当日に混入する。
 
+### TZ offset の `+` は必ず `%2B` にエンコード（致命的、必須）
+
+`gh api "search/...?q=...committer-date:...T00:00:00+09:00.."` のように **TZ offset を生の `+` で書くと、GitHub Search が `+` をクエリ語の区切り（スペース）として解釈** し、`committer-date:...T00:00:00` と `09:00..` が別トークンに割れて **日付範囲フィルタが壊れ、全件 0 で返る**。`q=` 内では qualifier 連結の `+`（`author:X+type:pr` の `+`）と日付値内の `+`（`+09:00`）が同じ文字なので衝突する。
+
+**TZ offset の `+` は必ず `%2B` にエンコードする**こと（`T00:00:00%2B09:00`）。検証: 生の `+09:00` → `total_count=0` / `%2B09:00` → 正しくヒット。
+
+過去事例: 2026-06-01 の `/obsidian-daily` で全 commit/PR が 0 件になった真因（当日 13 commit + PR #322 マージが丸ごと欠落）。2026-05-13 の kentem-at-kato 活動欠落も auth 不一致だけでなくこの `+` 衝突が同時に効いていた可能性が高い。CLAUDE.md「Git Bash で `gh api` のクエリ内 `+` エンコード」参照。
+
 ### 3a. コミット
 
 ```bash
-gh api 'search/commits?q=author:<ACCOUNT>+committer-date:<TARGET_DATE>T00:00:00+09:00..<TARGET_DATE>T23:59:59+09:00&sort=committer-date&order=asc&per_page=100' \
+gh api 'search/commits?q=author:<ACCOUNT>+committer-date:<TARGET_DATE>T00:00:00%2B09:00..<TARGET_DATE>T23:59:59%2B09:00&sort=committer-date&order=asc&per_page=100' \
   --header 'Accept: application/vnd.github.cloak-preview+json'
 ```
 
@@ -95,7 +103,7 @@ gh api 'search/commits?q=author:<ACCOUNT>+committer-date:<TARGET_DATE>T00:00:00+
 ### 3b. PR（作成）
 
 ```bash
-gh api 'search/issues?q=author:<ACCOUNT>+type:pr+created:<TARGET_DATE>T00:00:00+09:00..<TARGET_DATE>T23:59:59+09:00&per_page=100'
+gh api 'search/issues?q=author:<ACCOUNT>+type:pr+created:<TARGET_DATE>T00:00:00%2B09:00..<TARGET_DATE>T23:59:59%2B09:00&per_page=100'
 ```
 
 抽出: タイトル、URL（html_url）、リポジトリ名、状態
@@ -103,7 +111,7 @@ gh api 'search/issues?q=author:<ACCOUNT>+type:pr+created:<TARGET_DATE>T00:00:00+
 ### 3c. PR（マージ）
 
 ```bash
-gh api 'search/issues?q=author:<ACCOUNT>+type:pr+merged:<TARGET_DATE>T00:00:00+09:00..<TARGET_DATE>T23:59:59+09:00&per_page=100'
+gh api 'search/issues?q=author:<ACCOUNT>+type:pr+merged:<TARGET_DATE>T00:00:00%2B09:00..<TARGET_DATE>T23:59:59%2B09:00&per_page=100'
 ```
 
 抽出: タイトル、URL（html_url）、リポジトリ名
@@ -111,7 +119,7 @@ gh api 'search/issues?q=author:<ACCOUNT>+type:pr+merged:<TARGET_DATE>T00:00:00+0
 ### 3d. レビュー
 
 ```bash
-gh api 'search/issues?q=reviewed-by:<ACCOUNT>+type:pr+updated:<TARGET_DATE>T00:00:00+09:00..<TARGET_DATE>T23:59:59+09:00&per_page=100'
+gh api 'search/issues?q=reviewed-by:<ACCOUNT>+type:pr+updated:<TARGET_DATE>T00:00:00%2B09:00..<TARGET_DATE>T23:59:59%2B09:00&per_page=100'
 ```
 
 抽出: タイトル、URL（html_url）、リポジトリ名、状態
@@ -327,7 +335,7 @@ author: at-kato
 
 ## 注意事項
 
-- GitHub Search API の日付絞り込みは **TZ 省略時 UTC 解釈**。JST 帯運用では §3「日付絞り込みの TZ」に従い `+09:00` offset 付き range 構文を使う
+- GitHub Search API の日付絞り込みは **TZ 省略時 UTC 解釈**。JST 帯運用では §3「日付絞り込みの TZ」に従い `%2B09:00`（`+09:00` の URL エンコード）offset 付き range 構文を使う。**生の `+09:00` は `q=` 内でスペース扱いされ範囲が壊れて全件 0 になる**（§3「TZ offset の `+` は必ず `%2B` にエンコード」参照）
 - 作業ログ のファイル名はタイムスタンプ（JST）ベースなので、`YYYYMMDD` の前方一致で正しくフィルタできる
 - Obsidian のリンク記法（`[[]]`）やコールアウト（`> [!info]`）を活用する
 - Windows 環境で `python` が無い場合は Python 3 をインストールしてから実行すること（`python3` は MS Store スタブの可能性があるので避ける）
