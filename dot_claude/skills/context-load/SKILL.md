@@ -70,6 +70,11 @@ allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(echo:*), Bash(basename:*), Ba
 ### プロジェクト概要
 （概要）
 
+### 現在の状態（context.md に `## 現在の状態` がある場合のみ）
+- **直近のコミット**: （保存時のコミット）
+- **未コミットの変更**: （あれば）
+- **オープン PR 等**: （あれば）
+
 ### 進捗マップ（.claude/progress.md より）
 （progress.md の内容をそのまま表示）
 
@@ -89,6 +94,7 @@ allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(echo:*), Bash(basename:*), Ba
 
 ```
 
+- 「現在の状態」は context.md に `## 現在の状態` がある場合のみ表示する。git 管理外（ホームワークスペース等）でセクションが無ければ省略する（ブランチは冒頭の `**ブランチ**` で出すため重複させない）
 - 「進捗マップ」は `.claude/progress.md`（優先）または CLAUDE.md の `## 進捗マップ` セクション（後方互換）がある場合のみ表示する。どちらもない場合はセクションごと省略する
 - 「次のステップ」は `~/ObsidianVault/00_meta/tasks.md` から該当プロジェクトの Next / Waiting を抽出して表示する。Vault 未配備・tasks.md 不存在の場合はセクションごと省略
 - Waiting のタスクには ⏳ マーカーを付けて区別する
