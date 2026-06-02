@@ -171,7 +171,7 @@ LOW: 変数名 `d` を `deliveryDate` に変えると可読性が上がります
 - `/obsidian-log` — 作業ログを Obsidian Vault に記録
 - `/obsidian-resource` — 調査メモ・参考リンク・記事ドラフトを Obsidian Vault `30_resource/YYYYMM/` 配下に保存（引数 `auto` でセッションから自動ドラフト化）
 - `/obsidian-mail` — Obsidian デイリーノートのサマリーをメール向けに再構成して Gmail SMTP で送信（日報・週報、ローカル routine から呼ぶ前提）
-- `/session-review` — セッション振り返り（権限・CLAUDE.md・スキルの整理）
+- `/session-review` — セッション振り返り（権限・CLAUDE.md・スキル・判断メモ圧縮の整理）
 - `/session-save` — `/obsidian-log` + `/context-save` を一括実行し、アウトプット候補の提案も行う
 - `/spec-design` — 仕様書・設計ドキュメント・ADR・C4 図・README 等の作成/レビュー/改善を担うロール変換型スキル。視覚設計が主役の入口は `/dashboard-design` 側に集約
 

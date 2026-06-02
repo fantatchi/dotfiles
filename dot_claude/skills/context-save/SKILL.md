@@ -1,6 +1,6 @@
 ---
 name: context-save
-description: プロジェクトの作業状態を保存し、次回セッションで復帰可能にする。セッション終了時や作業の区切りで使う。context.md の保存と `## 進行中の作業` の 14 日ローテーション、`~/ObsidianVault/00_meta/tasks.md` の `## Next` への次アクション吸い上げ、`.claude/progress.md` の更新まで含む。UserPromptSubmit hook（`context-save-reminder.sh`、しきい値 240 分）からモデルが自律実行することを前提とした設定で、`disable-model-invocation: false` を意図的に指定（自動起動を許可）。手動 `/context-save` 起動も可。
+description: プロジェクトの作業状態を保存し、次回セッションで復帰可能にする。セッション終了時や作業の区切りで使う。context.md の保存と `## 進行中の作業` の 14 日ローテーション、`~/ObsidianVault/00_meta/tasks.md` の `## Next` への次アクション吸い上げ、`.claude/progress.md` の更新、`## 判断メモ` が 15 件を超えた場合の圧縮アラート（実仕分けは /session-review に委譲）まで含む。UserPromptSubmit hook（`context-save-reminder.sh`、しきい値 240 分）からモデルが自律実行することを前提とした設定で、`disable-model-invocation: false` を意図的に指定（自動起動を許可）。手動 `/context-save` 起動も可。
 disable-model-invocation: false
 allowed-tools: Read, Write, Edit, Glob, Bash(git:*), Bash(echo:*), Bash(mkdir:*), Bash(basename:*), Bash(date:*), Bash(pwd), Bash(chezmoi source-path)
 ---
@@ -77,6 +77,17 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git:*), Bash(echo:*), Bash(mkdir:*)
 - `## 判断メモ` セクションは時間でローテーションしない（再利用される普遍知見のため）。MEMORY.md への昇格判断は「情報の収集」セクションの **判断メモ** 項目を参照
 - `## 関連リポジトリ` の「直近のコミット」リストは保存ごとに最新 5-6 件に丸める（既存挙動）
 - 日付パースが失敗した entry（プレフィックスが想定形式と異なる）は **保守的に残す**（誤削除より誤残存を選ぶ）
+
+## 判断メモの肥大アラート
+
+`## 判断メモ` セクションは時間でローテーションしない（普遍知見の昇格判断が要るため機械削除できない）。代わりに、保存時にエントリ件数をチェックし、肥大したら圧縮を促すアラートを出す。実際の仕分け（昇格・統合・削除）は判断を要するため `/session-review` の「判断メモ圧縮」フェーズに委ね、本スキルはアラートのみ行う。
+
+### ルール
+
+- `## 判断メモ` のトップレベル箇条書き（`- ` で始まる行。子のインデント箇条書きは数えない）を数える
+- 件数が **15 件を超えている** 場合、context-save 完了後に次の 1 行アラートを表示する:
+  - `⚠️ 判断メモが N 件あります。/session-review の「判断メモ圧縮」フェーズで昇格・統合・削除を検討してください`
+- アラートを出すだけで、本スキルは判断メモを削除・編集しない（昇格判断は session-review に委ねる）
 
 ## tasks.md への書き出し
 

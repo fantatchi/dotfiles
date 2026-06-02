@@ -1,6 +1,6 @@
 ---
 name: session-review
-description: セッション完了時に振り返りを行い、権限追加・CLAUDE.md更新・スキル洗練を一括で行う。**手動で `/session-review` を実行して発動**（`disable-model-invocation: true` で自動起動しない）。
+description: セッション完了時に振り返りを行い、権限追加・CLAUDE.md更新・スキル洗練・判断メモ圧縮（context.md の判断メモを MEMORY.md へ昇格/統合/削除で仕分け）を一括で行う。**手動で `/session-review` を実行して発動**（`disable-model-invocation: true` で自動起動しない）。
 disable-model-invocation: true
 allowed-tools: Read, Edit, Write, Glob, Grep
 ---
@@ -14,7 +14,7 @@ allowed-tools: Read, Edit, Write, Glob, Grep
 
 ### Step 1: 全フェーズの判定と提案の収集
 
-会話コンテキスト全体を振り返り、以下の3フェーズそれぞれについて実行要否を判定する。
+会話コンテキスト全体を振り返り、以下の4フェーズそれぞれについて実行要否を判定する。
 該当するフェーズは `references/` の詳細手順を `Read` で読み込み、提案内容を収集する。
 
 | フェーズ | 実行条件 | 詳細手順 |
@@ -22,6 +22,7 @@ allowed-tools: Read, Edit, Write, Glob, Grep
 | 1. 権限レビュー | 手動で承認/拒否したツール呼び出しが1件以上 | `references/permission-review.md` |
 | 2. CLAUDE.md更新 | コマンド・パターン・設定の発見やgotchaがあった | `references/claude-md-update.md`（実作業は `/claude-md-management:revise-claude-md` スキルに委譲する） |
 | 3. スキル洗練 | 既存スキルの不備発見、繰り返しワークフロー、新スキル候補 | `references/skill-refine.md` |
+| 4. 判断メモ圧縮 | context.md の `## 判断メモ` が肥大（context-save が「15件超」とアラート）/ セッションで普遍知見が生まれた | `references/memo-compaction.md` |
 
 ### Step 2: 提案の一括提示
 
