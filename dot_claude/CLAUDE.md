@@ -70,6 +70,7 @@ GOをもらってから進める。
 - **`NODE_ENV=production` 切替を無確認で行わない**: 本番判定切替・本番向け命令はユーザー確認必須
 - **HTTP 認証情報を生埋め込みしない**: `Authorization: Basic <base64>` ヘッダや `https://user:pass@host/` 形式の URL をコード内にリテラル記述しない。環境変数経由で読む
 - **API key / アプリパスワードを会話・履歴に貼らない**: `~/.claude/projects/*/history.jsonl` に残留する。ユーザー自身に `~/.claude/settings.local.json` 等へ直接書いてもらう運用（過去判断メモ準拠）
+- **Claude Code 設定ファイルにも secrets を直書きしない**: `~/.claude/settings.local.json` や `<project>/.claude/settings.local.json` の `env` セクションに API key / token / password を**素のリテラルで書かない**（Claude Code が settings をパースする過程で `~/.claude/projects/*/history.jsonl` に残留する可能性がある + chezmoi 管理外のファイルでもバックアップ・同期経路で漏れる）。secrets は OS の環境変数 / `pass` 等の認証ストア経由で渡し、設定ファイルにはキー名のみ書く。既に直書きしている既存ファイルがあれば rotate + 環境変数化を検討
 
 # エラー時の対処方針
 
