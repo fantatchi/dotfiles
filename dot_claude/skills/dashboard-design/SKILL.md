@@ -165,7 +165,7 @@ md で済むもの（仕様本文 / API リスト / ADR / 用語集 / Mermaid・
 
 両者は補完関係。md ベースの仕様書を書く時は spec-design が主、HTML 補足ページの視覚設計時に本スキルを参照する。
 
-**HTML 補足ページが複数ある場合の CSS 構造**（共通 CSS への集約・`:root` 変数化・`body.page-X` scope での衝突回避）は `spec-design` の領域。`~/.claude/skills/spec-design/references/html-css-centralization.md` を参照。本スキルが配色・タイポを決め、spec-design 側が CSS をどう束ねるかを決める分業。
+**HTML 補足ページが複数ある場合の CSS 構造**（SSOT 共通 CSS + 生成時インライン展開・`:root` 変数化・`body.page-X` scope での衝突回避）は `spec-design` の領域。`~/.claude/skills/spec-design/references/html-css-centralization.md` を参照。本スキルが配色・タイポを決め、spec-design 側が CSS をどう束ねるかを決める分業。
 
 **仕様書の章立て・用語集・ADR・図種選択** も spec-design 担当。本スキルで「視覚」を設計したら、次は spec-design で「構造」を整える。両者を連携させて 1 つの仕様書セットを完成させるのが想定運用。
 

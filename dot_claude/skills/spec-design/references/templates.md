@@ -299,11 +299,11 @@ HTML 補足ページは **サマリー / 概況 / 比較・対比 / 配色で意
 | 状況 | 採用するパターン |
 |---|---|
 | HTML 補足ページが **1 本のみ**（単発） | 本ファイルの最小骨格。`<style>` 内に最小装飾を直書きしてよい |
-| HTML 補足ページが **2 本以上 or 増える見込み** | 共通 CSS 集約型。[`html-css-centralization.md`](./html-css-centralization.md) を必ず参照し、`<link>` で共通 CSS を参照し各 HTML の `<style>` は `:root` 固有変数のみに収める |
+| HTML 補足ページが **2 本以上 or 増える見込み** | SSOT + 生成時インライン展開型。[`html-css-centralization.md`](./html-css-centralization.md) を必ず参照し、SSOT 共通 CSS を `<style data-shared-source="...">` へ全文展開し、各 HTML の固有 `<style>` は `:root` 固有変数のみに収める |
 
-以下のサマリー / 比較ページ骨格は **共通 CSS 集約型** で示す（複数ページ前提の推奨パターン）。単一 HTML の場合は `<link>` 参照を外して `<style>` 内に必要装飾を直書きしてよい。
+以下のサマリー / 比較ページ骨格は **SSOT + 生成時インライン展開型** で示す（複数ページ前提の推奨パターン）。単一 HTML の場合は SSOT を作らず `<style>` 内に必要装飾を直書きしてよい。いずれの場合も配布物は self-contained になる。
 
-### サマリーページの最小骨格（共通 CSS 集約型）
+### サマリーページの最小骨格（SSOT + インライン展開型）
 
 ```html
 <!DOCTYPE html>
@@ -314,10 +314,14 @@ HTML 補足ページは **サマリー / 概況 / 比較・対比 / 配色で意
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="../_shared/spec-page.css">
+  <style data-shared-source="../_shared/spec-page.css">
+    /* ===== 共通 CSS（SSOT: _shared/spec-page.css の生成時コピー、直接編集禁止） =====
+     * スタイル変更は SSOT 側で行い、HTML へ再展開して反映する。 */
+    /* …spec-page.css の内容を全文インライン展開… */
+  </style>
   <style>
     /* ===== summary.html 固有 CSS 変数のみ =====
-     * その他のスタイルは ../_shared/spec-page.css の body.page-summary scope に集約。
+     * その他のスタイルは SSOT（_shared/spec-page.css）の body.page-summary scope に集約。
      */
     :root {
       --kpi-positive: #059669;
@@ -375,7 +379,7 @@ HTML 補足ページは **サマリー / 概況 / 比較・対比 / 配色で意
 </html>
 ```
 
-共通 CSS 側（`_shared/spec-page.css`）には以下を `body.page-summary` scope で追加する:
+共通 CSS（SSOT `_shared/spec-page.css`）側には以下を `body.page-summary` scope で追加し、各 HTML へ再展開する:
 
 ```css
 body.page-summary .summary-grid {
@@ -406,7 +410,7 @@ body.page-summary .card .value {
 }
 ```
 
-### 比較・対比ページの最小骨格（共通 CSS 集約型）
+### 比較・対比ページの最小骨格（SSOT + インライン展開型）
 
 ```html
 <!DOCTYPE html>
@@ -415,7 +419,10 @@ body.page-summary .card .value {
   <meta charset="UTF-8">
   <title>[項目] 比較</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="../_shared/spec-page.css">
+  <style data-shared-source="../_shared/spec-page.css">
+    /* ===== 共通 CSS（SSOT: _shared/spec-page.css の生成時コピー、直接編集禁止） ===== */
+    /* …spec-page.css の内容を全文インライン展開… */
+  </style>
   <style>
     /* ===== compare.html 固有 CSS 変数のみ ===== */
     :root {
@@ -461,7 +468,7 @@ body.page-summary .card .value {
 </html>
 ```
 
-共通 CSS 側に `body.page-compare` scope で:
+SSOT 側に `body.page-compare` scope で追加し、各 HTML へ再展開する:
 
 ```css
 body.page-compare table.compare {
@@ -486,4 +493,4 @@ body.page-compare .verdict.partial {
 **注意**:
 - HTML 補足ページの配色・コントラスト比・色数制約・装飾排除・アクセシビリティの詳細は `dashboard-design` スキル + [`dashboard-design/references/visual-encoding.md`](../../dashboard-design/references/visual-encoding.md) を参照
 - 共通 CSS の最小骨格・`:root` 変数命名規則・ページ別 scope の書き方・段階的移行手順は [`html-css-centralization.md`](./html-css-centralization.md) を参照
-- 単一 HTML 完結で書きたい場合は `<link>` 参照を外し、上記の `body.page-X scope` で示した CSS を `<style>` 内にインライン展開してよい
+- 単一 HTML（1 本のみ）の場合は SSOT を作らず、上記の `body.page-X` scope で示した CSS を固有 `<style>` 内に直書きしてよい

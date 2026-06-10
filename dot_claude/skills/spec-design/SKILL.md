@@ -1,6 +1,6 @@
 ---
 name: spec-design
-description: 仕様書（specification / 設計ドキュメント / requirements / architecture）の設計・作成・レビューを担うロール変換型スキル。判断軸（読み手別の入口、UML/C4/BPMN の図種選択、ADR で意思決定分離、用語集を唯一の出典に、MUST/SHOULD/MAY の要件レベル語）+「全体像・なぜ・用語」3 点を手厚くカバーする具体テンプレ（README / ADR Nygard・MADR / C4 / glossary）。出力は md がメイン（Docs as Code）、視覚情報が主役のページのみ HTML 補足。仕様書を書く文脈での視覚設計判断も内蔵: HTML 補足のデフォルト CSS は Vercel inspired (`#0070f3` link blue + Inter / Noto Sans JP、`references/html-css-centralization.md` 参照)、別系統 (Blue 900 / Green / Orange 等) への切替は `shared/base-color-mapping.md` の階調表、「伝わるデザイン」12 原則の参照誘導、**HTML 補足ページが複数あるときは共通 CSS への集約 SHOULD**（`:root` 固有変数のみ + `body.page-X` scope で衝突回避、`references/html-css-centralization.md`）。「仕様書」「specification」「設計ドキュメント」「ドキュメントレビュー」「ADR」「アーキテクチャ図」「C4 図」「設計書のテンプレート」「READMEを充実」「オンボーディング資料」「PDF 仕様書」「HTML 補足ページの CSS 集約」「仕様書 HTML の共通スタイル」「補足 HTML の共通 CSS 化」等で自動起動。**棲み分け**: 視覚設計の入口（「ダッシュボード作って」「カラーパレット選定」「ベースカラー何にする」「伝わるデザイン」「HTML 補足ページのデザイン」「文書の配色・タイポグラフィ」）は dashboard-design、対話的な文章共著は doc-coauthoring、本スキルは構造・判断軸・テンプレで「仕様書ロール」に変換する。単発の図描画（コードレビュー補助図・スケッチ用途）には起動しない。
+description: 仕様書（specification / 設計ドキュメント / requirements / architecture）の設計・作成・レビューを担うロール変換型スキル。判断軸（読み手別の入口、UML/C4/BPMN の図種選択、ADR で意思決定分離、用語集を唯一の出典に、MUST/SHOULD/MAY の要件レベル語）+「全体像・なぜ・用語」3 点を手厚くカバーする具体テンプレ（README / ADR Nygard・MADR / C4 / glossary）。出力は md がメイン（Docs as Code）、視覚情報が主役のページのみ HTML 補足。仕様書を書く文脈での視覚設計判断も内蔵: HTML 補足のデフォルト CSS は Vercel inspired (`#0070f3` link blue + Inter / Noto Sans JP、`references/html-css-centralization.md` 参照)、別系統 (Blue 900 / Green / Orange 等) への切替は `shared/base-color-mapping.md` の階調表、「伝わるデザイン」12 原則の参照誘導、**HTML 補足ページが複数あるときは共通 CSS を SSOT 化し各 HTML へ生成時インライン展開 SHOULD**（配布物は self-contained 維持で単体共有可、`:root` 固有変数のみ + `body.page-X` scope で衝突回避、`references/html-css-centralization.md`）。「仕様書」「specification」「設計ドキュメント」「ドキュメントレビュー」「ADR」「アーキテクチャ図」「C4 図」「設計書のテンプレート」「READMEを充実」「オンボーディング資料」「PDF 仕様書」「HTML 補足ページの CSS 集約」「仕様書 HTML の共通スタイル」「補足 HTML の共通 CSS 化」等で自動起動。**棲み分け**: 視覚設計の入口（「ダッシュボード作って」「カラーパレット選定」「ベースカラー何にする」「伝わるデザイン」「HTML 補足ページのデザイン」「文書の配色・タイポグラフィ」）は dashboard-design、対話的な文章共著は doc-coauthoring、本スキルは構造・判断軸・テンプレで「仕様書ロール」に変換する。単発の図描画（コードレビュー補助図・スケッチ用途）には起動しない。
 ---
 
 # 仕様書設計ロール
@@ -143,23 +143,26 @@ HTML 補足ページを新規に生成する際の **既定のスタイルは Ve
 
 ### HTML 補足ページの CSS 集約方針（複数ページ作成時 SHOULD）
 
+集約は **ソース管理レベル（SSOT）** の話であり、**配布物（生成された HTML）は常に self-contained** とする（2026-06-10 再定義。社内に静的ホスティング場が無く、共有は「リポジトリ管理 + HTML 単体ファイル配布」で行う運用判断に基づく）。
+
 HTML 補足ページの本数に応じて要件レベルを切り替える:
 
 | 状況 | 要件レベル | 採用パターン |
 |---|---|---|
-| 補足ページが **2 本以上 or 増える見込み** | **SHOULD**（強く推奨） | 共通 CSS 集約型（下記ルール） |
-| 補足ページが **1 本のみ**（単発） | **MAY** | `<style>` 内に最小装飾を直書きしてよい（[references/templates.md](references/templates.md) の骨格） |
+| 補足ページが **2 本以上 or 増える見込み** | **SHOULD**（強く推奨） | SSOT 共通 CSS + 生成時インライン展開（下記ルール） |
+| 補足ページが **1 本のみ**（単発） | **MAY** | `<style>` 内に最小装飾を直書きしてよい（もともと self-contained、[references/templates.md](references/templates.md) の骨格） |
 
-**共通 CSS 集約型のルール**（SHOULD 採用時）:
+**SSOT + 生成時インライン展開のルール**（SHOULD 採用時）:
 
-- 各 HTML に `<link rel="stylesheet" href="path/to/_shared/spec-page.css">` を追加
-- 各 HTML の `<style>` は `:root` 固有変数のみ（10-30 行程度）。`html, body { ... }` や `.toc { ... }` などのレイアウトは書かない
-- 各 HTML の `<body>` に `class="page-X"`（X はファイル名 kebab-case）を付与
-- 共通 CSS 側で `body.page-X .selector { ... }` の scope を付ける形で各ページ固有レイアウトを集約
+- 共通 CSS は `_shared/spec-page.css` 等に SSOT として置く。**スタイル編集は必ず SSOT 側で行う（MUST）**
+- 各 HTML へは `<link>` 参照ではなく、生成・更新時に SSOT 全文を `<style data-shared-source="...">` ブロックへインライン展開する（先頭に「SSOT の生成時コピー・直接編集禁止」コメント必須）
+- SSOT を変更したら同プロジェクトの全 HTML 補足ページへ再展開して伝播する（対象は `grep -rl 'data-shared-source'` で列挙）
+- 各 HTML の固有 `<style>` は `:root` 固有変数のみ（10-30 行程度）。`html, body { ... }` や `.toc { ... }` などのレイアウトは書かない
+- 各 HTML の `<body>` に `class="page-X"`（X はファイル名 kebab-case）を付与し、各ページ固有レイアウトは SSOT 側で `body.page-X .selector { ... }` の scope を付けて集約
 
-**理由**: 個別ファイル内 `<style>` で共通 CSS を上書きしてしまう事故を防ぎ、複数ファイルでの視覚一貫性（フォント・h1 サイズ・配色）を保証する。「伝わるデザイン」原則 3（反復）の最終的な担保（[references/communicative-design.md](references/communicative-design.md) 参照）。
+**理由**: (1) 個別ファイル内 `<style>` で共通 CSS を上書きしてしまう事故を防ぎ、複数ファイルでの視覚一貫性（フォント・h1 サイズ・配色）を保証する。「伝わるデザイン」原則 3（反復）の最終的な担保（[references/communicative-design.md](references/communicative-design.md) 参照）。(2) **HTML 1 ファイル単体で共有・閲覧できる**（リポジトリ checkout 不要、ダウンロード・チャット添付でそのまま開ける）。旧 `<link>` 参照型は (2) が成立しないため採らない。
 
-**実証例（規模）**: cloud-dsc プロジェクトの `docs/_html/_shared/spec-page.css`（3072 行、2026-05-14 時点、ファイル別 scope で全レイアウト統合済み）。各 HTML の `<style>` は 10-30 行（`:root` 固有変数のみ）。**注**: cloud-dsc は本変更前の Blue 900 ベースで運用されているプロジェクトで「**規模・運用パターンの実証例**」として参照する。本スキルのデフォルト CSS の **スタイル骨格の出典は Vercel inspired**（cloud-dsc の配色そのものではない）。
+**実証例（規模）**: cloud-dsc プロジェクトの `docs/_html/_shared/spec-page.css`（3072 行、2026-05-14 時点、ファイル別 scope で全レイアウト統合済み）。各 HTML の固有 `<style>` は 10-30 行（`:root` 固有変数のみ）。**注**: cloud-dsc は旧 `<link>` 参照型 + 本変更前の Blue 900 ベースで運用されてきたプロジェクトで「**規模・scope 運用パターンの実証例**」として参照する（インライン展開型への移行対象）。本スキルのデフォルト CSS の **スタイル骨格の出典は Vercel inspired**（cloud-dsc の配色そのものではない）。
 
 具体的な共通 CSS の最小骨格・移行手順・`:root` 変数命名規則・ページ別 scope の書き方は [references/html-css-centralization.md](references/html-css-centralization.md) を参照。
 
