@@ -6,3 +6,5 @@ Thumbs.db
 *.swo
 *~
 .claude/context.md
+**/__pycache__
+*.pyc
