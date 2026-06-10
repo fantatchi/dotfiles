@@ -39,7 +39,8 @@ $includeForLink = @(
     'agents',
     'docs',
     'scripts',
-    'skills'
+    'skills',
+    'commands'
 )
 
 Write-Host "=== setup-windows-claude.ps1 ==="

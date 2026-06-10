@@ -49,7 +49,7 @@ if (Test-Path -LiteralPath $claudeWslCacheFile) {
         if ($rootItem -and ($rootItem.LinkType -notin @('SymbolicLink', 'Junction'))) {
             $claudeInclude = @(
                 'CLAUDE.md', 'settings.json', 'settings.local.json', 'context.md',
-                'agents', 'docs', 'scripts', 'skills'
+                'agents', 'docs', 'scripts', 'skills', 'commands'
             )
             foreach ($name in $claudeInclude) {
                 $source   = Join-Path $claudeWslRoot $name
