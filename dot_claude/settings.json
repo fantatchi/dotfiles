@@ -104,7 +104,8 @@
     "dotnet-aspnet@dotnet-agent-skills": true,
     "microsoft-docs@claude-plugins-official": true,
     "codex@openai-codex": true,
-    "modern-web-guidance@googlechrome": true
+    "modern-web-guidance@googlechrome": true,
+    "claude-code-setup@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "anthropic-agent-skills": {
