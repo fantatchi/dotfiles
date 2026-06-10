@@ -303,7 +303,7 @@ HTML 補足ページは **サマリー / 概況 / 比較・対比 / 配色で意
 
 以下のサマリー / 比較ページ骨格は **SSOT + 生成時インライン展開型** で示す（複数ページ前提の推奨パターン）。単一 HTML の場合は SSOT を作らず `<style>` 内に必要装飾を直書きしてよい。いずれの場合も配布物は self-contained になる。
 
-### サマリーページの最小骨格（SSOT + インライン展開型）
+### サマリーページの最小骨格（SSOT + 生成時インライン展開型）
 
 ```html
 <!DOCTYPE html>
@@ -316,8 +316,9 @@ HTML 補足ページは **サマリー / 概況 / 比較・対比 / 配色で意
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
   <style data-shared-source="../_shared/spec-page.css">
     /* ===== 共通 CSS（SSOT: _shared/spec-page.css の生成時コピー、直接編集禁止） =====
-     * スタイル変更は SSOT 側で行い、HTML へ再展開して反映する。 */
-    /* …spec-page.css の内容を全文インライン展開… */
+     * スタイル変更は SSOT 側で行い、HTML へ再展開して反映する。
+     * 実際の生成物ではこの位置に SSOT の【全文】を展開する（省略・要約・畳み込み禁止、
+     * placeholder コメント自体を残さない）。展開は expand-shared-css.ts で機械化推奨。 */
   </style>
   <style>
     /* ===== summary.html 固有 CSS 変数のみ =====
@@ -410,7 +411,7 @@ body.page-summary .card .value {
 }
 ```
 
-### 比較・対比ページの最小骨格（SSOT + インライン展開型）
+### 比較・対比ページの最小骨格（SSOT + 生成時インライン展開型）
 
 ```html
 <!DOCTYPE html>
@@ -421,7 +422,8 @@ body.page-summary .card .value {
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
   <style data-shared-source="../_shared/spec-page.css">
     /* ===== 共通 CSS（SSOT: _shared/spec-page.css の生成時コピー、直接編集禁止） ===== */
-    /* …spec-page.css の内容を全文インライン展開… */
+    /* ↑ 実際の生成物では SSOT (_shared/spec-page.css) の【全文】をここへ展開する。
+     * 省略・要約・畳み込み禁止。この placeholder コメント自体を出力に残さない。 */
   </style>
   <style>
     /* ===== compare.html 固有 CSS 変数のみ ===== */

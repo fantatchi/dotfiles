@@ -4,6 +4,24 @@
 
 > **方針の再定義（2026-06-10）**: 集約は **ソース管理レベル**（編集する場所を 1 つにする）の話であり、**配布物（生成された HTML）は self-contained** とする。従来の `<link rel="stylesheet">` 参照型は「リポジトリを checkout してローカルで開く」前提でしか表示できず、HTML ファイル単体での共有（ダウンロード閲覧・チャット添付）で表示が崩れるため、**生成時インライン展開型** へ移行した。SSOT による drift 防止と単体配布可能性を両立する。
 
+### なぜこの方針か（背景・採用案・再検討トリガー）
+
+**背景**: 仕様書の HTML 補足ページを社内共有したいが、**社内に静的 HTML をホスティングする場が無い**。検討の結果、(a) GitHub Organization は **Team プラン**（Enterprise ではない、API で確認）のため private リポジトリの Pages にアクセス制御をかけられず公開状態になってしまう、(b) Azure Static Web Apps は自社テナント限定認証だと Standard プラン必須でコスト過剰、と判明。結論として「**仕様書 HTML はホスティングせず、リポジトリ管理 + HTML 単体ファイル配布で共有する**」運用に決めた。この運用には配布物が self-contained である必要がある。
+
+**採用案の比較**:
+
+| 案 | 内容 | 判定 |
+|---|---|---|
+| **A（採用）** | SSOT 共通 CSS を残し、各 HTML へ生成時インライン展開 | スタイルの一元管理（drift 防止）と単体配布を両立。生成 1 ステップ増のみ |
+| B（不採用） | self-contained をデフォルト化し SSOT を廃止、各 HTML に直書き | 単体配布は満たすが、ページ増でスタイル修正が全ファイル横断になり、集約で防ぎたかった drift が復活 |
+| C（不採用） | 旧 `<link>` 参照型を維持し、共有時だけ都度手動インライン化 | 今すぐの変更ゼロだが、共有のたびに手間 + インライン化した瞬間に SSOT から切り離れて drift |
+
+**再検討トリガー**（前提が変われば見直す。該当したらこの方針を再評価する）:
+
+- **静的ホスティングが確保できたら**（認証付き Pages が使える Enterprise への移行 / SWA Standard 導入 / 社内に閲覧サーバが立つ 等）→ `<link>` 参照型へ戻すことを検討してよい（**MAY**）。単体配布の必要性が消えるため
+- **HTML が md を超えて主役化したら**（インタラクティブな仕様書を常用し始めた 等）→ ホスティング前提の運用へ方針ごと再評価
+- **再展開漏れが事故化したら** → drift 検査を MAY から CI 強制（SHOULD 以上）へ昇格
+
 ## 採用判断
 
 | 状況 | 採用するか |
@@ -48,7 +66,10 @@ docs/_html/
      * このブロックを直接編集しない。スタイル変更は SSOT 側で行い、
      * HTML へ再展開して反映する（直接編集すると次回再展開で消える）。
      */
-    /* …spec-page.css の内容を全文インライン展開… */
+    /* ↓↓↓ ここに SSOT (_shared/spec-page.css) の【全文】が入る ↓↓↓
+     * このテンプレ上は紙面の都合でプレースホルダだが、実際の生成物では
+     * 省略・要約・畳み込みを一切せず SSOT を 1 バイト残らず展開する。
+     * この placeholder コメント自体を出力に残してはならない（不完全コピーの温床）。 */
   </style>
   <style>
     /* ===== {page-name}.html 固有 CSS 変数のみ =====
@@ -77,9 +98,25 @@ SSOT と配布物の関係を壊さないための規約:
 - **編集は必ず SSOT（`_shared/spec-page.css`）側で行う（MUST）**。HTML 内のインラインコピーを直接編集しない（次回再展開で消える）
 - HTML の新規生成・更新時、SSOT を読み込んで `<style data-shared-source="<SSOT への相対パス>">` ブロックへ全文展開する。`data-shared-source` 属性が「このブロックは生成コピーである」ことの機械可読マーカーを兼ねる
 - インラインコピーの先頭に「SSOT の生成時コピー・直接編集禁止」コメントを必ず入れる
-- **SSOT を変更したら、同プロジェクトの全 HTML 補足ページへ再展開して伝播する（SHOULD）**。対象は `grep -rl 'data-shared-source' docs/` で機械的に列挙できる
-- drift 検査（MAY）: インラインコピーと SSOT の差分を比較すれば再展開漏れを検出できる
-- Google Fonts の `<link>`（CDN 参照）はそのまま残してよい。CDN 遮断環境では `--font-sans` の fallback（BIZ UDPGothic 等）に落ちる設計のため、単体配布性を実用上損なわない
+- **SSOT を変更したら、同プロジェクトの全 HTML 補足ページへ再展開して伝播する**。対象は `grep -rl 'data-shared-source' docs/` で機械的に列挙できる。要件レベルは展開手段で変わる:
+  - **展開スクリプトを導入しているプロジェクト（[§展開・検証スクリプト](#展開検証スクリプト)）**: SSOT 編集とコミットは全 HTML 再展開とセットでなければならない（**MUST**、1 コミット完結）。手作業より遥かに安全なため強制できる
+  - **スクリプト未導入（LLM 手作業で展開）**: 全 HTML 再展開は **SHOULD**。ただし「SSOT だけ直して HTML は後で」は drift 未収束コミットを生むため、可能な限り同一セッションで再展開する
+- **外部資産を埋め込まない（MUST）**: self-contained を壊さないため、`<img src="...">`・外部 `.svg` ファイル参照・`@import`・相対パスのローカル資産を HTML に入れない。図は **インライン SVG または data URI** で埋め込む（`.svg-wrap` は「インライン SVG 前提」）。Google Fonts の `<link>`（CDN 参照）だけは例外として残してよい — CDN 遮断環境では `--font-sans` の fallback（BIZ UDPGothic 等）に落ちる設計で、単体配布性を実用上損なわないため
+- drift 検査: インラインコピー（`<style data-shared-source>` の中身）を抽出し SSOT と正規化 diff すれば再展開漏れを検出できる。スクリプト導入時は `--check` で自動化（[§展開・検証スクリプト](#展開検証スクリプト)）、未導入時は MAY
+- **git diff ノイズの緩和（任意）**: SSOT 1 行変更が全 HTML の `<style>` ブロックに伝播し diff が肥大化する。レビューでシグナルが埋もれるのが気になるなら、`.gitattributes` に該当 HTML への `linguist-generated` 付与や `*.html -diff`（差分非表示）を検討する。ただし HTML 本文の実変更も隠れるため、CSS 専用ディレクトリを分けない限り副作用に注意
+
+## 展開・検証スクリプト
+
+LLM の手作業展開は「全文コピー漏れ・相対パスズレ・再展開忘れ」を生むため、**展開と drift 検査をスクリプトに寄せる（SHOULD、特に HTML が 3 本以上 or 更新頻度が高いプロジェクト）**。雛形を [`expand-shared-css.ts`](./expand-shared-css.ts) に置いている。これを各リポジトリへコピーして使う（配置例 `scripts/expand-shared-css.ts`）。
+
+- **言語**: TypeScript（`tsx` / `ts-node` で実行）。Node 標準ライブラリのみで外部 npm 依存なし。cloud-dsc / cloud-cmp 等の TS リポジトリと馴染む。Python 主体のリポジトリでも `npx tsx` で単発実行できる
+- **やること**: SSOT を読み、`docs/` 以下で `data-shared-source` を持つ全 HTML を発見し、各 HTML の `<style data-shared-source>` ブロックを SSOT 全文で置換する。`data-shared-source` の相対パスは各 HTML の階層から自動算出するため、パスズレが構造的に起きない
+- **2 モード**:
+  - 展開: `npx tsx scripts/expand-shared-css.ts` — 全対象 HTML を SSOT 最新で上書き
+  - 検証: `npx tsx scripts/expand-shared-css.ts --check` — drift があれば非ゼロ終了。**pre-commit hook / CI に組み込めば再展開漏れを無症状放置させない**
+- スクリプト導入時、SSOT 編集とコミットは「展開して 1 コミット」が **MUST**（[§生成時インライン展開の運用ルール](#生成時インライン展開の運用ルール)）。`--check` を CI ゲートにすると規約を機械的に担保できる
+
+スクリプトを導入しない（手作業展開の）場合は、移行手順 [§Phase 2 の踏み外し防御](#phase-2-個別-html-の-style-縮小ファイル単位で繰り返す)に従い、全文転記・相対パス・Google Fonts link 保持を人手で守る。
 
 ## 共通 CSS の最小骨格
 
@@ -463,6 +500,8 @@ table td.num, table th.num {
 
 /* ========== .svg-wrap（SVG 図のラッパー） ==========
  * 用途: インライン SVG / Mermaid 出力の囲み + キャプション。横スクロール許容。
+ *       【self-contained 必須】図は必ず **インライン <svg>** か data URI で埋め込む。
+ *       <img src="diagram.svg"> のような外部ファイル参照は単体配布で壊れる。
  *       figure-caption は mono にして技術ドキュメント voice を統一。 */
 .svg-wrap {
   background: var(--surface);
@@ -658,7 +697,7 @@ body.page-glossary .term-grid { ... }
 
 ## 段階的移行手順（既存プロジェクト向け）
 
-既存 HTML 補足ページを SSOT + インライン展開型へ移行する手順。起点は 2 通り: **(a) 分散直書き型**（各 HTML が独自の `<style>` を持つ。cloud-dsc Phase 7a〜7c はこの起点の実例）と **(b) 旧 `<link>` 参照型**（2026-06-10 の方針再定義以前に集約済みのプロジェクト）。(b) 起点の場合 Phase 1 の SSOT 整備は済んでいるため Phase 2 から着手する。各 Phase の **遷移条件**（次に進んでよい判定）をチェックリストで明示する。
+既存 HTML 補足ページを SSOT + 生成時インライン展開型へ移行する手順。起点は 2 通り: **(a) 分散直書き型**（各 HTML が独自の `<style>` を持つ。cloud-dsc Phase 7a〜7c はこの起点の実例）と **(b) 旧 `<link>` 参照型**（2026-06-10 の方針再定義以前に集約済みのプロジェクト）。(b) 起点の場合 Phase 1 の SSOT 整備は済んでいるため Phase 2 から着手する。各 Phase の **遷移条件**（次に進んでよい判定）をチェックリストで明示する。
 
 ### Phase 1: 共通 CSS 雛形作成
 
@@ -679,6 +718,12 @@ body.page-glossary .term-grid { ... }
 - [ ] ページ固有レイアウト（`.layer-flow` 等）は SSOT 側に `body.page-X` scope 付きで移動し、HTML へ再展開
 - [ ] 固有 `<style>` を **`:root` 固有変数のみ**（10-30 行目安）に縮小
 - [ ] ブラウザで visual diff を取り、意図しない変化がないことを確認
+
+**LLM 手作業で移行するときの踏み外し防御**（スクリプト未導入時に特に注意。エージェントが踏みやすい罠）:
+
+- **SSOT は全文を省略せず転記する**: 3072 行規模を Read → そのまま展開する。`/* … */` での畳み込み・要約・「以下同様」は厳禁。転記後に SSOT と行数・バイト数が一致するか確認する（一致しなければ不完全コピー）
+- **`data-shared-source` の相対パスは階層ごとに算出する**: `docs/_html/overview.html` なら `../_shared/spec-page.css`、`docs/_html/architecture/context.html` なら `../../_shared/spec-page.css`。固定例をそのまま貼らない（深さでズレる）
+- **Google Fonts の `<link>` は消さない**: CSS の `<link>` を削除するのは旧 `_shared/spec-page.css` への参照だけ。`fonts.googleapis.com` への `<link>`（preconnect 2 本 + stylesheet 1 本）は残す。「重複 link」と誤認して消すと Web フォントが効かなくなる
 
 **遷移条件**: 全 HTML ファイルでこのリストが完了したら Phase 3。
 

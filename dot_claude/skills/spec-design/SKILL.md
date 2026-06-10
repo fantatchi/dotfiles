@@ -155,8 +155,9 @@ HTML 補足ページの本数に応じて要件レベルを切り替える:
 **SSOT + 生成時インライン展開のルール**（SHOULD 採用時）:
 
 - 共通 CSS は `_shared/spec-page.css` 等に SSOT として置く。**スタイル編集は必ず SSOT 側で行う（MUST）**
-- 各 HTML へは `<link>` 参照ではなく、生成・更新時に SSOT 全文を `<style data-shared-source="...">` ブロックへインライン展開する（先頭に「SSOT の生成時コピー・直接編集禁止」コメント必須）
-- SSOT を変更したら同プロジェクトの全 HTML 補足ページへ再展開して伝播する（対象は `grep -rl 'data-shared-source'` で列挙）
+- 各 HTML へは `<link>` 参照ではなく、生成・更新時に SSOT 全文を `<style data-shared-source="...">` ブロックへインライン展開する（先頭に「SSOT の生成時コピー・直接編集禁止」コメント必須。**全文を省略・要約・畳み込みせず転記する**）
+- SSOT を変更したら同プロジェクトの全 HTML 補足ページへ再展開して伝播する（対象は `grep -rl 'data-shared-source'` で列挙）。**展開・検証は TS スクリプト雛形 [`references/expand-shared-css.ts`](references/expand-shared-css.ts) を各リポジトリへコピーして機械化する（SHOULD）**。スクリプト導入時は「SSOT 編集 → 展開 → 1 コミット」が MUST、`--check` を pre-commit / CI に組み込めば drift 放置を防げる
+- self-contained を壊さないため外部資産を埋め込まない（MUST）。図はインライン SVG / data URI、`<img src>` や外部 `.svg` 参照は不可。Google Fonts CDN `<link>` のみ例外で残す
 - 各 HTML の固有 `<style>` は `:root` 固有変数のみ（10-30 行程度）。`html, body { ... }` や `.toc { ... }` などのレイアウトは書かない
 - 各 HTML の `<body>` に `class="page-X"`（X はファイル名 kebab-case）を付与し、各ページ固有レイアウトは SSOT 側で `body.page-X .selector { ... }` の scope を付けて集約
 
