@@ -785,6 +785,8 @@ _shared/
 
 ## 関連参照
 
+- 既存プロジェクトを本方針へ移行する起動プロンプト → [`migration-prompt.md`](./migration-prompt.md)
+- 展開・検証スクリプト雛形 → [`expand-shared-css.ts`](./expand-shared-css.ts)
 - 視覚一貫性の原則的な裏付け → [`communicative-design.md`](./communicative-design.md) 原則 3「反復」
 - ベースカラー（`--accent` 値）の選定 → [`../../shared/base-color-mapping.md`](../../shared/base-color-mapping.md)
 - HTML 単体テンプレ（共通 CSS なしの最小骨格）→ [`templates.md`](./templates.md) §HTML 補足テンプレート
