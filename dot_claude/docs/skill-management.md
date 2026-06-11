@@ -29,6 +29,16 @@
 - [ ] SKILL.md の `description` に新機能のトリガー語（「○○について」で呼び出されるべき語）を追加したか
 - [ ] references を新規追加した場合、SKILL.md 本文から **明示的に参照誘導**（「詳細は references/X.md 参照」）が書かれているか（参照誘導なしだと LLM が references を読まずに進む過去事例あり）
 
+### chezmoi 反映（追加・削除・拡張すべてに共通、編集後 必須確認）
+
+`~/.claude/skills/` 配下は **chezmoi 管理下だが live を直接編集する**運用（context.md 運用ルール）。live 編集だけで止めると source と乖離し、後日 `chezmoi diff` に想定外差分が出て解釈に詰まる（2026-06-02 に `obsidian-daily/SKILL.md` を live のみ編集して source 反映が漏れた事故が由来）。**編集と同一セッションで source 反映まで必ず確認する**（2026-05-27 原則「live と source の乖離時間を最小化」）。
+
+- [ ] **新規ファイル**（新スキルの SKILL.md / references 等）は `chezmoi add <path>` で source に取り込む（`re-add` は未管理ファイルに対しては `not managed` エラーになる）
+- [ ] **既存ファイルの編集**は `chezmoi re-add <path>` で source を更新する
+- [ ] **削除**は live ディレクトリ削除後、source 側（`~/.local/share/chezmoi/dot_claude/skills/<skill-name>/`）も削除する
+- [ ] `chezmoi diff` で残差を確認する（`run_before_*` 由来の差分は常時出るので無視可、それ以外が消えていれば反映完了）
+- [ ] source 反映を確認してから commit する（live と source を 1 コミットに揃え、乖離状態のコミットを残さない）
+
 ### コミット粒度
 
 スキル本体の変更とドキュメント反映は **1 コミット 1 意図** で揃える（コミット `75b64c2` `multi-persona-review` 追加時の慣例）。
