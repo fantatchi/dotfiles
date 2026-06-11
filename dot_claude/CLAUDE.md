@@ -150,7 +150,9 @@ LOW: 変数名 `d` を `deliveryDate` に変えると可読性が上がります
 
 # 作業 Tips
 
+- **Bash ツールは bash。PowerShell の here-string `@'...'@` は使えない**: 環境の primary shell が PowerShell でも、Claude Code の Bash ツールは bash を実行する。`git commit -m @'...'@` のような PowerShell here-string を Bash ツールで使うと、bash が `@` をリテラルとして扱いコミットメッセージの先頭・末尾に `@` が混入する（実際に 4 コミット作り直す事故あり）。複数行メッセージは **bash heredoc**（`git commit -F - <<'EOF'` … `EOF`）で渡す
 - **別ブランチのファイルを checkout せずに読む**: PR レビュー時など、現在のブランチを維持したまま別ブランチの内容を読むには `git fetch origin <branch>` した上で `git show FETCH_HEAD:<path>` または `git show origin/<branch>:<path>` を使う。作業中のブランチを崩さずに済む
+- **「未取込」ローカルブランチ ≠ 作業ロストの検証手順**: マージ後にローカルブランチが `[origin/...: gone]`（リモート削除済）かつ `git branch -d` で「未マージ」と弾かれても、即ロストとは限らない。`git merge-base --is-ancestor <branch> origin/master` で祖先判定 → 真なら取込済。偽でも `git diff --stat origin/master <branch>` で「origin 側が前進＝オーファン tip が古い」を確認できれば内容は別経路で反映済と判定でき、`-D` で安全に削除できる。GUI 即マージで follow-up push がオーファン化したケース（同一テーマの別 PR で再実装）で有効。「未マージ」表示を鵜呑みにして残し続けると stale ブランチが溜まる
 - **`chezmoi add` と `chezmoi re-add` の違い**: `re-add` は既存管理ファイルの更新専用。新規ファイルを source に取り込むには `chezmoi add` を使う（`re-add` だと `not managed` エラー）
 - **`run_before_*` は `chezmoi diff` に常に出る**: `run_before_` スクリプトは毎回 apply 時に実行されるため、diff がクリアにならないのは正常動作。`run_onchange_` はハッシュ変化時のみ実行されるので diff に出ない
 - **リモートブランチ削除を `gh api` で回避する**: `git push origin --delete <branch>` がシステム側のブロックで弾かれる環境では、`gh api --method DELETE repos/<owner>/<repo>/git/refs/heads/<branch>` が代替になる。PR マージ後のブランチ片付けに使える
