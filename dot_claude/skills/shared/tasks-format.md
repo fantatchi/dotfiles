@@ -19,8 +19,10 @@
 
 ## 場所
 
-- **正本**: `~/ObsidianVault/00_meta/tasks.md`（グローバル、Vault 配下）
-- **同期**: Obsidian Sync で全 PC リアルタイム共通（モバイル含む）
+本ファイルは tasks.md の**中身のフォーマット**の SSOT であり、tasks.md が**どこにあるか**は resolver が出典（責務分離）。
+
+- **出典**: resolver `~/.claude/skills/shared/integrations.md` の `task_store`（無ければ既定 `~/ObsidianVault/00_meta/tasks.md`）
+- **同期（既定環境）**: `task_store` を Obsidian Vault 配下に置く場合は Obsidian Sync で全 PC リアルタイム共通（モバイル含む）。Vault 外パスを指す standalone 環境では同期は各自の運用に委ねる
 
 ## セクション構造
 
