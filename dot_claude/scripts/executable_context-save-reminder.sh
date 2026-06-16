@@ -90,7 +90,7 @@ CONTEXT_FILE="${REPO_ROOT}/.claude/context.md"
 # context.md が無いプロジェクトでは何もしない（初回は手動 /context-save 前提）
 [ -f "$CONTEXT_FILE" ] || exit 0
 
-# frontmatter から updated を抽出（context-save-hook.sh と同様のパターン）
+# frontmatter から updated を抽出（context.md の `updated:` フィールド）
 UPDATED=$(awk '
     /^---$/ { fc++; if(fc==1) fm=1; else if(fc==2) { fm=0; exit }; next }
     fm && /^updated:/ {
@@ -103,7 +103,7 @@ UPDATED=$(awk '
 
 [ -n "$UPDATED" ] || exit 0
 
-# Unix 時刻に変換（ローカルタイム前提。context-save-hook.sh の書式と揃える）
+# Unix 時刻に変換（ローカルタイム前提。context.md の updated は ISO 8601 ローカル時刻）
 UPDATED_EPOCH=$(date -d "$UPDATED" +%s 2>/dev/null) || exit 0
 
 # 基準は max(updated, session_start)
