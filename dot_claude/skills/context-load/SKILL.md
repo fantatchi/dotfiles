@@ -11,7 +11,7 @@ allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(echo:*), Bash(basename:*), Ba
 
 このスキルは **コア（`.claude/context.md` / `.claude/progress.md` の読み込みと提示で完結・外部依存なし）** と **連携（タスクストアが揃っていれば「次のステップ」を追加表示する任意処理）** に分かれる。Obsidian や他スキルが無い環境でも「## コア」だけで動作する。連携の配線は `~/.claude/skills/shared/integrations.md`（resolver）で判定する。
 
-## コア（外部依存なし・単独完結）
+## コア（単独完結・連携なしで動く）
 
 ### 読み込み元
 
@@ -90,10 +90,9 @@ allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(echo:*), Bash(basename:*), Ba
 
 ## 連携（任意・対象があれば実行）
 
-**連携の前提確認**: `~/.claude/skills/shared/integrations.md` を Read する（無ければ全キー未設定とみなす）。各連携の ［参照キー］ について、resolver の「参照規約」(a)/(b)/(c) で判定する:
-- (a) ファイルが無い / キーが空・未設定 → その連携を skip
-- (b) キーにパスがあり `*_probe`（無ければキー自身）の存在が確認できる → 実行
-- (c) キーにパスがあるが probe 不在 → 未同期とみなし skip
+**連携の前提確認**: `~/.claude/skills/shared/integrations.md` を Read する（無ければ全キー未設定とみなす）。各連携の ［参照キー］ を resolver の「参照規約」で判定する。**(a)→(b)→(c) を上から評価し最初に真の分岐を採る**:
+- **path 系キー**（task_store 等）: (a) 空/未設定 → skip / (b) パスあり＋`*_probe`（無ければキー自身）存在 → 実行 / (c) パスあるが probe 不在 → skip
+- **bool 系キー**（memory_promotion 等）: probe 判定なし。`on` → 実行 / `off`・未設定 → skip
 
 連携が skip された場合、提示の「### 次のステップ」セクションは省略する（コアの提示には影響しない）。
 
