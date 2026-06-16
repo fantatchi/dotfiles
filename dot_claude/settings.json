@@ -43,29 +43,6 @@
     "defaultMode": "auto"
   },
   "hooks": {
-    "PreCompact": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node -e \"require(require('os').homedir()+'/.claude/scripts/run-hook.js')('context-save-hook')\"",
-            "timeout": 30,
-            "statusMessage": "コンテキストを自動保存中..."
-          }
-        ]
-      }
-    ],
-    "SessionEnd": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node -e \"require(require('os').homedir()+'/.claude/scripts/run-hook.js')('context-save-hook')\"",
-            "timeout": 30
-          }
-        ]
-      }
-    ],
     "UserPromptSubmit": [
       {
         "matcher": "",
