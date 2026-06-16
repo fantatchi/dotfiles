@@ -79,6 +79,22 @@
             "type": "command",
             "command": "node -e \"require(require('os').homedir()+'/.claude/scripts/run-hook.js')('claude-md-audit-reminder')\"",
             "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "node -e \"require(require('os').homedir()+'/.claude/scripts/run-hook.js')('typecheck-reminder')\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"require(require('os').homedir()+'/.claude/scripts/run-hook.js')('typecheck-gate')\"",
+            "timeout": 10
           }
         ]
       }
@@ -137,6 +153,7 @@
     }
   },
   "alwaysThinkingEnabled": true,
+  "effortLevel": "high",
   "autoUpdatesChannel": "latest",
   "tui": "fullscreen",
   "skipAutoPermissionPrompt": true
