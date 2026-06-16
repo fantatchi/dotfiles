@@ -1,24 +1,28 @@
 ---
 name: session-save
 description: セッションの作業ログ記録とコンテキスト保存をまとめて実行し、アウトプット候補の提案も行う。「作業を保存して」「セッション終わり」「まとめて保存」といった依頼で使う。
-allowed-tools: Read, Write, Edit, Glob, Bash(git:*), Bash(echo:*), Bash(mkdir:*), Bash(basename:*), Bash(date:*), Bash(chezmoi source-path)
+allowed-tools: Read, Skill
 ---
 
 # セッション保存
 
-作業ログの記録（obsidian-log）とコンテキスト保存（context-save）をまとめて実行する。
+作業ログの記録（obsidian-log）とコンテキスト保存（context-save）をまとめて実行する **orchestrator**。
+
+**設計（orchestrator）**: 各処理の手順は持たず、`Skill` ツールでサブスキルを順に起動するだけ。書き出し先・フォーマット・ローテーション等の詳細はサブスキル側 SKILL.md が唯一の正本で、本ファイルでは再記述しない（齟齬防止）。**degradation（連携先が無いときの skip / フォールバック）は各サブスキルが内部で持つため、orchestrator は基本無条件で起動する**。例外は「起動自体が無意味になるキー」を持つサブスキルだけで、その場合のみ resolver を先読みして skip する（ここでは obsidian-log に対する `vault`）。サブスキルは各自の `allowed-tools` の下で動く。
 
 ## 実行順序
 
-### ステップ 1: 作業ログの記録
+### ステップ 1: 作業ログの記録（obsidian-log）
 
-`../obsidian-log/SKILL.md` の手順に完全に従う。書き出し先・フォーマット・タグ等の詳細は SKILL.md 側が正であり、このファイルでは再定義しない（齟齬防止のため）。
+obsidian-log は Vault を主資源とする「Vault 連携専用」スキルで、Vault が無いと起動しても案内終了するだけなので、ここだけ先読み skip 判定をする:
 
-### ステップ 2: コンテキスト保存
+1. resolver `~/.claude/skills/shared/integrations.md` を Read し `vault` を確認する（path 系キー：`vault` が空・未設定、または指すパスが不在 → 無効）
+2. `vault` が有効 → `Skill` ツールで **obsidian-log** を起動する（引数はユーザー指定のタグがあれば渡す）
+3. `vault` が無効 → このステップを skip し、完了報告で「作業ログ: skip（Vault 未設定）」と明示する
 
-`../context-save/SKILL.md` の手順に完全に従う。書き出し先・フォーマット等は SKILL.md 側が正。
+### ステップ 2: コンテキスト保存（context-save）
 
-**context-save は `.claude/context.md` の保存だけでなく、`## 進行中の作業` の 14 日ローテーション・`~/ObsidianVault/00_meta/tasks.md` の `## Next` への次アクション吸い上げ・`.claude/progress.md` の更新まで含む複合動作である**。session-save 経由でもこれら全てが実行される。詳細は context-save SKILL.md 側で管理されるので、本ファイルでは再記述しない（齟齬防止）。
+`Skill` ツールで **context-save** を起動する（無条件。context-save 自身がコア＝`.claude/context.md` 保存で完結し、tasks.md 吸い上げ・progress.md 更新・MEMORY 昇格提案などの連携は内部で resolver を見て自己 degradation する）。session-save から起動しても context-save のコア＋有効な連携がすべて実行される。詳細は context-save SKILL.md 側が正本（本ファイルでは再記述しない）。
 
 ### ステップ 3: アウトプット提案
 
@@ -54,11 +58,11 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git:*), Bash(echo:*), Bash(mkdir:*)
 
 ### ステップ 4: 完了報告
 
-両方の結果をまとめて報告する：
+各サブスキルの結果をまとめ、skip があれば内訳も明示して報告する：
 
 ```
 セッションを保存しました:
-- 作業ログ: {ログファイル名}
+- 作業ログ: {ログファイル名}        ← skip した場合は「skip（Vault 未設定）」
 - コンテキスト: .claude/context.md
 ```
 
@@ -66,6 +70,6 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git:*), Bash(echo:*), Bash(mkdir:*)
 
 ## 注意事項
 
-- ステップ 1 が失敗しても（`~/ObsidianVault` 未配置など）、ステップ 2 以降は実行する
-- 各ステップの詳細な仕様は個別のスキル定義を参照すること
-- 同セッションの作業ログが既に存在する場合は、新規作成せず既存ファイルを上書き更新する
+- **orchestrator はサブスキルを順に起動するだけ**。ステップ 1（obsidian-log）が skip / 失敗しても、ステップ 2（context-save）以降は実行する
+- 各ステップの詳細な仕様・degradation は個別のサブスキル定義（`obsidian-log` / `context-save`）が正本。本ファイルでは再記述しない
+- 同セッションの作業ログが既に存在する場合に新規作成せず上書き更新するかどうかは obsidian-log 側の責務（本 orchestrator は関与しない）
