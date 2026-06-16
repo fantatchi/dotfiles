@@ -9,6 +9,8 @@ allowed-tools: Read, Bash(gh:*), Bash(date:*), Bash(python:*), Bash(cat:*), Bash
 
 その日の GitHub アクティビティと Obsidian 作業ログ（作業ログ）を収集し、デイリーノートにサマリーを追記する。
 
+**主資源と連携**: 主資源は Obsidian Vault（デイリーノートの書き出し先）。配線はすべて resolver `~/.claude/skills/shared/integrations.md` から解決する — `vault`（書き出し先、無ければ案内終了）/ `vault_dirs`（サブディレクトリ名）/ `gh_accounts`（集約対象 GitHub アカウント、空ならアクティブ 1 アカウントのみ）/ `task_store`（予定タスク収集、空・未配備なら `upcoming_tasks` を空に）。GitHub 収集とサマリー組み立て自体は Vault があれば兄弟スキル無しで動く。
+
 ## 1. 対象日の決定
 
 - `$ARGUMENTS` が `YYYY-MM-DD` 形式で指定されていればその日を対象とする
@@ -22,9 +24,9 @@ allowed-tools: Read, Bash(gh:*), Bash(date:*), Bash(python:*), Bash(cat:*), Bash
 
 ## 2. Vault パスの決定
 
-`~/.claude/skills/shared/vault-init.md` の **§1「Vault 存在確認」を実行** する（`~/ObsidianVault` の存在チェックと、未配置時の案内メッセージ）。WSL / Windows (Git Bash) いずれからも同じ相対パスで解決される前提も shared 側に集約済み。
+`~/.claude/skills/shared/vault-init.md` の **§1「Vault パスの解決と存在確認」を実行** する（resolver `integrations.md` の `vault` を解決し、存在チェックと未配置時の案内を行う。既定 `~/ObsidianVault`）。以降この解決済みパスを `<vault>` と呼ぶ。WSL / Windows (Git Bash) いずれからも同じ相対パスで解決される前提も shared 側に集約済み。
 
-本スキルは Vault 内へのファイル書き出しを `write-daily.py` が `~/ObsidianVault/10_daily/YYYYMM/YYYY-MM-DD.md` に直接行う設計のため、shared/vault-init.md の §2「書き出し先ディレクトリ」/ §3「ファイル名」規約は使用しない（その 2 つは obsidian-log / obsidian-resource 用）。
+本スキルは Vault 内へのファイル書き出しを `write-daily.py` が `<vault>/<daily>/YYYYMM/YYYY-MM-DD.md`（`<daily>` は resolver `vault_dirs.daily`、既定 `10_daily`）に直接行う設計のため、shared/vault-init.md の §2「書き出し先ディレクトリ」/ §3「ファイル名」規約は使用しない（その 2 つは obsidian-log / obsidian-resource 用）。なお実際の出力パスは `daily-notes.json` を真の出典とし、`vault_dirs.daily` はその fallback（write-daily.py のテンプレ解決に従う）。
 
 ## 3. GitHub データ収集
 
@@ -32,11 +34,15 @@ allowed-tools: Read, Bash(gh:*), Bash(date:*), Bash(python:*), Bash(cat:*), Bash
 
 ### 対象アカウント
 
-複数 GitHub アカウントの活動を集約する。Bash 配列でループ:
+集約対象の GitHub アカウントは resolver `~/.claude/skills/shared/integrations.md` の `gh_accounts` で解決する。値を Bash 配列に展開してループ:
 
 ```bash
-accounts=("fantatchi" "kentem-at-kato")
+# resolver の gh_accounts の各要素をそのまま並べる
+accounts=("<gh_accounts の各要素>")
 ```
+
+- `gh_accounts` が **空 / 未設定** の場合は、現在アクティブな `gh` アカウント 1 つだけを対象にする（`gh auth status` の active user）。この場合「## アカウント切替」は不要。複数アカウント集約は composable な拡張で、単独環境では 1 アカウントで完結する
+- 値がある場合はその配列をそのまま使い、各要素を `${acc}` として以下のクエリに展開する
 
 各アカウントについて以下 4 クエリを **逐次実行**（並列化禁止: search 専用 rate limit 枠を一気に使い切らないため）し、結果を 1 つの JSON に統合する。
 クエリ文字列の `<ACCOUNT>` は `${acc}`、`<TARGET_DATE>` はステップ 1 で決めた日付（例: `2026-05-14`）に置換して叩く。
@@ -144,7 +150,8 @@ gh api 'search/issues?q=reviewed-by:<ACCOUNT>+type:pr+updated:<TARGET_DATE>T00:0
 Bash の ls コマンドでファイル一覧を取得し、各ファイルを Read ツールで読む:
 
 ```bash
-ls ~/ObsidianVault/20_log/{YYYYMM}/{YYYYMMDD}*.md 2>/dev/null
+# <vault> は §2 で解決した Vault パス、<log> は resolver vault_dirs.log（既定 20_log）
+ls <vault>/<log>/{YYYYMM}/{YYYYMMDD}*.md 2>/dev/null
 ```
 
 各ファイルから以下を抽出する:
@@ -158,7 +165,7 @@ ls ~/ObsidianVault/20_log/{YYYYMM}/{YYYYMMDD}*.md 2>/dev/null
 
 ## 4b. tasks.md からの予定タスク収集
 
-`~/ObsidianVault/00_meta/tasks.md` を Read で読み、`## Next` と `## Waiting` セクションのタスクを抽出する。
+resolver `~/.claude/skills/shared/integrations.md` の `task_store`（無ければ既定 `~/ObsidianVault/00_meta/tasks.md`）を Read で読み、`## Next` と `## Waiting` セクションのタスクを抽出する。`task_store` が空 / `task_store_probe` 不在 / ファイル不存在の場合は `upcoming_tasks` を空配列 `[]` として進む（予定タスクは連携であり、無くてもデイリーサマリー生成は完走する）。
 
 ### 抽出ルール
 
@@ -200,6 +207,7 @@ ls ~/ObsidianVault/20_log/{YYYYMM}/{YYYYMMDD}*.md 2>/dev/null
 }
 ```
 
+- `vault` には §2 で解決した `<vault>`（resolver `vault`、既定 `~/ObsidianVault`）をチルダ込みのまま入れる
 - `commits`, `prs`, `logs`, `upcoming_tasks` が 0 件の場合は空配列 `[]` にする
 - `commits[].date` は §3a で抽出した `commit.committer.date`（ISO-8601）。`write-daily.py` 自体は使わない（入力順を保持してそのまま出力する）が、§3 マージ規約のソートで使うため **必ず含めて出力**。例 schema からこのフィールドを削ると LLM が捨てる → ソートが空打ちになる過去事例あり
 - `prs[].labels` は `("作成", "マージ", "レビュー")` の **語固定**。write-daily.py の KPI 行が **label 別に分解カウント** する仕様（同 PR が `["作成", "マージ"]` を持つと breakdown で `作成 1・マージ 1`、ただし PR 件数自体は **1**）。LLM 側で labels を「代表 1 件に畳む」「順序を変える」「別語に置換」しないこと（畳むと breakdown が消える）
@@ -260,6 +268,7 @@ Microsoft Store のスタブランチャー (`AppData\Local\Microsoft\WindowsApp
 および `build_kpi_line` / `build_grouped_commits` / `build_logs_section` が実装上の唯一の正本。
 出力規約は `obsidian-mail` の reader 契約（`obsidian-mail/SKILL.md §2-b`）にも反映されているため、
 出力フォーマットを変更する際は reader 側の `_BULLET_RE` 等の依存を必ず確認すること。
+producer ↔ consumer の構造契約の人間可読な要約は `~/.claude/skills/shared/daily-summary-format.md` に集約してある（ただし真の SSOT は本コードと `extract-summary.py`）。
 
 ## 6-a. Obsidian テンプレート前提
 
@@ -340,4 +349,4 @@ author: at-kato
 - Obsidian のリンク記法（`[[]]`）やコールアウト（`> [!info]`）を活用する
 - Windows 環境で `python` が無い場合は Python 3 をインストールしてから実行すること（`python3` は MS Store スタブの可能性があるので避ける）
 - **JSON は必ずファイル経由で渡す**: `echo "$JSON" | python3 ...` / `cat <<EOF | python3 ...` / シェル変数展開は Windows (Git Bash) で cp932 化けを起こす。`sys.stdin.reconfigure` では救えない（Python 到達前にシェルが bytes 化しているため）。ステップ 6 の手順（Python ヒアドキュメントで UTF-8 ファイルに書き出し → パス引数）を必ず踏むこと
-- **`vault` の `~` 展開**: Python は `~` を自動展開しないため、`write-daily.py` 側で `os.path.expanduser()` を通している。JSON の `vault` には `~/ObsidianVault` のようなチルダ込みパスをそのまま渡してよい（渡さないと literal `~` ディレクトリが作られるバグを過去に踏んだ）
+- **`vault` の `~` 展開**: Python は `~` を自動展開しないため、`write-daily.py` 側で `os.path.expanduser()` を通している。JSON の `vault` には §2 で解決した `<vault>`（既定 `~/ObsidianVault`）のチルダ込みパスをそのまま渡してよい（渡さないと literal `~` ディレクトリが作られるバグを過去に踏んだ）

@@ -9,6 +9,8 @@ allowed-tools: Read, Write, Glob, Bash(echo:*), Bash(mkdir:*), Bash(date:*)
 
 今回のセッションで行った作業を振り返り、Obsidian Vaultに記録を残してください。
 
+**主資源と連携**: このスキルは Obsidian Vault（主資源）への作業ログ書き出し専用で、Vault があれば兄弟スキル無しで動く。Vault パスは resolver `~/.claude/skills/shared/integrations.md` の `vault`（既定 `~/ObsidianVault`）から `vault-init.md` 経由で解決する。Vault が無い環境では `vault-init.md` §1 の案内で終了する（standalone フォールバックは無い＝Vault 連携専用スキル）。それ以外の兄弟スキル連携は持たない。
+
 ## 書き出し先・ファイル名
 
 `~/.claude/skills/shared/vault-init.md` の手順に従うこと（サブディレクトリ名は `20_log`）。タイトル部分は「簡潔な作業概要」にする。

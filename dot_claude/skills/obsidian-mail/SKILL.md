@@ -10,6 +10,8 @@ allowed-tools: Read, Bash(date:*), Bash(python3:*), Bash(ls:*), Bash(test:*), Ba
 
 Obsidian デイリーノートの「## デイリーサマリー」セクションを **構造化パース → メール向けに再構成**して Gmail SMTP で送信する。Obsidian ノート形式をそのまま流すのではなく、「今日のひとこと → ハイライト → GitHub → 明日のタスク」の読み物形式にする。
 
+**主資源と連携**: 主資源は Obsidian Vault（`obsidian-daily` が書いたデイリーノートの読み出し元）。配線は resolver `~/.claude/skills/shared/integrations.md` の `vault`（既定 `~/ObsidianVault`、`extract-summary.py` が `os.path.expanduser` で解決）と、連携 on/off を持つ bool キー `daily_mail` で判定する。`daily_mail` が `off` / 未設定なら送信せず終了する（メール連携は composable な拡張で、無くても他スキルに影響しない）。読み取るサマリーの**文章規約は `obsidian-daily` の出力との契約**であり `~/.claude/skills/shared/daily-summary-format.md` に集約（ただし真の SSOT は両者のコード）。
+
 ## 引数仕様
 
 ```
@@ -69,6 +71,13 @@ OBSIDIAN_SUMMARY_SMTP_USER='...' OBSIDIAN_SUMMARY_SMTP_PASS='...' \
 - `markdown`（`pip3 install --user markdown`）— HTML 変換
 
 ## 動作
+
+### 0. 連携 gate の確認（daily_mail）
+
+resolver `~/.claude/skills/shared/integrations.md` を Read し `daily_mail` を確認する（bool 系キー：probe 判定なし）。
+
+- `daily_mail` が `off` / 未設定 / resolver 不在 → 「メール連携が無効（daily_mail off）のため送信をスキップします」と 1 行報告して **正常終了**
+- `daily_mail` が `on` → 以降の手順に進む
 
 ### 1. 引数解析と対象日決定
 
