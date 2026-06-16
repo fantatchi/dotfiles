@@ -277,7 +277,7 @@ producer ↔ consumer の構造契約の人間可読な要約は `~/.claude/skil
 
 ### 必須要件
 
-1. **Obsidian Core Daily notes が有効**: `~/ObsidianVault/.obsidian/daily-notes.json` が存在し、
+1. **Obsidian Core Daily notes が有効**: `<vault>/.obsidian/daily-notes.json`（`<vault>` は §2 で解決、既定 `~/ObsidianVault`）が存在し、
    `template` フィールドが vault 相対のテンプレファイル名（拡張子なし、例: `90_config/templates/daily_notes`）を指していること
 2. **テンプレートファイル本体**: 上記 `template + ".md"` パスに `.md` ファイルが配置されていること
 3. **Frontmatter placeholder**: テンプレ内の `{{date:FORMAT}}` は Moment.js 形式として解釈される。
