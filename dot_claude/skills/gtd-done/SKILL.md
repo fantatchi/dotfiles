@@ -1,13 +1,15 @@
 ---
 name: gtd-done
-description: ~/ObsidianVault/00_meta/tasks.md の指定タスクを **完了** にし Done セクションへ移動する操作型スキル。動詞は「完了」専用（追加は gtd-add、表示は gtd-list）。「タスク完了」「あれ終わった」「完了マーク」「終わった」「タスク消化」といった依頼、または他スキルからのタスク完了要求で使う。
+description: タスクストア（tasks.md）の指定タスクを **完了** にし Done セクションへ移動する操作型スキル。動詞は「完了」専用（追加は gtd-add、表示は gtd-list）。「タスク完了」「あれ終わった」「完了マーク」「終わった」「タスク消化」といった依頼、または他スキルからのタスク完了要求で使う。tasks.md の場所は shared/integrations.md の task_store で解決し、無ければ既定 ~/ObsidianVault/00_meta/tasks.md。
 argument-hint: <タスクタイトルの部分一致文字列>
 allowed-tools: Read, Write, Edit, Bash(date:*)
 ---
 
 # タスク完了
 
-指定したタスクを `## Done` セクションに移動する。
+指定したタスクをタスクストア（tasks.md）の `## Done` セクションに移動する。
+
+**単独動作**: このスキルはタスクストア（tasks.md）1 つだけに依存し、Obsidian や兄弟スキルが無くても動く。tasks.md の場所は resolver `~/.claude/skills/shared/integrations.md` の `task_store` で解決する（無ければ既定 `~/ObsidianVault/00_meta/tasks.md`）。連携なし。
 
 ## フォーマット仕様
 
@@ -19,9 +21,10 @@ allowed-tools: Read, Write, Edit, Bash(date:*)
 
 - `$ARGUMENTS` が空の場合はユーザーに「完了するタスクの部分一致文字列」を質問する
 
-### 2. tasks.md の読み込み
+### 2. タスクストアの解決と読み込み
 
-`~/ObsidianVault/00_meta/tasks.md` を Read で読む。存在しない場合は「タスクが登録されていません。」と案内して終了。
+1. resolver `~/.claude/skills/shared/integrations.md` を Read し `task_store` を取得する（resolver が無い / `task_store` が空なら既定 `~/ObsidianVault/00_meta/tasks.md`）。以降この解決済みパスを「tasks.md」と呼ぶ
+2. tasks.md を Read で読む。存在しない場合は「タスクが登録されていません。」と案内して終了
 
 ### 3. タスク検索
 
@@ -84,6 +87,6 @@ b. 次に Done セクションに追加する（`old_string`: `## Done\n`, `new_
 
 ## 注意事項
 
-- tasks.md は `~/ObsidianVault/00_meta/tasks.md`（グローバル固定）
+- tasks.md の場所は resolver の `task_store` が出典（既定 `~/ObsidianVault/00_meta/tasks.md`）
 - 既に Done のタスクは検索対象外（二重完了を防ぐ）
 - Done への挿入位置は Done セクションの先頭（新しい完了が上）
