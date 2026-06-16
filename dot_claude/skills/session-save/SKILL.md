@@ -1,14 +1,16 @@
 ---
 name: session-save
 description: セッションの作業ログ記録とコンテキスト保存をまとめて実行し、アウトプット候補の提案も行う。「作業を保存して」「セッション終わり」「まとめて保存」といった依頼で使う。
-allowed-tools: Read, Skill
+allowed-tools: Read, Skill, Write, Edit, Glob, Bash(git:*), Bash(echo:*), Bash(mkdir:*), Bash(basename:*), Bash(date:*), Bash(pwd), Bash(chezmoi source-path)
 ---
 
 # セッション保存
 
 作業ログの記録（obsidian-log）とコンテキスト保存（context-save）をまとめて実行する **orchestrator**。
 
-**設計（orchestrator）**: 各処理の手順は持たず、`Skill` ツールでサブスキルを順に起動するだけ。書き出し先・フォーマット・ローテーション等の詳細はサブスキル側 SKILL.md が唯一の正本で、本ファイルでは再記述しない（齟齬防止）。**degradation（連携先が無いときの skip / フォールバック）は各サブスキルが内部で持つため、orchestrator は基本無条件で起動する**。例外は「起動自体が無意味になるキー」を持つサブスキルだけで、その場合のみ resolver を先読みして skip する（ここでは obsidian-log に対する `vault`）。サブスキルは各自の `allowed-tools` の下で動く。
+**設計（orchestrator）**: 各処理の手順は持たず、`Skill` ツールでサブスキルを順に起動するだけ。書き出し先・フォーマット・ローテーション等の詳細はサブスキル側 SKILL.md が唯一の正本で、本ファイルでは再記述しない（齟齬防止）。**degradation（連携先が無いときの skip / フォールバック）は各サブスキルが内部で持つため、orchestrator は基本無条件で起動する**。例外は「起動自体が無意味になるキー」を持つサブスキルだけで、その場合のみ resolver を先読みして skip する（ここでは obsidian-log に対する `vault`）。
+
+> `allowed-tools` はこの orchestrator 自身が使う `Read` / `Skill` に加え、**サブスキル（obsidian-log / context-save）が要求するツールの和集合**を明示している。Skill 経由で起動したサブスキルが親の権限に絞られるか各自の `allowed-tools` で動くかは未確認のため、絞られた場合でも Bash / Write が拒否されて**無言で保存失敗**しないよう、安全側に広く宣言している（サブが各自権限で動くなら余剰宣言は無害）。
 
 ## 実行順序
 
@@ -18,7 +20,7 @@ obsidian-log は Vault を主資源とする「Vault 連携専用」スキルで
 
 1. resolver `~/.claude/skills/shared/integrations.md` を Read し `vault` を確認する（path 系キー：`vault` が空・未設定、または指すパスが不在 → 無効）
 2. `vault` が有効 → `Skill` ツールで **obsidian-log** を起動する（引数はユーザー指定のタグがあれば渡す）
-3. `vault` が無効 → このステップを skip し、完了報告で「作業ログ: skip（Vault 未設定）」と明示する
+3. `vault` が無効 → このステップを skip し、完了報告で「作業ログ: skip（Vault 未設定/未配置）」と明示する
 
 ### ステップ 2: コンテキスト保存（context-save）
 
@@ -62,7 +64,7 @@ obsidian-log は Vault を主資源とする「Vault 連携専用」スキルで
 
 ```
 セッションを保存しました:
-- 作業ログ: {ログファイル名}        ← skip した場合は「skip（Vault 未設定）」
+- 作業ログ: {ログファイル名}        ← skip した場合は「skip（Vault 未設定/未配置）」
 - コンテキスト: .claude/context.md
 ```
 
