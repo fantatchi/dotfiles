@@ -1,6 +1,6 @@
 ---
 name: context-load
-description: 保存済みのプロジェクトコンテキストを読み込み、前回の作業状態を復帰する。セッション開始時に使う。
+description: 保存済みのプロジェクトコンテキストを読み込み、前回の作業状態を復帰する。セッション開始時に使う。コアは `.claude/context.md` と `.claude/progress.md` の読み込み・git 状態比較・提示で、外部依存なく単独で動く。連携が有効な環境では `~/ObsidianVault/00_meta/tasks.md`（task_store）から「次のステップ」を抽出して提示に含める。連携の有無は `shared/integrations.md` で判定し、未設定ならコアのみで完結する。
 disable-model-invocation: true
 allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(echo:*), Bash(basename:*), Bash(pwd)
 ---
@@ -9,37 +9,26 @@ allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(echo:*), Bash(basename:*), Ba
 
 保存済みのプロジェクトコンテキストを読み込み、前回の作業状態を復帰する。
 
-## 読み込み元
+このスキルは **コア（`.claude/context.md` / `.claude/progress.md` の読み込みと提示で完結・外部依存なし）** と **連携（タスクストアが揃っていれば「次のステップ」を追加表示する任意処理）** に分かれる。Obsidian や他スキルが無い環境でも「## コア」だけで動作する。連携の配線は `~/.claude/skills/shared/integrations.md`（resolver）で判定する。
+
+## コア（外部依存なし・単独完結）
+
+### 読み込み元
 
 プロジェクトルートの `.claude/context.md`
 
-### プロジェクトルートの決定
+#### プロジェクトルートの決定
 
 1. `git rev-parse --show-toplevel` でリポジトリルートを取得
 2. git リポジトリ外の場合は CWD をプロジェクトルートとする
 
-### ファイルが存在しない場合
+#### ファイルが存在しない場合
 
 「コンテキストが保存されていません。`/context-save` で保存してください。」と案内して終了。
-
-## 読み込み処理
 
 ### 1. コンテキストファイルの読み込み
 
 `{project-root}/.claude/context.md` を読み込み、内容を把握する。
-
-### 1-b. タスクの読み込み
-
-`~/ObsidianVault/00_meta/tasks.md` を読み込み、現在プロジェクトのタスクを抽出する。tasks.md は context-save が各セッションで吸い上げた「次のアクション」を全プロジェクト横断で集約する共有ストア。context-load 時にここを参照することで、セッション開始時に「前回までに次やる予定にしたこと」が即座に見える。
-
-フォーマット規約は `~/.claude/skills/shared/tasks-format.md` を参照（context-save と同じ SSOT）。
-
-1. tasks.md を Read で読む
-   - **Vault 未配備の場合**（`~/ObsidianVault/.obsidian/` も存在しない）または **tasks.md 不存在**: ステップ 1-b ごとスキップ（context.md 本体の読み込みには影響しない）
-2. プロジェクトタグを決定: `#project/<basename of git toplevel>`（または CWD 名、`$HOME` 完全一致なら `#project/global`）
-3. `## Next` / `## Waiting` セクションから該当プロジェクトタグを持つタスクを抽出
-4. 存在すれば「次のステップ」として提示に含める（ステップ 3 参照）
-5. 該当タスクが 0 件の場合は「次のステップなし」とする
 
 ### 2. 現在の git 状態との比較
 
@@ -49,15 +38,15 @@ allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(echo:*), Bash(basename:*), Ba
 - 未コミットの変更がある場合: 注意喚起
 - 保存時以降に新しいコミットがある場合: その旨を表示
 
-### 2-b. 進捗マップの読み込み
+### 3. 進捗マップの読み込み
 
-`{project-root}/.claude/progress.md` を読み込み、進捗マップとして扱う。
+`{project-root}/.claude/progress.md` を読み込み、進捗マップとして扱う（project-local のため外部依存なし）。
 
 - ファイルが存在しない場合はスキップ
-- 抽出した内容は提示（ステップ 3）に含める
+- 抽出した内容は提示（ステップ 4）に含める
 - 後方互換: `.claude/progress.md` がなく、かつ `{project-root}/CLAUDE.md` に `## 進捗マップ` セクションがある場合は、そこから抽出する（旧形式）
 
-### 3. コンテキストの提示
+### 4. コンテキストの提示
 
 読み込んだ情報を整理して提示する：
 
@@ -81,7 +70,7 @@ allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(echo:*), Bash(basename:*), Ba
 ### 進行中の作業
 （作業内容）
 
-### 次のステップ（tasks.md より）
+### 次のステップ（連携1 が実行された場合のみ・task_store より）
 - [ ] （Next から抽出したタスク）
 - [ ] （Waiting から抽出したタスク） ⏳ 待ち
 
@@ -96,12 +85,33 @@ allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(echo:*), Bash(basename:*), Ba
 
 - 「現在の状態」は context.md に `## 現在の状態` がある場合のみ表示する。git 管理外（ホームワークスペース等）でセクションが無ければ省略する（ブランチは冒頭の `**ブランチ**` で出すため重複させない）
 - 「進捗マップ」は `.claude/progress.md`（優先）または CLAUDE.md の `## 進捗マップ` セクション（後方互換）がある場合のみ表示する。どちらもない場合はセクションごと省略する
-- 「次のステップ」は `~/ObsidianVault/00_meta/tasks.md` から該当プロジェクトの Next / Waiting を抽出して表示する。Vault 未配備・tasks.md 不存在の場合はセクションごと省略
-- Waiting のタスクには ⏳ マーカーを付けて区別する
-- タスクが 0 件の場合は「次のステップなし。`/gtd-add` で追加できます。」と表示
+- 「次のステップ」は連携1（タスクストア読み込み）が実行された場合のみ表示する。連携が無効な環境ではセクションごと省略する
 - 「関連リポジトリ」は context.md に `## 関連リポジトリ` セクションがある場合のみ表示する。ない場合はセクションごと省略する
+
+## 連携（任意・対象があれば実行）
+
+**連携の前提確認**: `~/.claude/skills/shared/integrations.md` を Read する（無ければ全キー未設定とみなす）。各連携の ［参照キー］ について、resolver の「参照規約」(a)/(b)/(c) で判定する:
+- (a) ファイルが無い / キーが空・未設定 → その連携を skip
+- (b) キーにパスがあり `*_probe`（無ければキー自身）の存在が確認できる → 実行
+- (c) キーにパスがあるが probe 不在 → 未同期とみなし skip
+
+連携が skip された場合、提示の「### 次のステップ」セクションは省略する（コアの提示には影響しない）。
+
+### 連携1: タスクストアからの「次のステップ」抽出 ［参照キー: task_store, task_store_probe］
+
+`task_store`（タスクストア tasks.md）を読み込み、現在プロジェクトのタスクを抽出する。tasks.md は context-save が各セッションで吸い上げた「次のアクション」を全プロジェクト横断で集約する共有ストア。context-load 時にここを参照することで、セッション開始時に「前回までに次やる予定にしたこと」が即座に見える。
+
+フォーマット規約は `~/.claude/skills/shared/tasks-format.md` を参照（context-save と同じ SSOT）。
+
+1. `task_store` が指すファイルを Read で読む
+   - `task_store` が空 / `task_store_probe`（既定 `~/ObsidianVault/.obsidian/`）が不在 / tasks.md 不存在: 連携1 ごとスキップ（context.md 本体の読み込みには影響しない）
+2. プロジェクトタグを決定: `#project/<basename of git toplevel>`（または CWD 名、`$HOME` 完全一致なら `#project/global`）
+3. `## Next` / `## Waiting` セクションから該当プロジェクトタグを持つタスクを抽出
+4. 存在すれば「次のステップ」として提示に含める（コアのステップ 4 のテンプレート参照）
+5. Waiting のタスクには ⏳ マーカーを付けて区別する
+6. 該当タスクが 0 件の場合は「次のステップなし。`/gtd-add` で追加できます。」と表示
 
 ## 注意事項
 
-- 読み込み専用。コンテキストファイル・tasks.md・progress.md を変更しない
+- 読み込み専用。context.md・progress.md・tasks.md を変更しない
 - パスはプロジェクトルートからの相対パスで記録されているため、現在のマシンのパスと異なる場合がある
