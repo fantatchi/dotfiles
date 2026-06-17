@@ -2,7 +2,7 @@
 #
 # 現プロジェクト（cwd）に typecheck-gate が記録した型エラーがあれば
 # <system-reminder> として Claude に通知する。無ければ無音 exit 0。
-# ※ Windows 実機での検証は未実施。
+# Windows 実機検証済み（2026-06-17、run-hook.js 経由で system-reminder を stdout に出力・PASS 後は無音を確認）。
 
 $ErrorActionPreference = 'SilentlyContinue'
 

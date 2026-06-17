@@ -2,7 +2,7 @@
 #
 # 役割は typecheck-gate.sh と同じ。バックグラウンドで `npm run typecheck` を実行し
 # 結果を ~/.claude/state/typecheck-gate/<ハッシュ>.errors に記録する。
-# ※ Windows 実機での検証は未実施（正本の .sh は WSL で smoke test 済み）。
+# Windows 実機検証済み（2026-06-17、run-hook.js 経由で bg 実行/ロック/state 書込/reminder 通知/PASS 時 .errors 自動削除/二重起動防止を確認）。
 
 $ErrorActionPreference = 'SilentlyContinue'
 
