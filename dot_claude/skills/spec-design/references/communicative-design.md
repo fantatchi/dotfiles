@@ -4,7 +4,7 @@
 
 **出典**: 「伝わるデザイン」(<https://tsutawarudesign.com/>) — 各原則の末尾に該当ページ URL を明記。
 
-**範囲外**: 配色（カラーパレット選定・コントラスト比・色覚多様性配慮）は本ファイルでは扱わない。配色は [`../../shared/base-color-mapping.md`](../../shared/base-color-mapping.md) および [`../../dashboard-design/references/visual-encoding.md`](../../dashboard-design/references/visual-encoding.md) を参照。
+**範囲外**: 配色（カラーパレット選定・コントラスト比・色覚多様性配慮）は本ファイルでは扱わない。配色は [`visual-encoding.md`](./visual-encoding.md) および [`base-color-mapping.md`](./base-color-mapping.md) を参照。
 
 ## 適用範囲
 
@@ -60,7 +60,7 @@
 
 - **やる**: 見出しと本文のサイズ比を明確に大きく取り、階層が一目で分かるようにする。サイズ・太さの対比（コントラスト）で重要度を表現する。**視覚的階層は 3 段までに抑える**（H1 / H2 / H3 のみを「見出し階層」として扱い、H4 以下は本文と同サイズの太字で代替）
 - **やらない**: H1〜H3 を 1〜2pt 差で並べて区別不能にしない。階層を 4 段以上に深めない（読者が「自分が何階層目にいるか」を見失う）
-- **仕様書への適用例**: HTML で H1=2.0rem / H2=1.5rem / H3=1.2rem / body=1.0rem 程度の段差を確保。H4 以下は `font-size: 1rem; font-weight: 700`。PDF も同等比率。配色によるコントラストは `shared/base-color-mapping.md` のベースカラー 900 階調を採用
+- **仕様書への適用例**: HTML で H1=2.0rem / H2=1.5rem / H3=1.2rem / body=1.0rem 程度の段差を確保。H4 以下は `font-size: 1rem; font-weight: 700`。PDF も同等比率。配色によるコントラストは [`base-color-mapping.md`](./base-color-mapping.md) のベースカラー 900 階調を採用
 - **出典**: <https://tsutawarudesign.com/miyasuku4.html>（ジャンプ率・コントラストの章）
 
 ### 5. 視線の流れ（左上→右下）に沿わせる
@@ -187,6 +187,6 @@
 
 ## 関連参照
 
-- 配色・コントラスト比・ベースカラー切り替え → [`../../shared/base-color-mapping.md`](../../shared/base-color-mapping.md) および [`../../dashboard-design/references/visual-encoding.md`](../../dashboard-design/references/visual-encoding.md)
+- 配色・コントラスト比・ベースカラー切り替え → [`visual-encoding.md`](./visual-encoding.md) および [`base-color-mapping.md`](./base-color-mapping.md)
 - HTML / md / PDF の出力フォーマット選択 → SKILL.md「## 出力フォーマットのすみ分け」
 - 既存スタイル踏襲手順 → SKILL.md「### Step 1: 読み手と既存状態を確認」「### Step 3: スタイルを既存に合わせる」

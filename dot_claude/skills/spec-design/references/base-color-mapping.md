@@ -1,38 +1,23 @@
-# ベースカラー切り替えと階調マッピング（共通リソース）
+# ベースカラー切り替えと階調マッピング
 
-複数スキル（`spec-design` / `dashboard-design`）から参照される **ベースカラー運用ルール** の共通出典。HTML 補足ページ / PDF / スライド / ダッシュボードの配色選定で使う。
+spec-design の HTML 補足ページで **ベースカラーを別系統に切り替える** 際の運用ルール。パレット HEX 値の正本は同ディレクトリの [`visual-encoding.md`](visual-encoding.md)「## カラーパレット（デジタル庁デザインシステム由来）」セクションで、本ファイルはその HEX を **「どう使い分けるか」のマッピングルール** に専念する。
 
-**位置付け**: 本ファイルは `~/.claude/skills/shared/` 配下のライブラリ（`name:` 付きスキルではない、自動起動対象外）。配色パレットの HEX 値の正本は `~/.claude/skills/dashboard-design/references/visual-encoding.md` の「## カラーパレット（デジタル庁デザインシステム由来）」セクションを参照。本ファイルはその HEX 値を **「どう使い分けるか」のマッピングルール** に専念する。
+## デフォルトと本ファイルの関係（重要）
 
-## SSOT としての位置付け（重要）
+spec-design の HTML 補足ページの **デフォルト系統** は **Vercel link blue (`#0070f3`) + Inter / Noto Sans JP** で、[`html-css-centralization.md`](html-css-centralization.md) に直書きしている。これが最優先。
 
-各スキルの **デフォルト系統** はスキル本体に直書きしており、本ファイルの「§1 デフォルトのベースカラー: Blue」よりも優先される:
-
-| スキル | デフォルト系統 | 直書き場所 |
-|---|---|---|
-| `spec-design` (HTML 補足) | **Vercel link blue** (`#0070f3`) + Inter / Noto Sans JP | `spec-design/references/html-css-centralization.md` |
-| `dashboard-design` (HTML / BI ツール / ダッシュボード) | **Blue 900** (`#0017C1`) + Noto Sans JP | `dashboard-design/SKILL.md` + `visual-encoding.md` |
-
-本ファイルは **別系統（Green / Orange / Light Blue / Cyan / Red）切替時の階調マッピング SSOT** として参照される。「§1 Blue デフォルト」は dashboard-design 視点の歴史的記述であり、spec-design の HTML 補足は本ファイルを直接の HEX 出典としては使わない（Vercel inspired を直書き採用）。
-
-同一プロジェクトで両スキルの成果物（仕様書 HTML 補足 + ダッシュボード）が並走する場合、両者は別 CSS ファイルで動くため `--accent` の値が異なっても CSS スコープ衝突は起きない。読み手の認知統一が必要なら、プロジェクト ADR で「両スキルの `--accent` をどちらかに揃える」決定を残す。
+本ファイルは、プロジェクトのブランドカラーや業種都合で **デフォルト以外（Blue 900 / Green / Orange / Light Blue / Cyan / Red）に切り替える** 場合の階調マッピング SSOT として参照する。Vercel link blue (`#0070f3`) は本ファイルの階調表に存在しない HEX なので、デフォルトのまま使う場合は本ファイルの整合確認は適用外。
 
 **出典**: デジタル庁「ダッシュボードデザインの実践ガイドブック」第 4.3 節、カラーパレット <https://www.digital.go.jp/resources/dashboard-guidebook/color-palette>
 
 ---
 
-## 1. デフォルトのベースカラー: Blue（青） — dashboard-design 系統
-
-> **※ 本節は dashboard-design スキル系統のデフォルト記述** です。spec-design スキルの HTML 補足ページのデフォルトは **Vercel link blue (`#0070f3`)** で、本節の Blue 900 (`#0017C1`) ではありません (冒頭「SSOT としての位置付け」セクション参照)。本節は dashboard-design の利用時、または spec-design で別系統に切り替える際の参照として使う。
-
-dashboard-design のデフォルト・または別系統選択時の Blue 系列を採用する。
-
-優先順位:
+## 1. ベースカラーを切り替える場合の優先順位
 
 1. **プロジェクト固有指定がある場合**（CLAUDE.md / 既存仕様書のスタイル / ブランドガイド等）→ それを最優先で踏襲
-2. **指定がない・dashboard-design 系統 (ダッシュボード / KPI 画面 / BI ツール) で既存スタイル無し** → Blue 系列をデフォルト採用
+2. **指定がなく、デフォルト（Vercel link blue）以外のデジタル庁系統を採りたい場合** → 下記の階調マッピングルールに従って Blue / Green / Orange / Light Blue / Cyan / Red から選ぶ
 
-ベースカラーを Blue 以外（Green / Orange / Light Blue / Cyan / Red）に変える場合は、後述の階調マッピングルールに従う + プロジェクトの ADR に「ベースカラー選定」を残す（`spec-design/references/adr-format.md` の ADR テンプレを参照）。
+デフォルト以外に変える場合は、後述の階調マッピングルールに従う + プロジェクトの ADR に「ベースカラー選定」を残す（[`adr-format.md`](adr-format.md) の ADR テンプレを参照）。
 
 ## 2. 階調番号と用途の対応（基本ルール）
 
@@ -41,17 +26,17 @@ dashboard-design のデフォルト・または別系統選択時の Blue 系列
 | 用途 | 階調番号 | 役割の趣旨 |
 |---|---|---|
 | リンク / ハイライト | **900** | 視認性高め・本文上で目立つ濃さ |
-| チャート Primary（主要指標） | **1200** | パレット内で最も濃い、主役の表現 |
+| 強調（主要指標） | **1200** | パレット内で最も濃い、主役の表現 |
 | Positive（強調・正常達成） | **600** | コントラスト比 3:1 を満たす中濃度（※色相依存で破綻するケースあり、§4 を参照） |
 | ラベル / 控えめ要素 | **200** | 装飾的・サブ要素 |
 | 背景アクセント | **50** | ごく薄い面塗り、ノートカード等 |
 
 ## 3. 色相を変えた場合の HEX 例
 
-| 用途 | Blue（デフォルト） | Green 採用時 | Orange 採用時 | Light Blue 採用時 | Cyan 採用時 |
+| 用途 | Blue | Green 採用時 | Orange 採用時 | Light Blue 採用時 | Cyan 採用時 |
 |---|---|---|---|---|---|
 | リンク / ハイライト（900） | `#0017C1` | `#115A36` | `#AC3E00` | `#0055AD` | `#006F83` |
-| チャート Primary（1200） | `#000060` | `#032213` | `#541E00` | `#00234B` | `#003741` |
+| 強調（1200） | `#000060` | `#032213` | `#541E00` | `#00234B` | `#003741` |
 | Positive（600） | `#3460FB` | `#259D63` | `#FB5B01` | `#008BF2` | `#00A3BF` |
 | ラベル（200） | `#C5D7FB` | `#9BD4B5` | `#FFC199` | `#C0E4FF` | `#99F2FF` |
 | 背景アクセント（50） | `#D9E6FF` | `#E6F5EC` | `#FFEEE2` | `#F0F9FF` | `#E9F7F9` |
@@ -105,7 +90,7 @@ dashboard-design のデフォルト・または別系統選択時の Blue 系列
 
 | ベースカラー | 適する用途 | 注意点 |
 |---|---|---|
-| **Blue（デフォルト）** | 一般的な仕様書・技術文書・行政文書・教育 | 安全側、迷ったら Blue |
+| **Blue** | 一般的な仕様書・技術文書・行政文書・教育 | 安全側、迷ったら Blue |
 | **Light Blue / Cyan** | SaaS・データ系・分析ダッシュボード・医療（清潔感） | Cyan 600 は 3:1 未達、Positive 用途は要強調補強 |
 | **Green** | 環境・農業・金融（プラス指標主役）・成功状態が主役・医療（健康・成長） | Negative=Red 面塗りと相性が悪い、§5 のルール厳守 |
 | **Orange** | 注意喚起・物流・建設・警告系・エネルギー | Negative=Red と色相が近く混同リスク、二重符号化 MUST |
@@ -126,7 +111,7 @@ dashboard-design のデフォルト・または別系統選択時の Blue 系列
 
 ## 7. 運用: ADR への記録
 
-ベースカラーを Blue 以外にした場合、または Blue を採用したが業種的に複数案があり迷った場合、プロジェクトの ADR に「ベースカラー選定」を 1 件残す。テンプレートは `~/.claude/skills/spec-design/references/adr-format.md` の「## ベースカラー選定 ADR テンプレ」セクションを参照。
+ベースカラーをデフォルト以外にした場合、または業種的に複数案があり迷った場合、プロジェクトの ADR に「ベースカラー選定」を 1 件残す。テンプレートは [`adr-format.md`](adr-format.md) の「## ベースカラー選定 ADR テンプレ」セクションを参照。
 
 最低限残すべき項目:
 
@@ -137,8 +122,7 @@ dashboard-design のデフォルト・または別系統選択時の Blue 系列
 
 ## 8. 関連参照
 
-- カラーパレット HEX の全量（7 系統 × 6 階調）: `~/.claude/skills/dashboard-design/references/visual-encoding.md` の「## カラーパレット」セクション
-- コントラスト比のルール（背景 vs グラフ色面の 3:1 等）: 同 visual-encoding.md「## コントラスト比のルール」
-- 視覚デザイン原則（配色以外）: `~/.claude/skills/spec-design/references/communicative-design.md`
-- 仕様書全体の出力フォーマット選択: `~/.claude/skills/spec-design/SKILL.md`「## 出力フォーマットのすみ分け」
-- ADR テンプレ: `~/.claude/skills/spec-design/references/adr-format.md` / `templates.md`
+- カラーパレット HEX の全量（7 系統 × 6 階調）・コントラスト比のルール: [`visual-encoding.md`](visual-encoding.md)
+- 視覚デザイン原則（配色以外）: [`communicative-design.md`](communicative-design.md)
+- 仕様書全体の出力フォーマット選択: [`../SKILL.md`](../SKILL.md)「## 出力フォーマットのすみ分け」
+- ADR テンプレ: [`adr-format.md`](adr-format.md) / [`templates.md`](templates.md)

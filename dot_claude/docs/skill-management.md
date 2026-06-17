@@ -49,11 +49,11 @@
 
 ## スキル設計の判断軸（責務分担・入口・単一出典）
 
-複数スキルが共通ドメインを扱う時の構造判断。2026-05-13〜14 の視覚設計スキル群（spec-design / dashboard-design）整理で確立し、context.md の判断メモから昇格した。
+複数スキルが共通ドメインを扱う時の構造判断。2026-05-13〜14 の視覚設計スキル群（spec-design / dashboard-design）整理で確立し、context.md の判断メモから昇格した。なお dashboard-design は 2026-06-17 に spec-design へ統合・削除済み（PDF / BI / ダッシュボード用途が使われず、唯一の実消費者が spec-design の HTML 補足ページのみだったため、分割の維持コストが価値を上回った）。視覚設計データ・原則は `spec-design/references/` に集約。<strong>分割スキルの非共有ユースケースが使われなくなったら統合する</strong>、という逆方向の判断例。
 
-- **入口（トリガー語）の集約 vs 中身の参照誘導を分ける**: 複数スキルが共通ドメインを扱う場合、トリガー語は 1 つのスキルに集約しつつ、機能本体は references で相互参照させると、トリガー精度を保ったまま機能カバレッジを失わない（例: 視覚設計の入口は dashboard-design に集約し、spec-design は references から配色データを引く）
+- **入口（トリガー語）の集約 vs 中身の参照誘導を分ける**: 複数スキルが共通ドメインを扱う場合、トリガー語は 1 つのスキルに集約しつつ、機能本体は references で相互参照させると、トリガー精度を保ったまま機能カバレッジを失わない（例: タスク操作のトリガー語は gtd-add / gtd-done / gtd-list と動詞別に分け、共通の tasks.md フォーマットは shared/tasks-format.md を単一出典として参照させる）
 - **複合スキルと単体スキルの棲み分けは単体側 description に明記する**: 複合 ⊃ 単体 の内包関係（例: session-save ⊃ context-save）は、単体側の description で「複合スキルが内包する旨」を書かないと、複合側を使うメリットが利用者から見えなくなる
-- **配色は dashboard-design / 配色以外の判断軸は spec-design に置いて二重化しない**: カラーパレット HEX の正本は dashboard-design（`visual-encoding.md`）、伝わるデザイン原則・図種選択などの判断軸は spec-design 側に置き、互いに内製で重複させない。共通部分は `shared/` に単一出典化する
+- **視覚設計データは責務軸で単一出典化する**: `spec-design/references/` 内で、パレット HEX の正本は `visual-encoding.md`、ベースカラー切替の階調マッピングは `base-color-mapping.md`、伝わるデザイン原則は `communicative-design.md` と責務別に分け、互いに内製で重複させない（2026-06-17 の dashboard-design 統合で spec-design 内に集約）
 - **共通リソースの「真の単一出典化」は責務軸で切る**: 「何の単一出典か」を軸にすると、マッピングルール（判断軸）/ パレット HEX（データ）/ 原則集（判断軸）と責務がきれいに分かれ、どれをどこへ置くか迷わない
 
 ## スキルの種類と frontmatter 方針

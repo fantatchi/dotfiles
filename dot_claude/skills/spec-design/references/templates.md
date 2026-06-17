@@ -292,7 +292,7 @@ sequenceDiagram
 
 ## HTML 補足テンプレート
 
-HTML 補足ページは **サマリー / 概況 / 比較・対比 / 配色で意味を伝える表** など、視覚情報が主役のページに限定して使う。視覚設計の判断は `dashboard-design` スキルを必ず参照すること。
+HTML 補足ページは **サマリー / 概況 / 比較・対比 / 配色で意味を伝える表** など、視覚情報が主役のページに限定して使う。視覚設計の判断は [`visual-encoding.md`](./visual-encoding.md) を必ず参照すること。
 
 ### 採用パターン
 
@@ -493,6 +493,6 @@ body.page-compare .verdict.partial {
 ```
 
 **注意**:
-- HTML 補足ページの配色・コントラスト比・色数制約・装飾排除・アクセシビリティの詳細は `dashboard-design` スキル + [`dashboard-design/references/visual-encoding.md`](../../dashboard-design/references/visual-encoding.md) を参照
+- HTML 補足ページの配色・コントラスト比・色数制約・装飾排除・アクセシビリティの詳細は [`visual-encoding.md`](./visual-encoding.md) を参照
 - 共通 CSS の最小骨格・`:root` 変数命名規則・ページ別 scope の書き方・段階的移行手順は [`html-css-centralization.md`](./html-css-centralization.md) を参照
 - 単一 HTML（1 本のみ）の場合は SSOT を作らず、上記の `body.page-X` scope で示した CSS を固有 `<style>` 内に直書きしてよい

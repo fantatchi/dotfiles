@@ -1,6 +1,6 @@
 ---
 name: spec-design
-description: 仕様書（specification / 設計ドキュメント / requirements / architecture）の設計・作成・レビューを担うロール変換型スキル。判断軸（読み手別の入口、UML/C4/BPMN の図種選択、ADR で意思決定分離、用語集を唯一の出典に、MUST/SHOULD/MAY の要件レベル語）+「全体像・なぜ・用語」3 点を手厚くカバーする具体テンプレ（README / ADR Nygard・MADR / C4 / glossary）。出力は md がメイン（Docs as Code）、視覚情報が主役のページのみ HTML 補足。仕様書を書く文脈での視覚設計判断も内蔵: HTML 補足のデフォルト CSS は Vercel inspired (`#0070f3` link blue + Inter / Noto Sans JP、`references/html-css-centralization.md` 参照)、別系統 (Blue 900 / Green / Orange 等) への切替は `shared/base-color-mapping.md` の階調表、「伝わるデザイン」12 原則の参照誘導、**HTML 補足ページが複数あるときは共通 CSS を SSOT 化し各 HTML へ生成時インライン展開 SHOULD**（配布物は self-contained 維持で単体共有可、`:root` 固有変数のみ + `body.page-X` scope で衝突回避、`references/html-css-centralization.md`）。「仕様書」「specification」「設計ドキュメント」「ドキュメントレビュー」「ADR」「アーキテクチャ図」「C4 図」「設計書のテンプレート」「READMEを充実」「オンボーディング資料」「PDF 仕様書」「HTML 補足ページの CSS 集約」「仕様書 HTML の共通スタイル」「補足 HTML の共通 CSS 化」等で自動起動。**棲み分け**: 視覚設計の入口（「ダッシュボード作って」「カラーパレット選定」「ベースカラー何にする」「伝わるデザイン」「HTML 補足ページのデザイン」「文書の配色・タイポグラフィ」）は dashboard-design、対話的な文章共著は doc-coauthoring、本スキルは構造・判断軸・テンプレで「仕様書ロール」に変換する。単発の図描画（コードレビュー補助図・スケッチ用途）には起動しない。
+description: 仕様書（specification / 設計ドキュメント / requirements / architecture）の設計・作成・レビューを担うロール変換型スキル。判断軸（読み手別の入口、UML/C4/BPMN の図種選択、ADR で意思決定分離、用語集を唯一の出典に、MUST/SHOULD/MAY の要件レベル語）+「全体像・なぜ・用語」3 点を手厚くカバーする具体テンプレ（README / ADR Nygard・MADR / C4 / glossary）。出力は md がメイン（Docs as Code）、視覚情報が主役のページのみ HTML 補足。仕様書を書く文脈での視覚設計判断も内蔵: HTML 補足のデフォルト CSS は Vercel inspired (`#0070f3` link blue + Inter / Noto Sans JP、`references/html-css-centralization.md` 参照)、別系統 (Blue 900 / Green / Orange 等) への切替は `references/base-color-mapping.md` の階調表、配色パレット HEX は `references/visual-encoding.md`、「伝わるデザイン」12 原則の参照誘導、**HTML 補足ページが複数あるときは共通 CSS を SSOT 化し各 HTML へ生成時インライン展開 SHOULD**（配布物は self-contained 維持で単体共有可、`:root` 固有変数のみ + `body.page-X` scope で衝突回避、`references/html-css-centralization.md`）。「仕様書」「specification」「設計ドキュメント」「ドキュメントレビュー」「ADR」「アーキテクチャ図」「C4 図」「設計書のテンプレート」「READMEを充実」「オンボーディング資料」「PDF 仕様書」「HTML 補足ページの CSS 集約」「仕様書 HTML の共通スタイル」「補足 HTML の共通 CSS 化」「カラーパレット選定」「ベースカラー何にする」「HTML 補足ページのデザイン」「文書の配色・タイポグラフィ」等で自動起動。**棲み分け**: 対話的な文章共著は doc-coauthoring、本スキルは構造・判断軸・テンプレで「仕様書ロール」に変換する。仕様書 HTML 補足ページの視覚設計（配色・タイポグラフィ・アクセシビリティ）は本スキル内の `references/visual-encoding.md` / `references/communicative-design.md` で扱う。単発の図描画（コードレビュー補助図・スケッチ用途）には起動しない。
 ---
 
 # 仕様書設計ロール
@@ -108,11 +108,11 @@ API 定義に OpenAPI 3.1、データモデルに Protobuf など厳格なスキ
 | **Markdown（メイン）** | 仕様本文、API リスト、ADR、用語集、ガイドライン、章立て構造、コードブロック、Mermaid / PlantUML の簡易図。GitHub 管理の Docs as Code |
 | **HTML（補足）** | サマリーページ / 概況ランディング / システム概要 / 比較・対比ページ / 配色で意味を伝える表 / 「ぱっと見で構造を伝えたい」もの。視覚情報が主役のページに限定 |
 
-**HTML 補足ページを書くときの視覚設計は `dashboard-design` スキルを必ず参照** する。デジタル庁ダッシュボードデザインガイドブックの設計原則（配色 1〜5 色、コントラスト比 3:1 以上、装飾排除、タイトル命名、アクセシビリティ）が直接適用できる。
+**HTML 補足ページを書くときの視覚設計は [references/visual-encoding.md](references/visual-encoding.md) を必ず参照** する。デジタル庁ダッシュボードデザインガイドブック由来の設計原則（配色 1〜5 色、コントラスト比 3:1 以上、装飾排除、図表タイトル命名、アクセシビリティ）が直接適用できる。
 
 ### 視覚デザイン全般: 「伝わるデザイン」原則を意識する
 
-HTML / PDF / md いずれの媒体でも、配色以外のデザイン原則は **「伝わるデザイン」(<https://tsutawarudesign.com/>)** の考え方を意識して作成する。整列・近接・反復・ジャンプ率・余白・タイポグラフィ・箇条書き・表・図解など、誰が読んでも伝わりやすい視覚整理の 12 原則 + 約物ルールは [references/communicative-design.md](references/communicative-design.md) に集約しており、新規 HTML / PDF 出力時の設計判断・レビューチェックリストとして使う。配色のみ `dashboard-design` 側を参照する役割分担とする。
+HTML / PDF / md いずれの媒体でも、配色以外のデザイン原則は **「伝わるデザイン」(<https://tsutawarudesign.com/>)** の考え方を意識して作成する。整列・近接・反復・ジャンプ率・余白・タイポグラフィ・箇条書き・表・図解など、誰が読んでも伝わりやすい視覚整理の 12 原則 + 約物ルールは [references/communicative-design.md](references/communicative-design.md) に集約しており、新規 HTML / PDF 出力時の設計判断・レビューチェックリストとして使う。配色は [references/visual-encoding.md](references/visual-encoding.md) を参照する役割分担とする。
 
 ### デフォルト CSS テンプレートと配色（Vercel inspired）
 
@@ -135,11 +135,9 @@ HTML 補足ページを新規に生成する際の **既定のスタイルは Ve
 1. **プロジェクト固有指定がある場合**（CLAUDE.md / 既存仕様書のスタイル / ブランドガイド等）→ それを最優先で踏襲
 2. **指定がない・新規プロジェクト・既存スタイル無し** → Vercel inspired をデフォルト採用
 
-**ベースカラーを別系統に切り替える場合**（プロジェクトのブランドカラーが緑系、危険系領域で赤主体、デジタル庁ガイド準拠の Blue 900 を採用したい、など）は、共通リソース [`~/.claude/skills/shared/base-color-mapping.md`](../shared/base-color-mapping.md) §3 の階調マッピング表から該当系統 (Blue / Green / Orange / Light Blue / Cyan / Red) の HEX を引き、`--accent` 値を差し替える。パレット HEX の全量（7 系統 × 6 階調）は `~/.claude/skills/dashboard-design/references/visual-encoding.md` の「## カラーパレット」セクション。
+**ベースカラーを別系統に切り替える場合**（プロジェクトのブランドカラーが緑系、危険系領域で赤主体、デジタル庁ガイド準拠の Blue 900 を採用したい、など）は、[`references/base-color-mapping.md`](references/base-color-mapping.md) §3 の階調マッピング表から該当系統 (Blue / Green / Orange / Light Blue / Cyan / Red) の HEX を引き、`--accent` 値を差し替える。パレット HEX の全量（7 系統 × 6 階調）は [`references/visual-encoding.md`](references/visual-encoding.md) の「## カラーパレット」セクション。
 
 別系統に切り替えた場合は ADR に「ベースカラー選定」を残す（テンプレは [references/adr-format.md](references/adr-format.md) の「## ベースカラー選定 ADR テンプレ」）。
-
-**dashboard-design との関係**: dashboard-design スキルは引き続きデジタル庁ガイド準拠の Blue 900 (`#0017C1`) をデフォルトに使う。両スキルで `--accent` トークン名が同じだが値が異なる構造になるため、同一プロジェクトで両方の成果物を並べる際は **別 CSS ファイル** で並走する前提（CSS スコープ衝突は起きない）。**読み手の認知統一が必要な場合は SHOULD**: プロジェクト ADR で「両スキルの `--accent` をどちらかに揃える」決定を残す（テンプレは [references/adr-format.md](references/adr-format.md) の「## ベースカラー選定 ADR テンプレ」を流用）。
 
 ### HTML 補足ページの CSS 集約方針（複数ページ作成時 SHOULD）
 
@@ -226,15 +224,15 @@ docs/
 
 ### Step 3: スタイルを既存に合わせる
 
-Step 1 で把握したスタイルを踏襲して生成。CSS / breadcrumb / footer / page-nav は **既存ファイルからほぼコピー** し、色変数（`--accent` 等）だけトピックに応じて選び直す。新規プロジェクトや既存スタイルが無い場合、`--accent` は Vercel link blue (`#0070f3`) を採用、フォントは Inter + Noto Sans JP（「デフォルト CSS テンプレートと配色（Vercel inspired）」節および `references/html-css-centralization.md` 参照）。別系統 (Blue 900 / Green 等) を採用したい場合は `shared/base-color-mapping.md` の 3 節の階調表から HEX を引いて差し替え。
+Step 1 で把握したスタイルを踏襲して生成。CSS / breadcrumb / footer / page-nav は **既存ファイルからほぼコピー** し、色変数（`--accent` 等）だけトピックに応じて選び直す。新規プロジェクトや既存スタイルが無い場合、`--accent` は Vercel link blue (`#0070f3`) を採用、フォントは Inter + Noto Sans JP（「デフォルト CSS テンプレートと配色（Vercel inspired）」節および `references/html-css-centralization.md` 参照）。別系統 (Blue 900 / Green 等) を採用したい場合は [`references/base-color-mapping.md`](references/base-color-mapping.md) の 3 節の階調表から HEX を引いて差し替え。
 
 新規プロジェクトで既存が無い場合は [references/skeletons.md](references/skeletons.md) の最小汎用骨格（HTML / Markdown / 用語集エントリ）、あるいは [references/templates.md](references/templates.md) の具体テンプレ（README / ADR Nygard・MADR / C4 PlantUML / 用語集）を fallback として使う。
 
-**HTML 補足ページの視覚設計**（配色パレット選定 / コントラスト比 / 色数制約 / 装飾排除 / タイポグラフィ / アクセシビリティ）は **`dashboard-design` スキル**を参照。デジタル庁ダッシュボードデザインガイドブックの設計原則のうち、チャート種選択以外のほぼ全てが仕様書文書にも転用可能。詳しくは dashboard-design の「HTML 補足ページへの適用（md ベース仕様書）」セクションを参照。
+**HTML 補足ページの視覚設計**（配色パレット選定 / コントラスト比 / 色数制約 / 装飾排除 / 図表タイトル命名 / アクセシビリティ）は [`references/visual-encoding.md`](references/visual-encoding.md) を参照。デジタル庁ダッシュボードデザインガイドブックの設計原則のうち、チャート種選択以外のほぼ全てが仕様書文書にも転用可能。
 
-棲み分け:
-- **spec-design（本スキル）**: 何を書くか・どう構造化するか（章立て、用語集、ADR、要件レベル語、図種選択、md/HTML 配置判断）
-- **dashboard-design**: どう見せるか（HTML 補足ページの配色・タイポ・装飾・アクセシビリティ）
+役割分担:
+- **構造**（何を書くか・どう構造化するか）: 章立て、用語集、ADR、要件レベル語、図種選択、md/HTML 配置判断
+- **視覚**（どう見せるか）: HTML 補足ページの配色・タイポ・装飾・アクセシビリティ → [`references/visual-encoding.md`](references/visual-encoding.md) / [`references/communicative-design.md`](references/communicative-design.md)
 
 ### Step 4: 関連ファイルの整合性チェック
 
@@ -283,7 +281,7 @@ Step 1 で把握したスタイルを踏襲して生成。CSS / breadcrumb / foo
 
 **md / HTML 配置**
 - [ ] サマリー・概況・比較系の視覚情報が主役のページのみ HTML、それ以外は md
-- [ ] HTML 補足ページは dashboard-design の視覚設計原則を満たしている
+- [ ] HTML 補足ページは [references/visual-encoding.md](references/visual-encoding.md) の視覚設計原則を満たしている
 
 ## アンチパターン
 
