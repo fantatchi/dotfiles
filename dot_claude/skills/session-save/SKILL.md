@@ -10,7 +10,7 @@ allowed-tools: Read, Skill, Write, Edit, Glob, Bash(git:*), Bash(echo:*), Bash(m
 
 **設計（orchestrator）**: 各処理の手順は持たず、`Skill` ツールでサブスキルを順に起動するだけ。書き出し先・フォーマット・ローテーション等の詳細はサブスキル側 SKILL.md が唯一の正本で、本ファイルでは再記述しない（齟齬防止）。**degradation（連携先が無いときの skip / フォールバック）は各サブスキルが内部で持つため、orchestrator は基本無条件で起動する**。例外は「起動自体が無意味になるキー」を持つサブスキルだけで、その場合のみ resolver を先読みして skip する（ここでは obsidian-log に対する `vault`）。
 
-> `allowed-tools` はこの orchestrator 自身が使う `Read` / `Skill` に加え、**サブスキル（obsidian-log / context-save）が要求するツールの和集合**を明示している。Skill 経由で起動したサブスキルが親の権限に絞られるか各自の `allowed-tools` で動くかは未確認のため、絞られた場合でも Bash / Write が拒否されて**無言で保存失敗**しないよう、安全側に広く宣言している（サブが各自権限で動くなら余剰宣言は無害）。
+> `allowed-tools` はこの orchestrator 自身が使う `Read` / `Skill` に加え、**サブスキル（obsidian-log / context-save）が要求するツールの和集合**を明示している。Claude Code の `allowed-tools` は「リスト内をプロンプトなしで許可」する宣言であって**リスト外を禁止しない**（リスト外ツールは通常の permission 設定に従う）ため、宣言漏れがあってもサブスキルが**無言で保存失敗することはなく**、最悪でも権限プロンプトが出るだけ。和集合を宣言しておくのは、その**プロンプトを抑制してサブの書き込みを滑らかに通すための保険**である。`Skill` 経由起動はメイン会話への SKILL.md 注入で別権限スコープを作らない（公式ドキュメント確認済み）が、入れ子時に親の `allowed-tools` へ絞られるかはドキュメント非明示のため、保険として和集合宣言を維持する。
 
 ## 実行順序
 
