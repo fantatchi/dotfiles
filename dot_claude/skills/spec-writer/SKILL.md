@@ -1,6 +1,6 @@
 ---
 name: spec-writer
-description: 仕様書（specification / 設計ドキュメント / requirements / architecture）の設計・作成・レビューを担うロール変換型スキル。判断軸（読み手別の入口、UML/C4/BPMN の図種選択、ADR で意思決定分離、用語集を唯一の出典に、MUST/SHOULD/MAY の要件レベル語）+「全体像・なぜ・用語」3 点を手厚くカバーする具体テンプレ（README / ADR Nygard・MADR / C4 / glossary）。出力は md がメイン（Docs as Code）、視覚情報が主役のページのみ HTML 補足。仕様書を書く文脈での視覚設計判断も内蔵: HTML 補足のデフォルト CSS は Vercel inspired (`#0070f3` link blue + Inter / Noto Sans JP、`references/html-css-centralization.md` 参照)、別系統 (Blue 900 / Green / Orange 等) への切替は `references/base-color-mapping.md` の階調表、配色パレット HEX は `references/visual-encoding.md`、「伝わるデザイン」12 原則の参照誘導、**HTML 補足ページが複数あるときは共通 CSS を SSOT 化し各 HTML へ生成時インライン展開 SHOULD**（配布物は self-contained 維持で単体共有可、`:root` 固有変数のみ + `body.page-X` scope で衝突回避、`references/html-css-centralization.md`）。「仕様書」「specification」「設計ドキュメント」「ドキュメントレビュー」「ADR」「アーキテクチャ図」「C4 図」「設計書のテンプレート」「READMEを充実」「オンボーディング資料」「PDF 仕様書」「HTML 補足ページの CSS 集約」「仕様書 HTML の共通スタイル」「補足 HTML の共通 CSS 化」「カラーパレット選定」「ベースカラー何にする」「HTML 補足ページのデザイン」「文書の配色・タイポグラフィ」等で自動起動。**棲み分け**: 対話的な文章共著は doc-coauthoring、本スキルは構造・判断軸・テンプレで「仕様書ロール」に変換する。仕様書 HTML 補足ページの視覚設計（配色・タイポグラフィ・アクセシビリティ）は本スキル内の `references/visual-encoding.md` / `references/communicative-design.md` で扱う。単発の図描画（コードレビュー補助図・スケッチ用途）には起動しない。
+description: 仕様書（specification / 設計ドキュメント / requirements / architecture）の設計・作成・レビューを担うロール変換型スキル。判断軸（読み手別の入口、UML/C4/BPMN の図種選択、ADR で意思決定分離、用語集を唯一の出典に、MUST/SHOULD/MAY の要件レベル語）+「全体像・なぜ・用語」3 点を手厚くカバーする具体テンプレ（README / ADR Nygard・MADR / C4 / glossary）。出力は md がメイン（Docs as Code）、視覚情報が主役のページのみ HTML 補足。仕様書を書く文脈での視覚設計判断も内蔵: HTML 補足のデフォルト CSS は **デジタル庁デザインシステム DADS v2.0.1 準拠** (key-color = Blue 固定、Noto Sans JP + Noto Sans Mono、`references/dads-tokens.md` が SSOT)、配色パレット HEX 全量は `references/dads-tokens.md`、用途別配色と図表タイトル命名は `references/visual-encoding.md`、「伝わるデザイン」12 原則の参照誘導は `references/communicative-design.md`、**HTML 補足ページが複数あるときは共通 CSS を SSOT 化し各 HTML へ生成時インライン展開 SHOULD**（配布物は self-contained 維持で単体共有可、`:root` 固有変数のみ + `body.page-X` scope で衝突回避、`references/html-css-centralization.md`）。「仕様書」「specification」「設計ドキュメント」「ドキュメントレビュー」「ADR」「アーキテクチャ図」「C4 図」「設計書のテンプレート」「READMEを充実」「オンボーディング資料」「PDF 仕様書」「HTML 補足ページの CSS 集約」「仕様書 HTML の共通スタイル」「補足 HTML の共通 CSS 化」「DADS」「デジタル庁デザインシステム」「key-color」「カラーパレット選定」「HTML 補足ページのデザイン」「文書の配色・タイポグラフィ」等で自動起動。**棲み分け**: 対話的な文章共著は doc-coauthoring、本スキルは構造・判断軸・テンプレで「仕様書ロール」に変換する。仕様書 HTML 補足ページの視覚設計（配色・タイポグラフィ・アクセシビリティ）は本スキル内の `references/dads-tokens.md` / `references/visual-encoding.md` / `references/communicative-design.md` で扱う。単発の図描画（コードレビュー補助図・スケッチ用途）には起動しない。
 ---
 
 # 仕様書設計ロール
@@ -114,30 +114,28 @@ API 定義に OpenAPI 3.1、データモデルに Protobuf など厳格なスキ
 
 HTML / PDF / md いずれの媒体でも、配色以外のデザイン原則は **「伝わるデザイン」(<https://tsutawarudesign.com/>)** の考え方を意識して作成する。整列・近接・反復・ジャンプ率・余白・タイポグラフィ・箇条書き・表・図解など、誰が読んでも伝わりやすい視覚整理の 12 原則 + 約物ルールは [references/communicative-design.md](references/communicative-design.md) に集約しており、新規 HTML / PDF 出力時の設計判断・レビューチェックリストとして使う。配色は [references/visual-encoding.md](references/visual-encoding.md) を参照する役割分担とする。
 
-### デフォルト CSS テンプレートと配色（Vercel inspired）
+### デフォルト CSS テンプレートと配色（DADS 準拠）
 
-HTML 補足ページを新規に生成する際の **既定のスタイルは Vercel inspired** とする。
+HTML 補足ページを新規に生成する際の **既定のスタイルは デジタル庁デザインシステム (DADS) v2.0.1 準拠** とする（key-color = Blue 固定）。
 
 | 項目 | デフォルト値 | 出典・参照 |
 |---|---|---|
-| `--accent` (リンク / ハイライト) | `#0070f3` (Vercel link blue) | `references/html-css-centralization.md` |
-| `--accent-bg` (背景アクセント) | `#d3e5ff` | 同上 |
-| `--accent-ink` (CTA black bar) | `#171717` | 同上 |
-| 日本語フォント | Noto Sans JP | 同上 |
-| ラテンフォント | Inter | 同上 |
-| 等幅フォント | JetBrains Mono | 同上 |
-| UD 保険 fallback | BIZ UDPGothic | `references/communicative-design.md` 原則 7 |
+| `--link` (本文リンク) | `#0017c1` (Blue 900) | `references/dads-tokens.md` §1 |
+| `--key-color` (UI primary) | `#264af4` (Blue 700) | 同上 |
+| `--accent-bg` (badge 背景) | `#e8f1fe` (Blue 50) | 同上 |
+| `--accent-ink` (本文・濃文字) | `#1a1a1a` (Solid Gray 900) | `references/dads-tokens.md` §3 |
+| 日本語フォント | Noto Sans JP | `references/dads-tokens.md` §5 |
+| 等幅フォント | Noto Sans Mono | 同上 |
+| UD 保険 fallback | BIZ UDPGothic / BIZ UDGothic | `references/communicative-design.md` 原則 7 |
 
-採用理由: Vercel の calm-technical aesthetic (stark monochrome + ink-blue link + stacked shadow) が技術ドキュメントと相性が良く、Noto Sans JP は日本語コミュニティの事実上の標準で OS 横断で読みやすさを担保するため。JetBrains Mono は等幅で技術文書のコード/数値表示に向く (詳細は `references/html-css-centralization.md` 冒頭)。
+採用理由: DADS は **JIS X 8341-3:2016 AA 準拠** を担保する公的標準で、配色・タイポ・コントラスト体系がアクセシビリティ要件を自動充足する。Noto Sans JP は DADS 採用フォントで OS 横断の高い可読性を提供し、Noto Sans Mono は CJK + Latin 等幅で技術文書のコード / 数値表示にも対応する。「なぜこの色 / フォントか」の説明コストが消え、プロジェクトを跨いだ一貫性が得られる。
 
 優先順位:
 
 1. **プロジェクト固有指定がある場合**（CLAUDE.md / 既存仕様書のスタイル / ブランドガイド等）→ それを最優先で踏襲
-2. **指定がない・新規プロジェクト・既存スタイル無し** → Vercel inspired をデフォルト採用
+2. **指定がない・新規プロジェクト・既存スタイル無し** → DADS 準拠（key-color Blue）をデフォルト採用
 
-**ベースカラーを別系統に切り替える場合**（プロジェクトのブランドカラーが緑系、危険系領域で赤主体、デジタル庁ガイド準拠の Blue 900 を採用したい、など）は、[`references/base-color-mapping.md`](references/base-color-mapping.md) §3 の階調マッピング表から該当系統 (Blue / Green / Orange / Light Blue / Cyan / Red) の HEX を引き、`--accent` 値を差し替える。パレット HEX の全量（7 系統 × 6 階調）は [`references/visual-encoding.md`](references/visual-encoding.md) の「## カラーパレット」セクション。
-
-別系統に切り替えた場合は ADR に「ベースカラー選定」を残す（テンプレは [references/adr-format.md](references/adr-format.md) の「## ベースカラー選定 ADR テンプレ」）。
+**ベースカラーは Blue 固定**（spec-writer のデフォルト）。プロジェクトのブランド要請等で別色を採用する場合は [`references/dads-tokens.md`](references/dads-tokens.md) §2 の DADS プリミティブ 10 色族（Blue / Light Blue / Cyan / Green / Lime / Yellow / Orange / Red / Magenta / Purple）から選び、選定 ADR を残す（テンプレは [references/adr-format.md](references/adr-format.md) の「## カラー選定 ADR テンプレ」）。**HEX 値の正本は `references/dads-tokens.md` のみ**、他ファイルで再掲する場合は出典として「dads-tokens.md §...」を明示する（drift 防止）。
 
 ### HTML 補足ページの CSS 集約方針（複数ページ作成時 SHOULD）
 
@@ -161,7 +159,7 @@ HTML 補足ページの本数に応じて要件レベルを切り替える:
 
 **理由**: (1) 個別ファイル内 `<style>` で共通 CSS を上書きしてしまう事故を防ぎ、複数ファイルでの視覚一貫性（フォント・h1 サイズ・配色）を保証する。「伝わるデザイン」原則 3（反復）の最終的な担保（[references/communicative-design.md](references/communicative-design.md) 参照）。(2) **HTML 1 ファイル単体で共有・閲覧できる**（リポジトリ checkout 不要、ダウンロード・チャット添付でそのまま開ける）。旧 `<link>` 参照型は (2) が成立しないため採らない。
 
-**実証例（規模）**: cloud-dsc プロジェクトの `docs/_html/_shared/spec-page.css`（3072 行、2026-05-14 時点、ファイル別 scope で全レイアウト統合済み）。各 HTML の固有 `<style>` は 10-30 行（`:root` 固有変数のみ）。**注**: cloud-dsc は旧 `<link>` 参照型 + 本変更前の Blue 900 ベースで運用されてきたプロジェクトで「**規模・scope 運用パターンの実証例**」として参照する（インライン展開型への移行対象）。本スキルのデフォルト CSS の **スタイル骨格の出典は Vercel inspired**（cloud-dsc の配色そのものではない）。
+**実証例（規模）**: cloud-dsc プロジェクトの `docs/_html/_shared/spec-page.css`（3072 行、2026-05-14 時点、ファイル別 scope で全レイアウト統合済み）。各 HTML の固有 `<style>` は 10-30 行（`:root` 固有変数のみ）。**注**: cloud-dsc は旧 `<link>` 参照型 + 旧版 Blue 900 ベース時代の実証例で、現在はインライン展開型 + DADS 準拠への移行対象。本スキルのデフォルト CSS の **スタイル骨格の出典は DADS v2.0.1**（cloud-dsc の旧配色そのものではない）。
 
 具体的な共通 CSS の最小骨格・移行手順・`:root` 変数命名規則・ページ別 scope の書き方は [references/html-css-centralization.md](references/html-css-centralization.md) を参照。
 
@@ -224,7 +222,7 @@ docs/
 
 ### Step 3: スタイルを既存に合わせる
 
-Step 1 で把握したスタイルを踏襲して生成。CSS / breadcrumb / footer / page-nav は **既存ファイルからほぼコピー** し、色変数（`--accent` 等）だけトピックに応じて選び直す。新規プロジェクトや既存スタイルが無い場合、`--accent` は Vercel link blue (`#0070f3`) を採用、フォントは Inter + Noto Sans JP（「デフォルト CSS テンプレートと配色（Vercel inspired）」節および `references/html-css-centralization.md` 参照）。別系統 (Blue 900 / Green 等) を採用したい場合は [`references/base-color-mapping.md`](references/base-color-mapping.md) の 3 節の階調表から HEX を引いて差し替え。
+Step 1 で把握したスタイルを踏襲して生成。CSS / breadcrumb / footer / page-nav は **既存ファイルからほぼコピー** し、色変数（`--accent` 等）だけトピックに応じて選び直す。新規プロジェクトや既存スタイルが無い場合、`--accent` は DADS key-color = Blue 700 (`#264af4`)、`--accent-deep` は Blue 900 (`#0017c1`、本文リンク用)、フォントは Noto Sans JP + Noto Sans Mono を採用（「デフォルト CSS テンプレートと配色（DADS 準拠）」節および `references/html-css-centralization.md` 参照）。別系統 (Light Blue / Green 等) を採用したい場合は [`references/dads-tokens.md`](references/dads-tokens.md) §2 の DADS プリミティブ 10 色族から HEX を引いて差し替え、選定 ADR を残す（[`references/adr-format.md`](references/adr-format.md) §カラー選定 ADR）。
 
 新規プロジェクトで既存が無い場合は [references/skeletons.md](references/skeletons.md) の最小汎用骨格（HTML / Markdown / 用語集エントリ）、あるいは [references/templates.md](references/templates.md) の具体テンプレ（README / ADR Nygard・MADR / C4 PlantUML / 用語集）を fallback として使う。
 
@@ -347,3 +345,12 @@ Step 1 で把握したスタイルを踏襲して生成。CSS / breadcrumb / foo
 - [RFC 7322 - RFC Style Guide](https://datatracker.ietf.org/doc/html/rfc7322)
 - [Stripe API Reference](https://docs.stripe.com/api) — 3 カラム DX の参考
 - [Docs as Code (Write the Docs)](https://www.writethedocs.org/guide/docs-as-code/) — Docs as Code 方法論
+- [デジタル庁デザインシステム DADS](https://design.digital.go.jp/dads/) — HTML 補足ページの視覚設計が準拠する公的標準
+- [@digital-go-jp/design-tokens (GitHub)](https://github.com/digital-go-jp/design-tokens) — DADS デザイントークンの配布元（取込版は v2.0.1、本スキルでは `references/dads-tokens.md` に静的転記）
+
+---
+
+## 変更履歴
+
+- **2026-06-18**: `spec-design` から `spec-writer` へ改名（仕様書作成が主の用途を明示）。同時に HTML 補足ページのデフォルト CSS を Vercel inspired (`#0070f3` link blue + Inter / Noto Sans JP) から **DADS v2.0.1 準拠** (key-color = Blue 固定、Noto Sans JP + Noto Sans Mono) へ全面差し替え。ベースカラー切替機構（旧 `base-color-mapping.md`）は廃止。
+- **2026-06-17**: 旧 `dashboard-design` スキルを統合・削除（PDF / BI / ダッシュボード用途が使われず、唯一の実消費者が当スキルの HTML 補足ページのみだったため）。視覚設計データ・原則を `references/` に集約。
