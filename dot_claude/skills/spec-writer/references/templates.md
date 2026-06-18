@@ -406,7 +406,7 @@ body.page-summary .card h3 {
 
 body.page-summary .card .value {
   font-size: 28px;
-  font-weight: 600;             /* Vercel display ceiling = 600 (700 へ昇格しない) */
+  font-weight: 700;             /* DADS は 400 / 700 の 2 段階 */
   color: var(--text);
 }
 ```
@@ -479,12 +479,12 @@ body.page-compare table.compare {
 
 body.page-compare .verdict.yes {
   color: var(--verdict-yes);
-  font-weight: 600;             /* Vercel display ceiling = 600 */
+  font-weight: 700;             /* DADS は 400 / 700 の 2 段階 */
 }
 
 body.page-compare .verdict.no {
   color: var(--verdict-no);
-  font-weight: 600;             /* Vercel display ceiling = 600 */
+  font-weight: 700;             /* DADS は 400 / 700 の 2 段階 */
 }
 
 body.page-compare .verdict.partial {
