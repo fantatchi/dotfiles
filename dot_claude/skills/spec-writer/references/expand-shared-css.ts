@@ -2,7 +2,7 @@
 /**
  * expand-shared-css.ts — SSOT 共通 CSS を各 HTML 補足ページへインライン展開 / 検証する。
  *
- * spec-design スキルの「HTML 補足の CSS = SSOT + 生成時インライン展開型」方針
+ * spec-writer スキルの「HTML 補足の CSS = SSOT + 生成時インライン展開型」方針
  * (references/html-css-centralization.md) を機械化するためのプロジェクト常駐ヘルパ。
  * LLM の手転記に依存すると「全文コピー漏れ」「相対パスズレ」「再展開忘れ」が起きるため、
  * 展開と drift 検査をこのスクリプトに寄せて MUST レベルで強制できるようにする。

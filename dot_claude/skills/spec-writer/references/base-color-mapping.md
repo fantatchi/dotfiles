@@ -1,10 +1,10 @@
 # ベースカラー切り替えと階調マッピング
 
-spec-design の HTML 補足ページで **ベースカラーを別系統に切り替える** 際の運用ルール。パレット HEX 値の正本は同ディレクトリの [`visual-encoding.md`](visual-encoding.md)「## カラーパレット（デジタル庁デザインシステム由来）」セクションで、本ファイルはその HEX を **「どう使い分けるか」のマッピングルール** に専念する。
+spec-writer の HTML 補足ページで **ベースカラーを別系統に切り替える** 際の運用ルール。パレット HEX 値の正本は同ディレクトリの [`visual-encoding.md`](visual-encoding.md)「## カラーパレット（デジタル庁デザインシステム由来）」セクションで、本ファイルはその HEX を **「どう使い分けるか」のマッピングルール** に専念する。
 
 ## デフォルトと本ファイルの関係（重要）
 
-spec-design の HTML 補足ページの **デフォルト系統** は **Vercel link blue (`#0070f3`) + Inter / Noto Sans JP** で、[`html-css-centralization.md`](html-css-centralization.md) に直書きしている。これが最優先。
+spec-writer の HTML 補足ページの **デフォルト系統** は **Vercel link blue (`#0070f3`) + Inter / Noto Sans JP** で、[`html-css-centralization.md`](html-css-centralization.md) に直書きしている。これが最優先。
 
 本ファイルは、プロジェクトのブランドカラーや業種都合で **デフォルト以外（Blue 900 / Green / Orange / Light Blue / Cyan / Red）に切り替える** 場合の階調マッピング SSOT として参照する。Vercel link blue (`#0070f3`) は本ファイルの階調表に存在しない HEX なので、デフォルトのまま使う場合は本ファイルの整合確認は適用外。
 

@@ -1,5 +1,5 @@
 ---
-name: spec-design
+name: spec-writer
 description: 仕様書（specification / 設計ドキュメント / requirements / architecture）の設計・作成・レビューを担うロール変換型スキル。判断軸（読み手別の入口、UML/C4/BPMN の図種選択、ADR で意思決定分離、用語集を唯一の出典に、MUST/SHOULD/MAY の要件レベル語）+「全体像・なぜ・用語」3 点を手厚くカバーする具体テンプレ（README / ADR Nygard・MADR / C4 / glossary）。出力は md がメイン（Docs as Code）、視覚情報が主役のページのみ HTML 補足。仕様書を書く文脈での視覚設計判断も内蔵: HTML 補足のデフォルト CSS は Vercel inspired (`#0070f3` link blue + Inter / Noto Sans JP、`references/html-css-centralization.md` 参照)、別系統 (Blue 900 / Green / Orange 等) への切替は `references/base-color-mapping.md` の階調表、配色パレット HEX は `references/visual-encoding.md`、「伝わるデザイン」12 原則の参照誘導、**HTML 補足ページが複数あるときは共通 CSS を SSOT 化し各 HTML へ生成時インライン展開 SHOULD**（配布物は self-contained 維持で単体共有可、`:root` 固有変数のみ + `body.page-X` scope で衝突回避、`references/html-css-centralization.md`）。「仕様書」「specification」「設計ドキュメント」「ドキュメントレビュー」「ADR」「アーキテクチャ図」「C4 図」「設計書のテンプレート」「READMEを充実」「オンボーディング資料」「PDF 仕様書」「HTML 補足ページの CSS 集約」「仕様書 HTML の共通スタイル」「補足 HTML の共通 CSS 化」「カラーパレット選定」「ベースカラー何にする」「HTML 補足ページのデザイン」「文書の配色・タイポグラフィ」等で自動起動。**棲み分け**: 対話的な文章共著は doc-coauthoring、本スキルは構造・判断軸・テンプレで「仕様書ロール」に変換する。仕様書 HTML 補足ページの視覚設計（配色・タイポグラフィ・アクセシビリティ）は本スキル内の `references/visual-encoding.md` / `references/communicative-design.md` で扱う。単発の図描画（コードレビュー補助図・スケッチ用途）には起動しない。
 ---
 

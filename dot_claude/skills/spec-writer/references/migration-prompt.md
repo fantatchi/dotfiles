@@ -9,7 +9,7 @@
 
 ```
 仕様書 HTML 補足ページの CSS を「SSOT + 生成時インライン展開型」へ移行して。
-方針と手順は ~/.claude/skills/spec-design/references/html-css-centralization.md
+方針と手順は ~/.claude/skills/spec-writer/references/html-css-centralization.md
 （2026-06-10 再定義版）に従う。配布物は self-contained（HTML 1 ファイル単体で
 表示できる）を保つこと。
 
@@ -22,7 +22,7 @@
      「段階的移行手順」Phase 1 から、SSOT があるなら Phase 2 から着手
 
 2. 展開スクリプトの導入を優先（HTML 3 本以上 or 更新頻度が高いなら SHOULD）:
-   - ~/.claude/skills/spec-design/references/expand-shared-css.ts をリポジトリの
+   - ~/.claude/skills/spec-writer/references/expand-shared-css.ts をリポジトリの
      scripts/ 配下へコピーし、--ssot / --root をプロジェクト構成に合わせる
    - `npx tsx scripts/expand-shared-css.ts` で全 HTML へ SSOT を一括インライン展開
    - 相対パス（data-shared-source）はスクリプトが階層別に自動算出するので手で書かない

@@ -2,6 +2,8 @@
 
 `~/.claude/CLAUDE.md` から外出ししたスキル運用の詳細。スキルの追加・削除・拡張時にだけ必要な情報のため、毎セッションで読み込まれる CLAUDE.md からは外している。
 
+> **注記**: 本ドキュメント内で言及している `spec-design` は **2026-06-18 に `spec-writer` へ改名**された（旧名は史実説明の文脈で残置）。現役パス参照は `spec-writer/references/` を読む。
+
 ## 新スキル追加・削除時のチェックリスト
 
 スキルを追加・削除した時は **同一コミットで** 以下を揃える（過去 `obsidian-summary` 追加時にここを抜かして `~/.claude/CLAUDE.md` / dotfiles README への反映が漏れ、後続セッションでスキルが認識されず誤作動を起こした。`consistency-check` 削除時も README から消し忘れた）。

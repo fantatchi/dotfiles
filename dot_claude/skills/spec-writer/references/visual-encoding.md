@@ -1,6 +1,6 @@
 # 配色・視覚エンコーディング（HTML 補足ページ）
 
-spec-design の HTML 補足ページ（サマリー / 概況 / 比較・対比 / 配色で意味を伝える表）の配色・コントラスト・装飾の設計指針。デジタル庁「ダッシュボードデザインの実践ガイドブック」(2026/3/31 版) のうち、仕様書文書に転用できる原則を抜粋している。
+spec-writer の HTML 補足ページ（サマリー / 概況 / 比較・対比 / 配色で意味を伝える表）の配色・コントラスト・装飾の設計指針。デジタル庁「ダッシュボードデザインの実践ガイドブック」(2026/3/31 版) のうち、仕様書文書に転用できる原則を抜粋している。
 
 ## カラーパレット（デジタル庁デザインシステム由来）
 
@@ -58,7 +58,7 @@ spec-design の HTML 補足ページ（サマリー / 概況 / 比較・対比 /
 | Success | `#197A4B` | |
 | Error | `#CE0000` | |
 
-> spec-design の HTML 補足ページのデフォルトは **Vercel link blue (`#0070f3`)** で、上表 Blue 900 (`#0017C1`) ではない（[`html-css-centralization.md`](html-css-centralization.md) 参照）。上表は別系統（Green / Orange 等）へ切り替える際の HEX 出典として使う。切り替え運用ルールは [`base-color-mapping.md`](base-color-mapping.md)。
+> spec-writer の HTML 補足ページのデフォルトは **Vercel link blue (`#0070f3`)** で、上表 Blue 900 (`#0017C1`) ではない（[`html-css-centralization.md`](html-css-centralization.md) 参照）。上表は別系統（Green / Orange 等）へ切り替える際の HEX 出典として使う。切り替え運用ルールは [`base-color-mapping.md`](base-color-mapping.md)。
 
 ## 図表タイトルの命名
 
