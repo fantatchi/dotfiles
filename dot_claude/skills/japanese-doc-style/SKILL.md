@@ -1,5 +1,5 @@
 ---
-name: japanese-writing
+name: japanese-doc-style
 description: Style guidelines for technical documents and book manuscripts in Japanese. It defines formatting (one sentence per line, block quotes, footnotes, column notation), paragraph and logical structure (paragraph writing), logical rigor (eliminating logical gaps), managing reader cognitive load, perspective and narrative voice, restraint in presentation, prohibition of LLM-like hollow phrases, and elimination of redundancy. Used when writing, proofreading, or rewriting technical book chapters, drafts, articles, and explanatory texts in Japanese.
 ---
 
