@@ -21,18 +21,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{タイトル}}</title>
 <style>
-  :root { --bg:#fafafa; --surface:#fff; --text:#171717; --muted:#4d4d4d; --border:#ebebeb; --accent:#0070f3; --accent-bg:#d3e5ff; }
-  body { margin:0; background:var(--bg); color:var(--text); font-family:'Inter','Segoe UI','Noto Sans JP','BIZ UDPGothic','Hiragino Sans',system-ui,sans-serif; line-height:1.65; }
+  /* DADS v2.0.1 準拠 (HEX 出典: references/dads-tokens.md) */
+  :root { --bg:#ffffff; --surface:#f2f2f2; --text:#1a1a1a; --muted:#4d4d4d; --border:#e6e6e6; --accent:#264af4; --accent-deep:#0017c1; --accent-bg:#e8f1fe; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family:'Noto Sans JP','BIZ UDPGothic',system-ui,sans-serif; line-height:1.7; }
   main { max-width:1000px; margin:0 auto; padding:40px 24px; }
   header.page { border-bottom:1px solid var(--border); padding-bottom:24px; margin-bottom:32px; }
-  header.page h1 { font-size:26px; font-weight:600; margin:0 0 6px; }
-  .tldr { background:var(--surface); border:1px solid var(--border); border-left:4px solid var(--accent); border-radius:6px; padding:14px 18px; }
-  .tldr .label { display:inline-block; font-size:11px; font-weight:700; color:var(--accent); background:var(--accent-bg); padding:2px 8px; border-radius:3px; margin-bottom:8px; }
+  header.page h1 { font-size:26px; font-weight:700; margin:0 0 6px; }
+  a { color:var(--accent-deep); text-decoration:underline; }
+  .tldr { background:var(--surface); border:1px solid var(--border); border-left:4px solid var(--accent); border-radius:8px; padding:14px 18px; }
+  .tldr .label { display:inline-block; font-size:11px; font-weight:700; color:var(--accent-deep); background:var(--accent-bg); padding:2px 8px; border-radius:4px; margin-bottom:8px; }
   section { margin:40px 0; }
-  section > h2 { font-size:20px; font-weight:600; border-bottom:1px solid var(--border); padding-bottom:8px; }
-  table { width:100%; border-collapse:collapse; border:1px solid var(--border); border-radius:6px; font-size:13px; }
+  section > h2 { font-size:20px; font-weight:700; border-bottom:1px solid var(--border); padding-bottom:8px; }
+  table { width:100%; border-collapse:collapse; border:1px solid var(--border); border-radius:8px; font-size:13px; }
   th, td { padding:10px 14px; text-align:left; border-bottom:1px solid var(--border); vertical-align:top; }
-  thead th { background:#f5f5f4; }
+  thead th { background:var(--surface); }
 </style>
 </head>
 <body>

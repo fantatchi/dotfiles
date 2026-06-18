@@ -313,7 +313,7 @@ HTML 補足ページは **サマリー / 概況 / 比較・対比 / 配色で意
   <title>[システム名] サマリー</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Noto+Sans+Mono:wght@400;700&display=swap">
   <style data-shared-source="../_shared/spec-page.css">
     /* ===== 共通 CSS（SSOT: _shared/spec-page.css の生成時コピー、直接編集禁止） =====
      * スタイル変更は SSOT 側で行い、HTML へ再展開して反映する。
@@ -419,7 +419,7 @@ body.page-summary .card .value {
 <head>
   <meta charset="UTF-8">
   <title>[項目] 比較</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Noto+Sans+Mono:wght@400;700&display=swap">
   <style data-shared-source="../_shared/spec-page.css">
     /* ===== 共通 CSS（SSOT: _shared/spec-page.css の生成時コピー、直接編集禁止） ===== */
     /* ↑ 実際の生成物では SSOT (_shared/spec-page.css) の【全文】をここへ展開する。

@@ -66,7 +66,8 @@ HTML 補足ページ作成時に **必ず** 参照するべき項目:
 | 図表タイトル命名「対象 + 指標 + データ種別」 | [visual-encoding.md](./visual-encoding.md)「## 図表タイトルの命名」 |
 | 装飾排除（3D / 影 / 過剰グリッド線） | [visual-encoding.md](./visual-encoding.md)「## 装飾の排除」 |
 | アクセシビリティ（色覚多様性 / 二重符号化） | [visual-encoding.md](./visual-encoding.md)「## 色覚多様性への配慮」 |
-| ベースカラー別系統への切替 | [base-color-mapping.md](./base-color-mapping.md) |
+| カラー選定 (DADS 10 色族からの選定 ADR) | [adr-format.md](./adr-format.md)「## カラー選定 ADR テンプレ」 |
+| DADS デザイントークン全量 (HEX/タイポ/角丸/影) | [dads-tokens.md](./dads-tokens.md) |
 
 ## 出力形式の運用ルール
 

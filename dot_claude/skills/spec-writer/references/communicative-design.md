@@ -4,7 +4,7 @@
 
 **出典**: 「伝わるデザイン」(<https://tsutawarudesign.com/>) — 各原則の末尾に該当ページ URL を明記。
 
-**範囲外**: 配色（カラーパレット選定・コントラスト比・色覚多様性配慮）は本ファイルでは扱わない。配色は [`visual-encoding.md`](./visual-encoding.md) および [`base-color-mapping.md`](./base-color-mapping.md) を参照。
+**範囲外**: 配色（カラーパレット選定・コントラスト比・色覚多様性配慮）は本ファイルでは扱わない。配色は [`visual-encoding.md`](./visual-encoding.md)、HEX 全量は [`dads-tokens.md`](./dads-tokens.md) を参照。
 
 ## 適用範囲
 
@@ -60,7 +60,7 @@
 
 - **やる**: 見出しと本文のサイズ比を明確に大きく取り、階層が一目で分かるようにする。サイズ・太さの対比（コントラスト）で重要度を表現する。**視覚的階層は 3 段までに抑える**（H1 / H2 / H3 のみを「見出し階層」として扱い、H4 以下は本文と同サイズの太字で代替）
 - **やらない**: H1〜H3 を 1〜2pt 差で並べて区別不能にしない。階層を 4 段以上に深めない（読者が「自分が何階層目にいるか」を見失う）
-- **仕様書への適用例**: HTML で H1=2.0rem / H2=1.5rem / H3=1.2rem / body=1.0rem 程度の段差を確保。H4 以下は `font-size: 1rem; font-weight: 700`。PDF も同等比率。配色によるコントラストは [`base-color-mapping.md`](./base-color-mapping.md) のベースカラー 900 階調を採用
+- **仕様書への適用例**: HTML で H1=2.0rem / H2=1.5rem / H3=1.2rem / body=1.0rem 程度の段差を確保。H4 以下は `font-size: 1rem; font-weight: 700`。PDF も同等比率。配色によるコントラストは [`dads-tokens.md`](./dads-tokens.md) の Blue 900 (本文 4.5:1 以上、AAA 推奨) を採用
 - **出典**: <https://tsutawarudesign.com/miyasuku4.html>（ジャンプ率・コントラストの章）
 
 ### 5. 視線の流れ（左上→右下）に沿わせる
@@ -97,7 +97,7 @@
     sans-serif;
   ```
 
-  PDF も同系統で統一。Web 配信なら Google Fonts の `Noto Sans JP` を `@import` するのが OS 横断で最も安全（**注**: spec-writer の HTML 補足ページのデフォルトも `Inter` + `Noto Sans JP` を採用。`references/html-css-centralization.md` 参照）
+  PDF も同系統で統一。Web 配信なら Google Fonts の `Noto Sans JP` を `@import` するのが OS 横断で最も安全（**注**: spec-writer の HTML 補足ページのデフォルトは DADS 採用の `Noto Sans JP` + `Noto Sans Mono` を採用、UD 保険として `BIZ UDPGothic` / `BIZ UDGothic` を fallback に並べる。`references/html-css-centralization.md` 参照）
 - **出典**: <https://tsutawarudesign.com/yomiyasuku1.html>, <https://tsutawarudesign.com/yomiyasuku2.html>, <https://tsutawarudesign.com/universal2.html>
 - **注記**: 原典は「游ゴシック / メイリオ」推奨で UD フォント指定は明示されていない。BIZ UDPGothic（Windows 同梱の UD フォント）/ Noto Sans JP（Google Fonts）の優先指定は **アクセシビリティ実務則** として本ガイドが追加した
 - **運用則（CDN 遮断時の UD 保険）**: spec-writer のデフォルト CSS は平時 Noto Sans JP で表示される。Google Fonts CDN が遮断される環境（社内 LAN proxy 等）では `BIZ UDPGothic` に fallback して UD 保険が発動する構造になっている。`--font-sans` の並び順で `BIZ UDPGothic` を Latin 系の直後 3 位以内に置くことでこの fallback chain を担保する
@@ -187,6 +187,22 @@
 
 ## 関連参照
 
-- 配色・コントラスト比・ベースカラー切り替え → [`visual-encoding.md`](./visual-encoding.md) および [`base-color-mapping.md`](./base-color-mapping.md)
+- 配色・コントラスト比・用途別配色 → [`visual-encoding.md`](./visual-encoding.md)、HEX 全量は [`dads-tokens.md`](./dads-tokens.md)
 - HTML / md / PDF の出力フォーマット選択 → SKILL.md「## 出力フォーマットのすみ分け」
 - 既存スタイル踏襲手順 → SKILL.md「### Step 1: 読み手と既存状態を確認」「### Step 3: スタイルを既存に合わせる」
+
+## アクセシビリティ準拠（DADS 準拠）
+
+spec-writer の HTML 補足ページは DADS v2.0.1 を採用しており、以下のアクセシビリティ要件を **自動で充足する**:
+
+- **準拠標準**: JIS X 8341-3:2016 適合レベル AA（DADS 必須要件）
+- **追加対応**: WCAG 2.1 / 2.2 A / AA を順次追加予定（DADS ロードマップ）
+- **コントラスト比**:
+  - テキスト（本文・リンク等）: **4.5:1** 以上（デフォルト Blue 900 リンクは AAA 約 13.7:1 を達成）
+  - UI 非テキスト要素（ボタン枠等）: **3:1** 以上
+- **色覚多様性**: 本ファイル原則「色だけで意味を伝えない」を併用（形・テキスト・パターン）
+
+検証ツール推奨:
+- Chrome DevTools → Elements → Accessibility → Contrast 表示
+- WebAIM Contrast Checker（手動）
+- `@adobe/leonardo-contrast-colors` 等の CLI
