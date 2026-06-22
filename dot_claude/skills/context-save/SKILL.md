@@ -1,6 +1,6 @@
 ---
 name: context-save
-description: プロジェクトの作業状態を保存し、次回セッションで復帰可能にする。セッション終了時や作業の区切りで使う。コアは `.claude/context.md` の保存と `## 進行中の作業` の 14 日ローテーション・`## 判断メモ` 肥大アラートで、外部依存なく単独で動く。連携が有効な環境では `~/ObsidianVault/00_meta/tasks.md`（task_store）の `## Next` への次アクション吸い上げ・`.claude/progress.md` の更新・MEMORY.md 昇格提案・session-review への圧縮委譲まで行う。連携の有無は `shared/integrations.md` で判定し、未設定ならコアのみで完結する。UserPromptSubmit hook（`context-save-reminder.sh`、しきい値 240 分）からモデルが自律実行することを前提とした設定で、`disable-model-invocation: false` を意図的に指定（自動起動を許可）。手動 `/context-save` 起動も可。
+description: プロジェクトの作業状態を保存し、次回セッションで復帰可能にする。セッション終了時や作業の区切りで使う。コアは `.claude/context.md` の保存と `## 進行中の作業` の 14 日ローテーション・`## 判断メモ` 肥大アラートで、外部依存なく単独で動く。連携が有効な環境では `~/ObsidianVault/00_meta/tasks.md`（task_store）の `## Next` への次アクション吸い上げ・`.claude/progress.md` の更新・MEMORY.md 昇格提案・session-review への圧縮委譲まで行う。連携の有無は `shared/integrations.md` で判定し、未設定ならコアのみで完結する。UserPromptSubmit hook（`context-save-reminder.sh`、しきい値はスクリプト側で定義）からモデルが自律実行することを前提とした設定で、`disable-model-invocation: false` を意図的に指定（自動起動を許可）。手動 `/context-save` 起動も可。
 disable-model-invocation: false
 allowed-tools: Read, Write, Edit, Glob, Bash(git:*), Bash(echo:*), Bash(mkdir:*), Bash(basename:*), Bash(date:*), Bash(pwd), Bash(chezmoi source-path)
 ---
