@@ -105,7 +105,7 @@ Anthropic 記事「Steering Claude Code: skills, hooks, rules, subagents and mor
 - **`paths:` scoped Rules — 不採用**。グローバル運用ではリポジトリ相対の安定パスが無く機能しない。settings 二層 + chezmoi 境界に第三の層を足し保守が悪化する。条件付きロードは Skill（invoke 時ロード）か docs 参照に統一する。
 - **サブディレクトリ CLAUDE.md / `claudeMdExcludes` — 不採用**。モノレポ向けで対象が存在しない。
 - **managed settings — 不採用**。組織が端末を上書き不能に固定する用途。単一ユーザー環境では `permissions.deny` と強制力が同等で過剰。
-- **PreToolUse ガードレール hook（破壊的 SQL / push ブロック）— 不採用**。push は revert で回復可能（確認止まりで十分）、secrets は Edit/Write 経由で漏れ hook では塞げない（見せかけの安心）、破壊的 SQL のみ理論上は妥当だが WSL/Win 二重実装 + `run-hook.js` の exit code 伝播改修コストに見合わない。禁止事項は CLAUDE.md「# 確認トリガー」「# 禁止パターン」のプロンプト運用を継続する。
+- **PreToolUse ガードレール hook（破壊的 SQL / push ブロック）— 不採用**。push は revert で回復可能なので hook どころか事前確認も不要（2026-06-22 に自律実行へ変更済み）、secrets は Edit/Write 経由で漏れ hook では塞げない（見せかけの安心）、破壊的 SQL のみ理論上は妥当だが WSL/Win 二重実装 + `run-hook.js` の exit code 伝播改修コストに見合わない。禁止事項は CLAUDE.md「# 確認トリガー」「# 禁止パターン」のプロンプト運用を継続する。
 - **`~/.claude/agents/` は空のまま維持**。カスタム subagent は新設しない（research / ログ分析は組込 Explore / Plan + `multi-persona-review` で充足、subagent 乱立が最大リスク）。
 
 外部ガイドは一律全採用せず、既存環境のカバー状況との**差分**で 1 項目ずつ取り込む（メモリ `feedback_adopt-external-guidance-by-diff` 準拠）。
