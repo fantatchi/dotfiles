@@ -146,7 +146,7 @@ LOW: 変数名 `d` を `deliveryDate` に変えると可読性が上がります
 - まとめ系: 日次サマリー（GH 活動集約・複数アカウント）=`/obsidian-daily`（≠ obsidian-log）
 - タスク: 追加=`/gtd-add` / 完了=`/gtd-done` / 表示=`/gtd-list`
 - 仕様書系: 仕様書の構造・判断軸＋HTML 補足ページの視覚設計（配色 / タイポ / アクセシビリティ）=`/spec-writer`（旧 dashboard-design は 2026-06-17 に旧 spec-design へ統合・削除、2026-06-18 に spec-writer へ改名）
-- レビュー: 軽量な並列観点=`/multi-persona-review`（チーム不要・読取専用）
+- レビュー: 軽量な並列観点=`/multi-persona-review`（チーム不要・読取専用） / PR フル自動レビュー（URL→ブランチ切替→ペルソナ→裏取り→`.claude/reviews/` 草稿）=`/pr-review`
 - 振り返り: 権限・CLAUDE.md・スキル整理=`/session-review`
 
 ## 新スキルの追加・削除・拡張
