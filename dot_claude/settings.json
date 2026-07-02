@@ -42,6 +42,7 @@
     ],
     "defaultMode": "auto"
   },
+  "model": "sonnet",
   "hooks": {
     "UserPromptSubmit": [
       {
@@ -55,11 +56,6 @@
           {
             "type": "command",
             "command": "node -e \"require(require('os').homedir()+'/.claude/scripts/run-hook.js')('claude-md-audit-reminder')\"",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "node -e \"require(require('os').homedir()+'/.claude/scripts/run-hook.js')('typecheck-reminder')\"",
             "timeout": 5
           }
         ]
