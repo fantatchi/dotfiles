@@ -63,7 +63,7 @@ gh_accounts:              # obsidian-daily が集約する GitHub アカウン�
 | `vault` | Obsidian Vault ルート | obsidian-log/daily/resource/mail, gtd-list(転記) | Vault 連携を案内して終了 |
 | `vault_dirs` | Vault サブディレクトリ名 | obsidian-* | 既定値（20_log / 30_resource / 10_daily / 00_meta） |
 | `memory_promotion` | 判断メモの MEMORY.md 昇格提案 | context-save, session-review | off（提案しない） |
-| `progress_map` | `.claude/progress.md` 連携 | context-save/load | on（project-local で完結） |
+| `progress_map` | `.claude/progress.md` 連携 | context-save（context-load はコアで直接読む） | on（project-local で完結） |
 | `daily_mail` | デイリーサマリーのメール送信 | obsidian-mail | off |
 | `gh_accounts` | 集約対象 GitHub アカウント | obsidian-daily | アクティブ 1 アカウントのみ |
 
