@@ -124,22 +124,29 @@ Claude Code の `settings.json`・有効化済みプラグイン・このリポ�
 
 | コマンド | 説明 |
 |----------|------|
+| `/baseline-ui` † | Tailwind プロジェクトの UI ベースライン検証（アニメーション時間・タイポスケール・アクセシビリティ） |
+| `/cloud-solution-architect` † | Azure Architecture Center ベストプラクティスに基づくクラウドアーキテクト・ロール変換 |
 | `/context-load` | `.claude/context.md` からコンテキストを復帰、`tasks.md` の該当 Next / Waiting も提示 |
 | `/context-save` | プロジェクトの作業状態を `.claude/context.md` に保存（進行中は 14 日ローテ）、次アクションを `tasks.md` の `## Next` に吸い上げ |
-| `/dashboard-design` | デジタル庁ダッシュボードデザインガイドブックに基づく**視覚設計レイヤー**。ダッシュボード / KPI 画面 + 仕様書の HTML 補足ページの視覚設計（配色・タイポ・装飾原則・アクセシビリティ）が対象。視覚設計系トリガー語（「カラーパレット選定」「ベースカラー」「伝わるデザイン」「HTML 補足ページのデザイン」「文書の配色・タイポグラフィ」）は本スキルに集約。spec-design とは補完関係 |
 | `/gtd-add` | `~/ObsidianVault/00_meta/tasks.md` の Inbox にタスクを追加 |
 | `/gtd-done` | 指定タスクを完了にし Done セクションへ移動 |
 | `/gtd-list` | `~/ObsidianVault/00_meta/tasks.md` からタスクを表示 |
-| `/ks-naming` | 土木業界向け：日本語から識別子名を生成 |
+| `japanese-doc-style` | 日本語技術文書・原稿のスタイル規約（ロール変換型、執筆・推敲時に自動発動） |
+| `/ks-name` † | 土木業界向け：日本語から識別子名を生成 |
+| `/m365-agents-ts` † | Microsoft 365 Agents SDK (TypeScript) の開発支援リファレンス |
 | `/multi-persona-review` | 3〜5 人の専門ペルソナを並列 Agent で起動して読取専用レビューを行い、見落とし・別仮説・推奨アクションを統合 |
 | `/obsidian-daily` | GitHub アクティビティと作業ログからデイリーサマリーを生成（KPI 行・リポ別コミットグルーピング・作業ログ折り畳み callout の構成）。**複数 GH アカウント (`fantatchi` + `kentem-at-kato`) 対応**。Obsidian Core Daily notes テンプレ (`90_config/templates/daily_notes.md`) を SSOT として動的読み込み、Thino プラグインとの共存を考慮した `# Journal` セクション前提 |
 | `/obsidian-log` | 作業ログを Obsidian に記録（自動記録についてはセクション参照） |
-| `/obsidian-resource` | 調査メモ・参考リンク・ブログドラフトを Obsidian Vault に保存（自動発動型、`/obsidian-resource auto` でセッション内容から自動ドラフト化、「調査結果をメモして」「参考リンクを記録」「ブログ書いて」「記事のドラフト作って」等で発動） |
-| `/pr-review` | GitHub PR の URL または番号を渡すと、ブランチ切替・最新化、Copilot/discussion コメント取得、3-5 体のペルソナ並列レビュー、メインでの実コード裏取り、`.claude/reviews/pr-{NNN}-{branch-key}-{YYYY-MM-DD}.md` への所見草稿出力までを一気通貫で実施。投稿はしない（草稿のみ）。公式 `/code-review ultra` と棲み分け（本スキル=ローカル草稿・ペルソナ並列・MEMORY 運用ルール遵守、公式=inline 投稿） |
-| `/obsidian-mail` | デイリーサマリーを Gmail SMTP でメール送信（日報・週報。自動発火しない `disable-model-invocation: true` のためチャットからは呼ばれず、`/obsidian-mail daily\|weekly [YYYY-MM-DD]` で明示呼び出し、または火〜土 8:00 / 月 8:00 のローカル routine 経由） |
+| `/obsidian-mail` † | デイリーサマリーを Gmail SMTP でメール送信（日報・週報。`/obsidian-mail daily\|weekly [YYYY-MM-DD]` で明示呼び出し、または火〜土 8:00 / 月 8:00 のローカル routine 経由） |
+| `/obsidian-resource` † | 調査メモ・参考リンク・ブログドラフトを Obsidian Vault に保存（`/obsidian-resource auto` でセッション内容から自動ドラフト化） |
+| `/pr-review` | GitHub PR の URL または番号を渡すと、ブランチ切替・最新化、Copilot/discussion コメント取得、3-5 体のペルソナ並列レビュー、メインでの実コード裏取り、`.claude/reviews/pr-{NNN}-{branch-key}-{YYYY-MM-DD}.md` への所見草稿出力までを一気通貫で実施。投稿はしない（草稿のみ）。公式 `/code-review ultra` と棲み分け（本スキル=ローカル草稿・ペルソナ並列・MEMORY 運用ルール遵守、公式=inline 投稿）。投稿要否判断が残る所見は `/gtd-add` 起票を提案 |
 | `/session-review` | セッション振り返り（権限・CLAUDE.md・スキル・判断メモ圧縮の整理） |
 | `/session-save` | 作業ログ記録とコンテキスト保存をまとめて実行し、アウトプット提案（ブログ・リソース候補）も行う |
-| `/spec-design` | 仕様書（specification / 設計ドキュメント / requirements / architecture）を書く・レビュー・改善するロール変換型スキル。判断軸 + 具体テンプレ（README / ADR Nygard・MADR / C4 / glossary）。md メイン + HTML 補足の使い分け、仕様書文脈の視覚設計判断（ベースカラー Blue デフォルト・「伝わるデザイン」12 原則の参照・HTML 補足ページ複数時の CSS 集約 SHOULD）も内蔵。**視覚設計の入口は dashboard-design に集約**（補完関係） |
+| `/spec-writer` | 仕様書（specification / 設計ドキュメント / requirements / architecture / ADR / C4 / 用語集）の設計・作成・レビューを担うロール変換型スキル（旧 spec-design + dashboard-design を 2026-06 に統合）。読み手別入口・図種選択・ADR 形式・要件レベル語・Diátaxis 4 分類・テンプレ集を内蔵。HTML 補足ページは DADS v2.0.1 準拠（key-color = Blue 固定で JIS X 8341-3 AA 自動充足） |
+
+† = `disable-model-invocation: true`（自動発動しない手動呼び出し専用。コンテキスト注入削減のため、低頻度スキルに適用 2026-07-07）。japanese-doc-style はロール変換型のためコマンドでなく文脈で自動発動する。
+
+2026-07-07 の剪定で `frontend-patterns`（モデル既知の汎用知識）と `documentation-writer`（spec-writer と重複、Diátaxis 判断軸は `spec-writer/references/diataxis.md` へ吸収）を削除。
 
 ## タスクを Claude 経由で管理する (/gtd-*)
 

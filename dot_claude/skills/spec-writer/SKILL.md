@@ -99,6 +99,10 @@ Markdown で書き Git で管理。コードと同じ PR レビュー・バー�
 
 API 定義に OpenAPI 3.1、データモデルに Protobuf など厳格なスキーマを強制。AI エージェントによる自動実装を前提とする場合に採用。人間向けには過剰になりがちなので、API 仕様などピンポイントで使う。
 
+### 5. Diátaxis（文書種別の迷いを解くとき）
+
+「README 充実」「ドキュメント整備」のように **どの種類の文書を書くべきか自体が曖昧な依頼** では、読者ニーズで Tutorial / How-to / Reference / Explanation の 4 分類に割り当ててから章立てに入る。判断軸・混在の検出・章立てへの反映は [references/diataxis.md](references/diataxis.md) を参照。
+
 ## 出力フォーマットのすみ分け
 
 **md がメイン、HTML が補足** の使い分けを基本とする:
