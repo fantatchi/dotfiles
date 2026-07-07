@@ -56,6 +56,11 @@
             "type": "command",
             "command": "node -e \"require(require('os').homedir()+'/.claude/scripts/run-hook.js')('claude-md-audit-reminder')\"",
             "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "node -e \"require(require('os').homedir()+'/.claude/scripts/run-hook.js')('chezmoi-drift-reminder')\"",
+            "timeout": 10
           }
         ]
       }
