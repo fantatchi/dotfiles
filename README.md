@@ -127,7 +127,7 @@ Claude Code の `settings.json`・有効化済みプラグイン・このリポ�
 | `/baseline-ui` † | Tailwind プロジェクトの UI ベースライン検証（アニメーション時間・タイポスケール・アクセシビリティ） |
 | `/cloud-solution-architect` † | Azure Architecture Center ベストプラクティスに基づくクラウドアーキテクト・ロール変換 |
 | `/context-load` | `.claude/context.md` からコンテキストを復帰、`tasks.md` の該当 Next / Waiting も提示 |
-| `/context-save` | プロジェクトの作業状態を `.claude/context.md` に保存（進行中は 14 日ローテ）、次アクションを `tasks.md` の `## Next` に吸い上げ |
+| `/context-save` | プロジェクトの作業状態を `.claude/context.md` に保存（進行中は 14 日ローテ + 完了 entry を 300 字以内へ圧縮 + 12KB サイズアラート）、次アクションを `tasks.md` の `## Next` に吸い上げ |
 | `/gtd-add` | `~/ObsidianVault/00_meta/tasks.md` の Inbox にタスクを追加 |
 | `/gtd-done` | 指定タスクを完了にし Done セクションへ移動 |
 | `/gtd-list` | `~/ObsidianVault/00_meta/tasks.md` からタスクを表示 |

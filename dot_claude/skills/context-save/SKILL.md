@@ -1,6 +1,6 @@
 ---
 name: context-save
-description: プロジェクトの作業状態を保存し、次回セッションで復帰可能にする。セッション終了時や作業の区切りで使う。コアは `.claude/context.md` の保存と `## 進行中の作業` の 14 日ローテーション・`## 判断メモ` 肥大アラートで、外部依存なく単独で動く。連携が有効な環境では `~/ObsidianVault/00_meta/tasks.md`（task_store）の `## Next` への次アクション吸い上げ・`.claude/progress.md` の更新・MEMORY.md 昇格提案・session-review への圧縮委譲まで行う。連携の有無は `shared/integrations.md` で判定し、未設定ならコアのみで完結する。UserPromptSubmit hook（`context-save-reminder.sh`、しきい値はスクリプト側で定義）からモデルが自律実行することを前提とした設定で、`disable-model-invocation: false` を意図的に指定（自動起動を許可）。手動 `/context-save` 起動も可。
+description: プロジェクトの作業状態を保存し、次回セッションで復帰可能にする。セッション終了時や作業の区切りで使う。コアは `.claude/context.md` の保存と `## 進行中の作業` の 14 日ローテーション + 完了 entry の圧縮（compress-on-complete）・`## 判断メモ` / ファイルサイズの肥大アラートで、外部依存なく単独で動く。連携が有効な環境では `~/ObsidianVault/00_meta/tasks.md`（task_store）の `## Next` への次アクション吸い上げ・`.claude/progress.md` の更新・MEMORY.md 昇格提案・session-review への圧縮委譲まで行う。連携の有無は `shared/integrations.md` で判定し、未設定ならコアのみで完結する。UserPromptSubmit hook（`context-save-reminder.sh`、しきい値はスクリプト側で定義）からモデルが自律実行することを前提とした設定で、`disable-model-invocation: false` を意図的に指定（自動起動を許可）。手動 `/context-save` 起動も可。
 disable-model-invocation: false
 allowed-tools: Read, Write, Edit, Glob, Bash(git:*), Bash(echo:*), Bash(mkdir:*), Bash(basename:*), Bash(date:*), Bash(pwd), Bash(chezmoi source-path)
 ---
@@ -80,6 +80,27 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git:*), Bash(echo:*), Bash(mkdir:*)
 - `## 判断メモ` セクションは時間でローテーションしない（再利用される普遍知見のため）。MEMORY.md への昇格判断は「## 連携」の連携3 を参照
 - `## 関連リポジトリ` の「直近のコミット」リストは保存ごとに最新 5-6 件に丸める（既存挙動）
 - 日付パースが失敗した entry（プレフィックスが想定形式と異なる）は **保守的に残す**（誤削除より誤残存を選ぶ）
+
+### 完了 entry の圧縮（compress-on-complete）
+
+14 日ローテーションは「消す」だけで「痩せさせる」段階がなく、完了済み entry が数百語のまま最大 14 日残って context-load の token 消費を膨らませる（2026-07-07 監査時の実測: 完了 4 entry で約 9KB）。ライフサイクルに「完了 → 圧縮 →（14 日後）削除」の中間段階を足す。
+
+#### ルール
+
+- **対象**: 補足括弧に完了状態（`完了` / `クローズ` / `残なし` など）を含む entry のうち、**日付が今日でないもの**。このセッションで書いたばかりの詳細は次セッションの復帰材料なので当日分は触らない（圧縮は 1 保存周期遅れる）
+- **圧縮形式**: `- YYYY-MM-DD（完了）: <1〜2 文の成果サマリ>。残: <未消化項目あれば 1 行>（詳細: <entry 内の既存ポインタ — 作業ログ / commit / PR>）`
+- **サイズ**: 目安 200 文字、絶対上限 300 文字
+- **保持必須 4 点**: ①日付プレフィックス ②完了状態 ③残（未消化）項目 ④entry 内に既にある参照ポインタ（作業ログパス・commit ID・PR 番号）。経緯・手順・数値・ファイル一覧は捨てる（詳細の正本は作業ログ・git 履歴）
+- **保守則**: 完了マーカーが曖昧な entry（進行中とも読める・一部完了など）は圧縮しない。誤圧縮より誤残存を選ぶ（ローテーションの日付パース失敗時と同じ方針）
+- 残項目は連携1 で tasks.md へ吸い上げ済みでも圧縮行に 1 行保持する（standalone 環境の保険 + 見落とし防止の二重化）
+
+### サイズアラート
+
+保存完了後にファイル全体のサイズをチェックし、肥大の早期警報を出す（判断メモの肥大アラートと同じ「アラートのみ・自動編集しない」設計）。
+
+- `wc -c` 相当で **12,288 bytes（12KB）超** なら次の 1 行アラートを表示する:
+  - `⚠️ context.md が N KB あります。完了 entry の圧縮漏れ・重要ファイル表の陳腐化を確認してください`
+- 判断メモアラートと両方発火する場合は 2 行とも表示してよい（対象セクションが異なるため置換しない）
 
 ### 判断メモの肥大アラート
 
