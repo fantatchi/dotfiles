@@ -2,6 +2,7 @@
 
 `~/.claude/CLAUDE.md` から外出しした、環境固有・状況依存の操作 Tips。該当操作（Bash 実行 / Git / chezmoi / gh api / WSL interop / Windows UAC）に遭遇したときにだけ引く参照ナレッジのため、毎セッション読み込まれる CLAUDE.md からは外している。
 
+- **PowerShell の `&&` チェーン内に変数代入は置けない**: `cmd1 && $id = cmd2 && cmd3` は `Unexpected token '='` の ParserError になる（pipeline chain operator の右辺は pipeline のみで、代入文は不可）。代入を挟むときは `;` で区切る（`cmd1; $id = cmd2; cmd3`）か、`$id = (cmd1 && cmd2)` のように括弧で包む
 - **Bash ツールは bash。PowerShell の here-string `@'...'@` は使えない**: 環境の primary shell が PowerShell でも、Claude Code の Bash ツールは bash を実行する。`git commit -m @'...'@` のような PowerShell here-string を Bash ツールで使うと、bash が `@` をリテラルとして扱いコミットメッセージの先頭・末尾に `@` が混入する（実際に 4 コミット作り直す事故あり）。複数行メッセージは **bash heredoc**（`git commit -F - <<'EOF'` … `EOF`）で渡す
 - **別ブランチのファイルを checkout せずに読む**: PR レビュー時など、現在のブランチを維持したまま別ブランチの内容を読むには `git fetch origin <branch>` した上で `git show FETCH_HEAD:<path>` または `git show origin/<branch>:<path>` を使う。作業中のブランチを崩さずに済む
 - **「未取込」ローカルブランチ ≠ 作業ロストの検証手順**: マージ後にローカルブランチが `[origin/...: gone]`（リモート削除済）かつ `git branch -d` で「未マージ」と弾かれても、即ロストとは限らない。`git merge-base --is-ancestor <branch> origin/master` で祖先判定 → 真なら取込済。偽でも `git diff --stat origin/master <branch>` で「origin 側が前進＝オーファン tip が古い」を確認できれば内容は別経路で反映済と判定でき、`-D` で安全に削除できる。GUI 即マージで follow-up push がオーファン化したケース（同一テーマの別 PR で再実装）で有効。「未マージ」表示を鵜呑みにして残し続けると stale ブランチが溜まる
