@@ -3,7 +3,7 @@
 - 日本語で応答する（コミットメッセージ・PR含む）
 - 不明点や選択肢があれば推測で進めず、質問して埋める
 - 未確認の情報は断定しない（「未確認」と明示する）
-- コンテキストが残り少ない場合、その旨を伝えて区切りを提案する
+- コンテキストが残り少ない場合、`/context-save` を自律実行して事後報告する（確認は不要。context-save は自律実行前提の設計）
 - リサーチ・調査はサブエージェントに委譲してメインコンテキストを節約する
 
 # コミュニケーションスタイル
@@ -33,13 +33,11 @@
 
 # 確認トリガー（実装・実行前に必ず止まる）
 
-以下のいずれかに該当する場合、実装・実行前に確認を求める。
+境界は「コミット・プッシュの粒度」と同じ **巻き戻せるか否か**。巻き戻せる操作（git 管理下で revert 可能な変更など）は自律実行 + 事後報告でよく、以下の巻き戻せない・影響が外に出る操作のみ実装・実行前に確認を求める。
 
 - 外部APIの追加・変更、認証情報の操作
-- 環境変数・設定ファイル・CI/CDの変更
-- 本番環境に影響するコマンドの実行
-- 指示が曖昧、または変更範囲が想定より広がりそうなとき（基本方針の「推測で進めず質問」に加え、ここでは実装着手前の明示的な確認を行う）
-- 既存の動作を変える可能性があるとき
+- 本番環境に影響するコマンドの実行・設定変更（git 管理下で revert 可能な設定ファイル・CI/CD の変更は自律実行 + 事後報告でよい）
+- 変更範囲が承認済み計画から広がりそうなとき（「コミット・プッシュの粒度」の2段階承認②）
 - データやリソースの削除・破壊的操作（ファイル削除、DB操作、ブランチ削除など）
 
 確認時は以下の形式で提示する：
@@ -95,7 +93,7 @@ GOをもらってから進める。
 - **settings.json（chezmoi 管理、全マシン共通）** に入れるもの:
   - `hooks`（`context-save-reminder` / `claude-md-audit-reminder` / `chezmoi-drift-reminder` / `notification-hook`。すべて `run-hook.js` ラッパー経由）
   - `enabledPlugins`、`extraKnownMarketplaces`
-  - UI/挙動の共通設定: `permissions.defaultMode`、`skipAutoPermissionPrompt`、`tui`、`alwaysThinkingEnabled`、`autoUpdatesChannel`
+  - UI/挙動の共通設定: `model`、`effortLevel`、`permissions.defaultMode`、`skipAutoPermissionPrompt`、`tui`、`alwaysThinkingEnabled`、`autoUpdatesChannel` 等
   - 全マシンで必要な共通 permissions（基本 Bash 系、`deny` の secrets 系など）
 
 - **settings.local.json（chezmoi 管理外、マシン固有）** に入れるもの:
