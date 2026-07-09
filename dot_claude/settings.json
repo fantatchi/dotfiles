@@ -60,7 +60,7 @@
           {
             "type": "command",
             "command": "node -e \"require(require('os').homedir()+'/.claude/scripts/run-hook.js')('chezmoi-drift-reminder')\"",
-            "timeout": 10
+            "timeout": 15
           }
         ]
       }

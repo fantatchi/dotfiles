@@ -9,15 +9,34 @@
 #
 # デバウンス: state に「最終通知 epoch + status 出力ハッシュ」を保持し、
 # ハッシュ変化（新しいドリフト）or 24h 経過で再通知。差分解消時は state を消す。
+# チェック間隔ゲート: `chezmoi status` は I/O バウンドで 2〜4 秒かかり（2026-07-09 実測）、
+# 毎プロンプト実行だとレイテンシ + 負荷時の hook timeout 死の原因になるため、
+# 実行そのものを CHECK_INTERVAL_MIN 分に 1 回へ間引く（通知デバウンスとは別レイヤー）。
+# last-check は status 実行「前」に書く = timeout で殺されても連続再試行しない。
 # 除外: .chezmoiscripts/（run script の再実行 state はドリフトでない）
 
 set -uo pipefail
 
-RENOTIFY_MIN=1440   # 同一ドリフトの再通知間隔（分）
+RENOTIFY_MIN=1440       # 同一ドリフトの再通知間隔（分）
+CHECK_INTERVAL_MIN=30   # chezmoi status 実行そのものの間隔（分）
 STATE_DIR="${HOME}/.claude/state/chezmoi-drift"
 STATE_FILE="${STATE_DIR}/last-notified.txt"
+CHECK_FILE="${STATE_DIR}/last-check.txt"
 
 command -v chezmoi >/dev/null 2>&1 || exit 0
+
+NOW_EPOCH=$(date +%s)
+
+# チェック間隔ゲート: 前回チェックから CHECK_INTERVAL_MIN 未満なら status を実行せず無音 exit
+if [ -f "$CHECK_FILE" ]; then
+    LAST_CHECK=$(tr -cd '0-9' < "$CHECK_FILE" | head -c 20)
+    [ -n "$LAST_CHECK" ] || LAST_CHECK=0
+    if [ $(( (NOW_EPOCH - LAST_CHECK) / 60 )) -lt "$CHECK_INTERVAL_MIN" ]; then
+        exit 0
+    fi
+fi
+mkdir -p "$STATE_DIR" 2>/dev/null || true
+{ printf '%s\n' "$NOW_EPOCH" > "$CHECK_FILE"; } 2>/dev/null || true
 
 STATUS=$(chezmoi status 2>/dev/null) || exit 0
 DRIFT=$(printf '%s\n' "$STATUS" | grep -v '^\s*$' | grep -v ' \.chezmoiscripts/' || true)
@@ -27,12 +46,9 @@ if [ -z "$DRIFT" ]; then
     exit 0
 fi
 
-mkdir -p "$STATE_DIR" 2>/dev/null || true
-
 HASH=$(printf '%s' "$DRIFT" | md5sum 2>/dev/null | cut -d' ' -f1)
 [ -n "$HASH" ] || HASH=$(printf '%s' "$DRIFT" | cksum | cut -d' ' -f1)
 
-NOW_EPOCH=$(date +%s)
 LAST_EPOCH=0
 LAST_HASH=""
 if [ -f "$STATE_FILE" ]; then

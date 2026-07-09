@@ -3,6 +3,9 @@
 # `chezmoi status` が非空（= source と target のドリフト）なら <system-reminder> を
 # stdout 出力し、Claude に突合（re-add / apply）の提案を促す。差分なしなら無音 exit 0。
 # デバウンス: state に「最終通知 epoch + status 出力ハッシュ」、ハッシュ変化 or 24h で再通知。
+# チェック間隔ゲート: `chezmoi status` は I/O バウンドで数秒かかる（WSL 実測 2〜4 秒、
+# Windows は PS 起動オーバーヘッドも加算）ため、実行を $checkIntervalMin 分に 1 回へ間引く。
+# last-check は status 実行「前」に書く = timeout で殺されても連続再試行しない。
 # 除外: .chezmoiscripts/（run script の再実行 state はドリフトでない）
 
 $ErrorActionPreference = 'SilentlyContinue'
@@ -11,8 +14,26 @@ $ProgressPreference = 'SilentlyContinue'
 [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
 
 $renotifyMin = 1440
+$checkIntervalMin = 30
 
 if (-not (Get-Command chezmoi -ErrorAction SilentlyContinue)) { exit 0 }
+
+$stateDir = Join-Path $env:USERPROFILE '.claude\state\chezmoi-drift'
+$stateFile = Join-Path $stateDir 'last-notified.txt'
+$checkFile = Join-Path $stateDir 'last-check.txt'
+
+$nowEpoch = [int][double]::Parse((Get-Date -UFormat %s))
+
+# チェック間隔ゲート: 前回チェックから $checkIntervalMin 未満なら status を実行せず無音 exit
+if (Test-Path $checkFile) {
+    $lastCheck = 0
+    try { if ((Get-Content $checkFile -TotalCount 1 -ErrorAction Stop) -match '(\d+)') { $lastCheck = [int]$matches[1] } } catch {}
+    if ((($nowEpoch - $lastCheck) / 60) -lt $checkIntervalMin) { exit 0 }
+}
+if (-not (Test-Path $stateDir)) {
+    try { New-Item -ItemType Directory -Path $stateDir -Force | Out-Null } catch { exit 0 }
+}
+try { Set-Content -Path $checkFile -Value "$nowEpoch" -Encoding ASCII -NoNewline } catch {}
 
 $statusLines = @()
 try { $statusLines = @(chezmoi status 2>&1 | Where-Object { $_ -is [string] -or $_ -is [System.Management.Automation.PSObject] }) } catch { exit 0 }
@@ -20,23 +41,15 @@ if ($LASTEXITCODE -ne 0) { exit 0 }
 
 $drift = @($statusLines | ForEach-Object { "$_" } | Where-Object { $_.Trim() -ne '' -and $_ -notmatch ' \.chezmoiscripts/' })
 
-$stateDir = Join-Path $env:USERPROFILE '.claude\state\chezmoi-drift'
-$stateFile = Join-Path $stateDir 'last-notified.txt'
-
 if ($drift.Count -eq 0) {
     try { Remove-Item $stateFile -Force -ErrorAction SilentlyContinue } catch {}
     exit 0
-}
-
-if (-not (Test-Path $stateDir)) {
-    try { New-Item -ItemType Directory -Path $stateDir -Force | Out-Null } catch { exit 0 }
 }
 
 $driftText = $drift -join "`n"
 $md5 = [System.Security.Cryptography.MD5]::Create()
 $hash = [System.BitConverter]::ToString($md5.ComputeHash([System.Text.Encoding]::UTF8.GetBytes($driftText))).Replace('-', '').ToLower()
 
-$nowEpoch = [int][double]::Parse((Get-Date -UFormat %s))
 $lastEpoch = 0
 $lastHash = ''
 if (Test-Path $stateFile) {
