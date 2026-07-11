@@ -1,0 +1,61 @@
+---
+name: obsidian-log
+description: セッション中の作業内容を Obsidian Vault に単発で記録する。「作業ログだけ残して」「単発でログ記録」「Obsidian に作業メモ追記」と依頼されたときに使う。Claude の obsidian-daily が集約できる互換形式で `20_log` に一次ログを出力する。包括的な保存は session-save、日次集約は Claude の obsidian-daily が担う。
+---
+
+# 作業履歴の記録
+
+今回のセッションで行った作業を振り返り、Obsidian Vaultに記録を残してください。
+
+**主資源と連携**: このスキルは Obsidian Vault（主資源）への作業ログ書き出し専用で、Vault があれば兄弟スキル無しで動く。Vault パスは resolver `~/.claude/skills/shared/integrations.md` の `vault`（既定 `~/ObsidianVault`）から `vault-init.md` 経由で解決する。Vault が無い環境では `vault-init.md` 1 節 の案内で終了する（standalone フォールバックは無い＝Vault 連携専用スキル）。それ以外の兄弟スキル連携は持たない。
+
+## 書き出し先・ファイル名
+
+`~/.claude/skills/shared/vault-init.md` の手順に従うこと（サブディレクトリ名は resolver `vault_dirs.log`、既定 `20_log`）。タイトル部分は「簡潔な作業概要」にする。
+
+## 引数の扱い
+
+ユーザーが Skill 起動時に指定した引数をタグとして扱う。
+
+- スペース区切りでそれぞれを tags に追加する
+- 例: `$obsidian-log backend auth` → tags: codex-log, backend, auth, ...
+- 引数が空の場合は `codex-log` のみ＋自動生成タグ
+
+## タグの自動生成
+
+引数のタグに加え、作業内容から関連タグを自動生成して追加する。
+
+- 使用した言語・フレームワーク（例: typescript, react, python）
+- 作業の種類（例: bugfix, refactor, feature, docs, config）
+- 対象領域（例: api, ui, db, auth, test）
+
+ルール：
+- `codex-log` は常に含める
+- 引数タグ＋自動生成タグの合計が最大5個になるようにする（codex-log は数に含めない）
+- 引数タグを優先し、残り枠を自動生成で埋める
+
+## 出力フォーマット
+
+`./template.md` のフォーマットに従って書き出すこと。
+
+### 対話記録の書き方ルール
+
+- ユーザーの指示は `> **指示**:` で始め、ブロック引用で囲む
+- 指示は正確な原文でなくてよい。意図が伝わる要約で十分
+- 1つの指示とそれに対する対応を1つの `### #N` にまとめる
+- 各ペアのタイトルは「何についてのやり取りか」を簡潔に
+- 「方針」は判断を伴う場合のみ。単純作業では省略可
+- 「判断メモ」は後から読んで理由がわかるように書く
+- ペア間は水平線（---）で区切る
+- 雑談や短い確認のやり取りは1つのペアにまとめてよい
+- ファイルパスはバッククォートで囲む
+- エラーや試行錯誤もそのまま書く
+
+## 注意事項
+
+- セッション全体を振り返ってから書くこと
+- diffの羅列ではなく、人間が後から読んで文脈がわかるように書くこと
+- 書き出し先ディレクトリが存在しない場合は作成すること
+- frontmatter の `files_changed` はセッション中に変更したファイル数を数えて記入すること（`git status --short | wc -l` 等で取得）
+- frontmatter の `source: codex-log` / `generation: 0` は固定（再帰要約劣化対策のメタ。セッション原文に近い記録なので一次情報扱い）
+- frontmatter の `project` は `"[[<プロジェクト名>]]"` の **wiki-link 形式** で書くこと。Obsidian の Graph View は frontmatter のリンクプロパティのみエッジとして認識するため、プレーン文字列だとプロジェクトノードがハブ化されず孤立する。ダブルクォートで囲むのは YAML パーサ対策（`[[ ... ]]` のみだとパース時に flow sequence と誤解される可能性があるため）。スラッシュ区切りなど複数プロジェクトに跨る場合は値そのものを揺れたまま 1 つの link にしてよい（正規化はスコープ外）

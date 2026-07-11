@@ -1,0 +1,4 @@
+interface:
+  display_name: "コンテキスト読込"
+  short_description: "保存済みの共有プロジェクト状態を安全に読み込み、前回の作業を復元する"
+  default_prompt: "$context-load を使って前回のプロジェクト状態を読み込んでください。"

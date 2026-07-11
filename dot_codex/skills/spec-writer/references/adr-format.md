@@ -1,0 +1,134 @@
+# ADR フォーマット（Nygard / MADR）
+
+SKILL.md「ADR で意思決定を分離」の補足。
+
+## 形式の選択
+
+ADR には主に 2 形式ある。プロジェクト規模・運用方針に応じて選ぶ:
+
+| 形式 | 特徴 | 向くケース |
+|---|---|---|
+| **Nygard 形式** | シンプル（Status / Context / Decision / Consequences の 4 セクション）。原典。1 ADR 100〜300 行 | スタートアップ・中規模、軽量運用、最初の ADR 着手 |
+| **MADR 形式** | 構造化（検討した選択肢 / 理由 / 結果の細分化を明示）。Nygard を拡張 | エンタープライズ・規制業界、トレードオフを詳細に残したい、選択肢比較を明示したい |
+
+迷ったら **Nygard で始める**。後で詳細化が必要になったら個別 ADR を MADR 形式で書き直すか、選択肢比較セクションだけ追記する。
+
+## 基本ルール（両形式共通）
+
+- **1 ファイル 1 決定**: 1 つの ADR は 1 つの意思決定だけを扱う
+- **追記しない・書き換えない**: 一度 Accepted にした ADR は変更しない。撤回するときは新しい ADR を作って `Superseded by ADR-NNNN` で繋ぐ（Status 行の書き換えだけは例外的に許容）
+- **ファイル名は `ADR-NNNN-kebab-title.md`**: 連番 + 短いタイトル。NNNN は 4 桁ゼロ埋め
+- **Consequences が最重要**: デメリットやトレードオフを正直に書くこと。これが将来の保守者への最大の贈り物
+
+## 形式別の骨格
+
+具体的なテンプレ全文（コピペ可能）は [templates.md の「ADR テンプレート」セクション](./templates.md#adr-テンプレートnygard-形式--シンプル版) を参照。本ファイルは「形式の選び方・運用ルール」を担う。
+
+### Nygard 形式の特徴
+
+- 4 セクション構成: Status / Context / Decision / Consequences
+- Alternatives Considered は原典には含まれず、必要に応じて任意追記
+- シンプルで書きやすい
+
+### MADR 形式の特徴
+
+- 構造化された 7 セクション: ステータス / 日付 / コンテキストと課題 / 検討した選択肢 / 決定 / 理由 / 結果
+- 「検討した選択肢」を独立セクションとして強制
+- トレードオフを詳細に残せる
+
+## Status の遷移（両形式共通）
+
+- **Proposed / 提案中**: 提案中。レビュー待ち
+- **Accepted / 承認**: 承認済み。プロジェクトの方針として確定
+- **Deprecated / 廃止**: 推奨されなくなった（後継がない場合）
+- **Superseded by ADR-XXXX / 置き換え**: 後継 ADR に置き換えられた
+
+Superseded する場合、新 ADR の `Context / コンテキストと課題` に「ADR-NNNN を見直す経緯」を書き、旧 ADR の Status を `Superseded by ADR-XXXX` に書き換える。
+
+## 置き場所
+
+- `docs/adr/ADR-NNNN-*.md` が一般的
+- 用語集・本文からは相対リンクで参照
+- README に「過去の意思決定は `docs/adr/` を参照」と入口を作る
+
+## サイズ感
+
+- Nygard: 1 ADR で 100〜300 行が標準
+- MADR: 検討選択肢が多いと 200〜400 行になることもある
+- いずれも 1 ページに収まらない場合は、複数の決定が混ざっている可能性 → 分割を検討
+
+## いつ ADR を書くか
+
+書く判断基準:
+
+- **後任が「なぜこうしたのか」と聞きそうな決定** はすべて ADR 化
+- 採用しなかった案を「採用しなかった理由つき」で残せるものは ADR 化
+- ライブラリ選定 / アーキテクチャ層の分離方針 / データモデルの正規化方針 / 認証方式 などは典型
+
+書かなくて良い判断基準:
+
+- コードレベルの個別実装判断（コードコメント / PR description で十分）
+- すぐ覆る暫定判断（**ただし「暫定である」こと自体を ADR 化することはある**）
+
+## カラー選定 ADR テンプレ
+
+spec-writer のデフォルト (**DADS key-color = Blue 固定**、`--accent-deep` = Blue 900 `#0017c1`) から別系統 (Light Blue / Cyan / Green / Lime / Yellow / Orange / Red / Magenta / Purple) に切り替える場合、または業種的に複数案があり迷った場合に書く ADR。Nygard 形式の最小骨格:
+
+```markdown
+# ADR-NNNN: カラー選定 (DADS 10 色族からの選定)
+
+## Status
+
+Accepted（YYYY-MM-DD）
+
+## Context
+
+本プロジェクトの仕様書 HTML / PDF / スライドで採用するベースカラーを決定する必要がある。
+spec-writer のデフォルト (DADS key-color = Blue) を採用しない理由が以下にある:
+
+- 業種: {{例: 環境系 / 物流 / 金融 / 医療 / etc.}}
+- ブランドガイド: {{あり / なし / 既存スタイル: --accent=#XXX}}
+- 既存ドキュメントの状態: {{ゼロから / 既存スタイル踏襲 / 部分追加}}
+
+## Decision
+
+ベースカラーとして DADS プリミティブの **{{Light Blue / Cyan / Green / Lime / Yellow / Orange / Red / Magenta / Purple}}** 色族を採用する。
+
+主要 HEX 値（[`dads-tokens.md`](dads-tokens.md) 2 節 から引用）:
+
+| 用途 | 階調 | HEX |
+|---|---|---|
+| 本文リンク (`--accent-deep`) | 900 | `#XXXXXX` |
+| key-color (`--accent`、UI primary) | 700 | `#XXXXXX` |
+| アクセント面 (`--accent-bg`、badge 背景) | 50 | `#XXXXXX` |
+| 強調 / チャート Primary | 1200 | `#XXXXXX` |
+
+Negative の扱い: {{Red 800 固定で面塗り禁止・アイコン+ラベル併用 / 例外的に別色化 = #XXXXXX}}
+
+## Consequences
+
+**Positive（採用理由）**:
+- {{例: 業種慣例に沿う / ブランド一貫性 / 既存スタイル踏襲によるリブランドコスト回避}}
+
+**Negative（トレードオフ）**:
+- {{例: Green ベースは Negative の Red 面塗りと衝突する → アイコン併用 MUST で運用}}
+- {{例: Yellow 700 (#b78f00) は白背景で 4.5:1 をギリギリ通過、注意}}
+
+**Alternatives Considered**:
+- Blue（DADS デフォルト）: 棄却理由 = {{...}}
+- {{他の候補}}: 棄却理由 = {{...}}
+
+## 関連
+
+- DADS デザイントークン正本（HEX 全量・タイポ・角丸・影）: `~/.codex/skills/spec-writer/references/dads-tokens.md`
+- 用途別配色・状態色マッピング: `~/.codex/skills/spec-writer/references/visual-encoding.md`
+```
+
+業種・ブランド・既存スタイルの 3 要因のうち、棄却した選択肢の理由を必ず書くこと（Consequences の Alternatives セクション）。
+
+## 関連リンク
+
+- [Nygard "Documenting Architecture Decisions" (2011)](https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions) — 原典
+- [MADR (Markdown Architectural Decision Records)](https://adr.github.io/madr/) — Nygard を拡張したテンプレート
+- [ADR GitHub Organization](https://adr.github.io/) — 各種フォーマット集
+- 具体的なテンプレ全文は [templates.md](./templates.md) の「ADR テンプレート」セクションを参照

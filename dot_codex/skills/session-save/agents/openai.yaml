@@ -1,0 +1,4 @@
+interface:
+  display_name: "セッション保存"
+  short_description: "作業ログと共有プロジェクト状態を安全な手順でまとめて保存する"
+  default_prompt: "$session-save を使って今回のセッションをまとめて保存してください。"

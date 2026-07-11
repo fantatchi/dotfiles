@@ -1,0 +1,4 @@
+interface:
+  display_name: "仕様書作成"
+  short_description: "読み手中心の仕様書を設計し、作成・レビュー・改善まで一貫して支援する"
+  default_prompt: "$spec-writer を使ってこの仕様書を設計してください。"

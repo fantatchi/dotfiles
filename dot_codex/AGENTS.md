@@ -124,3 +124,27 @@ LOW: 変数名 `d` を `deliveryDate` に変えると可読性が上がります
 - 破壊的な Git 操作、ファイル削除、DB 操作は、ユーザーの明示指示または確認なしに実行しない。
 - `chezmoi add` は新規管理ファイルの追加、`chezmoi re-add` は既存管理ファイルの更新に使う。
 - `run_before_*` スクリプトが `chezmoi diff` に常に出るのは正常。`run_onchange_*` はハッシュ変化時のみ実行される。
+
+## プロジェクト状態の共有
+
+Claude Code、Codex、Obsidian は次のファイルを共有正本として扱う。`.codex/context.md` など writer ごとのコピーは作らない。
+
+- `{project-root}/.claude/context.md`: プロジェクトの作業状態。
+- `{project-root}/.claude/progress.md`: チェックボックス形式の進捗マップ。存在する場合のみ使う。
+- `~/ObsidianVault/00_meta/tasks.md`: 全プロジェクト横断の GTD タスクストア。
+
+`.claude/` はディレクトリ名にすぎず Claude 専用ではない。Codex も対等な writer として、書込み時は次を必須とする。
+
+1. 未知の frontmatter、見出し、フィールド、本文を保持する。
+2. 既知セクションだけを最小編集し、全体再生成は新規作成時だけにする。
+3. 書込み直前に再読込する。
+4. 編集対象と重なる競合を検出したら停止し、ユーザーへ報告する。
+5. 書込み後に再読込し、編集結果と既存構造の保持を検証する。
+6. パースできない内容や他 writer の entry を削除せず、文体の正規化だけを目的に書き換えない。
+
+`updated_by: codex` のような writer 識別フィールドは追加しない。詳細は次を正本とする。
+
+- `~/.claude/skills/shared/multi-writer.md`
+- `~/.claude/skills/shared/tasks-format.md`
+
+tasks.md を編集する場合は、5 セクションの重複、既存の類似タスク、タイトル 150 文字上限を事前確認し、編集後に各見出しが 1 回ずつ存在することと対象行を検証する。
