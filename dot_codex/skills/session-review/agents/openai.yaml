@@ -1,4 +1,0 @@
-interface:
-  display_name: "セッションレビュー"
-  short_description: "セッション後の権限・指示・Skill・判断メモの改善案をまとめて提案する"
-  default_prompt: "$session-review を使って今回のセッションを振り返ってください。"

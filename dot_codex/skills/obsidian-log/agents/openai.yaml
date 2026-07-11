@@ -1,4 +1,0 @@
-interface:
-  display_name: "Obsidian 作業ログ"
-  short_description: "セッションの作業履歴を Claude と互換性のある形式で Obsidian に記録する"
-  default_prompt: "$obsidian-log を使って今回の作業ログを記録してください。"

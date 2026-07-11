@@ -1,4 +1,0 @@
-interface:
-  display_name: "コンテキスト保存"
-  short_description: "共有プロジェクト状態を競合検出付きで安全に保存し、次回復帰に備える"
-  default_prompt: "$context-save を使って現在の作業状態を安全に保存してください。"
