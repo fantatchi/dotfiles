@@ -1,6 +1,5 @@
-# Windows 側 ~/.codex を WSL と共有する初回 setup スクリプト。
-# 認証、セッション、設定、Plugin、cache は Windows ローカルに保持し、
-# 人間が管理する静的ファイルだけを SymbolicLink で共有する。
+# Share selected WSL Codex files with Windows.
+# Keep auth, sessions, config, plugins, caches, and system skills local.
 
 [CmdletBinding(SupportsShouldProcess)]
 param(
@@ -8,53 +7,85 @@ param(
     [switch]$Force
 )
 
-$includeForLink = @('AGENTS.md', 'skills')
+$sharedRootFiles = @('AGENTS.md')
+$sharedSkills = @(
+    'context-load',
+    'context-save',
+    'session-save',
+    'obsidian-log',
+    'obsidian-resource',
+    'session-review',
+    'spec-writer'
+)
 $wslUser = (wsl.exe -d $Distro -e whoami 2>$null | Out-String).Trim()
 if (-not $wslUser) {
-    throw "WSL ($Distro) のユーザー名を取得できません。"
+    throw "Could not resolve the WSL user for distro: $Distro"
 }
 
 $wslCodexRoot = "\\wsl.localhost\$Distro\home\$wslUser\.codex"
 $windowsCodexRoot = Join-Path $env:USERPROFILE '.codex'
 
 if (-not (Test-Path -LiteralPath $wslCodexRoot)) {
-    throw "WSL 側の .codex が見つかりません: $wslCodexRoot"
+    throw "WSL .codex was not found: $wslCodexRoot"
 }
 
 $windowsRootItem = Get-Item -LiteralPath $windowsCodexRoot -Force -ErrorAction SilentlyContinue
 if ($windowsRootItem -and $windowsRootItem.LinkType -in @('SymbolicLink', 'Junction')) {
-    throw "Windows 側 .codex は実ディレクトリである必要があります: $windowsCodexRoot"
+    throw "Windows .codex must be a real directory: $windowsCodexRoot"
 }
 
-if (-not $windowsRootItem -and $PSCmdlet.ShouldProcess($windowsCodexRoot, '実ディレクトリを作成')) {
+if (-not $windowsRootItem -and $PSCmdlet.ShouldProcess($windowsCodexRoot, 'Create directory')) {
     New-Item -ItemType Directory -Path $windowsCodexRoot -Force | Out-Null
 }
 
-foreach ($name in $includeForLink) {
-    $source = Join-Path $wslCodexRoot $name
-    $linkPath = Join-Path $windowsCodexRoot $name
+function New-ProtectedSymbolicLink {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Source,
+        [Parameter(Mandatory)]
+        [string]$LinkPath,
+        [Parameter(Mandatory)]
+        [string]$Label
+    )
 
-    if (-not (Test-Path -LiteralPath $source)) {
-        Write-Warning "共有元がないためスキップします: $source"
-        continue
+    if (-not (Test-Path -LiteralPath $Source)) {
+        Write-Warning "Source not found; skipping: $Source"
+        return
     }
 
-    $existingItem = Get-Item -LiteralPath $linkPath -Force -ErrorAction SilentlyContinue
+    $existingItem = Get-Item -LiteralPath $LinkPath -Force -ErrorAction SilentlyContinue
     if ($existingItem) {
-        if ($existingItem.LinkType -eq 'SymbolicLink' -and $existingItem.Target -contains $source) {
-            Write-Host "既存リンクを維持: $name"
-            continue
+        if ($existingItem.LinkType -eq 'SymbolicLink' -and $existingItem.Target -contains $Source) {
+            Write-Host "Existing link is valid: $Label"
+            return
         }
         if (-not $Force) {
-            Write-Warning "既存項目を保護してスキップします: $linkPath"
-            continue
+            Write-Warning "Existing item protected; skipping: $LinkPath"
+            return
         }
-        throw "-Force でも既存項目は自動削除しません。退避後に再実行してください: $linkPath"
+        throw "Existing items are never removed automatically. Move it aside and retry: $LinkPath"
     }
 
-    if ($PSCmdlet.ShouldProcess($linkPath, "SymbolicLink を作成: $source")) {
-        New-Item -ItemType SymbolicLink -Path $linkPath -Target $source -ErrorAction Stop | Out-Null
+    if ($PSCmdlet.ShouldProcess($LinkPath, "Create SymbolicLink to $Source")) {
+        New-Item -ItemType SymbolicLink -Path $LinkPath -Target $Source -ErrorAction Stop | Out-Null
     }
 }
 
-Write-Host 'Codex の Windows 共有セットアップが完了しました。'
+foreach ($name in $sharedRootFiles) {
+    $source = Join-Path $wslCodexRoot $name
+    $linkPath = Join-Path $windowsCodexRoot $name
+    New-ProtectedSymbolicLink -Source $source -LinkPath $linkPath -Label $name
+}
+
+$windowsSkillsRoot = Join-Path $windowsCodexRoot 'skills'
+if (-not (Test-Path -LiteralPath $windowsSkillsRoot) -and $PSCmdlet.ShouldProcess($windowsSkillsRoot, 'Create skills directory')) {
+    New-Item -ItemType Directory -Path $windowsSkillsRoot -Force | Out-Null
+}
+
+foreach ($name in $sharedSkills) {
+    $source = Join-Path (Join-Path $wslCodexRoot 'skills') $name
+    $linkPath = Join-Path $windowsSkillsRoot $name
+    New-ProtectedSymbolicLink -Source $source -LinkPath $linkPath -Label "skills/$name"
+}
+
+Write-Host 'Windows Codex sharing setup completed.'

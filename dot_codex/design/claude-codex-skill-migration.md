@@ -14,4 +14,4 @@ Codex の作業ログは Claude と同じ `20_log/YYYYMM/`、リソースは `30
 
 ## chezmoi と Windows
 
-ユーザー管理対象は `dot_codex/AGENTS.md`、`skills/`、`scripts/`、`design/` とする。認証、config、セッション、Plugin、cache、ログ、SQLite は管理しない。Windows の `.codex` は実ディレクトリを維持し、`AGENTS.md` と `skills` だけを WSL 側へ SymbolicLink で共有する。
+ユーザー管理対象は `dot_codex/AGENTS.md`、`skills/`、`scripts/`、`design/` とする。認証、config、セッション、Plugin、cache、ログ、SQLite は管理しない。Windows の `.codex` と `skills` は実ディレクトリを維持し、`AGENTS.md` と移植した 7 Skill の各ディレクトリだけを WSL 側へ SymbolicLink で共有する。Windows の `skills/.system` は OS ローカルのまま保持する。
