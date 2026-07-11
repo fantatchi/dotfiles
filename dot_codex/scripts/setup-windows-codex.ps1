@@ -23,10 +23,15 @@ if (-not $wslUser) {
 }
 
 $wslCodexRoot = "\\wsl.localhost\$Distro\home\$wslUser\.codex"
+$wslAgentsRoot = "\\wsl.localhost\$Distro\home\$wslUser\.agents"
 $windowsCodexRoot = Join-Path $env:USERPROFILE '.codex'
+$windowsAgentsRoot = Join-Path $env:USERPROFILE '.agents'
 
 if (-not (Test-Path -LiteralPath $wslCodexRoot)) {
     throw "WSL .codex was not found: $wslCodexRoot"
+}
+if (-not (Test-Path -LiteralPath $wslAgentsRoot)) {
+    throw "WSL .agents was not found: $wslAgentsRoot"
 }
 
 $windowsRootItem = Get-Item -LiteralPath $windowsCodexRoot -Force -ErrorAction SilentlyContinue
@@ -77,13 +82,21 @@ foreach ($name in $sharedRootFiles) {
     New-ProtectedSymbolicLink -Source $source -LinkPath $linkPath -Label $name
 }
 
-$windowsSkillsRoot = Join-Path $windowsCodexRoot 'skills'
+$windowsAgentsItem = Get-Item -LiteralPath $windowsAgentsRoot -Force -ErrorAction SilentlyContinue
+if ($windowsAgentsItem -and $windowsAgentsItem.LinkType -in @('SymbolicLink', 'Junction')) {
+    throw "Windows .agents must be a real directory: $windowsAgentsRoot"
+}
+if (-not $windowsAgentsItem -and $PSCmdlet.ShouldProcess($windowsAgentsRoot, 'Create directory')) {
+    New-Item -ItemType Directory -Path $windowsAgentsRoot -Force | Out-Null
+}
+
+$windowsSkillsRoot = Join-Path $windowsAgentsRoot 'skills'
 if (-not (Test-Path -LiteralPath $windowsSkillsRoot) -and $PSCmdlet.ShouldProcess($windowsSkillsRoot, 'Create skills directory')) {
     New-Item -ItemType Directory -Path $windowsSkillsRoot -Force | Out-Null
 }
 
 foreach ($name in $sharedSkills) {
-    $source = Join-Path (Join-Path $wslCodexRoot 'skills') $name
+    $source = Join-Path (Join-Path $wslAgentsRoot 'skills') $name
     $linkPath = Join-Path $windowsSkillsRoot $name
     New-ProtectedSymbolicLink -Source $source -LinkPath $linkPath -Label "skills/$name"
 }

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Obsidian リソース"
+  short_description: "調査メモやブログ下書きを公開準備済みの形式で Obsidian に保存する"
+  default_prompt: "$obsidian-resource を使ってこの内容をリソースとして保存してください。"
