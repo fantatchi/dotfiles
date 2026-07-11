@@ -58,6 +58,8 @@ allowed-tools: Read, Write, Edit, Bash(git:*), Bash(basename:*), Bash(pwd)
 
 ### 5. Inbox セクションに追記
 
+**書込みは `~/.claude/skills/shared/tasks-format.md` の「書き込みプロトコル（複数 writer・MUST）」に従う**: 書き込み直前に tasks.md を再 Read し、重複見出し（同名セクション 2 回以上 → 自動編集停止）・重複タスク（同内容が既存 → 追加スキップ）をチェックする。書き込み後に再 Read して検証（5 見出しが各 1 回・追記行の存在・文字数）する。
+
 `## Inbox` セクションの末尾（次のセクション `## Next` の直前）にタスク行を追加する：
 
 ```

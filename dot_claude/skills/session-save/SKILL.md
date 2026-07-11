@@ -74,4 +74,5 @@ obsidian-log は Vault を主資源とする「Vault 連携専用」スキルで
 
 - **orchestrator はサブスキルを順に起動するだけ**。ステップ 1（obsidian-log）が skip / 失敗しても、ステップ 2（context-save）以降は実行する
 - 各ステップの詳細な仕様・degradation は個別のサブスキル定義（`obsidian-log` / `context-save`）が正本。本ファイルでは再記述しない
+- サブスキルによる共有正本（context.md / progress.md / tasks.md）への書込みは `~/.claude/skills/shared/multi-writer.md` の複数 writer 書込みプロトコルに従う（規定はサブスキル側 SKILL.md / tasks-format.md が正本。orchestrator は再記述しない）
 - 同セッションの作業ログが既に存在する場合に新規作成せず上書き更新するかどうかは obsidian-log 側の責務（本 orchestrator は関与しない）

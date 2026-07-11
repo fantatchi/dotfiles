@@ -112,5 +112,8 @@ allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(echo:*), Bash(basename:*), Ba
 
 ## 注意事項
 
-- 読み込み専用。context.md・progress.md・tasks.md を変更しない
+- **読み込み専用**。context.md・progress.md・tasks.md を変更しない
+- **複数 writer 前提で読む**: 3 ファイルとも Claude・Codex 等が共有する正本であり（`~/.claude/skills/shared/multi-writer.md` 参照）、Claude 固有の記述だけが存在する前提にしない
+  - 未知の frontmatter キー・見出し・フィールドがあっても**エラーにせず有効データとして扱う**（保持対象。提示から黙って落とさず、未知セクションは提示の末尾で「その他のセクション」として言及する）
+  - Claude 固有の目印（frontmatter の `tags: claude-context` 等）が無いファイルも正常として読み込む
 - パスはプロジェクトルートからの相対パスで記録されているため、現在のマシンのパスと異なる場合がある

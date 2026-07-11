@@ -25,7 +25,7 @@
 3. **削除・統合の前に、既出と判定した実ファイルを Read で開いて本当にカバーされているか確認する**（誤削除より誤残存を選ぶ。CLAUDE.md「削除前に何を失うか検証」）
 4. 昇格: MEMORY.md frontmatter 規約（`name` / `description` / `metadata.type`）に従って新規ファイルを作成し、`MEMORY.md` 索引に 1 行追加する。本文は `**Why:**` / `**How to apply:**` を付け、関連を `[[name]]` でリンク
 5. 統合: 既存 memory に追記。重複させない
-6. 削除・昇格・統合したエントリを context.md から除去し、残置のみを残す
+6. 削除・昇格・統合したエントリを context.md から除去し、残置のみを残す。除去の Edit は `~/.claude/skills/shared/multi-writer.md` の書込みプロトコルに従う（書込み直前に context.md を再 Read し、仕分け時点から `## 判断メモ` が他 writer に更新されていたら自動書込みを停止して報告 / 書込み後に再 Read し、`## 判断メモ` 以外のセクション・未知の見出し・frontmatter が変化していないことを検証）
 7. 仕分け結果（昇格 N / 統合 M / 削除 K / 残置 L）をユーザーに提示する
 
 ## 注意
