@@ -17,6 +17,7 @@ macOS では事前に [Homebrew](https://brew.sh/) が必要（hook 依存の `j
 - [セッションをまたいで作業状態を引き継ぐ (/context-save, /context-load)](#セッションをまたいで作業状態を引き継ぐ-context-save-context-load)
 - [作業ログ・メモを Obsidian に記録・配信する (/obsidian-*)](#作業ログメモを-obsidian-に記録配信する-obsidian-)
 - [環境セットアップの注意点（Windows / WSL）](#環境セットアップの注意点windows--wsl)
+- [Codex 設定を他 PC に展開する](#codex-設定を他-pc-に展開する)
 
 ## クイックスタート
 
@@ -319,6 +320,56 @@ Vault 本体は Windows の `C:\Users\<username>\ObsidianVault` に配置。
 `.chezmoiscripts/*.ps1.tmpl` は `.chezmoi.os == "windows"` の分岐で
 Windows 側で chezmoi を実行したときのみ評価されるため、上記の WSL 実行
 前提では発火しない（別環境・将来の拡張用）。
+
+## Codex 設定を他 PC に展開する
+
+Codex は、設定全体を共有せず、作業規約とユーザー Skill だけを chezmoi で共有する。認証情報やセッションなどの PC 固有データを誤って持ち込まないためである。
+
+### 共有するもの・しないもの
+
+| 区分 | 対象 | 扱い |
+| --- | --- | --- |
+| 共有 | `~/.codex/AGENTS.md` | chezmoi で配備 |
+| 共有 | `~/.agents/skills/` の 7 Skill | chezmoi で配備。Codex のユーザー Skill 正規探索先 |
+| 共有 | `~/.codex/scripts/setup-windows-codex.ps1` | Windows 側リンク作成用 |
+| ローカル | `~/.codex/config*`、認証情報、セッション、ログ、キャッシュ、SQLite | chezmoi 管理外 |
+| ローカル | `~/.codex/skills/.system/` | Codex が OS ごとに提供・管理するため共有しない |
+
+### WSL または Linux の初期化
+
+1. [クイックスタート](#クイックスタート) の手順で chezmoi を初期化する。
+2. Codex をインストールして一度起動し、PC 固有の `.codex` を作成する。
+3. `~/.agents/skills/` と `~/.codex/AGENTS.md` が存在することを確認する。
+
+```bash
+test -f ~/.codex/AGENTS.md
+find ~/.agents/skills -name SKILL.md -print
+```
+
+以降、共有設定を更新したら WSL/Linux 側で `chezmoi update` を実行する。
+
+### Windows の初期化（WSL と同じ設定を利用する場合）
+
+Windows 版 Codex も使う場合は、まず WSL 側の初期化を完了してから、**Windows PowerShell** で次を実行する。管理者権限または Windows の開発者モードが必要になる場合がある。
+
+```powershell
+& "\\wsl.localhost\Ubuntu\home\<wsl-user>\.codex\scripts\setup-windows-codex.ps1"
+```
+
+`Ubuntu` と `<wsl-user>` は実際のディストリビューション名・WSL ユーザー名に置き換える。別のディストリビューションを使う場合は、引数でも指定できる。
+
+```powershell
+& "\\wsl.localhost\<distro>\home\<wsl-user>\.codex\scripts\setup-windows-codex.ps1" -Distro <distro>
+```
+
+このスクリプトは Windows 側の `.codex` と `.agents` を実体ディレクトリのまま維持し、次だけを WSL 側へ個別シンボリックリンクとして作成する。
+
+- `%USERPROFILE%\.codex\AGENTS.md`
+- `%USERPROFILE%\.agents\skills\` 配下の 7 Skill ディレクトリ
+
+既存のファイルやリンク先が期待と異なる場合、スクリプトは削除・上書きせず停止する。必要なら対象を手動で退避してから、再実行する。
+
+Windows 側では `chezmoi apply` を実行しない。共有ファイルの更新・配備は WSL 側の chezmoi だけで行い、Windows 側は上記のリンクを通じて参照する。
 
 ### Windows セットアップ時の注意
 
