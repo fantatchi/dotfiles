@@ -33,6 +33,24 @@ function readEpoch(file) {
   }
 }
 
+// Vault 上の共有 state (claude-state.md) から監査実施時刻を読む。無い/未同期/parse 失敗は 0
+// → 呼び出し側がローカル state へフォールバックする。
+// frontmatter の `last_audit: <epoch>` のみを読む。`last_audit_at:` (ISO 併記・人間用) は
+// キー名がコロンで区切られるため ^last_audit: にマッチせず、取り違えない。
+// Vault パスは ~/.claude/skills/shared/integrations.md の vault / task_store_probe を SSOT として
+// ミラー。Vault を移動したら .sh / .ps1 / ここの 3 箇所を grep で同時更新すること。
+function readSharedAuditEpoch() {
+  const vaultDir = join(homedir(), 'ObsidianVault');
+  if (!existsSync(join(vaultDir, '.obsidian'))) return 0;
+  try {
+    const m = readFileSync(join(vaultDir, '00_meta', 'claude-state.md'), 'utf8')
+      .match(/^last_audit:\s*(\d+)/m);
+    return m ? parseInt(m[1], 10) : 0;
+  } catch (_) {
+    return 0;
+  }
+}
+
 // hookName ごとの「確実に no-op なら true (= spawn 不要)」判定。gate が無い hook は常に spawn。
 const gates = {
   // chezmoi-drift-reminder.{sh,ps1} のチェック間隔ゲートをミラー: 前回 check から 30 分未満なら
@@ -52,7 +70,8 @@ const gates = {
     if (Number.isFinite(envDays) && envDays > 0) thresholdDays = envDays;
     const SNOOZE_MIN = 1440; // mirror: claude-md-audit-reminder.{sh,ps1}
     const stateDir = join(homedir(), '.claude', 'state', 'claude-md-audit');
-    const lastAudit = readEpoch(join(stateDir, 'last-audit.txt'));
+    // 監査実施時刻は Vault (全 PC 共通の正) → ローカル (フォールバック) の順。script 側と同順。
+    const lastAudit = readSharedAuditEpoch() || readEpoch(join(stateDir, 'last-audit.txt'));
     if (lastAudit <= 0) return false; // 初回/旧 state 移行は script 側に委ねる
     if ((nowEpoch - lastAudit) / 86400 < thresholdDays) return true; // 閾値未満 = no-op
     // overdue: スヌーズ中 (直近発火 < 24h) なら no-op
