@@ -117,7 +117,8 @@ GOをもらってから進める。
 - まとめ系: 日次サマリー（GH 活動集約・複数アカウント）=`/obsidian-daily`（≠ obsidian-log）
 - タスク: 追加=`/gtd-add` / 完了=`/gtd-done` / 表示=`/gtd-list`
 - 仕様書系: 仕様書の構造・判断軸＋HTML 補足ページの視覚設計（配色 / タイポ / アクセシビリティ）=`/spec-writer`
-- レビュー: 軽量な並列観点=`/multi-persona-review`（チーム不要・読取専用） / PR フル自動レビュー（URL→ブランチ切替→ペルソナ→裏取り→`.claude/reviews/` 草稿）=`/pr-review`
+- レビュー: 軽量な並列観点=`/multi-persona-review`（チーム不要・読取専用） / PR フル自動レビュー（URL→ブランチ切替→ペルソナ→裏取り→`.claude/reviews/` 草稿）=`/pr-review`。`superpowers:requesting-code-review` / `receiving-code-review` は superpowers の実装フロー（brainstorming→writing-plans→subagent-driven-development）を通した時のみ使う
+- スキル作成・編集: `/skill-creator`（ひな形生成 + eval で description の trigger 精度を実測できる）。`superpowers:writing-skills` は description が実質同義で紛れやすいが使わない — 方法論は下記「新スキルの追加・削除・拡張」が正
 - 振り返り: 権限・CLAUDE.md・スキル整理=`/session-review`
 
 ## 新スキルの追加・削除・拡張
@@ -128,4 +129,4 @@ GOをもらってから進める。
 
 「3 つ以上の独立した専門観点に分解」+「相互依存が少なく独立調査可能」+「統合判断必要」+「読取専用 or 非破壊」を**すべて満たす**タスクのみ、Agent ツールの `name` 指定（named teammates。旧 TeamCreate/TeamDelete は廃止済み、セッション単位の暗黙チームに移行）を提案（勝手には起動しない）。
 
-並列レビューだけが目的なら `/multi-persona-review` の方が軽量で済む（チーム継続不要・読取専用）。通常のコーディング・デバッグ・単発質問では提案しない。
+並列レビューだけが目的なら `/multi-persona-review` の方が軽量で済む（チーム継続不要・読取専用）。通常のコーディング・デバッグ・単発質問では提案しない。`superpowers:dispatching-parallel-agents` は実装タスクの分割時に限る（レビュー目的では multi-persona-review が第一候補）。
