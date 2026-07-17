@@ -93,10 +93,11 @@ GOをもらってから進める。
 - **settings.json（chezmoi 管理、全マシン共通）** に入れるもの:
   - `hooks`（`context-save-reminder` / `claude-md-audit-reminder` / `chezmoi-drift-reminder` / `notification-hook`。すべて `run-hook.js` ラッパー経由）
   - `enabledPlugins`、`extraKnownMarketplaces`
-  - UI/挙動の共通設定: `model`、`effortLevel`、`permissions.defaultMode`、`skipAutoPermissionPrompt`、`tui`、`alwaysThinkingEnabled`、`autoUpdatesChannel` 等
+  - UI/挙動の共通設定: `effortLevel`、`permissions.defaultMode`、`skipAutoPermissionPrompt`、`tui`、`alwaysThinkingEnabled`、`autoUpdatesChannel`、`statusLine` 等
   - 全マシンで必要な共通 permissions（基本 Bash 系、`deny` の secrets 系など）
 
 - **settings.local.json（chezmoi 管理外、マシン固有）** に入れるもの:
+  - マシン固有の `model` 指定（fast mode 付き等。2026-07-17 にマシン固有運用へ変更）
   - プロジェクト固有 permissions（例: `Bash(npm run typecheck)`）
   - マシン固有の MCP / WebFetch permissions（例: `mcp__growi__*`、社内ドメインの `WebFetch`）
   - 特定 PC のパスを参照する `Bash` / `Read` permissions
