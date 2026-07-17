@@ -77,6 +77,10 @@
       }
     ]
   },
+  "statusLine": {
+    "type": "command",
+    "command": "bash ~/.claude/statusline-command.sh"
+  },
   "enabledPlugins": {
     "document-skills@anthropic-agent-skills": true,
     "skill-creator@claude-plugins-official": true,
@@ -125,9 +129,5 @@
   "effortLevel": "high",
   "autoUpdatesChannel": "latest",
   "tui": "fullscreen",
-  "skipAutoPermissionPrompt": true,
-  "statusLine": {
-    "type": "command",
-    "command": "bash ~/.claude/statusline-command.sh"
-  }
+  "skipAutoPermissionPrompt": true
 }
