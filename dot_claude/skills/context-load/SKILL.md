@@ -37,6 +37,7 @@ allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(echo:*), Bash(basename:*), Ba
 - ブランチが異なる場合: 「保存時のブランチ: `xxx` → 現在: `yyy`」
 - 未コミットの変更がある場合: 注意喚起
 - 保存時以降に新しいコミットがある場合: その旨を表示
+- **context.md に PR 番号が出てくる場合は、提示前に `gh pr view <番号> --json state,isDraft,reviewDecision,mergeable` で実査する**（読み込み専用の原則には反しない。context.md は書き換えない）。PR の状態は他人の操作で変わるため保存時点の記述をそのまま提示すると、古い前提のまま作業方針を立ててしまう。実査できない場合（gh 未認証・ネットワーク不通）は「保存時点の記述」と明示して提示する
 
 ### 3. 進捗マップの読み込み
 
