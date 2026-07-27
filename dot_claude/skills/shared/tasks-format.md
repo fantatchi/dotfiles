@@ -87,6 +87,8 @@ Done に移動する際、タイトル先頭に完了日（`YYYY-MM-DD`）を付
 （完了済み。2 週間で剪定）
 ```
 
+**剪定期間が捕捉箱（1 週間）と非対称なのは意図的**。捕捉箱は削除前に Daily Note へ転記されるので短くてよいが、作業キューは転記先が無く削除が不可逆なため長めに取る。
+
 冒頭の 2 行は**必ず入れる**。人と AI のどちらが管理しているかがファイルを開いただけで分かるようにするため。
 
 ### タスク行
@@ -136,7 +138,9 @@ obsidian://adv-uri?vault=<iOS の Vault 名>&filepath=00_meta%2Ftasks.md&command
 ```markdown
 # Tasks
 
-思いつきの捕捉箱。プロジェクト固有のタスクは各プロジェクトの .claude/tasks.md へ。
+思いつきの捕捉箱。Obsidian Sync で全 PC 共通同期（モバイル捕捉あり）。
+プロジェクト固有のタスクは各プロジェクトの `.claude/tasks.md` へ（`/context-save` が管理）。
+Done は 1 週間で剪定され、各日の Daily Note の `## Done アーカイブ` へ転記される。
 
 ## Inbox
 
