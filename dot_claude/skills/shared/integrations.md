@@ -10,10 +10,11 @@
 #       値は「空 / パス・配列」の二状態（off は取らない）。空 → その連携は無効（standalone）
 #   - bool 系キー (memory_promotion / progress_map / daily_mail):
 #       値は「on / off / 未設定」。on のみ有効、off・未設定は無効。probe 判定はしない
-#   ※ progress_map は外部資源でなく各リポジトリ内 .claude/ を見るだけの project-local キーだが、
-#     連携の on/off をここで集中管理するため同居させている
-task_store: ~/ObsidianVault/00_meta/tasks.md   # タスクストア tasks.md の絶対パス。空 → タスク連携を全 skip
+#   ※ progress_map / project_task_store は外部資源でなく各リポジトリ内 .claude/ を見るだけの
+#     project-local キーだが、連携の on/off をここで集中管理するため同居させている
+task_store: ~/ObsidianVault/00_meta/tasks.md   # 捕捉箱（gtd-* 専用）の絶対パス。空 → gtd-* は案内して終了
 task_store_probe: ~/ObsidianVault/.obsidian    # 「配備済み」判定に使う存在チェック対象（Vault 同期ガード）
+project_task_store: .claude/tasks.md           # プロジェクトの作業キュー（context-* 専用・プロジェクトルートからの相対パス）。空 → context-* はタスク欄を出さずコアのみで完結
 vault: ~/ObsidianVault                          # Obsidian Vault ルート。空 → log/resource/daily/mail は案内終了
 vault_dirs:                                     # Vault サブディレクトリ名
   log: 20_log
@@ -58,8 +59,9 @@ gh_accounts:              # obsidian-daily が集約する GitHub アカウン�
 
 | キー | 用途 | 主な参照スキル | 未設定時（standalone） |
 |---|---|---|---|
-| `task_store` | tasks.md の絶対パス | gtd-add/done/list, context-save/load, obsidian-daily | タスク連携を全 skip |
-| `task_store_probe` | tasks.md 配備済み判定 | 同上 | `task_store` 自身の存在で代用 |
+| `task_store` | 捕捉箱の絶対パス | gtd-add/done/list | gtd-* は案内して終了 |
+| `task_store_probe` | 捕捉箱の配備済み判定 | 同上 | `task_store` 自身の存在で代用 |
+| `project_task_store` | 作業キューの相対パス | context-save/load | タスク欄なしでコアのみ完結 |
 | `vault` | Obsidian Vault ルート | obsidian-log/daily/resource/mail, gtd-list(転記) | Vault 連携を案内して終了 |
 | `vault_dirs` | Vault サブディレクトリ名 | obsidian-* | 既定値（20_log / 30_resource / 10_daily / 00_meta） |
 | `memory_promotion` | 判断メモの MEMORY.md 昇格提案 | context-save, session-review | off（提案しない） |
