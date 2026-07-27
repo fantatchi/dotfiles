@@ -1,15 +1,17 @@
 ---
 name: gtd-list
-description: タスクストア（tasks.md）からタスクを読み込み、指定条件で **表示** する操作型スキル。動詞は「表示」専用（追加は gtd-add、完了は gtd-done）。「タスク一覧」「TODO を見せて」「Inbox 確認」「進捗確認」「タスク表示」といった依頼、または他スキルからのタスク参照で使う。tasks.md の場所は shared/integrations.md の task_store で解決し、無ければ既定 ~/ObsidianVault/00_meta/tasks.md。
+description: 捕捉箱（tasks.md）からタスクを読み込み、指定条件で **表示** する操作型スキル。動詞は「表示」専用（追加は gtd-add、完了は gtd-done）。「タスク一覧」「TODO を見せて」「Inbox 確認」「タスク表示」といった依頼で使う。対象は捕捉箱（shared/integrations.md の task_store、既定 ~/ObsidianVault/00_meta/tasks.md）のみで、プロジェクトごとの作業キュー（.claude/tasks.md）は表示しない（そちらは /context-load）。
 argument-hint: [--all|--inbox|--next|--waiting|--someday|--done [N]|--project <name>]
 allowed-tools: Read, Write, Edit, Bash(git:*), Bash(basename:*), Bash(pwd), Bash(date:*)
 ---
 
 # タスク一覧表示
 
-タスクストア（tasks.md）からタスクを読み込み、条件に応じて表示する。
+捕捉箱（tasks.md）からタスクを読み込み、条件に応じて表示する。
 
-**単独動作と連携**: タスクストア（tasks.md）1 つだけで表示・Done 昇格・剪定まで動く（Obsidian や兄弟スキル不要）。tasks.md の場所は resolver `~/.claude/skills/shared/integrations.md` の `task_store` で解決する（無ければ既定 `~/ObsidianVault/00_meta/tasks.md`）。**連携は Done 剪定時の Daily Note 転記（`vault` があるときのみ）** だけ。
+**単独動作と連携**: 捕捉箱 1 ファイルだけで表示・Done 昇格・剪定まで動く（兄弟スキル不要）。場所は resolver `~/.claude/skills/shared/integrations.md` の `task_store` で解決する（無ければ既定 `~/ObsidianVault/00_meta/tasks.md`）。**連携は Done 剪定時の Daily Note 転記（`vault` があるときのみ）** だけ。
+
+**対象は捕捉箱のみ**。プロジェクトの作業キュー（`<project>/.claude/tasks.md`）は本スキルの守備範囲外で、`/context-load` が表示する。「このプロジェクトの残タスクは？」と聞かれたら `/context-load` を案内する。
 
 ## フォーマット仕様
 
@@ -19,10 +21,10 @@ allowed-tools: Read, Write, Edit, Bash(git:*), Bash(basename:*), Bash(pwd), Bash
 
 | 引数 | 動作 |
 |---|---|
-| （なし） | **現在プロジェクトの Inbox + Next** を表示 |
-| `--all` | Inbox / Next / Waiting / Someday を全て表示（Done は除く、全プロジェクト） |
+| （なし） | **Inbox + Next** を表示（捕捉箱の主役は Inbox） |
+| `--all` | Inbox / Next / Waiting / Someday を全て表示（Done は除く） |
 | `--inbox` | Inbox のみ |
-| `--next` | Next のみ（全プロジェクト） |
+| `--next` | Next のみ |
 | `--waiting` | Waiting のみ |
 | `--someday` | Someday のみ |
 | `--done [N]` | 直近 N 件の Done（デフォルト 10） |
@@ -88,43 +90,33 @@ allowed-tools: Read, Write, Edit, Bash(git:*), Bash(basename:*), Bash(pwd), Bash
 
 削除が 0 件なら何も報告しない。
 
-### 4. 現在プロジェクトの推定（引数なしの場合）
+### 4. フィルタリングと表示
 
-1. **ホーム判定**: `[ "$(pwd -P)" = "$HOME" ]` が真なら `<name>` を `global` とする（プロジェクト非依存タスク）。以降の手順はスキップ
-2. `git rev-parse --show-toplevel` でリポジトリルートを取得
-3. 取得できた場合: `basename` でディレクトリ名を取り `<name>` とする
-4. git リポジトリ外の場合: `basename "$(pwd)"` を使う
-5. タグ `#project/<name>` でフィルタリング
+引数に応じて該当セクションからタスク行を抽出し、整形して表示する。**CWD によるプロジェクト推定はしない**（捕捉箱は CWD と無関係な思いつきの置き場のため）。
 
-### 5. フィルタリングと表示
-
-引数に応じて該当セクションからタスク行を抽出し、整形して表示する。
-
-**引数なしの場合**（現在プロジェクトの Inbox + Next）:
+**引数なしの場合**（Inbox + Next）:
 
 ```
-## Inbox — #project/claude-config
+## Inbox
 
 - [ ] 新しい思いつきタスク
+- [ ] #project/asla ログ解析の改善案
 
-## Next — #project/claude-config
+## Next
 
-- [ ] gtd-list スキルの実装
-- [ ] gtd-done スキルの実装
+- [ ] ドメイン移管の手続き
 
-（Inbox 1 件 / Next 2 件）
+（Inbox 2 件 / Next 1 件）
 ```
 
-**`--all` の場合**（全プロジェクト横断）:
+**`--all` の場合**:
 
 - Inbox / Next / Waiting / Someday の順に表示
-- 各タスク行にプロジェクトタグを付けたまま表示
 - 末尾に合計件数を表示
 
 #### 表示ルール
 
-- 引数なし・`--project` では該当プロジェクトのタグは省略してよい（セクション見出しに表示済みなので重複回避）
-- `--all` やプロジェクト横断の表示ではプロジェクトタグを残す
+- `#project/<name>` タグは付いていればそのまま表示する（振り分け先の目印）。`--project <name>` 指定時は見出しに出るのでタグを省略してよい
 - 空セクションの場合は「（該当タスクなし）」と表示
 - `--done` の場合、Done セクションの**末尾から N 件**を表示（新しいものが下にある想定なので反転して表示）
 
@@ -133,14 +125,14 @@ allowed-tools: Read, Write, Edit, Bash(git:*), Bash(basename:*), Bash(pwd), Bash
 Inbox 内のタスクで `@captured-on-mobile` メタを持つものを件数集計し、表示の末尾に注意喚起を 1 行で出す（GTD の「収集」フェーズから「整理」フェーズへの移行漏れを検出）:
 
 ```
-（Inbox にモバイル捕捉タスクが N 件滞留中、プロジェクトタグ振り直しが推奨されます）
+（Inbox にモバイル捕捉タスクが N 件滞留中、各プロジェクトへの振り分けが推奨されます）
 ```
 
 該当が 0 件の場合は表示しない。`@captured-on-mobile` メタは QuickAdd choice の format で自動付与される想定（`shared/tasks-format.md` のモバイル運用セクション参照）。
 
-### 6. 現在プロジェクトのタスクが 0 件の場合（引数なし）
+### 5. タスクが 0 件の場合（引数なし）
 
-Inbox と Next の両方が 0 件の場合は「現在プロジェクト `<name>` に Inbox / Next のタスクはありません。`/gtd-list --all` で全体を表示できます。」と案内する。
+Inbox と Next の両方が 0 件の場合は「捕捉箱は空です。`/gtd-add` で追加できます（プロジェクトの残タスクは `/context-load`）。」と案内する。
 
 ## 連携（任意・対象があれば実行）
 

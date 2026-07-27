@@ -1,6 +1,6 @@
 ---
 name: gtd-done
-description: タスクストア（tasks.md）の指定タスクを **完了** にし Done セクションへ移動する操作型スキル。動詞は「完了」専用（追加は gtd-add、表示は gtd-list）。「タスク完了」「あれ終わった」「完了マーク」「終わった」「タスク消化」といった依頼、または他スキルからのタスク完了要求で使う。tasks.md の場所は shared/integrations.md の task_store で解決し、無ければ既定 ~/ObsidianVault/00_meta/tasks.md。
+description: 捕捉箱（tasks.md）の指定タスクを **完了** にし Done セクションへ移動する操作型スキル。動詞は「完了」専用（追加は gtd-add、表示は gtd-list）。「タスク完了」「あれ終わった」「完了マーク」「終わった」「タスク消化」といった依頼で使う。対象は捕捉箱（shared/integrations.md の task_store、既定 ~/ObsidianVault/00_meta/tasks.md）のみ。プロジェクトの作業キュー（.claude/tasks.md）の完了は行に `[x]` を付けておけば次の /context-save が Done へ整理する。
 argument-hint: <タスクタイトルの部分一致文字列>
 allowed-tools: Read, Write, Edit, Bash(date:*)
 ---
@@ -9,7 +9,9 @@ allowed-tools: Read, Write, Edit, Bash(date:*)
 
 指定したタスクをタスクストア（tasks.md）の `## Done` セクションに移動する。
 
-**単独動作**: このスキルはタスクストア（tasks.md）1 つだけに依存し、Obsidian や兄弟スキルが無くても動く。tasks.md の場所は resolver `~/.claude/skills/shared/integrations.md` の `task_store` で解決する（無ければ既定 `~/ObsidianVault/00_meta/tasks.md`）。連携なし。
+**単独動作**: このスキルは捕捉箱 1 ファイルだけに依存し、兄弟スキルが無くても動く。場所は resolver `~/.claude/skills/shared/integrations.md` の `task_store` で解決する（無ければ既定 `~/ObsidianVault/00_meta/tasks.md`）。連携なし。
+
+**対象は捕捉箱のみ**。プロジェクトの作業キュー（`<project>/.claude/tasks.md`）の完了は、行に `[x]` を付けておけば次の `/context-save` が Done へ整理する（本スキルは触らない）。
 
 ## フォーマット仕様
 

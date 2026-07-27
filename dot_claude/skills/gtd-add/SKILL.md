@@ -1,15 +1,17 @@
 ---
 name: gtd-add
-description: タスクをタスクストア（tasks.md）の Inbox セクションに **追加** する操作型スキル。動詞は「追加」専用（完了は gtd-done、表示は gtd-list）。「タスクを追加」「TODO として残して」「思いつき記録」「Inbox にメモ」「タスク登録」といった依頼、または他スキルからのタスク追加要求で使う。tasks.md の場所は shared/integrations.md の task_store で解決し、無ければ既定 ~/ObsidianVault/00_meta/tasks.md。
+description: 思いつきタスクを捕捉箱（tasks.md）の Inbox セクションに **追加** する操作型スキル。動詞は「追加」専用（完了は gtd-done、表示は gtd-list）。「タスクを追加」「TODO として残して」「思いつき記録」「Inbox にメモ」「タスク登録」といった依頼で使う。書き込み先は常に捕捉箱（shared/integrations.md の task_store、既定 ~/ObsidianVault/00_meta/tasks.md）で、CWD による切り替えはしない。プロジェクトの作業キュー（.claude/tasks.md）は context-save の担当なので本スキルは触らない。
 argument-hint: [タスクタイトル]
 allowed-tools: Read, Write, Edit, Bash(git:*), Bash(basename:*), Bash(pwd)
 ---
 
 # タスク追加
 
-新規タスクをタスクストア（tasks.md）の `## Inbox` セクションに追加する。
+思いつき・未分類のタスクを捕捉箱（tasks.md）の `## Inbox` セクションに追加する。
 
-**単独動作**: このスキルはタスクストア（tasks.md）1 つだけに依存し、Obsidian や兄弟スキルが無くても動く。tasks.md の場所は resolver `~/.claude/skills/shared/integrations.md` の `task_store` で解決する（無ければ既定 `~/ObsidianVault/00_meta/tasks.md`）。連携なし。
+**単独動作**: このスキルは捕捉箱 1 ファイルだけに依存し、兄弟スキルが無くても動く。場所は resolver `~/.claude/skills/shared/integrations.md` の `task_store` で解決する（無ければ既定 `~/ObsidianVault/00_meta/tasks.md`）。連携なし。
+
+**書き込み先は CWD で変わらない**（常に捕捉箱）。プロジェクト固有の「次にやること」は `/context-save` が各プロジェクトの `.claude/tasks.md` に保存するので、本スキルの守備範囲外。捕捉箱に落ちた思いつきを各プロジェクトへ振り分けるのは人の作業。
 
 ## フォーマット仕様
 
@@ -22,17 +24,13 @@ allowed-tools: Read, Write, Edit, Bash(git:*), Bash(basename:*), Bash(pwd)
 - `$ARGUMENTS` が空の場合はユーザーにタスクタイトルを質問する
 - `$ARGUMENTS` にタイトルがあればそれを使う
 
-### 2. プロジェクトタグの決定
+### 2. プロジェクトタグ（任意）
 
-引数に既に `#project/xxx` が含まれている場合はそれを使う。含まれていない場合は CWD から推定する：
+- 引数に `#project/xxx` が含まれていればそれをそのまま使う（後で振り分ける先が決まっている場合の目印）
+- 含まれていなければ**タグを付けない**。CWD からの推定はしない（捕捉箱は「どのプロジェクトか決まっていない思いつき」の置き場であり、CWD が振り分け先とは限らないため）
+- ユーザーが「これは <プロジェクト> の話」と明示したときだけ、その名前で `#project/<name>` を付ける
 
-1. **ホーム判定**: `[ "$(pwd -P)" = "$HOME" ]` が真なら `#project/global` を使う（プロジェクト非依存タスク）。以降の手順はスキップ
-2. `git rev-parse --show-toplevel` でリポジトリルートを取得
-3. 取得できた場合: `basename` でディレクトリ名を取り、`#project/<name>` を作る
-4. git リポジトリ外の場合: `basename "$(pwd)"` を使う
-5. どれも取れない場合: `#project/unknown` とし、ユーザーに後で修正するよう伝える
-
-### 3. タスクストアの解決と読み込み
+### 3. 捕捉箱の解決と読み込み
 
 1. resolver `~/.claude/skills/shared/integrations.md` を Read し `task_store` を取得する（resolver が無い / `task_store` が空なら既定 `~/ObsidianVault/00_meta/tasks.md`）。以降この解決済みパスを「tasks.md」と呼ぶ
 2. tasks.md を Read で読む
@@ -58,12 +56,13 @@ allowed-tools: Read, Write, Edit, Bash(git:*), Bash(basename:*), Bash(pwd)
 
 ### 5. Inbox セクションに追記
 
-**書込みは `~/.claude/skills/shared/tasks-format.md` の「書き込みプロトコル（複数 writer・MUST）」に従う**: 書き込み直前に tasks.md を再 Read し、重複見出し（同名セクション 2 回以上 → 自動編集停止）・重複タスク（同内容が既存 → 追加スキップ）をチェックする。書き込み後に再 Read して検証（5 見出しが各 1 回・追記行の存在・文字数）する。
+**書込みは `~/.claude/skills/shared/tasks-format.md` の「書き込みプロトコル（複数 writer・MUST）」に従う**: 書き込み直前に tasks.md を再 Read し、重複見出し（同名セクション 2 回以上 → 自動編集停止）・重複タスク（同内容が既存 → 追加スキップ）をチェックする。書き戻し後はセクション見出しが各 1 回のままかだけ確認する。
 
 `## Inbox` セクションの末尾（次のセクション `## Next` の直前）にタスク行を追加する：
 
 ```
-- [ ] #project/<name> <タイトル>
+- [ ] <タイトル>              ← 通常
+- [ ] #project/<name> <タイトル>  ← 振り分け先が決まっている場合
 ```
 
 Edit ツールで `## Inbox\n\n## Next` のように空セクションの場合は、`## Inbox` の直後に挿入する。既存タスクがある場合は最後のタスク行の直後に挿入する。
@@ -80,6 +79,6 @@ Edit ツールで `## Inbox\n\n## Next` のように空セクションの場合�
 ## 注意事項
 
 - **タイトルは短く保つ** (60-100 文字中心、**150 文字絶対上限**)。ステップ 4 で文字数チェック必須。詳細・進捗・コミット ID・判断メモは context.md / Obsidian ノート / コミットメッセージへ逃がす（フォーマット詳細は `~/.claude/skills/shared/tasks-format.md` 参照）
-- tasks.md の場所は resolver の `task_store` が出典（既定 `~/ObsidianVault/00_meta/tasks.md`）。プロジェクトごとのファイルは作らない
+- 捕捉箱の場所は resolver の `task_store` が出典（既定 `~/ObsidianVault/00_meta/tasks.md`）。本スキルはプロジェクト側の `.claude/tasks.md` を作らない・書かない（それは `context-save` の責務）
 - セクション見出しの表記（`## Inbox`）は変更しない
 - 既存のタスク行は一切変更しない

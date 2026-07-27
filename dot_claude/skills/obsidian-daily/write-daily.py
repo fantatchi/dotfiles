@@ -39,13 +39,6 @@ class Log(TypedDict, total=False):
     summary: str
 
 
-class Task(TypedDict, total=False):
-    """tasks.md の 1 行を抽出したレコード。`section` は "Next" / "Waiting"。"""
-    section: str
-    project: str
-    title: str
-
-
 class SummaryInput(TypedDict, total=False):
     """write-daily.py が JSON で受け取る最上位ペイロード。"""
     vault: str
@@ -53,7 +46,6 @@ class SummaryInput(TypedDict, total=False):
     commits: list[Commit]
     prs: list[PR]
     logs: list[Log]
-    upcoming_tasks: list[Task]
     summary_text: str
 
 # Windows の stdin/stdout はデフォルトで cp932 等になり UnicodeEncodeError
@@ -113,11 +105,7 @@ SUMMARY_TEMPLATE = """\
 
 ### 作業ログ
 
-{logs_section}
-
-### 明日以降のタスク
-
-{upcoming_tasks}"""
+{logs_section}"""
 
 
 def build_kpi_line(data: SummaryInput) -> str:
@@ -323,20 +311,6 @@ def build_summary(data: SummaryInput) -> str:
 
     summary_text = data.get("summary_text", "特筆事項なし")
 
-    # 明日以降のタスク（Next / Waiting）
-    upcoming_list = data.get("upcoming_tasks", [])
-    if upcoming_list:
-        lines = []
-        for t in upcoming_list:
-            section = t.get("section", "Next")
-            marker = " ⏳" if section == "Waiting" else ""
-            project = t.get("project", "")
-            project_str = f" `#{project}`" if project else ""
-            lines.append(f"- [ ]{project_str} {t['title']}{marker}")
-        upcoming_tasks = "\n".join(lines)
-    else:
-        upcoming_tasks = "予定タスクなし"
-
     return SUMMARY_TEMPLATE.format(
         timestamp=timestamp,
         kpi_line=kpi_line,
@@ -345,7 +319,6 @@ def build_summary(data: SummaryInput) -> str:
         prs=prs,
         logs_section=logs_section,
         summary=summary_text,
-        upcoming_tasks=upcoming_tasks,
     )
 
 

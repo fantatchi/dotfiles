@@ -9,7 +9,7 @@ allowed-tools: Read, Bash(gh:*), Bash(date:*), Bash(python:*), Bash(cat:*), Bash
 
 その日の GitHub アクティビティと Obsidian 作業ログ（作業ログ）を収集し、デイリーノートにサマリーを追記する。
 
-**主資源と連携**: 主資源は Obsidian Vault（デイリーノートの書き出し先）。配線はすべて resolver `~/.claude/skills/shared/integrations.md` から解決する — `vault`（書き出し先、無ければ案内終了）/ `vault_dirs`（サブディレクトリ名）/ `gh_accounts`（集約対象 GitHub アカウント、空ならアクティブ 1 アカウントのみ）/ `task_store`（予定タスク収集、空・未配備なら `upcoming_tasks` を空に）。GitHub 収集とサマリー組み立て自体は Vault があれば兄弟スキル無しで動く。
+**主資源と連携**: 主資源は Obsidian Vault（デイリーノートの書き出し先）。配線はすべて resolver `~/.claude/skills/shared/integrations.md` から解決する — `vault`（書き出し先、無ければ案内終了）/ `vault_dirs`（サブディレクトリ名）/ `gh_accounts`（集約対象 GitHub アカウント、空ならアクティブ 1 アカウントのみ）。GitHub 収集とサマリー組み立て自体は Vault があれば兄弟スキル無しで動く。**タスクストアは参照しない**（デイリーは「その日やったこと」の集約に専念する。プロジェクトの残タスクは各 `.claude/tasks.md` に、思いつきは捕捉箱にあり、`/context-load` と `/gtd-list` が担当する）。
 
 ## 1. 対象日の決定
 
@@ -165,25 +165,6 @@ ls <vault>/<log>/{YYYYMM}/{YYYYMMDD}*.md 2>/dev/null
 
 `path` は `summary_of`（再帰要約劣化対策の一次情報源リンク）に使うため、必ず含める。
 
-## 4b. tasks.md からの予定タスク収集
-
-resolver `~/.claude/skills/shared/integrations.md` の `task_store`（無ければ既定 `~/ObsidianVault/00_meta/tasks.md`）を Read で読み、`## Next` と `## Waiting` セクションのタスクを抽出する。`task_store` が空 / `task_store_probe` 不在 / ファイル不存在の場合は `upcoming_tasks` を空配列 `[]` として進む（予定タスクは連携であり、無くてもデイリーサマリー生成は完走する）。**この skip 理由（(a) 空＝未設定 / (c) probe 不在＝未同期 / ファイル不存在）を覚えておき §7 完了報告で区別して明示する**（resolver「参照規約」の skip 理由区別に従う。無人実行で「本当に予定タスク 0 件」と「同期待ちで読めず 0 件」を取り違えないため）。
-
-### 抽出ルール
-
-- タスク行のフォーマット: `- [ ] #project/<name> タイトル [メタデータ]`
-- 各タスクから以下を取り出す:
-  - `section`: `"Next"` または `"Waiting"`
-  - `project`: `#project/<name>` の `<name>` 部分（タグなしなら空文字）
-  - `title`: タグとチェックボックスを除いた本文
-- 全プロジェクト横断で収集する（フィルタなし）
-- タスクが 0 件の場合、または tasks.md が存在しない場合は空配列 `[]` とする
-
-### 注意
-
-- **ユーザーに確認を求めない**。このスキルは自動実行される前提なので、収集結果をそのまま JSON に詰めて進む
-- 読み込み専用。tasks.md は変更しない
-
 ## 5. サマリーデータの組み立て
 
 収集したデータを以下の JSON 形式に組み立てる:
@@ -201,16 +182,12 @@ resolver `~/.claude/skills/shared/integrations.md` の `task_store`（無けれ�
   "logs": [
     {"path": "20_log/202604/20260423-foo.md", "project": "project-name", "summary": "作業概要"}
   ],
-  "upcoming_tasks": [
-    {"section": "Next", "project": "claude-config", "title": "gtd-list スキルの実装"},
-    {"section": "Waiting", "project": "mlit", "title": "APIキー発行待ち @since:2026-04-08"}
-  ],
   "summary_text": "- toto-predictor: Phase 2.2 完走 (Brier 0.7761)\n- kabuto: Phase 6-α ゲート 2/10 達成\n- cloud-dsc: PR #38-42 を 5 本作成・4 本マージ"
 }
 ```
 
 - `vault` には §2 で解決した `<vault>`（resolver `vault`、既定 `~/ObsidianVault`）をチルダ込みのまま入れる。**§4 の `ls` パスや本 JSON に `<vault>` / `<log>` のようなプレースホルダ文字列を literal のまま残さない**（write-daily.py は `vault` を `expanduser` するだけなので、literal が来ると `~/<vault>` ディレクトリを誤生成する。§注意事項の過去事例参照）
-- `commits`, `prs`, `logs`, `upcoming_tasks` が 0 件の場合は空配列 `[]` にする
+- `commits`, `prs`, `logs` が 0 件の場合は空配列 `[]` にする
 - `commits[].date` は §3a で抽出した `commit.committer.date`（ISO-8601）。`write-daily.py` 自体は使わない（入力順を保持してそのまま出力する）が、§3 マージ規約のソートで使うため **必ず含めて出力**。例 schema からこのフィールドを削ると LLM が捨てる → ソートが空打ちになる過去事例あり
 - `prs[].labels` は `("作成", "マージ", "レビュー")` の **語固定**。write-daily.py の KPI 行が **label 別に分解カウント** する仕様（同 PR が `["作成", "マージ"]` を持つと breakdown で `作成 1・マージ 1`、ただし PR 件数自体は **1**）。LLM 側で labels を「代表 1 件に畳む」「順序を変える」「別語に置換」しないこと（畳むと breakdown が消える）
 - `summary_text` は全データを総合して LLM が**プロジェクト軸の箇条書き 2-4 行**で生成する
@@ -340,10 +317,9 @@ author: at-kato
 以下を**必ず**報告する:
 
 - 書き込んだファイルのパス
-- サマリーの概要: コミット数（× 何 repo）、PR 数（作成 / マージ / レビュー の breakdown）、ログ数、予定タスク件数
+- サマリーの概要: コミット数（× 何 repo）、PR 数（作成 / マージ / レビュー の breakdown）、ログ数
 - **アカウント別の取得件数**: 例 `fantatchi: commits 5 / PR 1` / `kentem-at-kato: commits 12 / PR 3`
 - **取得失敗があった場合は必ず明示**: §3「エラー処理」でスキップしたアカウント・セクションと理由（rate limit / auth / 422 等）。write-daily.py は失敗をノート上で可視化しないため、ここで報告しないと **静かな 0 件** として埋もれる（2026-05-13 事故の再発防止）
-- **予定タスクが skip された場合は理由を区別して明示**: §4b で `upcoming_tasks` が空になった理由が (a) 未設定 / (c) 未同期（probe 不在）/ ファイル不存在 のいずれかを `予定タスク: skip（未同期: probe 不在）` のように報告する。「予定タスク 0 件」と「同期待ちで読めず 0 件」を取り違えないため
 
 ## 注意事項
 
