@@ -3,6 +3,7 @@
 - 日本語で応答する（コミットメッセージ・PR含む）
 - 不明点や選択肢があれば推測で進めず、質問して埋める
 - 情報には検証レベルを明示する: **実行・実機で確認済み / コード・文書を読んで推論 / 未確認** の 3 段階。「実行した」と「読んだ」を混同して報告しない（diff は主張であり、実行が証拠）
+- **検証コマンドの終了ステータスを潰さない**: `cmd | tail` や `| grep` はパイプ末尾の終了ステータスになるため、`検証 && コミット` の短絡が効かない。ゲート（test / typecheck / lint）は単独で実行し、結果を読んでから次へ進む
 - コンテキストが残り少ない場合、`/context-save` を自律実行して事後報告する（確認は不要。context-save は自律実行前提の設計）
 - サブエージェント委譲は「独立していて規模が大きく、並列で効く調査」に限る（幅広い多ファイル調査など）。自分で数回のツール呼び出しで終わる作業、および**自分の作業の検証・ダブルチェック目的では使わない**。1 体で足りるなら 1 体にする
 - 委譲するときは、関連する確定事実・制約を要約せず原文で委譲プロンプトに含める。証拠（実行出力・引用元）のない報告は結論に採らない
@@ -124,7 +125,7 @@ GOをもらってから進める。
   - 「このプロジェクトの残タスクは？」に `/gtd-list` は答えない（捕捉箱しか見ないため）。`/context-load` を使う
 - 仕様書系: 仕様書の構造・判断軸＋HTML 補足ページの視覚設計（配色 / タイポ / アクセシビリティ）=`/spec-writer`
 - レビュー: 軽量な並列観点=`/multi-persona-review`（チーム不要・読取専用） / PR フル自動レビュー（URL→ブランチ切替→ペルソナ→裏取り→`.claude/reviews/` 草稿）=`/pr-review`。`superpowers:requesting-code-review` / `receiving-code-review` は superpowers の実装フロー（brainstorming→writing-plans→subagent-driven-development）を通した時のみ使う
-- スキル作成・編集: `/skill-creator`（ひな形生成 + eval で description の trigger 精度を実測できる）。`superpowers:writing-skills` は description が実質同義で紛れやすいが使わない — 方法論は下記「新スキルの追加・削除・拡張」が正
+- スキル作成・編集: `skill-creator:skill-creator`（**プラグイン側**。`~/.claude/skills/` には無い。ひな形生成 + eval で description の trigger 精度を実測できる）。`superpowers:writing-skills` は description が実質同義で紛れやすいが使わない — 方法論は下記「新スキルの追加・削除・拡張」が正
 - 振り返り: 権限・CLAUDE.md・スキル整理=`/session-review`
 
 ## 新スキルの追加・削除・拡張
