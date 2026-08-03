@@ -33,7 +33,7 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply fantatchi
 chezmoi init --apply fantatchi
 ```
 
-`/obsidian-*` 系スキルを使う場合は別途 `~/ObsidianVault` の配置が必要（[作業ログ・メモを Obsidian に記録する](#作業ログメモを-obsidian-に記録する-obsidian-) を参照）。Vault 未配置でも `chezmoi apply` は警告を出して継続する（他の依存 — macOS の Homebrew など — が未解決の場合は apply が中断する）。
+`/obsidian-*` 系スキルを使う場合は別途 `~/ObsidianVault` の配置が必要（[作業ログ・メモを Obsidian に記録・配信する](#作業ログメモを-obsidian-に記録配信する-obsidian-) を参照）。Vault 未配置でも `chezmoi apply` は警告を出して継続する（他の依存 — macOS の Homebrew など — が未解決の場合は apply が中断する）。
 
 ## 含まれるもの
 
@@ -118,6 +118,12 @@ Claude Code の `settings.json`・有効化済みプラグイン・このリポ�
 | `dotnet@dotnet-agent-skills` | .NET 開発支援 |
 | `dotnet-aspnet@dotnet-agent-skills` | ASP.NET Core 開発支援 |
 | `microsoft-docs@claude-plugins-official` | Microsoft Learn ドキュメント参照 |
+| `skill-creator@claude-plugins-official` | スキルのひな形生成・eval によるトリガー精度測定 |
+| `codex@openai-codex` | Codex CLI 連携（`/codex:review` / `/codex:adversarial-review` / `/codex:rescue`。自作 `/codex-review-loop` が依存） |
+| `modern-web-guidance@googlechrome` | モダン Web（HTML/CSS/クライアント JS）のベストプラクティス参照 |
+| `claude-code-setup@claude-plugins-official` | Claude Code の自動化（hooks / subagents / skills）推奨構成の提案 |
+| `superpowers@claude-plugins-official` | 実装フローのプロセススキル群（brainstorming / writing-plans / systematic-debugging 等） |
+| `code-simplifier@claude-plugins-official` | 変更済みコードの整理・簡素化 |
 
 セッション中のモデル切り替えは `/model sonnet` などを使用。
 
@@ -127,8 +133,8 @@ Claude Code の `settings.json`・有効化済みプラグイン・このリポ�
 |----------|------|
 | `/baseline-ui` † | Tailwind プロジェクトの UI ベースライン検証（アニメーション時間・タイポスケール・アクセシビリティ） |
 | `/cloud-solution-architect` † | Azure Architecture Center ベストプラクティスに基づくクラウドアーキテクト・ロール変換 |
-| `/codex-review-loop` | ローカル差分を Codex（`adversarial-review` の構造化 JSON）に 1 次レビューさせ、critical / high が 0 になるまで「レビュー → Claude 修正 → 再レビュー」を反復。最大 3 ラウンド + 無進捗検知で停止し、`.claude/reviews/codex-loop-*.md` に結果を出力。偽陽性は反証を書いてユーザー判断へ回す。重い処理のため `disable-model-invocation: true`（明示起動のみ） |
-| `/context-load` | `.claude/context.md` からコンテキストを復帰、`tasks.md` の該当 Next / Waiting も提示 |
+| `/codex-review-loop` † | ローカル差分を Codex（`adversarial-review` の構造化 JSON）に 1 次レビューさせ、critical / high が 0 になるまで「レビュー → Claude 修正 → 再レビュー」を反復。最大 3 ラウンド + 無進捗検知で停止し、`.claude/reviews/codex-loop-*.md` に結果を出力。偽陽性は反証を書いてユーザー判断へ回す。重い処理のため `disable-model-invocation: true`（明示起動のみ） |
+| `/context-load` † | `.claude/context.md` からコンテキストを復帰、同じプロジェクトの `.claude/tasks.md` の Next / Someday も提示 |
 | `/context-save` | プロジェクトの作業状態を `.claude/context.md` に保存（進行中は 14 日ローテ + 完了 entry を 300 字以内へ圧縮 + 12KB サイズアラート）、次アクションを `tasks.md` の `## Next` に吸い上げ |
 | `/gtd-add` | `~/ObsidianVault/00_meta/tasks.md` の Inbox にタスクを追加 |
 | `/gtd-done` | 指定タスクを完了にし Done セクションへ移動 |
@@ -142,7 +148,7 @@ Claude Code の `settings.json`・有効化済みプラグイン・このリポ�
 | `/obsidian-mail` † | デイリーサマリーを Gmail SMTP でメール送信（日報・週報。`/obsidian-mail daily\|weekly [YYYY-MM-DD]` で明示呼び出し、または火〜土 8:00 / 月 8:00 のローカル routine 経由） |
 | `/obsidian-resource` † | 調査メモ・参考リンク・ブログドラフトを Obsidian Vault に保存（`/obsidian-resource auto` でセッション内容から自動ドラフト化） |
 | `/pr-review` | GitHub PR の URL または番号を渡すと、ブランチ切替・最新化、Copilot/discussion コメント取得、3-5 体のペルソナ並列レビュー、メインでの実コード裏取り、`.claude/reviews/pr-{NNN}-{branch-key}-{YYYY-MM-DD}.md` への所見草稿出力までを一気通貫で実施。投稿はしない（草稿のみ）。公式 `/code-review ultra` と棲み分け（本スキル=ローカル草稿・ペルソナ並列・MEMORY 運用ルール遵守、公式=inline 投稿）。投稿要否判断が残る所見は `/gtd-add` 起票を提案 |
-| `/session-review` | セッション振り返り（権限・CLAUDE.md・スキル・判断メモ圧縮の整理） |
+| `/session-review` † | セッション振り返り（権限・CLAUDE.md・スキル・判断メモ圧縮の整理） |
 | `/session-save` | 作業ログ記録とコンテキスト保存をまとめて実行し、アウトプット提案（ブログ・リソース候補）も行う |
 | `/spec-writer` | 仕様書（specification / 設計ドキュメント / requirements / architecture / ADR / C4 / 用語集）の設計・作成・レビューを担うロール変換型スキル（旧 spec-design + dashboard-design を 2026-06 に統合）。読み手別入口・図種選択・ADR 形式・要件レベル語・Diátaxis 4 分類・テンプレ集を内蔵。HTML 補足ページは DADS v2.0.1 準拠（key-color = Blue 固定で JIS X 8341-3 AA 自動充足） |
 
@@ -178,16 +184,15 @@ Claude に話しかけてタスクを追加・一覧・完了させる GTD ベ�
 - [ ] #project/<name> タイトル [@key:value]
 ```
 
-- `#project/<name>` は必須。`<name>` はリポジトリのディレクトリ名（`basename $(git rev-parse --show-toplevel)`）
-- ユーザーホーム（`$HOME` 完全一致）で gtd-* を実行した場合は `#project/global` が自動付与される
+- `#project/<name>` は**任意**。振り分け先が決まっているなら書く（後でその作業キューへ移すときの目印になる）。決まっていなければ付けない。`gtd-*` は **CWD からのプロジェクト推定をしない**（捕捉箱は CWD と無関係な思いつきの置き場のため）
 - Done に移す際はタイトル先頭に完了日（`YYYY-MM-DD`）を付加：`- [x] 2026-04-09 #project/... タイトル`
 - 任意メタデータ: `@since:2026-04-08`（Waiting 開始日）、`@due:2026-04-15`（期限）など
 
 **運用ルール:**
 
-- Done は 1 ヶ月保持（1 ヶ月以上前のエントリを `/gtd-list` 実行時に自動剪定する）
+- Done は **1 週間**保持（1 週間以上前のエントリを `/gtd-list` 実行時に自動剪定する。2026-07-27 に 2 週間から短縮。削除前に各日の Daily Note `## Done アーカイブ` へ転記される）
 - 「やらない」と決めたタスクは Done に送らず、素の Edit で削除する
-- `/gtd-list` のデフォルトは「現在プロジェクトの Inbox + Next」のフィルタビュー
+- `/gtd-list` のデフォルトは **Inbox + Next** の表示（CWD によるプロジェクトフィルタはしない）
 
 **使いどころ:**
 
@@ -201,8 +206,8 @@ Claude に話しかけてタスクを追加・一覧・完了させる GTD ベ�
 
 ユーザーホーム (`~/`) は「**ホームワークスペース**」として扱う。プロジェクト単位で完結しない作業（スキル編集・tasks 管理・Obsidian 書き込み・個人 TODO 等）をここで行う場として位置付けている。
 
-- `/gtd-*` はプロジェクトタグに **`#project/global`** を自動付与する（`$HOME` 完全一致で判定）
-- プロジェクト非依存のタスク（個人 TODO、環境整備、PC 固有の設定作業など）を集約する予約タグ
+- `/gtd-*` の書き先は **CWD によらず常に捕捉箱**（`~/ObsidianVault/00_meta/tasks.md`）。ホームワークスペースでも特別扱いはしない
+- ホームワークスペース自身の**作業キュー**は `~/.claude/tasks.md`（`/context-save` が書き `/context-load` が表示する。`~/` も 1 プロジェクトとして扱う）
 
 ## セッションをまたいで作業状態を引き継ぐ (/context-save, /context-load)
 
@@ -239,8 +244,8 @@ tags:
 **tasks.md との役割分担:**
 
 - **`context.md`**: そのプロジェクトの「**状態**」（進行中の作業、判断メモ、重要ファイル）。プロジェクトルート毎に独立
-- **`tasks.md`** の `## Next`: そのプロジェクトの「**次にやること**」（`#project/<name>` タグで絞り込み）。全プロジェクト横断の共有ストア
-- `/context-save` は「次のステップ」を `context.md` に書かず、必ず `tasks.md` の `## Next` に `#project/<name>` 付きで追記する
+- **`<project>/.claude/tasks.md`** の `## Next`: そのプロジェクトの「**次にやること**」（プロジェクトごとに独立した**作業キュー**。2026-07-27 に思いつきの捕捉箱と分離した）
+- `/context-save` は「次のステップ」を `context.md` に書かず、必ず同じプロジェクトの `.claude/tasks.md` の `## Next` に追記する。`#project/<name>` タグは**付けない**（ファイルの場所がプロジェクトを表すため冗長）
 - `context.md` の `## 進行中の作業` は **日付プレフィックス付き entry** で時系列ログとして記録され、`/context-save` 実行時に **14 日より古い entry が自動削除** される（最低 3 件は保証）。永続的な保存ではないため、長く残したいものは別途 obsidian-log 等の外部ログに逃がす
 
 **ホームワークスペースでの使い方:**
