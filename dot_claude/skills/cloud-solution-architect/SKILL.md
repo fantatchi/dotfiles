@@ -37,6 +37,8 @@ Design well-architected, production-grade cloud systems following Azure Architec
 | 9 | **Design for evolution** | Loose coupling, versioned APIs, backward compatibility, async messaging for integration, feature flags |
 | 10 | **Build for business needs** | Define SLAs/SLOs, establish RTO/RPO targets, domain-driven design, cost modeling, composite SLAs |
 
+See [Design Principles Reference](./references/design-principles.md) for the full write-up of each principle.
+
 ---
 
 ## Architecture Styles
@@ -49,6 +51,8 @@ Design well-architected, production-grade cloud systems following Azure Architec
 | **Event-driven** | Pub/sub model, event producers/consumers | Real-time processing, IoT, reactive systems | Event Hubs, Event Grid, Functions |
 | **Big data** | Batch + stream processing pipeline | Analytics, ML pipelines, large-scale data | Synapse, Data Factory, Databricks |
 | **Big compute** | HPC, parallel processing | Simulations, modeling, rendering, genomics | Batch, CycleCloud, HPC VMs |
+
+See [Architecture Styles Reference](./references/architecture-styles.md) for the benefits, challenges, and reference diagram of each style.
 
 ### Selection Criteria
 
@@ -199,6 +203,8 @@ Avoid these common patterns that degrade performance under load:
 | **Retry Storm** | Aggressive retries overwhelming a recovering service | Exponential backoff + jitter, circuit breaker, retry budgets |
 | **Synchronous I/O** | Blocking threads on I/O operations | Async/await, non-blocking I/O, reactive streams |
 
+See [Performance Antipatterns Reference](./references/performance-antipatterns.md) for symptoms, diagnosis steps, and worked fixes for each antipattern.
+
 ---
 
 ## Mission-Critical Design
@@ -245,7 +251,7 @@ Every architecture decision should be evaluated against all five pillars:
 
 ## Architecture Review Workflow
 
-When reviewing or designing a system, follow this structured approach:
+When reviewing or designing a system, follow this structured approach. Check the result against [Acceptance Criteria Reference](./references/acceptance-criteria.md) before calling the design done.
 
 ### Step 1: Identify Requirements
 
@@ -306,10 +312,14 @@ Use Architecture Decision Records (ADRs):
 
 ## References
 
+- [Design Principles Reference](./references/design-principles.md) — The 10 design principles in full
+- [Architecture Styles Reference](./references/architecture-styles.md) — The 6 styles with selection guidance
 - [Design Patterns Reference](./references/design-patterns.md) — Detailed pattern implementations
 - [Technology Choices Reference](./references/technology-choices.md) — Decision trees for Azure services
 - [Best Practices Reference](./references/best-practices.md) — Implementation guidance
+- [Performance Antipatterns Reference](./references/performance-antipatterns.md) — Antipatterns to avoid, with fixes
 - [Mission-Critical Reference](./references/mission-critical.md) — High-availability design
+- [Acceptance Criteria Reference](./references/acceptance-criteria.md) — Criteria for reviewing a design
 
 ---
 
