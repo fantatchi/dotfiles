@@ -26,6 +26,7 @@ disable-model-invocation: true
 - GitHub PR が対象 → `/pr-review`
 - Codex を使わず Claude 内のペルソナで観点分割したい → `/multi-persona-review`
 - 実装そのものを Codex に任せたい → `/codex:rescue`
+- **差分ではなく「全体の整合性」を見たい**（ドキュメントと実装の突合、設定と実体の照合など） → Codex のレビューは **git 差分専用**なので向かない。全数突合はスクリプトで機械的に確定させ、判断を要する部分だけ `/multi-persona-review` に回すほうが速く確実（2026-08-03 に dotfiles の整合性監査で実証: 機械的突合で確定できた不整合は 0 件、ペルソナが別の 15 件を検出）
 
 ## 既存資産との棲み分け
 
@@ -54,7 +55,9 @@ disable-model-invocation: true
    ```
    見つからなければ `~/.claude/plugins/marketplaces/openai-codex/plugins/codex/scripts/codex-companion.mjs` にフォールバック。どちらも無ければ「codex プラグインが導入されていません」で中断
 3. **Codex 利用可否**: `node <companion> setup --json` を実行し `ready` を見る（フラグ無しの `setup` は状態レポートのみで設定を変更しない）。`false` なら `nextSteps` をそのまま提示して中断（`!codex login` 等はユーザー自身に実行してもらう）
-4. **レビュー対象の存在確認**: `git status --short --untracked-files=all` と `git diff --shortstat`。どちらも空で `--base` 指定も無ければ「レビュー対象の差分がありません」で終了
+4. **レビュー対象の存在確認**: `git status --short --untracked-files=all` と `git diff --shortstat`。どちらも空で `--base` 指定も無い場合、**黙って終了せず対象範囲の選択肢を出す**（クリーンなリポジトリでレビューを頼まれるのは珍しくない）:
+   - `git log --oneline -10` で直近コミットを提示し、「どこからの差分を見るか」を `--base <ref>` の候補として `AskUserQuestion` で選ばせる
+   - 差分そのものが存在しない（初期コミットのみ等）か、依頼が**非差分型の整合性チェック**なら、本スキルは不適だと伝えて終了する（上記「使わない」参照）
 5. **引数の解釈**: `--scope` / `--base` はそのまま companion に渡す。`--max-rounds`（既定 3）とフォーカステキストはスキル側で扱う
 6. **ユーザーへの事前提示**: 対象スコープ・想定ラウンド数・所要時間の目安（1 ラウンド数分 × 最大 3）を 2〜3 行で伝えてから開始する
 
