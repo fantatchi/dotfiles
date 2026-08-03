@@ -7,5 +7,6 @@ Thumbs.db
 *~
 .claude/context.md
 .claude/tasks.md
+.claude/settings.local.json
 **/__pycache__
 *.pyc

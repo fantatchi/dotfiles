@@ -22,6 +22,7 @@
       "Bash(echo:*)",
       "Bash(cat:*)",
       "Bash(python:*)",
+      "Bash(node:*)",
       "Bash(printenv:*)",
       "Bash(basename:*)",
       "Bash(gh:*)",
@@ -71,7 +72,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node -e \"require(require('os').homedir()+'/.claude/scripts/run-hook.js')('notification-hook')\""
+            "command": "node -e \"require(require('os').homedir()+'/.claude/scripts/run-hook.js')('notification-hook')\"",
+            "timeout": 10
           }
         ]
       }
