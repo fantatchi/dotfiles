@@ -127,6 +127,7 @@ Claude Code の `settings.json`・有効化済みプラグイン・このリポ�
 |----------|------|
 | `/baseline-ui` † | Tailwind プロジェクトの UI ベースライン検証（アニメーション時間・タイポスケール・アクセシビリティ） |
 | `/cloud-solution-architect` † | Azure Architecture Center ベストプラクティスに基づくクラウドアーキテクト・ロール変換 |
+| `/codex-review-loop` | ローカル差分を Codex（`adversarial-review` の構造化 JSON）に 1 次レビューさせ、critical / high が 0 になるまで「レビュー → Claude 修正 → 再レビュー」を反復。最大 3 ラウンド + 無進捗検知で停止し、`.claude/reviews/codex-loop-*.md` に結果を出力。偽陽性は反証を書いてユーザー判断へ回す。重い処理のため `disable-model-invocation: true`（明示起動のみ） |
 | `/context-load` | `.claude/context.md` からコンテキストを復帰、`tasks.md` の該当 Next / Waiting も提示 |
 | `/context-save` | プロジェクトの作業状態を `.claude/context.md` に保存（進行中は 14 日ローテ + 完了 entry を 300 字以内へ圧縮 + 12KB サイズアラート）、次アクションを `tasks.md` の `## Next` に吸い上げ |
 | `/gtd-add` | `~/ObsidianVault/00_meta/tasks.md` の Inbox にタスクを追加 |
