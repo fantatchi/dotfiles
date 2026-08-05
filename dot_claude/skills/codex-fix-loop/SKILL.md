@@ -1,13 +1,15 @@
 ---
-name: codex-review-loop
-description: 指定した対象（既定はプロジェクト全体）を Codex（別モデル）に 1 次レビューさせ、critical/high の指摘が 0 になるまで「Codex レビュー → Claude 修正 → 再レビュー」を反復するオーケストレータ。git 差分ではなくコード全体が対象で、git 管理外のディレクトリでも動く。「コードベース全体をレビューして直して」「Codex にレビューさせて」「全体チェックして課題を潰して」「レビューループ」「HIGH が消えるまで回して」「1 次レビューは Codex に」「別モデルで見てもらって直して」といった依頼で使う。**git 差分**のレビューが欲しいだけなら `/codex:adversarial-review`、GitHub PR なら `/pr-review`、Claude 内ペルソナで観点分割したいだけなら `/multi-persona-review`。
+name: codex-fix-loop
+description: 指定した対象（既定はプロジェクト全体）を Codex（別モデル）に 1 次レビューさせ、critical/high の指摘が 0 になるまで「Codex レビュー → Claude 修正 → 再レビュー」を反復して**実際にコードを直す**オーケストレータ。git 差分ではなくコード全体が対象で、git 管理外のディレクトリでも動く。「コードベース全体をレビューして直して」「Codex にレビューさせて直して」「全体チェックして課題を潰して」「指摘が消えるまで直して」「HIGH が消えるまで回して」「1 次レビューは Codex に」「別モデルで見てもらって直して」といった依頼で使う。**コードを書き換える点でレビュー系 3 スキルと異なる**（`/multi-persona-review` と `/pr-review` は読取専用）。所見だけ欲しいなら書き換えないスキルを選ぶこと。**git 差分**のレビューだけなら `/codex:adversarial-review`、GitHub PR なら `/pr-review`、Claude 内ペルソナで観点分割したいだけなら `/multi-persona-review`。
 argument-hint: '[--target <path...>] [--max-rounds N] [focus text]'
 disable-model-invocation: true
 ---
 
-# Codex Review Loop
+# Codex Fix Loop
 
 ベース開発は Claude、1 次レビューは Codex という分業を回すためのスキル。**指定した対象のコード全体**を対象に、Codex の指摘（critical / high）が 0 になるまでレビューと修正を反復する。
+
+> **名前に `review` を含めていないのは意図的**（2026-08-05 改名。旧 `codex-review-loop`）。`/multi-persona-review` と `/pr-review` が読取専用なのに対し、本スキルは**実際にコードを書き換える**。read-only の仲間だと誤解されると、危険な側に倒れるため名前で区別している。
 
 ## このスキルが解く問題
 
@@ -40,7 +42,7 @@ disable-model-invocation: true
 | stop-review-gate hook（`/codex:setup --enable-review-gate`） | 直前ターン | 毎ターン | ALLOW / BLOCK の二値 |
 | `/multi-persona-review` | 任意 | 単発 | Claude 内ペルソナのみ |
 | `/pr-review` | GitHub PR | 単発 | ペルソナ + 実コード裏取り |
-| **`/codex-review-loop`（本スキル）** | **指定した対象の全体（git 不要）** | **収束まで反復** | **構造化 + 反証ルート** |
+| **`/codex-fix-loop`（本スキル）** | **指定した対象の全体（git 不要）** | **収束まで反復** | **構造化 + 反証ルート** |
 
 ## frontmatter の方針（変更時の注意）
 
@@ -69,13 +71,13 @@ disable-model-invocation: true
 
 ```bash
 codex exec --skip-git-repo-check -C <root> -s read-only \
-  --output-schema ~/.claude/skills/codex-review-loop/schemas/review-output.schema.json \
+  --output-schema ~/.claude/skills/codex-fix-loop/schemas/review-output.schema.json \
   -o <scratchpad>/codex-review-r<N>.json \
   "<prompts/review.md を {{TARGET}} / {{USER_FOCUS}} 展開したもの>" \
   > <scratchpad>/codex-review-r<N>.log 2>&1
 ```
 
-- プロンプトは `~/.claude/skills/codex-review-loop/prompts/review.md` を **Read** し、`{{TARGET}}`（対象パスと、絞り込みがあればその範囲）と `{{USER_FOCUS}}`（引数の focus text。無ければ `(none)`）を差し替えて渡す
+- プロンプトは `~/.claude/skills/codex-fix-loop/prompts/review.md` を **Read** し、`{{TARGET}}`（対象パスと、絞り込みがあればその範囲）と `{{USER_FOCUS}}`（引数の focus text。無ければ `(none)`）を差し替えて渡す
 - **`-o` で書かせたファイルだけを読む。stdout / ログを結果として使わない**。`codex exec` は中間ターンでも同じスキーマ形状の JSON を出力するが、そちらは `findings` が空のことがあり、拾うと「指摘なし」と誤判定する（2026-08-05 の実測で確認）
 - **`-s read-only` を必ず付ける**。Codex はこのサンドボックス内で自律的にシェルを実行して裏取りするが（構文チェック等）、書き込みはできない。修正は Claude 側の責務
 - **`run_in_background: true` で起動し `BashOutput` でポーリングする**。Bash ツールの timeout 上限は 10 分だが、対象が広いとレビューはそれを超えうる
@@ -84,7 +86,7 @@ codex exec --skip-git-repo-check -C <root> -s read-only \
 結果の要約は同梱スクリプトで行う（`jq` は使わない。Windows で jq 依存を外した経緯があるため）:
 
 ```bash
-node ~/.claude/skills/codex-review-loop/scripts/summarize-review.mjs \
+node ~/.claude/skills/codex-fix-loop/scripts/summarize-review.mjs \
   <scratchpad>/codex-review-r<N>.json [<scratchpad>/codex-review-r<N-1>.json]
 ```
 

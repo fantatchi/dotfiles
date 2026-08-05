@@ -119,7 +119,7 @@ Claude Code の `settings.json`・有効化済みプラグイン・このリポ�
 | `dotnet-aspnet@dotnet-agent-skills` | ASP.NET Core 開発支援 |
 | `microsoft-docs@claude-plugins-official` | Microsoft Learn ドキュメント参照 |
 | `skill-creator@claude-plugins-official` | スキルのひな形生成・eval によるトリガー精度測定 |
-| `codex@openai-codex` | Codex CLI 連携（`/codex:review` / `/codex:adversarial-review` / `/codex:rescue`。自作 `/codex-review-loop` が依存） |
+| `codex@openai-codex` | Codex CLI 連携（`/codex:review` / `/codex:adversarial-review` / `/codex:rescue`。自作 `/codex-fix-loop` が依存） |
 | `modern-web-guidance@googlechrome` | モダン Web（HTML/CSS/クライアント JS）のベストプラクティス参照 |
 | `claude-code-setup@claude-plugins-official` | Claude Code の自動化（hooks / subagents / skills）推奨構成の提案 |
 | `superpowers@claude-plugins-official` | 実装フローのプロセススキル群（brainstorming / writing-plans / systematic-debugging 等） |
@@ -133,7 +133,7 @@ Claude Code の `settings.json`・有効化済みプラグイン・このリポ�
 |----------|------|
 | `/baseline-ui` † | Tailwind プロジェクトの UI ベースライン検証（アニメーション時間・タイポスケール・アクセシビリティ） |
 | `/cloud-solution-architect` † | Azure Architecture Center ベストプラクティスに基づくクラウドアーキテクト・ロール変換 |
-| `/codex-review-loop` † | 指定した対象の**コード全体**（既定はプロジェクト全体、**git 不要**）を Codex に 1 次レビューさせ、critical / high が 0 になるまで「レビュー → Claude 修正 → 再レビュー」を反復。`codex exec --output-schema` で severity 付き構造化 JSON を取り、最大 3 ラウンド + 無進捗検知で停止して `.claude/reviews/codex-loop-*.md` へ出力。既存問題が 10 件超なら着手範囲を確認し、git 管理外なら修正前に確認する安全弁つき。偽陽性は反証を書いてユーザー判断へ回す。**git 差分**の単発レビューは `/codex:adversarial-review` の担当。重い処理のため `disable-model-invocation: true`（明示起動のみ） |
+| `/codex-fix-loop` † | 指定した対象の**コード全体**（既定はプロジェクト全体、**git 不要**）を Codex に 1 次レビューさせ、critical / high が 0 になるまで「レビュー → Claude 修正 → 再レビュー」を反復。`codex exec --output-schema` で severity 付き構造化 JSON を取り、最大 3 ラウンド + 無進捗検知で停止して `.claude/reviews/codex-loop-*.md` へ出力。既存問題が 10 件超なら着手範囲を確認し、git 管理外なら修正前に確認する安全弁つき。偽陽性は反証を書いてユーザー判断へ回す。**git 差分**の単発レビューは `/codex:adversarial-review` の担当。重い処理のため `disable-model-invocation: true`（明示起動のみ） |
 | `/context-load` † | `.claude/context.md` からコンテキストを復帰、同じプロジェクトの `.claude/tasks.md` の Next / Someday も提示 |
 | `/context-save` | プロジェクトの作業状態を `.claude/context.md` に保存（進行中は 14 日ローテ + 完了 entry を 300 字以内へ圧縮 + 12KB サイズアラート）、次アクションを `tasks.md` の `## Next` に吸い上げ |
 | `/gtd-add` | `~/ObsidianVault/00_meta/tasks.md` の Inbox にタスクを追加 |

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * `codex exec --output-schema ... -o <FILE>` が書いたレビュー結果を、codex-review-loop が使う形へ要約する。
+ * `codex exec --output-schema ... -o <FILE>` が書いたレビュー結果を、codex-fix-loop が使う形へ要約する。
  *
  * 入力の形状: `schemas/review-output.schema.json` 準拠のオブジェクトが**素で**書かれている。
  *   { verdict, summary, findings[], next_steps[] }

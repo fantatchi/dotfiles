@@ -171,5 +171,5 @@ argument-hint: [レビュー対象の概要]
 - `~/.claude/CLAUDE.md` の **Agent Teams の使い所** セクション: 1 セッション 1 チーム制約のある TeamCreate 機構との比較。本スキルはより軽量な並列 Agent パターン
 - `session-review`: セッション完了時の振り返りスキル。本スキルで集めた所見を session-review の更新候補として活かせる
 - `pr-review`: **GitHub PR が対象ならこちらを使う**。ブランチ切替・最新化、Copilot / discussion コメント取得、ペルソナ並列（本スキルの Step 2-3 を内部で参照）、実コード裏取り、`.claude/reviews/` への所見草稿出力までを一気通貫で行う。本スキルは PR に限らない汎用レビュー（障害分析・設計・runbook 等）向け
-- `codex-review-loop`: 指定した対象の**コード全体**（git 不要）を **Codex（別モデル）** に 1 次レビューさせ、critical / high が 0 になるまで反復する。本スキルが Claude 内の複数ペルソナで観点を分けるのに対し、あちらはモデルそのものを変えて収束させる。読取専用の所見が欲しいだけなら本スキル、修正まで回したいならあちら
+- `codex-fix-loop`: 指定した対象の**コード全体**（git 不要）を **Codex（別モデル）** に 1 次レビューさせ、critical / high が 0 になるまで反復する。本スキルが Claude 内の複数ペルソナで観点を分けるのに対し、あちらはモデルそのものを変えて収束させる。読取専用の所見が欲しいだけなら本スキル、修正まで回したいならあちら
 - 公式 `/code-review` plugin（`~/.claude/plugins/marketplaces/claude-plugins-official/plugins/code-review/`）: PR 差分専用の自動レビュー（confidence scoring + 80 閾値 + gh コメント投稿）。**純粋な PR/コード差分レビューはこちらを直接使う**のが正解で、本スキルは障害分析・設計・runbook 等の汎用レビュー向け。Step 3.5 の確信度フィルタは code-review の confidence scoring を汎用化して取り込んだもの
