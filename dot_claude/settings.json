@@ -23,6 +23,7 @@
       "Bash(cat:*)",
       "Bash(python:*)",
       "Bash(node:*)",
+      "Bash(codex:*)",
       "Bash(printenv:*)",
       "Bash(basename:*)",
       "Bash(gh:*)",
