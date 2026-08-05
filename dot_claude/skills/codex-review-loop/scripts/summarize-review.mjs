@@ -1,26 +1,28 @@
 #!/usr/bin/env node
 /**
- * Codex `adversarial-review --json` の出力を codex-review-loop が使う形へ要約する。
+ * `codex exec --output-schema ... -o <FILE>` が書いたレビュー結果を、codex-review-loop が使う形へ要約する。
  *
- * 入力の payload 形状（codex プラグイン v1.0.6 `codex-companion.mjs` の adversarial 経路）:
- *   { review, target, threadId, context, codex:{status,...}, result, rawOutput, parseError, reasoningSummary }
- *   `result` は schemas/review-output.schema.json 準拠（verdict / summary / findings[] / next_steps[]）。
+ * 入力の形状: `schemas/review-output.schema.json` 準拠のオブジェクトが**素で**書かれている。
+ *   { verdict, summary, findings[], next_steps[] }
  *   findings[].severity は critical | high | medium | low、confidence は 0-1。
+ *
+ * 注意: `codex exec` は中間ターンでも同じ形状の JSON を stdout に出すが、そちらは findings が空のことがある。
+ * 必ず `-o` で書かせた最終メッセージのファイルを渡すこと（stdout を拾うと空結果を掴む）。
  *
  * 使い方:
  *   node summarize-review.mjs <current.json> [previous.json]
  *
- * @param current.json  今ラウンドの `adversarial-review --json` 出力ファイル
+ * @param current.json  今ラウンドの `-o` 出力ファイル
  * @param previous.json 前ラウンドの同ファイル（省略可）。無進捗検知に使う
  *
  * 標準出力（JSON）:
- *   成功時 { ok: true, verdict, summary, counts:{critical,high,medium,low}, blocking[], other[], repeated[] }
+ *   成功時 { ok: true, verdict, summary, counts:{critical,high,medium,low}, blocking[], other[], repeated[], nextSteps[] }
  *     blocking = severity が critical / high の finding（`key` 付き。修正対象はこれだけ）
  *     other    = medium / low の finding（報告のみ、修正対象外）
  *     repeated = previous 側にも blocking として同じ key があったもの（無進捗検知用）
- *   失敗時 { ok: false, reason, parseError?, rawOutput?, codexStatus? }
+ *   失敗時 { ok: false, reason, rawOutput? }
  *
- * 終了コード: 0 = 要約成功 / 1 = 入力不正・Codex 側の失敗・構造化出力の取得失敗
+ * 終了コード: 0 = 要約成功 / 1 = 入力不正・構造化出力の取得失敗
  */
 
 import fs from "node:fs";
@@ -43,12 +45,27 @@ function findingKey(finding) {
   return `${file}::${title}`;
 }
 
-function readPayload(filePath) {
+/**
+ * レビュー結果ファイルを読む。スキーマ準拠オブジェクトでなければ null を返す。
+ *
+ * @param {string} filePath
+ * @returns {{raw: string, data: object|null}}
+ */
+function readResult(filePath) {
   const raw = fs.readFileSync(filePath, "utf8").trim();
   if (!raw) {
-    throw new Error(`${filePath} が空です（Codex の実行が失敗した可能性があります）`);
+    throw new Error(`${filePath} が空です（codex exec が最終メッセージを書けていない可能性があります）`);
   }
-  return JSON.parse(raw);
+  let data = null;
+  try {
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed) && Array.isArray(parsed.findings)) {
+      data = parsed;
+    }
+  } catch {
+    data = null;
+  }
+  return { raw, data };
 }
 
 function toFinding(finding) {
@@ -64,12 +81,11 @@ function toFinding(finding) {
   };
 }
 
-function blockingKeysOf(payload) {
-  const findings = payload?.result?.findings;
-  if (!Array.isArray(findings)) {
+function blockingKeysOf(data) {
+  if (!Array.isArray(data?.findings)) {
     return new Set();
   }
-  return new Set(findings.filter((f) => BLOCKING_SEVERITIES.has(f?.severity)).map(findingKey));
+  return new Set(data.findings.filter((f) => BLOCKING_SEVERITIES.has(f?.severity)).map(findingKey));
 }
 
 function fail(reason, extra = {}) {
@@ -83,22 +99,20 @@ function main() {
     fail("使い方: node summarize-review.mjs <current.json> [previous.json]");
   }
 
-  let payload;
+  let current;
   try {
-    payload = readPayload(currentPath);
+    current = readResult(currentPath);
   } catch (error) {
     fail(`current.json を読めませんでした: ${error.message}`);
   }
 
-  if (!payload?.result) {
-    fail("構造化レビュー結果が取得できませんでした", {
-      parseError: payload?.parseError ?? null,
-      rawOutput: payload?.rawOutput ?? null,
-      codexStatus: payload?.codex?.status ?? null
+  if (!current.data) {
+    fail("スキーマ準拠のレビュー結果として解釈できませんでした", {
+      rawOutput: current.raw.slice(0, 4000)
     });
   }
 
-  const findings = Array.isArray(payload.result.findings) ? payload.result.findings : [];
+  const findings = current.data.findings;
   const counts = { critical: 0, high: 0, medium: 0, low: 0 };
   for (const finding of findings) {
     if (Object.prototype.hasOwnProperty.call(counts, finding?.severity)) {
@@ -109,7 +123,7 @@ function main() {
   let previousBlockingKeys = new Set();
   if (previousPath) {
     try {
-      previousBlockingKeys = blockingKeysOf(readPayload(previousPath));
+      previousBlockingKeys = blockingKeysOf(readResult(previousPath).data);
     } catch {
       // 前ラウンドのファイルが読めない場合は無進捗検知だけ諦める（今ラウンドの要約は返す）
       previousBlockingKeys = new Set();
@@ -122,9 +136,8 @@ function main() {
     JSON.stringify(
       {
         ok: true,
-        verdict: payload.result.verdict,
-        summary: payload.result.summary,
-        target: payload.target?.label ?? null,
+        verdict: current.data.verdict ?? null,
+        summary: current.data.summary ?? "",
         counts,
         blocking,
         other: findings
@@ -136,7 +149,7 @@ function main() {
             line: `${f.line_start}-${f.line_end}`
           })),
         repeated: blocking.filter((f) => previousBlockingKeys.has(f.key)).map((f) => f.key),
-        nextSteps: Array.isArray(payload.result.next_steps) ? payload.result.next_steps : []
+        nextSteps: Array.isArray(current.data.next_steps) ? current.data.next_steps : []
       },
       null,
       2
