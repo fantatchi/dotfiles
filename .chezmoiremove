@@ -1,3 +1,4 @@
 .claude/config.json
 .claude/scripts/migrate-tasks.mjs
 .claude/skills/stop-redundant
+.claude/skills/codex-fix-loop

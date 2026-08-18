@@ -126,7 +126,7 @@ GOをもらってから進める。
   - 「このプロジェクトの残タスクは？」に `/gtd-list` は答えない（捕捉箱しか見ないため）。`/context-load` を使う
 - 仕様書系: 仕様書の構造・判断軸＋HTML 補足ページの視覚設計（配色 / タイポ / アクセシビリティ）=`/spec-writer`
 - 文章: 書籍・記事の原稿の文章規範=`japanese-doc-style`（ロール変換型で文脈から自動発動する）
-- レビュー: 軽量な並列観点=`/multi-persona-review`（チーム不要・読取専用） / PR フル自動レビュー（URL→ブランチ切替→ペルソナ→裏取り→`.claude/reviews/` 草稿）=`/pr-review` / 対象全体（既定はプロジェクト全体・git 不要）を Codex に 1 次レビューさせ critical・high が消えるまで反復して**コードを直す**=`/codex-fix-loop`（明示起動のみ。**レビュー系 3 つのうちこれだけが書き換える**ので、所見だけ欲しいときは選ばない。**git 差分**の単発レビューは `/codex:adversarial-review`）。`superpowers:requesting-code-review` / `receiving-code-review` は superpowers の実装フロー（brainstorming→writing-plans→subagent-driven-development）を通した時のみ使う
+- レビュー: 軽量な並列観点=`/multi-persona-review`（チーム不要・読取専用） / PR フル自動レビュー（URL→ブランチ切替→ペルソナ→裏取り→`.claude/reviews/` 草稿）=`/pr-review` / **git 差分**の単発レビュー=`/codex:adversarial-review`（別モデルの目）。いずれも読取専用で、修正まで回すスキルは持たない（`/codex-fix-loop` は 2026-08-18 に撤去。recall の問題ではなく使いどころが定まらなかったため）。`superpowers:requesting-code-review` / `receiving-code-review` は superpowers の実装フロー（brainstorming→writing-plans→subagent-driven-development）を通した時のみ使う
 - スキル作成・編集: `skill-creator:skill-creator`（**プラグイン側**。`~/.claude/skills/` には無い。ひな形生成 + eval で description の trigger 精度を実測できる）。`superpowers:writing-skills` は description が実質同義で紛れやすいが使わない — 方法論は下記「新スキルの追加・削除・拡張」が正
 - 振り返り: 権限・CLAUDE.md・スキル整理=`/session-review`
 
