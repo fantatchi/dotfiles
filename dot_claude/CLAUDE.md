@@ -14,6 +14,7 @@
 - 質問は選択式で答えやすくする
 - 1回あたり 3〜5 個、ブロッカー（答えがないと進めない質問）を優先する
 - 仕様の選択肢は「複数案 + 推奨案 + トレードオフ」で提示して選んでもらう
+- 冗長性を抑える: 過剰に列挙しない（思いつく限りの候補を並べない）、知っている情報を全部書かない、強調の直後に但し書きを重ねない。詳細な判断基準と推敲手順は `/stop-redundant`
 
 # 日本語表記ルール
 
@@ -124,6 +125,7 @@ GOをもらってから進める。
   - **プロジェクトの作業キュー**（`<project>/.claude/tasks.md`、ローカル管理）= `/context-save` が書き `/context-load` が表示する。`~/` も 1 プロジェクトとして `~/.claude/tasks.md` を持つ
   - 「このプロジェクトの残タスクは？」に `/gtd-list` は答えない（捕捉箱しか見ないため）。`/context-load` を使う
 - 仕様書系: 仕様書の構造・判断軸＋HTML 補足ページの視覚設計（配色 / タイポ / アクセシビリティ）=`/spec-writer`
+- 文章: 出力（応答・コミットメッセージ・コードコメント）の冗長性排除=`stop-redundant` / 書籍・記事の原稿の文章規範=`japanese-doc-style`。どちらもロール変換型で文脈から自動発動する。原稿を書いているなら japanese-doc-style が優先で、冗長ルールを stop-redundant 側に再掲しない
 - レビュー: 軽量な並列観点=`/multi-persona-review`（チーム不要・読取専用） / PR フル自動レビュー（URL→ブランチ切替→ペルソナ→裏取り→`.claude/reviews/` 草稿）=`/pr-review` / 対象全体（既定はプロジェクト全体・git 不要）を Codex に 1 次レビューさせ critical・high が消えるまで反復して**コードを直す**=`/codex-fix-loop`（明示起動のみ。**レビュー系 3 つのうちこれだけが書き換える**ので、所見だけ欲しいときは選ばない。**git 差分**の単発レビューは `/codex:adversarial-review`）。`superpowers:requesting-code-review` / `receiving-code-review` は superpowers の実装フロー（brainstorming→writing-plans→subagent-driven-development）を通した時のみ使う
 - スキル作成・編集: `skill-creator:skill-creator`（**プラグイン側**。`~/.claude/skills/` には無い。ひな形生成 + eval で description の trigger 精度を実測できる）。`superpowers:writing-skills` は description が実質同義で紛れやすいが使わない — 方法論は下記「新スキルの追加・削除・拡張」が正
 - 振り返り: 権限・CLAUDE.md・スキル整理=`/session-review`

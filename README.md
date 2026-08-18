@@ -151,6 +151,7 @@ Claude Code の `settings.json`・有効化済みプラグイン・このリポ�
 | `/session-review` † | セッション振り返り（権限・CLAUDE.md・スキル・判断メモ圧縮の整理） |
 | `/session-save` | 作業ログ記録とコンテキスト保存をまとめて実行し、アウトプット提案（ブログ・リソース候補）も行う |
 | `/spec-writer` | 仕様書（specification / 設計ドキュメント / requirements / architecture / ADR / C4 / 用語集）の設計・作成・レビューを担うロール変換型スキル（旧 spec-design + dashboard-design を 2026-06 に統合）。読み手別入口・図種選択・ADR 形式・要件レベル語・Diátaxis 4 分類・テンプレ集を内蔵。HTML 補足ページは DADS v2.0.1 準拠（key-color = Blue 固定で JIS X 8341-3 AA 自動充足） |
+| `stop-redundant` | 出力（応答・コミットメッセージ・PR 説明・コードコメント・レビュー所見）の冗長性を排除するロール変換型スキル。過剰列挙・知識の全部出し・強調直後の但し書き・定型の水増しを止める。検証レベルの明示や確認トリガーなど「削ってはいけないもの」を明記して削りすぎを防ぐ。書籍・記事の原稿は `japanese-doc-style` が担当し、冗長ルールを再掲しない分業 |
 
 † = `disable-model-invocation: true`（自動発動しない手動呼び出し専用。コンテキスト注入削減のため、低頻度スキルに適用 2026-07-07）。japanese-doc-style はロール変換型のためコマンドでなく文脈で自動発動する。
 
