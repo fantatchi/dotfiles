@@ -1,7 +1,7 @@
 ---
 name: gtd-list
 description: 捕捉箱（tasks.md）からタスクを読み込み、指定条件で **表示** する操作型スキル。動詞は「表示」専用（追加は gtd-add、完了は gtd-done）。「タスク一覧」「TODO を見せて」「Inbox 確認」「タスク表示」といった依頼で使う。対象は捕捉箱（shared/integrations.md の task_store、既定 ~/ObsidianVault/00_meta/tasks.md）のみで、プロジェクトごとの作業キュー（.claude/tasks.md）は表示しない（そちらは /context-load）。
-argument-hint: [--all|--inbox|--next|--waiting|--someday|--done [N]|--project <name>]
+argument-hint: [--all|--done [N]]
 allowed-tools: Read, Write, Edit, Bash(git:*), Bash(basename:*), Bash(pwd), Bash(date:*)
 ---
 
@@ -23,12 +23,9 @@ allowed-tools: Read, Write, Edit, Bash(git:*), Bash(basename:*), Bash(pwd), Bash
 |---|---|
 | （なし） | **Inbox + Next** を表示（捕捉箱の主役は Inbox） |
 | `--all` | Inbox / Next / Waiting / Someday を全て表示（Done は除く） |
-| `--inbox` | Inbox のみ |
-| `--next` | Next のみ |
-| `--waiting` | Waiting のみ |
-| `--someday` | Someday のみ |
 | `--done [N]` | 直近 N 件の Done（デフォルト 10） |
-| `--project <name>` | 指定プロジェクトのタスクのみ（Done 除く） |
+
+セクション単位の絞り込み（`--inbox` / `--next` / `--waiting` / `--someday`）と `--project <name>` は 2026-08-18 に削除した。プロジェクト固有タスクが各プロジェクトの作業キューへ移った（2026-07-27 の 2 系統分離）結果、捕捉箱の全量が十数件に収まり絞る意味が無くなったうえ、残る `#project/` タグが実質 1 種類になって分類軸として機能しなくなったため。**捕捉箱が再び肥大したら復活を検討する**（その時は絞り込みより Inbox の振り分けが滞っている疑いを先に見る）。
 
 ## コア（単独完結・連携なしで動く）
 
@@ -118,7 +115,7 @@ allowed-tools: Read, Write, Edit, Bash(git:*), Bash(basename:*), Bash(pwd), Bash
 
 #### 表示ルール
 
-- `#project/<name>` タグは付いていればそのまま表示する（振り分け先の目印）。`--project <name>` 指定時は見出しに出るのでタグを省略してよい
+- `#project/<name>` タグは付いていればそのまま表示する（振り分け先の目印）
 - 空セクションの場合は「（該当タスクなし）」と表示
 - `--done` の場合、Done セクションの**末尾から N 件**を表示（新しいものが下にある想定なので反転して表示）
 
