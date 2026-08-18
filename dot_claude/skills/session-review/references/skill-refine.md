@@ -44,3 +44,22 @@ Step 1〜2 の結果を SKILL.md 本体の一括提示フォーマットに渡�
 - **新規スキルの作成**: `Write` で新しい SKILL.md を作成
   - 作成先をユーザーに確認（プロジェクト `.claude/skills/` or ユーザー `~/.claude/skills/`）
   - 最小限のSKILL.md（frontmatter + 基本構造）を生成
+
+### 編集で終わらせない（chezmoi 反映｜MUST）
+
+`~/.claude/skills/` 配下は **chezmoi 管理下の live を直接編集する**運用なので、`Edit` / `Write` だけで止めると
+source と乖離し、**次の `chezmoi apply` で黙って巻き戻る**。手順とチェックリストは
+[`~/.claude/docs/skill-management.md`](../../../docs/skill-management.md) の「chezmoi 反映」節が正本
+（既存ファイルは `chezmoi re-add`、新規ファイルは `chezmoi add`、削除は source 側も削除）。
+**編集と同一セッションで反映まで確認する。**
+
+- **`chezmoi` が Windows シェルで見つからなくても「入っていない」と判断しない。** WSL 側にのみ
+  インストールされている構成があり、その場合 `~/.claude/skills` は WSL パスへの symlink になっている
+  ことがある（= 編集は最初から管理対象に入っている）。発見手順は
+  [`~/.claude/docs/work-tips.md`](../../../docs/work-tips.md) の「WSL 側にしかない chezmoi に
+  Windows ネイティブからアクセスする」
+- **Windows の Python でファイルを書くと LF が CRLF に化ける**（`open(p, "w")` の既定）。
+  chezmoi はバイト比較なので `chezmoi diff` が全文置換になる。`newline=""` を付けるか `wb` で書く
+  （詳細は work-tips.md）
+- 反映漏れは**後から発見される**: 2026-06-02 に `obsidian-daily/SKILL.md`、2026-08-16 に
+  `context-save/SKILL.md` の手順追加が、いずれも live のみで source に入っていなかった
