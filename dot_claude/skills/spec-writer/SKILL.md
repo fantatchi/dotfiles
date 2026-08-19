@@ -173,7 +173,7 @@ HTML 補足ページの本数に応じて要件レベルを切り替える:
 
 **理由**: (1) 個別ファイル内 `<style>` で共通 CSS を上書きしてしまう事故を防ぎ、複数ファイルでの視覚一貫性（フォント・h1 サイズ・配色）を保証する。「伝わるデザイン」原則 3（反復）の最終的な担保（[references/communicative-design.md](references/communicative-design.md) 参照）。(2) **HTML 1 ファイル単体で共有・閲覧できる**（リポジトリ checkout 不要、ダウンロード・チャット添付でそのまま開ける）。旧 `<link>` 参照型は (2) が成立しないため採らない。
 
-**実証例（規模）**: cloud-dsc プロジェクトの `docs/_html/_shared/spec-page.css`（3072 行、2026-05-14 時点、ファイル別 scope で全レイアウト統合済み）。各 HTML の固有 `<style>` は 10-30 行（`:root` 固有変数のみ）。**注**: cloud-dsc は旧 `<link>` 参照型 + 旧版 Blue 900 ベース時代の実証例で、現在はインライン展開型 + DADS 準拠への移行対象。本スキルのデフォルト CSS の **スタイル骨格の出典は DADS v2.0.1**（cloud-dsc の旧配色そのものではない）。
+**実証例（規模）**: 共通 CSS を単一ファイルで 3000 行規模まで運用し、ファイル別 scope で全レイアウトを統合できる（各 HTML の固有 `<style>` は 10-30 行、`:root` 固有変数のみ）。スタイル骨格の出典は **DADS v2.0.1**。
 
 具体的な共通 CSS の最小骨格・移行手順・`:root` 変数命名規則・ページ別 scope の書き方は [references/html-css-centralization.md](references/html-css-centralization.md) を参照。
 
@@ -361,10 +361,3 @@ Step 1 で把握したスタイルを踏襲して生成。CSS / breadcrumb / foo
 - [Docs as Code (Write the Docs)](https://www.writethedocs.org/guide/docs-as-code/) — Docs as Code 方法論
 - [デジタル庁デザインシステム DADS](https://design.digital.go.jp/dads/) — HTML 補足ページの視覚設計が準拠する公的標準
 - [@digital-go-jp/design-tokens (GitHub)](https://github.com/digital-go-jp/design-tokens) — DADS デザイントークンの配布元（取込版は v2.0.1、本スキルでは `references/dads-tokens.md` に静的転記）
-
----
-
-## 変更履歴
-
-- **2026-06-18**: `spec-design` から `spec-writer` へ改名（仕様書作成が主の用途を明示）。同時に HTML 補足ページのデフォルト CSS を Vercel inspired (`#0070f3` link blue + Inter / Noto Sans JP) から **DADS v2.0.1 準拠** (key-color = Blue 固定、Noto Sans JP + Noto Sans Mono) へ全面差し替え。ベースカラー切替機構（旧 `base-color-mapping.md`）は廃止。
-- **2026-06-17**: 旧 `dashboard-design` スキルを統合・削除（PDF / BI / ダッシュボード用途が使われず、唯一の実消費者が当スキルの HTML 補足ページのみだったため）。視覚設計データ・原則を `references/` に集約。
