@@ -1,0 +1,4 @@
+interface:
+  display_name: "PR Review"
+  short_description: "GitHub PRを検証し、投稿前のレビュー草稿を作成する"
+  default_prompt: "$pr-review を使って、この GitHub PR をレビューし、ローカル草稿を作成してください。"
