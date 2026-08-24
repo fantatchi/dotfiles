@@ -8,15 +8,6 @@ param(
 )
 
 $sharedRootFiles = @('AGENTS.md')
-$sharedSkills = @(
-    'context-load',
-    'context-save',
-    'session-save',
-    'obsidian-log',
-    'obsidian-resource',
-    'session-review',
-    'spec-writer'
-)
 $wslUser = (wsl.exe -d $Distro -e whoami 2>$null | Out-String).Trim()
 if (-not $wslUser) {
     throw "Could not resolve the WSL user for distro: $Distro"
@@ -32,6 +23,17 @@ if (-not (Test-Path -LiteralPath $wslCodexRoot)) {
 }
 if (-not (Test-Path -LiteralPath $wslAgentsRoot)) {
     throw "WSL .agents was not found: $wslAgentsRoot"
+}
+
+$wslSkillsRoot = Join-Path $wslAgentsRoot 'skills'
+$sharedSkills = @(
+    Get-ChildItem -LiteralPath $wslSkillsRoot -Directory -ErrorAction Stop |
+        Where-Object { Test-Path -LiteralPath (Join-Path $_.FullName 'SKILL.md') } |
+        Sort-Object -Property Name |
+        Select-Object -ExpandProperty Name
+)
+if ($sharedSkills.Count -eq 0) {
+    throw "No user skills were found: $wslSkillsRoot"
 }
 
 $windowsRootItem = Get-Item -LiteralPath $windowsCodexRoot -Force -ErrorAction SilentlyContinue
@@ -96,7 +98,7 @@ if (-not (Test-Path -LiteralPath $windowsSkillsRoot) -and $PSCmdlet.ShouldProces
 }
 
 foreach ($name in $sharedSkills) {
-    $source = Join-Path (Join-Path $wslAgentsRoot 'skills') $name
+    $source = Join-Path $wslSkillsRoot $name
     $linkPath = Join-Path $windowsSkillsRoot $name
     New-ProtectedSymbolicLink -Source $source -LinkPath $linkPath -Label "skills/$name"
 }

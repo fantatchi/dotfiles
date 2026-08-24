@@ -335,7 +335,7 @@ Codex は、設定全体を共有せず、作業規約とユーザー Skill だ�
 | 区分 | 対象 | 扱い |
 | --- | --- | --- |
 | 共有 | `~/.codex/AGENTS.md` | chezmoi で配備 |
-| 共有 | `~/.agents/skills/` の 7 Skill | chezmoi で配備。Codex のユーザー Skill 正規探索先 |
+| 共有 | `~/.agents/skills/` の全ユーザー Skill | chezmoi で配備。Codex のユーザー Skill 正規探索先 |
 | 共有 | `~/.codex/scripts/setup-windows-codex.ps1` | Windows 側リンク作成用 |
 | ローカル | `~/.codex/config*`、認証情報、セッション、ログ、キャッシュ、SQLite | chezmoi 管理外 |
 | ローカル | `~/.codex/skills/.system/` | Codex が OS ごとに提供・管理するため共有しない |
@@ -370,7 +370,7 @@ Windows 版 Codex も使う場合は、まず WSL 側の初期化を完了して
 このスクリプトは Windows 側の `.codex` と `.agents` を実体ディレクトリのまま維持し、次だけを WSL 側へ個別シンボリックリンクとして作成する。
 
 - `%USERPROFILE%\.codex\AGENTS.md`
-- `%USERPROFILE%\.agents\skills\` 配下の 7 Skill ディレクトリ
+- `%USERPROFILE%\.agents\skills\` 配下の全ユーザー Skill ディレクトリ（`SKILL.md` があるものを自動検出）
 
 既存のファイルやリンク先が期待と異なる場合、スクリプトは削除・上書きせず停止する。必要なら対象を手動で退避してから、再実行する。
 

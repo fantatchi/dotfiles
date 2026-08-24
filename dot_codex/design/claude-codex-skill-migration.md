@@ -2,7 +2,7 @@
 
 ## 対象
 
-Codex へ移行する Skill は `context-load`、`context-save`、`session-save`、`obsidian-log`、`obsidian-resource`、`session-review`、`spec-writer` の 7 個とする。`obsidian-daily` と `obsidian-mail` は Claude 専用で維持する。
+Codex へ移行する Skill は `context-load`、`context-save`、`session-save`、`obsidian-log`、`obsidian-resource`、`session-review`、`spec-writer`、`multi-persona-review`、`pr-review` の 9 個とする。`obsidian-daily` と `obsidian-mail` は Claude 専用で維持する。Windows 配備では固定リストを持たず、`~/.agents/skills/*/SKILL.md` を自動検出する。
 
 ## 状態共有
 
@@ -14,4 +14,4 @@ Codex の作業ログは Claude と同じ `20_log/YYYYMM/`、リソースは `30
 
 ## chezmoi と Windows
 
-ユーザー管理対象は `dot_codex/AGENTS.md`、`dot_agents/skills/`、`dot_codex/scripts/`、`dot_codex/design/` とする。認証、config、セッション、Plugin、cache、ログ、SQLite は管理しない。Codex がユーザー Skill を探索する正規の場所は `~/.agents/skills/` とする。Windows の `.codex` と `.agents` は実ディレクトリを維持し、`AGENTS.md` と移植した 7 Skill の各ディレクトリだけを WSL 側へ SymbolicLink で共有する。Windows の `.codex/skills/.system` は OS ローカルのまま保持する。
+ユーザー管理対象は `dot_codex/AGENTS.md`、`dot_agents/skills/`、`dot_codex/scripts/`、`dot_codex/design/` とする。認証、config、セッション、Plugin、cache、ログ、SQLite は管理しない。Codex がユーザー Skill を探索する正規の場所は `~/.agents/skills/` とする。Windows の `.codex` と `.agents` は実ディレクトリを維持し、`AGENTS.md` と `~/.agents/skills/*/SKILL.md` で検出した各 Skill ディレクトリだけを WSL 側へ SymbolicLink で共有する。Windows の `.codex/skills/.system` は OS ローカルのまま保持する。
