@@ -1,0 +1,4 @@
+interface:
+  display_name: "Multi-Persona Review"
+  short_description: "複数の専門ペルソナで読取専用レビューを行い、所見を統合する"
+  default_prompt: "$multi-persona-review を使って、対象を複数の独立した専門観点からレビューしてください。"
