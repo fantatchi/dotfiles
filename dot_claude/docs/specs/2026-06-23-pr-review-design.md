@@ -5,6 +5,8 @@
 - 関連: `~/.claude/skills/multi-persona-review/SKILL.md`（再利用元）
 - 棲み分け対象: 公式 `/code-review`（plugin `claude-plugins-official`）
 
+> **3-11 節は 2026-06-23 時点の初版設計。** 2026-08-25 に公式レビュー資産を取り込んだ差分（常設の角度ペルソナ / 3 値 verdict / Phase 4.5 掃討 / shared 参照）は **12 節**にまとめてある。実装の現況は `~/.claude/skills/pr-review/SKILL.md` が正。
+
 ## 1. 目的
 
 GitHub PR の URL（または番号）を渡したら以下を一気通貫で実施するオーケストレータスキル:
@@ -229,3 +231,33 @@ skill-management.md チェックリスト遵守:
 - **worktree モード**: cloud-cmp の submodule + node_modules 問題でメリット薄、将来別ユースケースで必要なら検討
 - **MEMORY 遵守 references 化**: 該当 feedback memory が増えたら references で参照表化
 - **複数 PR 同時起動**: 1 セッション 1 タスク制で十分、不要
+
+## 12. 判断ログ: 公式コードレビュー資産の取り込み（2026-08-25）
+
+公式レビュー系プロンプトの原文を読み、`/pr-review` へ差分で取り込んだ（`[[feedback_adopt-external-guidance-by-diff]]` 準拠。機械的な全採用はしない）。
+
+出典:
+
+- プラグイン版 `/code-review`: `~/.claude/plugins/marketplaces/claude-plugins-official/plugins/code-review/commands/code-review.md`
+- ビルトイン版 `/code-review` `/simplify` `/security-review`: Claude Code CLI バイナリ埋め込み（`~/.local/share/claude/versions/2.1.243` の strings から抽出。effort 別に角度数 × 候補数 × verify 方式が切り替わる）
+
+### 採用
+
+| 取り込んだもの | 反映先 | 理由 |
+|---|---|---|
+| 角度（angle）による観点分割 — Angle B removed-behavior auditor / Angle C cross-file tracer / 囲む関数まで読む | SKILL.md 4 章「常設の角度ペルソナ」、Phase 2 | ドメインペルソナは追加行に寄り、削除行と呼び出し元が無担当になる。体数は増やさず枠の内数で確保 |
+| 3 値 verdict（CONFIRMED / PLAUSIBLE / REFUTED）と **REFUTED 側の立証責任** | Phase 4-2.7、5 章の注記 | 現行は MEMORY の speculation 抑制が片側にしか効かず、レース・稀パス系の実バグまで潰しうる。歯止めとして入れた（今回の改訂の要） |
+| ギャップ掃討 finder（確定リストを渡し、そこに無い欠陥だけを 1 体で探す） | Phase 4.5（新設） | Phase 3 の並列は各ペルソナの観点で打ち止めになり、収束後の穴が残る |
+| CLAUDE.md 準拠を**検出側**の角度として使う（ルール原文と違反行の両方を逐語引用できるときだけ指摘） | 4 章 角度 B | 現行は MEMORY を抑制側にしか使っていなかった |
+| 汎用偽陽性カタログ | `shared/review-false-positives.md`（新規 SSOT）。Phase 4 限定で参照 | `multi-persona-review` Step 3.5 と重複していたので shared へ集約。**finder prompt には入れない**（絞りを後段 1 パスに集約する既存設計を維持） |
+| `/security-review` の HARD EXCLUSIONS 17 項目 + 判断ガイド 12 項目 | `shared/security-review-exclusions.md`（新規、逐語） | security ペルソナの prompt に貼るだけで定番の偽陽性が消える。逐語なのは `[[feedback_pr_review_persona_prompt_verbatim]]` 準拠 |
+| verdict 行を所見ファイルへ | 6 章の構造 + Phase 5 | 「なぜ残したか / なぜ落としたか」を後から追えるようにする。既存 7 件との互換のため行の追加のみで構造は不変 |
+
+### 不採用
+
+| 見送ったもの | 理由 |
+|---|---|
+| confidence 0-100 → 80 未満切り捨て（プラグイン版） | 本スキルは severity 4 段を確定させて草稿に残す設計。閾値切り捨てだと LOW が消える |
+| `--fix` / `--comment` / `--post` | 読取専用・草稿のみという棲み分けの根幹 |
+| 偽陽性フィルタのサブエージェント委譲（`/security-review` の 3 ステップ目） | Phase 4 の「メインで一次確認する」設計意図と衝突する（SKILL.md に削るなと明記済み） |
+| finder 数を `ceil(変更行数/150)`（下限 2・上限 8）で算出 | 4.3 の体数テーブル + 「観点数で決める」原則で足りている。式は目安として本ログにのみ残す |
