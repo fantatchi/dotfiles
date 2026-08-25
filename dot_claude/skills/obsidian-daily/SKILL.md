@@ -1,6 +1,6 @@
 ---
 name: obsidian-daily
-description: GitHub アクティビティと作業ログから Obsidian デイリーノートの「## デイリーサマリー」セクションを生成・追記する。冒頭 KPI 行（commits / PRs / logs 件数）・「今日の要約」上配置・コミットのリポ別グルーピング・作業ログ折り畳み callout の構成。複数 GH アカウント（`fantatchi` + `kentem-at-kato`）の活動を `gh auth switch` で順次切替しながら集約。「今日のまとめ」「デイリーサマリー」「KPI」「リポ別コミット」「概況」「複数アカウント」「両アカウント集約」「個人と業務を合算」「fantatchi の commit も含めて」といった依頼で使う。**Obsidian Core Daily notes プラグインのテンプレ（`90_config/templates/daily_notes.md`）を SSOT として読み込む設計**（テンプレ未配置では `RuntimeError` で停止、§6-a 参照）。Thino プラグインと共存できるよう `# Journal` セクション前提のテンプレを推奨。
+description: GitHub アクティビティと作業ログから Obsidian デイリーノートの「## デイリーサマリー」セクションを生成・追記する。冒頭 KPI 行（commits / PRs / logs 件数）・「今日の要約」上配置・コミットのリポ別グルーピング・作業ログ折り畳み callout の構成。複数 GH アカウント（`fantatchi` + `kentem-at-kato`）の活動を `gh auth switch` で順次切替しながら集約。「今日のまとめ」「デイリーサマリー」「KPI」「リポ別コミット」「概況」「複数アカウント」「両アカウント集約」「個人と業務を合算」「fantatchi の commit も含めて」といった依頼で使う。**Obsidian Core Daily notes プラグインのテンプレ（`90_config/templates/daily_notes.md`）を SSOT として読み込む設計**（テンプレ未配置では `RuntimeError` で停止、6-a 節参照）。Thino プラグインと共存できるよう `# Journal` セクション前提のテンプレを推奨。
 argument-hint: [YYYY-MM-DD]
 allowed-tools: Read, Bash(gh:*), Bash(date:*), Bash(python:*), Bash(cat:*), Bash(ls:*), Bash(echo:*)
 ---
@@ -24,9 +24,9 @@ allowed-tools: Read, Bash(gh:*), Bash(date:*), Bash(python:*), Bash(cat:*), Bash
 
 ## 2. Vault パスの決定
 
-`~/.claude/skills/shared/vault-init.md` の **§1「Vault パスの解決と存在確認」を実行** する（resolver `integrations.md` の `vault` を解決し、存在チェックと未配置時の案内を行う。既定 `~/ObsidianVault`）。以降この解決済みパスを `<vault>` と呼ぶ。WSL / Windows (Git Bash) いずれからも同じ相対パスで解決される前提も shared 側に集約済み。
+`~/.claude/skills/shared/vault-init.md` の **1 節「Vault パスの解決と存在確認」を実行** する（resolver `integrations.md` の `vault` を解決し、存在チェックと未配置時の案内を行う。既定 `~/ObsidianVault`）。以降この解決済みパスを `<vault>` と呼ぶ。WSL / Windows (Git Bash) いずれからも同じ相対パスで解決される前提も shared 側に集約済み。
 
-本スキルは Vault 内へのファイル書き出しを `write-daily.py` が `<vault>/10_daily/YYYYMM/YYYY-MM-DD.md` に直接行う設計のため、shared/vault-init.md の §2「書き出し先ディレクトリ」/ §3「ファイル名」規約は使用しない（その 2 つは obsidian-log / obsidian-resource 用）。**出力ディレクトリ名 `10_daily` は現状 `write-daily.py` 側にハードコードされており（`os.path.join(vault, "10_daily", yyyymm)`）、resolver `vault_dirs.daily` はまだコードに配線されていない**（resolver 側の値は将来 write-daily.py を参照化する際の宣言用）。`daily-notes.json` は **§6-a のテンプレ/frontmatter 解決にのみ**使われ、出力先ディレクトリには影響しない。
+本スキルは Vault 内へのファイル書き出しを `write-daily.py` が `<vault>/10_daily/YYYYMM/YYYY-MM-DD.md` に直接行う設計のため、shared/vault-init.md の 2 節「書き出し先ディレクトリ」/ 3 節「ファイル名」規約は使用しない（その 2 つは obsidian-log / obsidian-resource 用）。**出力ディレクトリ名 `10_daily` は現状 `write-daily.py` 側にハードコードされており（`os.path.join(vault, "10_daily", yyyymm)`）、resolver `vault_dirs.daily` はまだコードに配線されていない**（resolver 側の値は将来 write-daily.py を参照化する際の宣言用）。`daily-notes.json` は **6-a 節のテンプレ/frontmatter 解決にのみ**使われ、出力先ディレクトリには影響しない。
 
 ## 3. GitHub データ収集
 
@@ -71,7 +71,7 @@ for acc in "${accounts[@]}"; do
 done
 ```
 
-切替に失敗（未認証 / token 失効）したアカウントは **スキップ**し、§7 完了報告で **必ず明示** する。
+切替に失敗（未認証 / token 失効）したアカウントは **スキップ**し、7 節の完了報告で **必ず明示** する。
 
 ### gh api endpoint の罠（必須）
 
@@ -132,7 +132,7 @@ gh api 'search/issues?q=reviewed-by:<ACCOUNT>+type:pr+updated:<TARGET_DATE>T00:0
 
 抽出: タイトル、URL（html_url）、リポジトリ名、状態
 
-注意: `reviewed-by` × `updated` は **当日他人がコメント等で PR を更新した場合**にも反応する（精度より再現を優先する割り切り）。誤検出は §5 の summary_text 生成段で人間目線でフィルタする運用。
+注意: `reviewed-by` × `updated` は **当日他人がコメント等で PR を更新した場合**にも反応する（精度より再現を優先する割り切り）。誤検出は 5 節の summary_text 生成段で人間目線でフィルタする運用。
 
 ### マージと重複排除
 
@@ -144,7 +144,7 @@ gh api 'search/issues?q=reviewed-by:<ACCOUNT>+type:pr+updated:<TARGET_DATE>T00:0
 ### エラー処理
 
 - API エラー（403 rate limit / 401 認証 / 422 等）: 該当アカウント・該当セクションのみスキップし、他は継続
-- スキップが発生した場合は §7 完了報告で **「N アカウント中 X 件取得失敗（理由）」を必ず明示**（旧版の「取得エラー」ノート表示の代替。write-daily.py 側にはエラー表示機構がないため、報告で可視化する）
+- スキップが発生した場合は 7 節の完了報告で **「N アカウント中 X 件取得失敗（理由）」を必ず明示**（旧版の「取得エラー」ノート表示の代替。write-daily.py 側にはエラー表示機構がないため、報告で可視化する）
 - 全アカウント・全セクションが 0 件: 空配列 `[]` のまま JSON に詰める（write-daily.py が「なし」と表示）
 
 ## 4. 作業ログ の収集
@@ -152,7 +152,7 @@ gh api 'search/issues?q=reviewed-by:<ACCOUNT>+type:pr+updated:<TARGET_DATE>T00:0
 Bash の ls コマンドでファイル一覧を取得し、各ファイルを Read ツールで読む:
 
 ```bash
-# <vault> は §2 で解決した Vault パス、<log> は resolver vault_dirs.log（既定 20_log）
+# <vault> は 2 節で解決した Vault パス、<log> は resolver vault_dirs.log（既定 20_log）
 ls <vault>/<log>/{YYYYMM}/{YYYYMMDD}*.md 2>/dev/null
 ```
 
@@ -186,9 +186,9 @@ ls <vault>/<log>/{YYYYMM}/{YYYYMMDD}*.md 2>/dev/null
 }
 ```
 
-- `vault` には §2 で解決した `<vault>`（resolver `vault`、既定 `~/ObsidianVault`）をチルダ込みのまま入れる。**§4 の `ls` パスや本 JSON に `<vault>` / `<log>` のようなプレースホルダ文字列を literal のまま残さない**（write-daily.py は `vault` を `expanduser` するだけなので、literal が来ると `~/<vault>` ディレクトリを誤生成する。§注意事項の過去事例参照）
+- `vault` には 2 節で解決した `<vault>`（resolver `vault`、既定 `~/ObsidianVault`）をチルダ込みのまま入れる。**4 節の `ls` パスや本 JSON に `<vault>` / `<log>` のようなプレースホルダ文字列を literal のまま残さない**（write-daily.py は `vault` を `expanduser` するだけなので、literal が来ると `~/<vault>` ディレクトリを誤生成する。注意事項の過去事例参照）
 - `commits`, `prs`, `logs` が 0 件の場合は空配列 `[]` にする
-- `commits[].date` は §3a で抽出した `commit.committer.date`（ISO-8601）。`write-daily.py` 自体は使わない（入力順を保持してそのまま出力する）が、§3 マージ規約のソートで使うため **必ず含めて出力**。例 schema からこのフィールドを削ると LLM が捨てる → ソートが空打ちになる過去事例あり
+- `commits[].date` は 3a 節で抽出した `commit.committer.date`（ISO-8601）。`write-daily.py` 自体は使わない（入力順を保持してそのまま出力する）が、3 節マージ規約のソートで使うため **必ず含めて出力**。例 schema からこのフィールドを削ると LLM が捨てる → ソートが空打ちになる過去事例あり
 - `prs[].labels` は `("作成", "マージ", "レビュー")` の **語固定**。write-daily.py の KPI 行が **label 別に分解カウント** する仕様（同 PR が `["作成", "マージ"]` を持つと breakdown で `作成 1・マージ 1`、ただし PR 件数自体は **1**）。LLM 側で labels を「代表 1 件に畳む」「順序を変える」「別語に置換」しないこと（畳むと breakdown が消える）
 - `summary_text` は全データを総合して LLM が**プロジェクト軸の箇条書き 2-4 行**で生成する
   - 形式: `- <project>: <その日の核心 1 行>`
@@ -245,7 +245,7 @@ Microsoft Store のスタブランチャー (`AppData\Local\Microsoft\WindowsApp
 具体的な構造（KPI 行・collapsible meta callout・「今日の要約」配置・コミットのリポ別
 グルーピング・作業ログのフラット件数 + callout）は `write-daily.py` の `SUMMARY_TEMPLATE`
 および `build_kpi_line` / `build_grouped_commits` / `build_logs_section` が実装上の唯一の正本。
-出力規約は `obsidian-mail` の reader 契約（`obsidian-mail/SKILL.md §2-b`）にも反映されているため、
+出力規約は `obsidian-mail` の reader 契約（`obsidian-mail/SKILL.md 2-b 節`）にも反映されているため、
 出力フォーマットを変更する際は reader 側の `_BULLET_RE` 等の依存を必ず確認すること。
 producer ↔ consumer の構造契約の人間可読な要約は `~/.claude/skills/shared/daily-summary-format.md` に集約してある（ただし真の SSOT は本コードと `extract-summary.py`）。
 
@@ -256,7 +256,7 @@ producer ↔ consumer の構造契約の人間可読な要約は `~/.claude/skil
 
 ### 必須要件
 
-1. **Obsidian Core Daily notes が有効**: `<vault>/.obsidian/daily-notes.json`（`<vault>` は §2 で解決、既定 `~/ObsidianVault`）が存在し、
+1. **Obsidian Core Daily notes が有効**: `<vault>/.obsidian/daily-notes.json`（`<vault>` は 2 節で解決、既定 `~/ObsidianVault`）が存在し、
    `template` フィールドが vault 相対のテンプレファイル名（拡張子なし、例: `90_config/templates/daily_notes`）を指していること
 2. **テンプレートファイル本体**: 上記 `template + ".md"` パスに `.md` ファイルが配置されていること
 3. **Frontmatter placeholder**: テンプレ内の `{{date:FORMAT}}` は Moment.js 形式として解釈される。
@@ -319,13 +319,13 @@ author: at-kato
 - 書き込んだファイルのパス
 - サマリーの概要: コミット数（× 何 repo）、PR 数（作成 / マージ / レビュー の breakdown）、ログ数
 - **アカウント別の取得件数**: 例 `fantatchi: commits 5 / PR 1` / `kentem-at-kato: commits 12 / PR 3`
-- **取得失敗があった場合は必ず明示**: §3「エラー処理」でスキップしたアカウント・セクションと理由（rate limit / auth / 422 等）。write-daily.py は失敗をノート上で可視化しないため、ここで報告しないと **静かな 0 件** として埋もれる（2026-05-13 事故の再発防止）
+- **取得失敗があった場合は必ず明示**: 3 節「エラー処理」でスキップしたアカウント・セクションと理由（rate limit / auth / 422 等）。write-daily.py は失敗をノート上で可視化しないため、ここで報告しないと **静かな 0 件** として埋もれる（2026-05-13 事故の再発防止）
 
 ## 注意事項
 
-- GitHub Search API の日付絞り込みは **TZ 省略時 UTC 解釈**。JST 帯運用では §3「日付絞り込みの TZ」に従い `%2B09:00`（`+09:00` の URL エンコード）offset 付き range 構文を使う。**生の `+09:00` は `q=` 内でスペース扱いされ範囲が壊れて全件 0 になる**（§3「TZ offset の `+` は必ず `%2B` にエンコード」参照）
+- GitHub Search API の日付絞り込みは **TZ 省略時 UTC 解釈**。JST 帯運用では 3 節「日付絞り込みの TZ」に従い `%2B09:00`（`+09:00` の URL エンコード）offset 付き range 構文を使う。**生の `+09:00` は `q=` 内でスペース扱いされ範囲が壊れて全件 0 になる**（3 節「TZ offset の `+` は必ず `%2B` にエンコード」参照）
 - 作業ログ のファイル名はタイムスタンプ（JST）ベースなので、`YYYYMMDD` の前方一致で正しくフィルタできる
 - Obsidian のリンク記法（`[[]]`）やコールアウト（`> [!info]`）を活用する
 - Windows 環境で `python` が無い場合は Python 3 をインストールしてから実行すること（`python3` は MS Store スタブの可能性があるので避ける）
 - **JSON は必ずファイル経由で渡す**: `echo "$JSON" | python3 ...` / `cat <<EOF | python3 ...` / シェル変数展開は Windows (Git Bash) で cp932 化けを起こす。`sys.stdin.reconfigure` では救えない（Python 到達前にシェルが bytes 化しているため）。ステップ 6 の手順（Python ヒアドキュメントで UTF-8 ファイルに書き出し → パス引数）を必ず踏むこと
-- **`vault` の `~` 展開**: Python は `~` を自動展開しないため、`write-daily.py` 側で `os.path.expanduser()` を通している。JSON の `vault` には §2 で解決した `<vault>`（既定 `~/ObsidianVault`）のチルダ込みパスをそのまま渡してよい（渡さないと literal `~` ディレクトリが作られるバグを過去に踏んだ）
+- **`vault` の `~` 展開**: Python は `~` を自動展開しないため、`write-daily.py` 側で `os.path.expanduser()` を通している。JSON の `vault` には 2 節で解決した `<vault>`（既定 `~/ObsidianVault`）のチルダ込みパスをそのまま渡してよい（渡さないと literal `~` ディレクトリが作られるバグを過去に踏んだ）

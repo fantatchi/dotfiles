@@ -28,4 +28,4 @@
 
 PR の `labels` は `("作成", "マージ", "レビュー")` の**語固定**。producer の KPI 行が label 別に分解カウントするため、consumer・LLM 側で畳む／順序変更／別語置換をしない。
 
-詳細な振る舞いは各スキルの SKILL.md（`obsidian-daily` §5/§6、`obsidian-mail` §2-b/§2-c）とコードを参照。
+詳細な振る舞いは各スキルの SKILL.md（`obsidian-daily` 5 節/6 節、`obsidian-mail` 2-b 節/2-c 節）とコードを参照。

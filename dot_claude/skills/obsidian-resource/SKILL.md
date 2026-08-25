@@ -11,7 +11,7 @@ allowed-tools: Read, Write, Glob, Bash(echo:*), Bash(mkdir:*), Bash(date:*)
 Claude との作業内容・調べた内容・参考リソースを Obsidian Vault に記録する。
 frontmatter を Hugo 公開可能な形にしてあるため、後からそのままブログ化しやすい。
 
-**主資源と連携**: このスキルは Obsidian Vault（主資源）へのリソース／ドラフト書き出し専用で、Vault があれば兄弟スキル無しで動く。Vault パスは resolver `~/.claude/skills/shared/integrations.md` の `vault`（既定 `~/ObsidianVault`）から `vault-init.md` 経由で解決する。Vault が無い環境では `vault-init.md` §1 の案内で終了する（standalone フォールバックは無い＝Vault 連携専用スキル）。それ以外の兄弟スキル連携は持たない。
+**主資源と連携**: このスキルは Obsidian Vault（主資源）へのリソース／ドラフト書き出し専用で、Vault があれば兄弟スキル無しで動く。Vault パスは resolver `~/.claude/skills/shared/integrations.md` の `vault`（既定 `~/ObsidianVault`）から `vault-init.md` 経由で解決する。Vault が無い環境では `vault-init.md` 1 節の案内で終了する（standalone フォールバックは無い＝Vault 連携専用スキル）。それ以外の兄弟スキル連携は持たない。
 
 ## 書き出し先・ファイル名
 

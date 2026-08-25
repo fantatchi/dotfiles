@@ -72,7 +72,7 @@ class TaskEntry(TypedDict):
 
 
 class ParsedSummary(TypedDict):
-    """`parse_summary()` の戻り値。obsidian-mail/SKILL.md §2-b の規約と同期。"""
+    """`parse_summary()` の戻り値。obsidian-mail/SKILL.md 2-b 節の規約と同期。"""
     tldr: str
     worklog: list[WorklogEntry]
     gh_commits: list[str]
@@ -173,7 +173,7 @@ def split_by_h3(body: str) -> dict[str, str]:
 
 # `> ` 接頭辞は callout 内バレットを許容するためのもので、`> ` の後に空白 1 つ以上を必須に
 # している（`>-` のような Markdown 不正形式は誤マッチさせない）。callout 内外いずれの形式でも
-# 抽出する設計（obsidian-mail/SKILL.md §2-b と §2-c に同期）。
+# 抽出する設計（obsidian-mail/SKILL.md 2-b 節と 2-c 節に同期）。
 #
 # 動作確認:
 # >>> bool(_BULLET_RE.match("- **proj**: body"))
@@ -194,7 +194,7 @@ _BULLET_RE = re.compile(r"^\s*(?:>\s+)?-\s*\*\*([^*]+)\*\*\s*[:：]\s*(.+)$")
 def parse_worklog(text: str) -> list[WorklogEntry]:
     """Parse `- **project**: body` bullets.
 
-    契約: `obsidian-mail/SKILL.md §2-b` の規約テーブルと同期。
+    契約: `obsidian-mail/SKILL.md 2-b 節` の規約テーブルと同期。
     `### 作業ログ` 配下の `[> ]- **project**: body` 形式 bullet を抽出する。
     callout 内（`> [!note]-` 配下の `> - **proj**: body`）でも callout 外でも、
     形式が合致すれば採用する（callout の内外を区別しない）。
@@ -231,7 +231,7 @@ GH_SUBSECTION_PRS = "PR"
 def parse_github(text: str) -> tuple[list[str], list[PREntry]]:
     """Parse '#### コミット' / '#### PR' subsections under '### GitHub アクティビティ'.
 
-    契約: `obsidian-mail/SKILL.md §2-b` の規約テーブルと同期。
+    契約: `obsidian-mail/SKILL.md 2-b 節` の規約テーブルと同期。
     `##### owner/repo (N)` のリポ別小見出し（`#### ` ではないので h4 判定を素通り）は
     無視し、bullet をリポ横断でフラットに集計する。
 
@@ -308,7 +308,7 @@ _TASK_RE = re.compile(
 def parse_tasks(text: str) -> list[TaskEntry]:
     """Parse `- [ ] #project body` lines.
 
-    契約: `obsidian-mail/SKILL.md §2-b` の規約テーブルと同期。
+    契約: `obsidian-mail/SKILL.md 2-b 節` の規約テーブルと同期。
     末尾 ⏳ または `@waiting` を含む行は `waiting: True`。
 
     >>> tasks = parse_tasks("- [ ] `#alpha` task 1\\n- [ ] `#beta` task 2 ⏳")
@@ -601,7 +601,7 @@ def md_to_html(md_text: str) -> str:
     """Convert markdown body to styled HTML (mail-ready).
 
     `## 今日のひとこと` 直後のブロックを `.tldr` で wrap し青ボックス化する。
-    obsidian-daily SKILL.md §5 仕様変更（プロジェクト軸の箇条書き化）に追従し、
+    obsidian-daily SKILL.md 5 節の仕様変更（プロジェクト軸の箇条書き化）に追従し、
     `<p>` だけでなく `<ul>` も wrap 対象とする。
 
     >>> html_p = md_to_html("## 今日のひとこと\\n\\nplain text")
@@ -616,7 +616,7 @@ def md_to_html(md_text: str) -> str:
         extensions=["extra", "sane_lists"],
     )
     # h2「今日のひとこと」直後の <p>...</p> または <ul>...</ul> に class を付与して
-    # 青ボックス化。obsidian-daily SKILL.md §5 の summary_text 仕様（プロジェクト軸の
+    # 青ボックス化。obsidian-daily SKILL.md 5 節の summary_text 仕様（プロジェクト軸の
     # 箇条書き 2-4 行）では bullet → <ul> に変換されるため、両ブロックを受ける。
     # re.DOTALL は markdown が段落内改行を <p>...\n...</p> 展開した場合の保険。
     body_html = re.sub(
