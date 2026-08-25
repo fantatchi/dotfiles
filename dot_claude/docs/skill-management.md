@@ -31,6 +31,15 @@
 - [ ] SKILL.md の `description` に新機能のトリガー語（「○○について」で呼び出されるべき語）を追加したか
 - [ ] references を新規追加した場合、SKILL.md 本文から **明示的に参照誘導**（「詳細は references/X.md 参照」）が書かれているか（参照誘導なしだと LLM が references を読まずに進む過去事例あり）
 
+### Codex 側ミラーの追従判断（`~/.agents/skills/` に同名スキルがある場合）
+
+Codex CLI 用のスキルは `~/.agents/skills/` に**別実体**として置かれている（symlink による 1 本化は検証のうえ不採用。理由と harness 依存差分の一覧は `~/.codex/design/claude-codex-skill-migration.md`）。Claude 側だけを編集すると Codex 側が古い仕様のまま取り残され、`context.md` / `tasks.md` / `handoff.md` のような**共有正本を古い規約で書かれる**（2026-08-25 に 26 コミット分の遅れを検出）。
+
+- [ ] 編集したスキルが `~/.agents/skills/<skill-name>/` にも存在するか確認する
+- [ ] 存在する場合、その変更が **harness 依存か非依存か**を判断する。`allowed-tools` / `Skill` ツール / `$ARGUMENTS` / `CLAUDE.md` 参照 / `source: claude-*` / `/skill` 記法 / 主語の「Claude」に**該当しない**変更は harness 非依存なので、Codex 側にも同じ変更が要る
+- [ ] 追従は **「Claude 版から作り直して harness 適応を再適用」** が確実（差分を拾い直す方式は取りこぼす）
+- [ ] Codex 側にあって Claude 側にない記述は、adaptation（残す）か staleness（捨てる）かを必ず判定する。判断がつかないものは残す
+
 ### chezmoi 反映（追加・削除・拡張すべてに共通、編集後 必須確認）
 
 `~/.claude/skills/` 配下は **chezmoi 管理下だが live を直接編集する**運用（context.md 運用ルール）。live 編集だけで止めると source と乖離し、後日 `chezmoi diff` に想定外差分が出て解釈に詰まる（2026-06-02 に `obsidian-daily/SKILL.md` を live のみ編集して source 反映が漏れた事故が由来）。**編集と同一セッションで source 反映まで必ず確認する**（2026-05-27 原則「live と source の乖離時間を最小化」）。

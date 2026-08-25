@@ -1,15 +1,15 @@
 ---
 name: context-load
-description: 保存済みのプロジェクトコンテキストを読み込み、前回の作業状態を復帰する。セッション開始時や「前回の状態を読み込んで」「コンテキストを復帰して」と依頼されたとき、および Claude から Codex へ作業を引き継ぐときに使う。共有正本 `.claude/context.md`、`.claude/progress.md`、tasks.md、`.claude/handoff.md`（他エージェントからの引き継ぎメモ）を読取専用で扱い、git の現在状態との差分を提示する。
+description: 保存済みのプロジェクトコンテキストを読み込み、前回の作業状態を復帰する。セッション開始時や「前回の状態を読み込んで」「コンテキストを復帰して」「Claude からの引き継ぎを読んで」と依頼されたとき、および Claude から Codex へ作業を引き継ぐ（またはその逆の）ときに使う。`.claude/context.md`・`.claude/progress.md`・`.claude/tasks.md`（作業キュー）・`.claude/handoff.md`（他エージェントからの引き継ぎメモ）の読み込みと git 状態比較・提示を行い、すべて project-local で完結する（Obsidian 等の外部依存なし）。
 ---
 
 # コンテキスト読み込み
 
 保存済みのプロジェクトコンテキストを読み込み、前回の作業状態を復帰する。
 
-このスキルは **コア（`.claude/context.md` / `.claude/progress.md` の読み込みと提示で完結・外部依存なし）** と **連携（タスクストアが揃っていれば「次のステップ」を追加表示する任意処理）** に分かれる。Obsidian や他スキルが無い環境でも「## コア」だけで動作する。連携の配線は `~/.claude/skills/shared/integrations.md`（resolver）で判定する。
+このスキルは **`.claude/` 配下（context.md / progress.md / tasks.md / handoff.md）だけを読む project-local スキル**で、外部連携を持たない。Obsidian や他スキルが無い環境でもそのまま動く。参照先パスの配線のみ `~/.claude/skills/shared/integrations.md`（resolver）で解決する。
 
-## コア（単独完結・連携なしで動く）
+## 手順
 
 ### 読み込み元
 
@@ -35,16 +35,27 @@ description: 保存済みのプロジェクトコンテキストを読み込み�
 - ブランチが異なる場合: 「保存時のブランチ: `xxx` → 現在: `yyy`」
 - 未コミットの変更がある場合: 注意喚起
 - 保存時以降に新しいコミットがある場合: その旨を表示
+- **context.md に PR 番号が出てくる場合は、提示前に `gh pr view <番号> --json state,isDraft,reviewDecision,mergeable` で実査する**（読み込み専用の原則には反しない。context.md は書き換えない）。PR の状態は他人の操作で変わるため保存時点の記述をそのまま提示すると、古い前提のまま作業方針を立ててしまう。実査できない場合（gh 未認証・ネットワーク不通）は「保存時点の記述」と明示して提示する
 
 ### 3. 進捗マップの読み込み
 
 `{project-root}/.claude/progress.md` を読み込み、進捗マップとして扱う（project-local のため外部依存なし）。
 
 - ファイルが存在しない場合はスキップ
-- 抽出した内容は提示（ステップ 5）に含める
-- 後方互換: `.claude/progress.md` がなく、かつ `{project-root}/CLAUDE.md` に `## 進捗マップ` セクションがある場合は、そこから抽出する（旧形式）
+- 抽出した内容は提示（ステップ 6）に含める
+- 後方互換: `.claude/progress.md` がなく、かつ `{project-root}/CLAUDE.md`（または `{project-root}/AGENTS.md`）に `## 進捗マップ` セクションがある場合は、そこから抽出する（旧形式）
 
-### 4. 引き継ぎメモの読み込み（handoff.md）
+### 4. 作業キューの読み込み
+
+resolver の `project_task_store`（既定 `<project-root>/.claude/tasks.md`）を読み、`## Next` / `## Someday` のタスクを抽出する。これは `context-save` が前回セッションで保存した「次にやること」で、セッション開始時に即座に見えるようにするのが目的。
+
+- `project_task_store` が空 / ファイルが存在しない場合はスキップし、提示の「次のステップ」セクションごと省略する
+- `## Someday`（条件待ち・保留）のタスクには 💤 マーカーを付けて Next と区別する
+- ファイルはあるが Next / Someday が 0 件の場合は「次のステップなし」と表示する
+- **Next が 15 件を超える場合は全件を並べず、上位 8 件 + 総件数を出す**（`（ほか N 件）`）。Someday は件数だけでよい。**間引いたことを必ず明示する**（黙って上位だけ出すと「これで全部」と読める）。あわせて `⚠️ Next が N 件あります。タスクでない行が混ざっていないか棚卸しを検討してください` を 1 行添える — 溜まるときはたいてい観測メモが混ざっている（2026-08-24 に degcloud で 34 件・提示の冒頭がノイズで埋まった）
+- フォーマット規約は `~/.claude/skills/shared/tasks-format.md`（context-save と同じ SSOT）
+
+### 5. 引き継ぎメモの読み込み（handoff.md）
 
 `{project-root}/.claude/handoff.md` を読む。これは `context-save` が毎回書き出す「他のエージェントへ作業を渡すとしたら何を伝えるか」のメモで、Claude ↔ Codex の往復（agent handoff）の受け取り口にあたる。
 
@@ -53,9 +64,9 @@ description: 保存済みのプロジェクトコンテキストを読み込み�
 - **`from` が自分と同じ場合**は「自分が書いた引き継ぎ（相手が未消化）」と明示する。自分の書いたメモを相手からの指示と誤読させない
 - `## 未解決・詰まっている点` が `なし` 以外なら強調表示する
 - **`at` が 7 日より古い場合**は `（N 日前の引き継ぎです）` と添える。揮発情報なので古いものは前提が変わっている可能性が高い
-- **整合チェック**: `handoff.md` の `at` が `context.md` の `updated` より**新しい**場合、`⚠️ context.md が引き継ぎメモより古いため、進行中の作業の記述が実態とずれている可能性があります` と 1 行添える
+- **整合チェック**: `handoff.md` の `at` が `context.md` の `updated` より**新しい**場合、`⚠️ context.md が引き継ぎメモより古いため、進行中の作業の記述が実態とずれている可能性があります` と 1 行添える。両者は本来 `context-save` が同時に書くので、ずれているのは handoff.md だけが手で書かれた場合など
 
-### 5. コンテキストの提示
+### 6. コンテキストの提示
 
 読み込んだ情報を整理して提示する：
 
@@ -85,9 +96,9 @@ description: 保存済みのプロジェクトコンテキストを読み込み�
 ### 進行中の作業
 （作業内容）
 
-### 次のステップ（連携1 が実行された場合のみ・task_store より）
-- [ ] （Next から抽出したタスク）
-- [ ] （Waiting から抽出したタスク） ⏳ 待ち
+### 次のステップ（.claude/tasks.md より）
+- [ ] （Next のタスク）
+- [ ] （Someday のタスク） 💤 保留
 
 ### 関連リポジトリ（context.md に該当セクションがある場合のみ）
 - **dotfiles (chezmoi)**: `<git remote URL>`
@@ -99,37 +110,17 @@ description: 保存済みのプロジェクトコンテキストを読み込み�
 ```
 
 - 「現在の状態」は context.md に `## 現在の状態` がある場合のみ表示する。git 管理外（ホームワークスペース等）でセクションが無ければ省略する（ブランチは冒頭の `**ブランチ**` で出すため重複させない）
-- 「進捗マップ」は `.claude/progress.md`（優先）または CLAUDE.md の `## 進捗マップ` セクション（後方互換）がある場合のみ表示する。どちらもない場合はセクションごと省略する
-- 「次のステップ」は連携1（タスクストア読み込み）が実行された場合のみ表示する。連携が無効な環境ではセクションごと省略する
+- 「進捗マップ」は `.claude/progress.md`（優先）または CLAUDE.md / AGENTS.md の `## 進捗マップ` セクション（後方互換）がある場合のみ表示する。どちらもない場合はセクションごと省略する
+- 「次のステップ」は `.claude/tasks.md` がある場合のみ表示する。無ければセクションごと省略する
 - 「関連リポジトリ」は context.md に `## 関連リポジトリ` セクションがある場合のみ表示する。ない場合はセクションごと省略する
-
-## 連携（任意・対象があれば実行）
-
-**連携の前提確認**: `~/.claude/skills/shared/integrations.md` を Read する（無ければ全キー未設定とみなす）。各連携の ［参照キー］ を resolver の「参照規約」で判定する。**(a)→(b)→(c) を上から評価し最初に真の分岐を採る**:
-- **path 系キー**（task_store 等）: (a) 空/未設定 → skip / (b) パスあり＋`*_probe`（無ければキー自身）存在 → 実行 / (c) パスあるが probe 不在 → skip
-- **bool 系キー**（memory_promotion 等）: probe 判定なし。`on` → 実行 / `off`・未設定 → skip
-
-連携が skip された場合、提示の「### 次のステップ」セクションは省略する（コアの提示には影響しない）。
-
-### 連携1: タスクストアからの「次のステップ」抽出 ［参照キー: task_store, task_store_probe］
-
-`task_store`（タスクストア tasks.md）を読み込み、現在プロジェクトのタスクを抽出する。tasks.md は context-save が各セッションで吸い上げた「次のアクション」を全プロジェクト横断で集約する共有ストア。context-load 時にここを参照することで、セッション開始時に「前回までに次やる予定にしたこと」が即座に見える。
-
-フォーマット規約は `~/.claude/skills/shared/tasks-format.md` を参照（context-save と同じ SSOT）。
-
-1. `task_store` が指すファイルを Read で読む
-   - `task_store` が空 / `task_store_probe`（既定 `~/ObsidianVault/.obsidian/`）が不在 / tasks.md 不存在: 連携1 ごとスキップ（context.md 本体の読み込みには影響しない）
-2. プロジェクトタグを決定: `#project/<basename of git toplevel>`（または CWD 名、`$HOME` 完全一致なら `#project/global`）
-3. `## Next` / `## Waiting` セクションから該当プロジェクトタグを持つタスクを抽出
-4. 存在すれば「次のステップ」として提示に含める（コアのステップ 4 のテンプレート参照）
-5. Waiting のタスクには ⏳ マーカーを付けて区別する
-6. 該当タスクが 0 件の場合は「次のステップなし。Claude の `gtd-add` または tasks.md から追加できます。」と表示
+- 「引き継ぎ」は `.claude/handoff.md` がある場合のみ表示する。無ければセクションごと省略する。**表示する場合は他のどのセクションより先（`**ブランチ**` の直後）に置く**
 
 ## 注意事項
 
-- **読み込み専用**。context.md・progress.md・tasks.md・handoff.md を変更しない（引き継ぎメモの更新は `context-save` の担当）
-- **handoff.md の消化状態は記録しない**。読んだことを示す `status: consumed` のようなフィールドは持たない設計で、次に `context-save` が走ったときの上書きで自然に入れ替わる
-- **複数 writer 前提で読む**: 3 ファイルとも Claude・Codex 等が共有する正本であり（`~/.claude/skills/shared/multi-writer.md` 参照）、Claude 固有の記述だけが存在する前提にしない
+- **読み込み専用**。context.md・progress.md・tasks.md・handoff.md を変更しない（タスクの追加・`[x]` の整理・引き継ぎメモの更新はいずれも `$context-save` の担当）
+- **handoff.md の消化状態は記録しない**。読んだことを示す `status: consumed` のようなフィールドは持たない設計で、次に `$context-save` が走ったときの上書きで自然に入れ替わる（読み込み専用の本スキルは書き戻せないため、状態を持たせると必ず腐る）
+- **Obsidian Vault は参照しない**。捕捉箱（`~/ObsidianVault/00_meta/tasks.md`）は `gtd-*` の担当で、本スキルとは無関係
+- **複数 writer 前提で読む**: 4 ファイルとも Claude・Codex 等が共有する正本であり（`~/.claude/skills/shared/multi-writer.md` 参照）、Claude 固有の記述だけが存在する前提にしない
   - 未知の frontmatter キー・見出し・フィールドがあっても**エラーにせず有効データとして扱う**（保持対象。提示から黙って落とさず、未知セクションは提示の末尾で「その他のセクション」として言及する）
   - Claude 固有の目印（frontmatter の `tags: claude-context` 等）が無いファイルも正常として読み込む
 - パスはプロジェクトルートからの相対パスで記録されているため、現在のマシンのパスと異なる場合がある

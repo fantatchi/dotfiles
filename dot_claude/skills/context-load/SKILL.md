@@ -44,7 +44,7 @@ allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(echo:*), Bash(basename:*), Ba
 `{project-root}/.claude/progress.md` を読み込み、進捗マップとして扱う（project-local のため外部依存なし）。
 
 - ファイルが存在しない場合はスキップ
-- 抽出した内容は提示（ステップ 4）に含める
+- 抽出した内容は提示（ステップ 6）に含める
 - 後方互換: `.claude/progress.md` がなく、かつ `{project-root}/CLAUDE.md` に `## 進捗マップ` セクションがある場合は、そこから抽出する（旧形式）
 
 ### 4. 作業キューの読み込み
@@ -122,7 +122,7 @@ resolver の `project_task_store`（既定 `<project-root>/.claude/tasks.md`）�
 - **読み込み専用**。context.md・progress.md・tasks.md・handoff.md を変更しない（タスクの追加・`[x]` の整理・引き継ぎメモの更新はいずれも `/context-save` の担当）
 - **handoff.md の消化状態は記録しない**。読んだことを示す `status: consumed` のようなフィールドは持たない設計で、次に `/context-save` が走ったときの上書きで自然に入れ替わる（読み込み専用の本スキルは書き戻せないため、状態を持たせると必ず腐る）
 - **Obsidian Vault は参照しない**。捕捉箱（`~/ObsidianVault/00_meta/tasks.md`）は `gtd-*` の担当で、本スキルとは無関係
-- **複数 writer 前提で読む**: 3 ファイルとも Claude・Codex 等が共有する正本であり（`~/.claude/skills/shared/multi-writer.md` 参照）、Claude 固有の記述だけが存在する前提にしない
+- **複数 writer 前提で読む**: 4 ファイルとも Claude・Codex 等が共有する正本であり（`~/.claude/skills/shared/multi-writer.md` 参照）、Claude 固有の記述だけが存在する前提にしない
   - 未知の frontmatter キー・見出し・フィールドがあっても**エラーにせず有効データとして扱う**（保持対象。提示から黙って落とさず、未知セクションは提示の末尾で「その他のセクション」として言及する）
   - Claude 固有の目印（frontmatter の `tags: claude-context` 等）が無いファイルも正常として読み込む
 - パスはプロジェクトルートからの相対パスで記録されているため、現在のマシンのパスと異なる場合がある
