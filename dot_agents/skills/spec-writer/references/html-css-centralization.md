@@ -126,7 +126,7 @@ LLM の手作業展開は「全文コピー漏れ・相対パスズレ・再展�
 
 **規模・運用パターンの実証例**: cloud-dsc プロジェクトの `_shared/spec-page.css`（**3072 行、2026-05-14 時点**）。**配色は旧版 Blue 900 ベース** で運用されてきたが、現在は本テンプレ準拠（DADS）への移行対象。ファイル別 scope での全レイアウト統合パターン・3000 行規模の単一ファイル運用は本テンプレ採用時の参考になる。
 
-**`--accent` の値について**: 下記サンプルは DADS key-color (Blue 700 `#264af4`) を `--accent` に、Blue 900 `#0017c1` を `--accent-deep`（本文リンクで AAA pass）、Blue 50 `#e8f1fe` を `--accent-bg`、Solid Gray 900 `#1a1a1a` を `--accent-ink` として採用。**ベースカラーは Blue 固定**（spec-writer デフォルト）。ブランド要請等で別色を採用する場合は [`dads-tokens.md`](./dads-tokens.md) 2 節 の DADS プリミティブ 10 色族（Light Blue / Cyan / Green / Lime / Yellow / Orange / Red / Magenta / Purple）から階調を選び、選定 ADR を残す（[`adr-format.md`](./adr-format.md) カラー選定 ADR）。
+**`--accent` の値について**: 下記サンプルは DADS key-color (Blue 700 `#264af4`) を `--accent` に、Blue 900 `#0017c1` を `--accent-deep`（本文リンクで AAA pass）、Blue 50 `#e8f1fe` を `--accent-bg`、Solid Gray 900 `#1a1a1a` を `--accent-ink` として採用。**ベースカラーは Blue 固定**（spec-writer デフォルト）。ブランド要請等で別色を採用する場合は [`dads-tokens.md`](./dads-tokens.md) 2 節の DADS プリミティブ 10 色族（Light Blue / Cyan / Green / Lime / Yellow / Orange / Red / Magenta / Purple）から階調を選び、選定 ADR を残す（[`adr-format.md`](./adr-format.md) カラー選定 ADR）。
 
 **フォントの選定について**: 日本語・等幅とも DADS 採用フォントを使う。日本語は `Noto Sans JP`（Google Fonts、SIL OFL 1.1）、等幅は `Noto Sans Mono`（CJK + Latin 対応）。UD フォント原則（[`./communicative-design.md`](./communicative-design.md) 原則 7）の保険として `BIZ UDPGothic` / `BIZ UDGothic` を fallback に並べ、Google Fonts CDN 遮断環境（社内 LAN proxy 等）では UD 保険へ自動 fallback する。ウェイトは DADS 採用の `400 (Normal) / 700 (Bold)` の 2 段階のみ。
 
@@ -706,8 +706,8 @@ body.page-glossary .term-grid { ... }
 - [ ] `:root` 変数の命名が `--accent` / `--primary-color` のような重複になっていないか確認
 - [ ] 不要になった内部 `<style>` 由来のクラスを削除
 - [ ] `--accent` / `--accent-deep` の値が DADS Blue 系列と整合しているか確認:
-  - **デフォルト (DADS key-color = Blue) を採用する場合**: `--accent` = Blue 700 (`#264af4`)、`--accent-deep` = Blue 900 (`#0017c1`)、`--accent-bg` = Blue 50 (`#e8f1fe`) が [`dads-tokens.md`](./dads-tokens.md) 1 節 と一致するか確認
-  - **別系統 (DADS Light Blue / Green / Orange 等) を採用した場合**: [`dads-tokens.md`](./dads-tokens.md) 2 節 の該当色族の階調と HEX 整合を確認し、選定 ADR が残っているか確認
+  - **デフォルト (DADS key-color = Blue) を採用する場合**: `--accent` = Blue 700 (`#264af4`)、`--accent-deep` = Blue 900 (`#0017c1`)、`--accent-bg` = Blue 50 (`#e8f1fe`) が [`dads-tokens.md`](./dads-tokens.md) 1 節と一致するか確認
+  - **別系統 (DADS Light Blue / Green / Orange 等) を採用した場合**: [`dads-tokens.md`](./dads-tokens.md) 2 節の該当色族の階調と HEX 整合を確認し、選定 ADR が残っているか確認
 
 **遷移条件**: 共通 CSS が「scope 付き = ページ固有 / scope なし = 汎用」で綺麗に分離されたら Phase 4。
 

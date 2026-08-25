@@ -28,7 +28,7 @@
 |---|---|
 | HTML 補足ページが **1 本のみ** | 共通 CSS は作らない。[`templates.md`](./templates.md) の最小骨格を `<style>` 内に直書き（もともと self-contained） |
 | HTML 補足ページが **2 本以上ある or 将来増える見込み** | **SSOT 共通 CSS + 生成時インライン展開を採用（SHOULD）**。本ファイルの手順に従う |
-| 既存プロジェクトに HTML 補足ページが分散 `<style>` 直書き or 旧 `<link>` 参照型で書かれている | [§段階的移行手順](#段階的移行手順) で順次移行 |
+| 既存プロジェクトに HTML 補足ページが分散 `<style>` 直書き or 旧 `<link>` 参照型で書かれている | [段階的移行手順](#段階的移行手順既存プロジェクト向け) で順次移行 |
 
 「単一 HTML を作ってから後で増やす」展開は頻発するので、**最初から複数想定で SSOT 共通 CSS を作ってもよい**（SSOT 1 ファイル + 各 HTML へ生成時インライン展開する構成）。
 
@@ -47,7 +47,7 @@ docs/_html/
 ```
 
 - 共通 CSS（SSOT）は `_shared/` に置く（プロジェクトの慣習があればそれを優先）。**スタイル編集は必ずこのファイルで行う**
-- 各 HTML は `<link>` で参照**しない**。生成・更新時に SSOT 全文を `<style data-shared-source="...">` へインライン展開する（[§生成時インライン展開の運用ルール](#生成時インライン展開の運用ルール)）
+- 各 HTML は `<link>` で参照**しない**。生成・更新時に SSOT 全文を `<style data-shared-source="...">` へインライン展開する（[生成時インライン展開の運用ルール](#生成時インライン展開の運用ルール)）
 - 各 HTML の `<body>` に `class="page-X"`（X はファイル名 kebab-case）を付与
 
 ## 個別 HTML 側の最小構造
@@ -99,10 +99,10 @@ SSOT と配布物の関係を壊さないための規約:
 - HTML の新規生成・更新時、SSOT を読み込んで `<style data-shared-source="<SSOT への相対パス>">` ブロックへ全文展開する。`data-shared-source` 属性が「このブロックは生成コピーである」ことの機械可読マーカーを兼ねる
 - インラインコピーの先頭に「SSOT の生成時コピー・直接編集禁止」コメントを必ず入れる
 - **SSOT を変更したら、同プロジェクトの全 HTML 補足ページへ再展開して伝播する**。対象は `grep -rl 'data-shared-source' docs/` で機械的に列挙できる。要件レベルは展開手段で変わる:
-  - **展開スクリプトを導入しているプロジェクト（[§展開・検証スクリプト](#展開検証スクリプト)）**: SSOT 編集とコミットは全 HTML 再展開とセットでなければならない（**MUST**、1 コミット完結）。手作業より遥かに安全なため強制できる
+  - **展開スクリプトを導入しているプロジェクト（[展開・検証スクリプト](#展開検証スクリプト)）**: SSOT 編集とコミットは全 HTML 再展開とセットでなければならない（**MUST**、1 コミット完結）。手作業より遥かに安全なため強制できる
   - **スクリプト未導入（LLM 手作業で展開）**: 全 HTML 再展開は **SHOULD**。ただし「SSOT だけ直して HTML は後で」は drift 未収束コミットを生むため、可能な限り同一セッションで再展開する
 - **外部資産を埋め込まない（MUST）**: self-contained を壊さないため、`<img src="...">`・外部 `.svg` ファイル参照・`@import`・相対パスのローカル資産を HTML に入れない。図は **インライン SVG または data URI** で埋め込む（`.svg-wrap` は「インライン SVG 前提」）。Google Fonts の `<link>`（CDN 参照）だけは例外として残してよい — CDN 遮断環境では `--font-sans` の fallback（BIZ UDPGothic 等）に落ちる設計で、単体配布性を実用上損なわないため
-- drift 検査: インラインコピー（`<style data-shared-source>` の中身）を抽出し SSOT と正規化 diff すれば再展開漏れを検出できる。スクリプト導入時は `--check` で自動化（[§展開・検証スクリプト](#展開検証スクリプト)）、未導入時は MAY
+- drift 検査: インラインコピー（`<style data-shared-source>` の中身）を抽出し SSOT と正規化 diff すれば再展開漏れを検出できる。スクリプト導入時は `--check` で自動化（[展開・検証スクリプト](#展開検証スクリプト)）、未導入時は MAY
 - **git diff ノイズの緩和（任意）**: SSOT 1 行変更が全 HTML の `<style>` ブロックに伝播し diff が肥大化する。レビューでシグナルが埋もれるのが気になるなら、`.gitattributes` に該当 HTML への `linguist-generated` 付与や `*.html -diff`（差分非表示）を検討する。ただし HTML 本文の実変更も隠れるため、CSS 専用ディレクトリを分けない限り副作用に注意
 
 ## 展開・検証スクリプト
@@ -114,9 +114,9 @@ LLM の手作業展開は「全文コピー漏れ・相対パスズレ・再展�
 - **2 モード**:
   - 展開: `npx tsx scripts/expand-shared-css.ts` — 全対象 HTML を SSOT 最新で上書き
   - 検証: `npx tsx scripts/expand-shared-css.ts --check` — drift があれば非ゼロ終了。**pre-commit hook / CI に組み込めば再展開漏れを無症状放置させない**
-- スクリプト導入時、SSOT 編集とコミットは「展開して 1 コミット」が **MUST**（[§生成時インライン展開の運用ルール](#生成時インライン展開の運用ルール)）。`--check` を CI ゲートにすると規約を機械的に担保できる
+- スクリプト導入時、SSOT 編集とコミットは「展開して 1 コミット」が **MUST**（[生成時インライン展開の運用ルール](#生成時インライン展開の運用ルール)）。`--check` を CI ゲートにすると規約を機械的に担保できる
 
-スクリプトを導入しない（手作業展開の）場合は、移行手順 [§Phase 2 の踏み外し防御](#phase-2-個別-html-の-style-縮小ファイル単位で繰り返す)に従い、全文転記・相対パス・Google Fonts link 保持を人手で守る。
+スクリプトを導入しない（手作業展開の）場合は、移行手順 [Phase 2 の踏み外し防御](#phase-2-個別-html-の-style-縮小ファイル単位で繰り返す)に従い、全文転記・相対パス・Google Fonts link 保持を人手で守る。
 
 ## 共通 CSS の最小骨格
 
@@ -126,7 +126,7 @@ LLM の手作業展開は「全文コピー漏れ・相対パスズレ・再展�
 
 **規模・運用パターンの実証例**: cloud-dsc プロジェクトの `_shared/spec-page.css`（**3072 行、2026-05-14 時点**）。**配色は旧版 Blue 900 ベース** で運用されてきたが、現在は本テンプレ準拠（DADS）への移行対象。ファイル別 scope での全レイアウト統合パターン・3000 行規模の単一ファイル運用は本テンプレ採用時の参考になる。
 
-**`--accent` の値について**: 下記サンプルは DADS key-color (Blue 700 `#264af4`) を `--accent` に、Blue 900 `#0017c1` を `--accent-deep`（本文リンクで AAA pass）、Blue 50 `#e8f1fe` を `--accent-bg`、Solid Gray 900 `#1a1a1a` を `--accent-ink` として採用。**ベースカラーは Blue 固定**（spec-writer デフォルト）。ブランド要請等で別色を採用する場合は [`dads-tokens.md`](./dads-tokens.md) §2 の DADS プリミティブ 10 色族（Light Blue / Cyan / Green / Lime / Yellow / Orange / Red / Magenta / Purple）から階調を選び、選定 ADR を残す（[`adr-format.md`](./adr-format.md) §カラー選定 ADR）。
+**`--accent` の値について**: 下記サンプルは DADS key-color (Blue 700 `#264af4`) を `--accent` に、Blue 900 `#0017c1` を `--accent-deep`（本文リンクで AAA pass）、Blue 50 `#e8f1fe` を `--accent-bg`、Solid Gray 900 `#1a1a1a` を `--accent-ink` として採用。**ベースカラーは Blue 固定**（spec-writer デフォルト）。ブランド要請等で別色を採用する場合は [`dads-tokens.md`](./dads-tokens.md) 2 節の DADS プリミティブ 10 色族（Light Blue / Cyan / Green / Lime / Yellow / Orange / Red / Magenta / Purple）から階調を選び、選定 ADR を残す（[`adr-format.md`](./adr-format.md) カラー選定 ADR）。
 
 **フォントの選定について**: 日本語・等幅とも DADS 採用フォントを使う。日本語は `Noto Sans JP`（Google Fonts、SIL OFL 1.1）、等幅は `Noto Sans Mono`（CJK + Latin 対応）。UD フォント原則（[`./communicative-design.md`](./communicative-design.md) 原則 7）の保険として `BIZ UDPGothic` / `BIZ UDGothic` を fallback に並べ、Google Fonts CDN 遮断環境（社内 LAN proxy 等）では UD 保険へ自動 fallback する。ウェイトは DADS 採用の `400 (Normal) / 700 (Bold)` の 2 段階のみ。
 
@@ -673,7 +673,7 @@ body.page-glossary .term-grid { ... }
 
 ### Phase 1: 共通 CSS 雛形作成
 
-- [ ] `_shared/spec-page.css` を本ファイル「§共通 CSS の最小骨格」を雛形に新規作成
+- [ ] `_shared/spec-page.css` を本ファイル「共通 CSS の最小骨格」を雛形に新規作成
 - [ ] 1 ファイルだけ選んで SSOT を `<style data-shared-source="...">` へインライン展開（既存の内部 `<style>` はまだ残す）
 - [ ] ブラウザで開いて表示崩れがないか確認
 - [ ] 既存の内部 `<style>` で **同名クラスの衝突** がないか目視チェック（展開した共通 CSS の `header.page h1` を内部 `<style>` の `header.page h1` が上書きしていないか）
@@ -706,8 +706,8 @@ body.page-glossary .term-grid { ... }
 - [ ] `:root` 変数の命名が `--accent` / `--primary-color` のような重複になっていないか確認
 - [ ] 不要になった内部 `<style>` 由来のクラスを削除
 - [ ] `--accent` / `--accent-deep` の値が DADS Blue 系列と整合しているか確認:
-  - **デフォルト (DADS key-color = Blue) を採用する場合**: `--accent` = Blue 700 (`#264af4`)、`--accent-deep` = Blue 900 (`#0017c1`)、`--accent-bg` = Blue 50 (`#e8f1fe`) が [`dads-tokens.md`](./dads-tokens.md) §1 と一致するか確認
-  - **別系統 (DADS Light Blue / Green / Orange 等) を採用した場合**: [`dads-tokens.md`](./dads-tokens.md) §2 の該当色族の階調と HEX 整合を確認し、選定 ADR が残っているか確認
+  - **デフォルト (DADS key-color = Blue) を採用する場合**: `--accent` = Blue 700 (`#264af4`)、`--accent-deep` = Blue 900 (`#0017c1`)、`--accent-bg` = Blue 50 (`#e8f1fe`) が [`dads-tokens.md`](./dads-tokens.md) 1 節と一致するか確認
+  - **別系統 (DADS Light Blue / Green / Orange 等) を採用した場合**: [`dads-tokens.md`](./dads-tokens.md) 2 節の該当色族の階調と HEX 整合を確認し、選定 ADR が残っているか確認
 
 **遷移条件**: 共通 CSS が「scope 付き = ページ固有 / scope なし = 汎用」で綺麗に分離されたら Phase 4。
 
@@ -761,5 +761,5 @@ _shared/
 - 展開・検証スクリプト雛形 → [`expand-shared-css.ts`](./expand-shared-css.ts)
 - 視覚一貫性の原則的な裏付け → [`communicative-design.md`](./communicative-design.md) 原則 3「反復」
 - DADS デザイントークン正本（HEX 全量・タイポ・角丸・影）→ [`dads-tokens.md`](./dads-tokens.md)
-- HTML 単体テンプレ（共通 CSS なしの最小骨格）→ [`templates.md`](./templates.md) §HTML 補足テンプレート
+- HTML 単体テンプレ（共通 CSS なしの最小骨格）→ [`templates.md`](./templates.md) HTML 補足テンプレート
 - 用途別配色・図表タイトル命名 → [`visual-encoding.md`](./visual-encoding.md)

@@ -94,7 +94,7 @@ spec-writer のデフォルト (DADS key-color = Blue) を採用しない理由�
 
 ベースカラーとして DADS プリミティブの **{{Light Blue / Cyan / Green / Lime / Yellow / Orange / Red / Magenta / Purple}}** 色族を採用する。
 
-主要 HEX 値（[`dads-tokens.md`](dads-tokens.md) 2 節 から引用）:
+主要 HEX 値（[`dads-tokens.md`](dads-tokens.md) 2 節から引用）:
 
 | 用途 | 階調 | HEX |
 |---|---|---|

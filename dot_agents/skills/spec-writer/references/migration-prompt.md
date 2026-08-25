@@ -124,7 +124,7 @@ key-color = Blue 固定）へ移行して。HEX 全量・タイポ・角丸・�
 
 4. 各 HTML の固有 <style> :root 変数を点検:
    - --feature / --feature-bg などページ固有色も DADS プリミティブから選び直す
-     （dads-tokens.md 2 節 の 10 色族から HEX を引用、出典コメント追記）
+     （dads-tokens.md 2 節の 10 色族から HEX を引用、出典コメント追記）
    - --accent / --link / --accent-bg が SSOT と一致しているか確認、不要な上書きを削除
 
 5. インライン展開 (Part A 完了後の通常運用):
@@ -137,7 +137,7 @@ key-color = Blue 固定）へ移行して。HEX 全量・タイポ・角丸・�
      状態色を点検
    - 本文リンク (Blue 900 on #ffffff) は約 13.7:1 (AAA pass) を確認
    - .badge.accent / .success / .error / .warning が各 4.5:1 以上を確認
-   - 失敗があれば dads-tokens.md 1 節 の用途別マッピングを参照して階調を上げる
+   - 失敗があれば dads-tokens.md 1 節の用途別マッピングを参照して階調を上げる
 
 7. ライセンス・出典の表記:
    - _shared/spec-page.css の冒頭コメントに以下を追記:

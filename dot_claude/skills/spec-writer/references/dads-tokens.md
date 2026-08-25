@@ -1,6 +1,6 @@
 # DADS デザイントークン正本（v2.0.1）
 
-spec-writer の HTML 補足ページが採用するデザイントークンの **唯一の出典 (SSOT)**。他の `references/*.md`・HTML 補足ページの `<style>`・各プロジェクトの `_shared/spec-page.css` は本ファイルの値を引用する。**HEX 値を再掲する場合は出典として「dads-tokens.md §...」を併記**して drift を防ぐ。
+spec-writer の HTML 補足ページが採用するデザイントークンの **唯一の出典 (SSOT)**。他の `references/*.md`・HTML 補足ページの `<style>`・各プロジェクトの `_shared/spec-page.css` は本ファイルの値を引用する。**HEX 値を再掲する場合は出典として「dads-tokens.md N 節」を併記**して drift を防ぐ。
 
 DADS は **デジタル庁デザインシステム (Digital Agency Design System)**。アクセシビリティ標準 (JIS X 8341-3:2016 AA) 準拠を担保した公的標準で、配色・タイポ・角丸・影の体系を提供する。
 

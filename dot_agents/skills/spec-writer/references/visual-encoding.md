@@ -6,7 +6,7 @@ spec-writer の HTML 補足ページ（サマリー / 概況 / 比較・対比 /
 
 ## カラーパレット（DADS 準拠の主要階調）
 
-DADS は **10 色族 × 13 階調** を提供する（Blue / Light Blue / Cyan / Green / Lime / Yellow / Orange / Red / Magenta / Purple）。本ファイルでは視覚エンコーディングで実際に使う頻度の高い「主要 4 階調」のみ示す。**全階調 HEX は [`dads-tokens.md`](./dads-tokens.md) 2 節 を参照**。
+DADS は **10 色族 × 13 階調** を提供する（Blue / Light Blue / Cyan / Green / Lime / Yellow / Orange / Red / Magenta / Purple）。本ファイルでは視覚エンコーディングで実際に使う頻度の高い「主要 4 階調」のみ示す。**全階調 HEX は [`dads-tokens.md`](./dads-tokens.md) 2 節を参照**。
 
 背景色 `#FFFFFF` を 1 とした時のコントラスト比が右に行くほど強くなる。**コントラスト比 3:1 を満たす階調を選ぶ**（500 以上が UI 非テキストの境界、700 以上がテキストの境界の目安）。
 
@@ -23,7 +23,7 @@ DADS は **10 色族 × 13 階調** を提供する（Blue / Light Blue / Cyan /
 | Magenta | `#f3e5f4` | `#f137f1` | `#aa00aa` | `#3b003b` |
 | Purple | `#f1eafa` | `#a565f8` | `#5c10be` | `#21004b` |
 
-中間階調（100/200/300/400/600/700/900/1000/1100）は [`dads-tokens.md`](./dads-tokens.md) 2 節 で全列挙。
+中間階調（100/200/300/400/600/700/900/1000/1100）は [`dads-tokens.md`](./dads-tokens.md) 2 節で全列挙。
 
 ### ニュートラル（Solid Gray）
 
@@ -54,7 +54,7 @@ spec-writer のデフォルトは **key-color = Blue** 固定。下表はそれ�
 | Error (テキスト) | Red 900 | `#ce0000` |
 | Warning (テキスト) | Yellow 900 | `#927200` |
 
-> ベースカラーは Blue 固定（spec-writer のデフォルト）。プロジェクトのブランド要請等で別色を採用する場合は [`dads-tokens.md`](./dads-tokens.md) 2 節 の DADS プリミティブ 10 色族から階調を選び、選定 ADR を残す（[`adr-format.md`](./adr-format.md) カラー選定 ADR）。
+> ベースカラーは Blue 固定（spec-writer のデフォルト）。プロジェクトのブランド要請等で別色を採用する場合は [`dads-tokens.md`](./dads-tokens.md) 2 節の DADS プリミティブ 10 色族から階調を選び、選定 ADR を残す（[`adr-format.md`](./adr-format.md) カラー選定 ADR）。
 
 ## 図表タイトルの命名
 

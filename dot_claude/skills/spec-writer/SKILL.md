@@ -124,11 +124,11 @@ HTML 補足ページを新規に生成する際の **既定のスタイルは �
 
 | 項目 | デフォルト値 | 出典・参照 |
 |---|---|---|
-| `--link` (本文リンク) | `#0017c1` (Blue 900) | `references/dads-tokens.md` §1 |
+| `--link` (本文リンク) | `#0017c1` (Blue 900) | `references/dads-tokens.md` 1 節 |
 | `--key-color` (UI primary) | `#264af4` (Blue 700) | 同上 |
 | `--accent-bg` (badge 背景) | `#e8f1fe` (Blue 50) | 同上 |
-| `--accent-ink` (本文・濃文字) | `#1a1a1a` (Solid Gray 900) | `references/dads-tokens.md` §3 |
-| 日本語フォント | Noto Sans JP | `references/dads-tokens.md` §5 |
+| `--accent-ink` (本文・濃文字) | `#1a1a1a` (Solid Gray 900) | `references/dads-tokens.md` 3 節 |
+| 日本語フォント | Noto Sans JP | `references/dads-tokens.md` 5 節 |
 | 等幅フォント | Noto Sans Mono | 同上 |
 | UD 保険 fallback | BIZ UDPGothic / BIZ UDGothic | `references/communicative-design.md` 原則 7 |
 
@@ -139,7 +139,7 @@ HTML 補足ページを新規に生成する際の **既定のスタイルは �
 1. **プロジェクト固有指定がある場合**（CLAUDE.md / 既存仕様書のスタイル / ブランドガイド等）→ それを最優先で踏襲
 2. **指定がない・新規プロジェクト・既存スタイル無し** → DADS 準拠（key-color Blue）をデフォルト採用
 
-**ベースカラーは Blue 固定**（spec-writer のデフォルト）。プロジェクトのブランド要請等で別色を採用する場合は [`references/dads-tokens.md`](references/dads-tokens.md) §2 の DADS プリミティブ 10 色族（Blue / Light Blue / Cyan / Green / Lime / Yellow / Orange / Red / Magenta / Purple）から選び、選定 ADR を残す（テンプレは [references/adr-format.md](references/adr-format.md) の「## カラー選定 ADR テンプレ」）。**HEX 値の正本は `references/dads-tokens.md` のみ**、他ファイルで再掲する場合は出典として「dads-tokens.md §...」を明示する（drift 防止）。
+**ベースカラーは Blue 固定**（spec-writer のデフォルト）。プロジェクトのブランド要請等で別色を採用する場合は [`references/dads-tokens.md`](references/dads-tokens.md) 2 節の DADS プリミティブ 10 色族（Blue / Light Blue / Cyan / Green / Lime / Yellow / Orange / Red / Magenta / Purple）から選び、選定 ADR を残す（テンプレは [references/adr-format.md](references/adr-format.md) の「## カラー選定 ADR テンプレ」）。**HEX 値の正本は `references/dads-tokens.md` のみ**、他ファイルで再掲する場合は出典として「dads-tokens.md N 節」を明示する（drift 防止）。
 
 ### HTML 補足ページの CSS 集約方針（複数ページ作成時 SHOULD）
 
@@ -236,7 +236,7 @@ docs/
 
 ### Step 3: スタイルを既存に合わせる
 
-Step 1 で把握したスタイルを踏襲して生成。CSS / breadcrumb / footer / page-nav は **既存ファイルからほぼコピー** し、色変数（`--accent` 等）だけトピックに応じて選び直す。新規プロジェクトや既存スタイルが無い場合、`--accent` は DADS key-color = Blue 700 (`#264af4`)、`--accent-deep` は Blue 900 (`#0017c1`、本文リンク用)、フォントは Noto Sans JP + Noto Sans Mono を採用（「デフォルト CSS テンプレートと配色（DADS 準拠）」節および `references/html-css-centralization.md` 参照）。別系統 (Light Blue / Green 等) を採用したい場合は [`references/dads-tokens.md`](references/dads-tokens.md) §2 の DADS プリミティブ 10 色族から HEX を引いて差し替え、選定 ADR を残す（[`references/adr-format.md`](references/adr-format.md) §カラー選定 ADR）。
+Step 1 で把握したスタイルを踏襲して生成。CSS / breadcrumb / footer / page-nav は **既存ファイルからほぼコピー** し、色変数（`--accent` 等）だけトピックに応じて選び直す。新規プロジェクトや既存スタイルが無い場合、`--accent` は DADS key-color = Blue 700 (`#264af4`)、`--accent-deep` は Blue 900 (`#0017c1`、本文リンク用)、フォントは Noto Sans JP + Noto Sans Mono を採用（「デフォルト CSS テンプレートと配色（DADS 準拠）」節および `references/html-css-centralization.md` 参照）。別系統 (Light Blue / Green 等) を採用したい場合は [`references/dads-tokens.md`](references/dads-tokens.md) 2 節の DADS プリミティブ 10 色族から HEX を引いて差し替え、選定 ADR を残す（[`references/adr-format.md`](references/adr-format.md) カラー選定 ADR）。
 
 新規プロジェクトで既存が無い場合は [references/skeletons.md](references/skeletons.md) の最小汎用骨格（HTML / Markdown / 用語集エントリ）、あるいは [references/templates.md](references/templates.md) の具体テンプレ（README / ADR Nygard・MADR / C4 PlantUML / 用語集）を fallback として使う。
 

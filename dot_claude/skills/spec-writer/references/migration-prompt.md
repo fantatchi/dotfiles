@@ -4,7 +4,7 @@
 
 方針・手順の正本:
 - **構造方針** (SSOT + インライン展開) → [`html-css-centralization.md`](./html-css-centralization.md)
-- **配色・タイポ方針** (DADS v2.0.1 準拠) → [`dads-tokens.md`](./dads-tokens.md) + [`html-css-centralization.md`](./html-css-centralization.md) §共通 CSS の最小骨格
+- **配色・タイポ方針** (DADS v2.0.1 準拠) → [`dads-tokens.md`](./dads-tokens.md) + [`html-css-centralization.md`](./html-css-centralization.md) 共通 CSS の最小骨格
 
 > このプロンプト自体も `data-shared-source` 方針に従い、スキル更新時はここを SSOT として保つ。
 
@@ -124,7 +124,7 @@ key-color = Blue 固定）へ移行して。HEX 全量・タイポ・角丸・�
 
 4. 各 HTML の固有 <style> :root 変数を点検:
    - --feature / --feature-bg などページ固有色も DADS プリミティブから選び直す
-     （dads-tokens.md §2 の 10 色族から HEX を引用、出典コメント追記）
+     （dads-tokens.md 2 節の 10 色族から HEX を引用、出典コメント追記）
    - --accent / --link / --accent-bg が SSOT と一致しているか確認、不要な上書きを削除
 
 5. インライン展開 (Part A 完了後の通常運用):
@@ -137,7 +137,7 @@ key-color = Blue 固定）へ移行して。HEX 全量・タイポ・角丸・�
      状態色を点検
    - 本文リンク (Blue 900 on #ffffff) は約 13.7:1 (AAA pass) を確認
    - .badge.accent / .success / .error / .warning が各 4.5:1 以上を確認
-   - 失敗があれば dads-tokens.md §1 の用途別マッピングを参照して階調を上げる
+   - 失敗があれば dads-tokens.md 1 節の用途別マッピングを参照して階調を上げる
 
 7. ライセンス・出典の表記:
    - _shared/spec-page.css の冒頭コメントに以下を追記:
@@ -159,14 +159,14 @@ key-color = Blue 固定）へ移行して。HEX 全量・タイポ・角丸・�
       （変更履歴・git log 参照などの史実記述は残してよい）
     - HTML を 1 つリポ外の一時フォルダへコピーして開き、self-contained 表示が崩れないこと
     - **HEX-without-source 検査（任意・推奨）**: HEX 値を再掲しているのに出典コメント
-      （dads-tokens.md §X / DADS Blue 等）が併記されていない箇所を grep で炙り出す:
+      （dads-tokens.md X 節 / DADS Blue 等）が併記されていない箇所を grep で炙り出す:
       ```bash
       # HEX 行のうち、近傍 (前後 3 行) に "dads\|DADS\|Blue\|Green\|Solid Gray" を
       # 含まない箇所を出力 (要レビュー候補)
       grep -rn -B 1 -A 1 '#[0-9a-fA-F]\{6\}' docs/ \
         | grep -v -E 'dads|DADS|Blue|Green|Solid Gray|Light Blue|Cyan|Lime|Yellow|Orange|Red|Magenta|Purple'
       ```
-      hit したら dads-tokens.md §N 引用コメントを追記するか、トークン変数 (`var(--accent)` 等) 経由に書き換える
+      hit したら dads-tokens.md N 節の引用コメントを追記するか、トークン変数 (`var(--accent)` 等) 経由に書き換える
 
 11. 完了したら 1 コミットにまとめる（push はしない）。コミットメッセージ例:
     `refactor(docs): migrate HTML supplementary pages CSS from Vercel to DADS v2.0.1`
