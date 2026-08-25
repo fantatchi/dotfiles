@@ -1,6 +1,6 @@
 ---
 name: context-load
-description: 保存済みのプロジェクトコンテキストを読み込み、前回の作業状態を復帰する。セッション開始時に使う。`.claude/context.md`・`.claude/progress.md`・`.claude/tasks.md`（作業キュー）の読み込みと git 状態比較・提示を行い、すべて project-local で完結する（Obsidian 等の外部依存なし）。
+description: 保存済みのプロジェクトコンテキストを読み込み、前回の作業状態を復帰する。セッション開始時や、Codex から Claude へ作業を引き継ぐ（またはその逆の）ときに使う。`.claude/context.md`・`.claude/progress.md`・`.claude/tasks.md`（作業キュー）・`.claude/handoff.md`（他エージェントからの引き継ぎメモ）の読み込みと git 状態比較・提示を行い、すべて project-local で完結する（Obsidian 等の外部依存なし）。
 disable-model-invocation: true
 allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(echo:*), Bash(basename:*), Bash(pwd)
 ---
@@ -9,7 +9,7 @@ allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(echo:*), Bash(basename:*), Ba
 
 保存済みのプロジェクトコンテキストを読み込み、前回の作業状態を復帰する。
 
-このスキルは **`.claude/` 配下（context.md / progress.md / tasks.md）だけを読む project-local スキル**で、外部連携を持たない。Obsidian や他スキルが無い環境でもそのまま動く。参照先パスの配線のみ `~/.claude/skills/shared/integrations.md`（resolver）で解決する。
+このスキルは **`.claude/` 配下（context.md / progress.md / tasks.md / handoff.md）だけを読む project-local スキル**で、外部連携を持たない。Obsidian や他スキルが無い環境でもそのまま動く。参照先パスの配線のみ `~/.claude/skills/shared/integrations.md`（resolver）で解決する。
 
 ## 手順
 
@@ -57,7 +57,18 @@ resolver の `project_task_store`（既定 `<project-root>/.claude/tasks.md`）�
 - **Next が 15 件を超える場合は全件を並べず、上位 8 件 + 総件数を出す**（`（ほか N 件）`）。Someday は件数だけでよい。**間引いたことを必ず明示する**（黙って上位だけ出すと「これで全部」と読める）。あわせて `⚠️ Next が N 件あります。タスクでない行が混ざっていないか棚卸しを検討してください` を 1 行添える — 溜まるときはたいてい観測メモが混ざっている（2026-08-24 に degcloud で 34 件・提示の冒頭がノイズで埋まった）
 - フォーマット規約は `~/.claude/skills/shared/tasks-format.md`（context-save と同じ SSOT）
 
-### 5. コンテキストの提示
+### 5. 引き継ぎメモの読み込み（handoff.md）
+
+`{project-root}/.claude/handoff.md` を読む。これは `context-save` が毎回書き出す「他のエージェントへ作業を渡すとしたら何を伝えるか」のメモで、Claude ↔ Codex の往復（agent handoff）の受け取り口にあたる。
+
+- ファイルが存在しない場合はスキップし、提示の該当セクションごと省略する
+- **`from` が自分と異なる場合**（Claude が読んでいて `from: codex` 等）は「**⚠️ codex からの引き継ぎ**」として提示の**冒頭**に出す。相手が残した negative results を読まずに作業を始めると同じ轍を踏むため、他のどのセクションより先に見せる
+- **`from` が自分と同じ場合**は「自分が書いた引き継ぎ（相手が未消化）」と明示する。自分の書いたメモを相手からの指示と誤読させない
+- `## 未解決・詰まっている点` が `なし` 以外なら強調表示する
+- **`at` が 7 日より古い場合**は `（N 日前の引き継ぎです）` と添える。揮発情報なので古いものは前提が変わっている可能性が高い
+- **整合チェック**: `handoff.md` の `at` が `context.md` の `updated` より**新しい**場合、`⚠️ context.md が引き継ぎメモより古いため、進行中の作業の記述が実態とずれている可能性があります` と 1 行添える。両者は本来 `context-save` が同時に書くので、ずれているのは handoff.md だけが手で書かれた場合など
+
+### 6. コンテキストの提示
 
 読み込んだ情報を整理して提示する：
 
@@ -66,6 +77,12 @@ resolver の `project_task_store`（既定 `<project-root>/.claude/tasks.md`）�
 
 **最終更新**: YYYY-MM-DD HH:mm
 **ブランチ**: feature/xxx
+
+### ⚠️ codex からの引き継ぎ（.claude/handoff.md より・handoff がある場合のみ・最上部に出す）
+**topic**: （topic）／**書き手**: codex（YYYY-MM-DD HH:mm）
+- **未解決・詰まっている点**: （内容）
+- **試して駄目だったこと**: （内容）
+- **現在の仮説** / **再現手順** / **次の一手**: （内容）
 
 ### プロジェクト概要
 （概要）
@@ -98,10 +115,12 @@ resolver の `project_task_store`（既定 `<project-root>/.claude/tasks.md`）�
 - 「進捗マップ」は `.claude/progress.md`（優先）または CLAUDE.md の `## 進捗マップ` セクション（後方互換）がある場合のみ表示する。どちらもない場合はセクションごと省略する
 - 「次のステップ」は `.claude/tasks.md` がある場合のみ表示する。無ければセクションごと省略する
 - 「関連リポジトリ」は context.md に `## 関連リポジトリ` セクションがある場合のみ表示する。ない場合はセクションごと省略する
+- 「引き継ぎ」は `.claude/handoff.md` がある場合のみ表示する。無ければセクションごと省略する。**表示する場合は他のどのセクションより先（`**ブランチ**` の直後）に置く**
 
 ## 注意事項
 
-- **読み込み専用**。context.md・progress.md・tasks.md を変更しない（タスクの追加・`[x]` の整理は `/context-save` の担当）
+- **読み込み専用**。context.md・progress.md・tasks.md・handoff.md を変更しない（タスクの追加・`[x]` の整理・引き継ぎメモの更新はいずれも `/context-save` の担当）
+- **handoff.md の消化状態は記録しない**。読んだことを示す `status: consumed` のようなフィールドは持たない設計で、次に `/context-save` が走ったときの上書きで自然に入れ替わる（読み込み専用の本スキルは書き戻せないため、状態を持たせると必ず腐る）
 - **Obsidian Vault は参照しない**。捕捉箱（`~/ObsidianVault/00_meta/tasks.md`）は `gtd-*` の担当で、本スキルとは無関係
 - **複数 writer 前提で読む**: 3 ファイルとも Claude・Codex 等が共有する正本であり（`~/.claude/skills/shared/multi-writer.md` 参照）、Claude 固有の記述だけが存在する前提にしない
   - 未知の frontmatter キー・見出し・フィールドがあっても**エラーにせず有効データとして扱う**（保持対象。提示から黙って落とさず、未知セクションは提示の末尾で「その他のセクション」として言及する）

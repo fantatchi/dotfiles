@@ -1,6 +1,6 @@
 ---
 name: context-save
-description: プロジェクトの作業状態を保存し、次回セッションで復帰可能にする。セッション終了時や作業の区切りで使う。コアは `.claude/context.md` の保存と `## 進行中の作業` の 14 日ローテーション + 完了 entry の圧縮（compress-on-complete）・`## 判断メモ` / ファイルサイズの肥大アラート・`.claude/tasks.md`（プロジェクトの作業キュー）への次アクション保存と `[x]` 行の Done 整理で、外部依存なく単独で動く（Obsidian 不要）。連携が有効な環境では `.claude/progress.md` の更新・MEMORY.md 昇格提案・session-review への圧縮委譲まで行う。連携の有無は `shared/integrations.md` で判定し、未設定ならコアのみで完結する。UserPromptSubmit hook（`context-save-reminder.sh`、しきい値はスクリプト側で定義）からモデルが自律実行することを前提とした設定で、`disable-model-invocation: false` を意図的に指定（自動起動を許可）。手動 `/context-save` 起動も可。作業ログ記録 + コンテキスト保存 + アウトプット候補の提案までまとめて実行したい場合は、本スキルを内包する `/session-save` を使う。
+description: プロジェクトの作業状態を保存し、次回セッションで復帰可能にする。セッション終了時や作業の区切りで使う。Claude で行き詰まって Codex へ渡す（またはその逆の）**エージェント間の引き継ぎ・ハンドオフ**にも使う。コアは `.claude/context.md` の保存と `## 進行中の作業` の 14 日ローテーション + 完了 entry の圧縮（compress-on-complete）・`## 判断メモ` / ファイルサイズの肥大アラート・`.claude/tasks.md`（プロジェクトの作業キュー）への次アクション保存と `[x]` 行の Done 整理・`.claude/handoff.md`（他エージェントへの引き継ぎメモ。試して駄目だったこと / 仮説 / 再現手順）の書き出しで、外部依存なく単独で動く（Obsidian 不要）。連携が有効な環境では `.claude/progress.md` の更新・MEMORY.md 昇格提案・session-review への圧縮委譲まで行う。連携の有無は `shared/integrations.md` で判定し、未設定ならコアのみで完結する。UserPromptSubmit hook（`context-save-reminder.sh`、しきい値はスクリプト側で定義）からモデルが自律実行することを前提とした設定で、`disable-model-invocation: false` を意図的に指定（自動起動を許可）。手動 `/context-save` 起動も可。作業ログ記録 + コンテキスト保存 + アウトプット候補の提案までまとめて実行したい場合は、本スキルを内包する `/session-save` を使う。
 disable-model-invocation: false
 allowed-tools: Read, Write, Edit, Glob, Bash(git:*), Bash(echo:*), Bash(mkdir:*), Bash(basename:*), Bash(date:*), Bash(pwd), Bash(chezmoi source-path)
 ---
@@ -9,7 +9,7 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git:*), Bash(echo:*), Bash(mkdir:*)
 
 現在のプロジェクトの作業状態を保存し、次回セッションで復帰できるようにする。
 
-このスキルは **コア（`.claude/context.md` と `.claude/tasks.md` の保存で完結・外部依存なし）** と **連携（progress.md / MEMORY / session-review が揃っていれば実行する任意処理）** に分かれる。**Obsidian は一切使わない**（捕捉箱 `~/ObsidianVault/00_meta/tasks.md` は `gtd-*` の担当で、本スキルは触らない）。連携の配線は `~/.claude/skills/shared/integrations.md`（resolver）で判定する。
+このスキルは **コア（`.claude/context.md` と `.claude/tasks.md` の保存、`.claude/handoff.md` の書き出しで完結・外部依存なし）** と **連携（progress.md / MEMORY / session-review が揃っていれば実行する任意処理）** に分かれる。**Obsidian は一切使わない**（捕捉箱 `~/ObsidianVault/00_meta/tasks.md` は `gtd-*` の担当で、本スキルは触らない）。連携の配線は `~/.claude/skills/shared/integrations.md`（resolver）で判定する。
 
 ## コア（単独完結・連携なしで動く）
 
@@ -186,6 +186,56 @@ Obsidian Vault の捕捉箱は**参照しない**。捕捉箱に落ちた思い�
 - 明確に「次にやること」として合意されたアクションのみ追加する
 - 推測や「やったほうがいいかも」レベルは追加しない（未分類の思いつきは捕捉箱の担当＝`/gtd-add`）
 - タスクが発生していない場合は追加をスキップしてよい（手順 3・4 の整理は実行する）
+
+### 引き継ぎメモの書き出し（handoff.md）
+
+`{project-root}/.claude/handoff.md` に「**今この瞬間、他のエージェントへ作業を渡すとしたら何を伝えるか**」を書く。Claude で行き詰まったら Codex へ、Codex で行き詰まったら Claude へ、という往復（agent handoff）を成立させるための節。
+
+**なぜ context.md と分けるか**: context.md の `## 進行中の作業` は「何を成したか」の完了要約で、引き継ぎで相手が本当に必要とする「**何を試して、なぜ駄目だったか**（negative results）・現在の仮説・再現手順」を置く場所がない。一方これらは翌週には無価値になる揮発情報なので、恒久ファイルである context.md に混ぜるとローテーション対象の判断が増える。よって**責務を分けて別ファイルにし、書き出しは context-save に内包する**（コマンドを 2 つに割ると「どちらを使うか」の判断が毎回発生するため）。
+
+**毎回書く**。「行き詰まった時だけ書く」にすると判定の分岐が生まれ、*肝心な時に書かれていない*という失敗モードを作る。毎回書けば余計な情報が出るだけで済み、失敗の方向として軽い。行き詰まっていない通常保存でも「どこまでやったか・次の一手」は引き継ぎとして有効に働く。
+
+#### ファイル仕様
+
+```markdown
+---
+from: claude
+at: 2026-08-25T10:12:00
+topic: <この作業を 1 行で>
+---
+
+## 現状（どこまで動くか）
+## 未解決・詰まっている点
+## 試して駄目だったこと
+## 現在の仮説
+## 再現手順
+## 未コミットの変更
+## 次の一手
+```
+
+- `from` は書き手の識別子（Claude なら `claude`、Codex なら `codex`）。**context.md 側には writer 識別フィールドを足さない**規約（`shared/multi-writer.md`）と矛盾しないよう、識別子を持つのはこの handoff.md だけに閉じる。読み手が「自分が書いたもの」と「相手からの引き継ぎ」を区別するために必須
+- `at` は保存時の実時刻まで書く（`T00:00:00` 固定にしない）
+- **各セクションは空欄で残さず、該当が無ければ `- なし` と明記する**。空欄だと読み手が「本当に無い」のか「書き忘れ」なのかを区別できない
+- `## 未コミットの変更` には `git status --short` の出力を載せる。Claude と Codex は同じ working tree を共有するので**ファイル自体は自動的に渡っている**（stash も WIP コミットも不要）。ここに載せるのは、相手が「この差分は自分が壊したのか」で迷わないためのスナップショット
+- 全体で 1,500 字を目安にする。超えるなら詳細は context.md か作業ログへ逃がし、ここにはポインタだけ残す
+
+#### 手順
+
+1. プロジェクトルートを決定する（コア冒頭と同じ）
+2. `git status --short` を取得する
+3. 既存の `handoff.md` があれば Read する
+4. 上記フォーマットで**全面上書き**する
+5. 書き出した旨を 1 行報告する（`引き継ぎメモを更新（未解決: あり/なし）`）
+
+#### 全面上書きの扱い（multi-writer プロトコルの例外）
+
+handoff.md は **1 件だけを保持する揮発ファイル**であり、`shared/multi-writer.md` の「ファイル全体の Write は新規作成時のみ」の対象外とする（全面上書きが仕様。上書きは lossy 処理だが、context.md の lossy 処理 4 つとは別枠でここに明示する）。
+
+ただし相手 writer の引き継ぎを黙って消さないよう、次のガードを置く:
+
+- **既存 handoff.md の `from` が自分と異なる場合**、新しい handoff の末尾に 1 行だけ痕跡を残す:
+  `> 前の引き継ぎ（from: codex, at: 2026-08-25T09:40）: <topic>`
+- ガードは**ブロックしない**（確認を求めない）。context-save は hook から自律実行されるため、毎回停止すると保存自体が回らなくなる。情報の完全消失だけを防げばよい
 
 ## 連携（任意・対象があれば実行）
 
