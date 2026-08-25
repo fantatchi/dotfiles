@@ -119,7 +119,7 @@ GOをもらってから進める。
 各スキルの説明は実行時にコンテキストへ自動注入される。このリストはそれとドリフトしうるので、使い分けで迷いやすい点だけ残す:
 
 - 保存系: 単発ログ=`/obsidian-log` / コンテキスト保存=`/context-save` / 両方+アウトプット提案の一括=`/session-save` / 復帰=`/context-load`
-- **Codex への引き継ぎ（行き詰まったとき）に専用コマンドは無い**: `/context-save` が `.claude/handoff.md`（試して駄目だったこと / 仮説 / 再現手順）を毎回書き、Codex 側の `context-load` が読む。操作は「Claude で save → Codex で load」の 2 つだけ（逆向きも同じ）。同じ working tree を共有しているのでファイル転送は不要
+- **Codex への引き継ぎ（行き詰まり時）に専用コマンドは無い**: `/context-save` が `.claude/handoff.md` を毎回書き、Codex 側の `context-load` が読む。操作は「Claude で save → Codex で load」の 2 つ（逆向きも同じ）。同じ working tree なのでファイル転送は不要
 - まとめ系: 日次サマリー（GH 活動集約・複数アカウント）=`/obsidian-daily`（≠ obsidian-log）
 - タスクは **2 系統**:
   - **思いつきの捕捉箱**（`~/ObsidianVault/00_meta/tasks.md`、モバイル捕捉あり）= 追加 `/gtd-add` / 完了 `/gtd-done` / 表示 `/gtd-list`。CWD で書き先は変わらない
