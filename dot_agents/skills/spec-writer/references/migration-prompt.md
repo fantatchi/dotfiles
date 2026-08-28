@@ -159,14 +159,14 @@ key-color = Blue 固定）へ移行して。HEX 全量・タイポ・角丸・�
       （変更履歴・git log 参照などの史実記述は残してよい）
     - HTML を 1 つリポ外の一時フォルダへコピーして開き、self-contained 表示が崩れないこと
     - **HEX-without-source 検査（任意・推奨）**: HEX 値を再掲しているのに出典コメント
-      （dads-tokens.md X / DADS Blue 等）が併記されていない箇所を grep で炙り出す:
+      （dads-tokens.md X 節 / DADS Blue 等）が併記されていない箇所を grep で炙り出す:
       ```bash
       # HEX 行のうち、近傍 (前後 3 行) に "dads\|DADS\|Blue\|Green\|Solid Gray" を
       # 含まない箇所を出力 (要レビュー候補)
       grep -rn -B 1 -A 1 '#[0-9a-fA-F]\{6\}' docs/ \
         | grep -v -E 'dads|DADS|Blue|Green|Solid Gray|Light Blue|Cyan|Lime|Yellow|Orange|Red|Magenta|Purple'
       ```
-      hit したら dads-tokens.md N 引用コメントを追記するか、トークン変数 (`var(--accent)` 等) 経由に書き換える
+      hit したら dads-tokens.md N 節の引用コメントを追記するか、トークン変数 (`var(--accent)` 等) 経由に書き換える
 
 11. 完了したら 1 コミットにまとめる（push はしない）。コミットメッセージ例:
     `refactor(docs): migrate HTML supplementary pages CSS from Vercel to DADS v2.0.1`

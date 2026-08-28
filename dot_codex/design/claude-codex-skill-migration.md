@@ -47,6 +47,22 @@ Codex の作業ログは Claude と同じ `20_log/YYYYMM/`、リソースは `30
 - **追従は「Claude 版から作り直して 7 種の適応を再適用」が確実**。差分を拾い直す方式は取りこぼす（12 コミット分の追従で実証）
 - **Codex 版にあって Claude 版にない記述**を見つけたら、adaptation（残す）か staleness（捨てる）かを必ず判定する。判断がつかないものは残す（誤削除より誤残存を選ぶ）
 
+### 9 種目の適応: terse リライト（2026-08-28 追記）
+
+`multi-persona-review` / `pr-review` の Codex 版は、上表 8 種に加えて**文体そのものが terse な命令形に全面リライトされている**（前置き・「このスキルが解く問題」・「よくある失敗と回避策」表・「関連スキル / 参考」節を持たない）。Claude 版の半分〜1/3 のサイズになるのはこのため。
+
+したがって**追従は「規範だけを Codex 文体で移植する」**。Claude 側で増えた解説・バイアス論・失敗表は移植しない。移植対象は、出力形式の固定・判定基準・参照する SSOT のような**実行時に守らせる規則**に限る。
+
+この方針だと 2 版の diff が「適応のみ」に収束しないため、**diff の行数を drift の指標に使えない**。次回の追従は、Claude 側の変更コミットを読んで規範か解説かを判定する方式で行う。
+
+2026-08-28 に上記方針で追従した内容（Claude 側 8/25〜8/28 分）:
+
+| スキル | 移植した規範 |
+|---|---|
+| `multi-persona-review` | 所見 4 項目固定（場所 / 何が起きる / 再現手順 / 根拠）、再現手順の層判定、`shared/review-output-style.md` と `shared/review-false-positives.md` の参照、提示構造（結論 3 行 → 直すなら効く順 → 指摘表 → 各 6 行 → 詳細を聞けば出せる項目 → 進め方案） |
+| `pr-review` | 上記に加え、子エージェントへの `shared/security-review-exclusions.md` 逐語貼付、3 値 verdict（CONFIRMED / PLAUSIBLE / REFUTED、既定 PLAUSIBLE、REFUTED に立証責任）、ギャップ掃討フェーズ（新 5 節）、草稿テンプレの刷新 |
+| `spec-writer` | 本文の構造化（表・リスト）、具体例の使い方、公式語選定の 3 基準と What it is NOT、Appendix 節、アンチパターン 10〜13、`references/diagram-selection.md` の論理図パターン表 |
+
 ## chezmoi と Windows
 
 ユーザー管理対象は `dot_codex/AGENTS.md`、`dot_agents/skills/`、`dot_codex/scripts/`、`dot_codex/design/` とする。認証、config、セッション、Plugin、cache、ログ、SQLite は管理しない。Codex がユーザー Skill を探索する正規の場所は `~/.agents/skills/` とする。Windows の `.codex` と `.agents` は実ディレクトリを維持し、`AGENTS.md` と `~/.agents/skills/*/SKILL.md` で検出した各 Skill ディレクトリだけを WSL 側へ SymbolicLink で共有する。Windows の `.codex/skills/.system` は OS ローカルのまま保持する。
