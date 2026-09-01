@@ -140,7 +140,7 @@ Claude Code の `settings.json`・有効化済みプラグイン・このリポ�
 | `/gtd-done` | 指定タスクを完了にし Done セクションへ移動 |
 | `/gtd-list` | `~/ObsidianVault/00_meta/tasks.md` からタスクを表示 |
 | `japanese-doc-style` | 論証を積む日本語文書（書籍の章・仕様書・設計ドキュメント）のスタイル規約（ロール変換型、執筆・推敲時に自動発動） |
-| `japanese-article-style` | 一人称の記事（体験記・ブログ・Obsidian 記事ノート）のスタイル規約。AI 味の原因を構造（定型骨格・箇条書き過多・1 文段落・失敗の削除）と捉えて崩す（ロール変換型、自動発動） |
+| `japanese-article-style` | 一人称の記事（体験記・ブログ・Obsidian 記事ノート）のスタイル規約。AI 味の原因を構造（定型骨格・箇条書き過多・1 文段落・公平な比較の型・失敗の削除）と捉えて崩し、観測範囲の明示と引用の扱いも定める（ロール変換型、自動発動。Codex 側 `~/.agents/skills/` にミラーあり） |
 | `/ks-name` † | 土木業界向け：日本語から識別子名を生成 |
 | `/m365-agents-ts` † | Microsoft 365 Agents SDK (TypeScript) の開発支援リファレンス |
 | `/multi-persona-review` | 3〜5 人の専門ペルソナを並列 Agent で起動して読取専用レビューを行い、見落とし・別仮説・推奨アクションを統合 |

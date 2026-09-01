@@ -7,6 +7,10 @@ description: Style guidelines for Japanese first-person articles: experience rep
 
 自分が試したこと、詰まったこと、決めたことを一人称で書く記事の規範。
 
+> **このファイルは Claude 側 `~/.claude/skills/japanese-article-style/SKILL.md` のミラー。**
+> 規範を変えるときは Claude 側を先に直し、ここへ作り直して反映する（差分を拾い直すと取りこぼす）。
+> harness 適応は `shared/llm-tone.md` の参照パスと CLAUDE.md → AGENTS.md の読み替えだけ。
+
 ## この規範を当てる範囲
 
 体験記、ブログ記事、Obsidian の記事ノート（`30_resource/`）が対象である。
@@ -89,11 +93,11 @@ AI 味は、書き手が実際にやったことの手触りを削ったとき�
 
 ## 事実の等級を混ぜない
 
-**実行して確認した / コードや文書を読んで推論した / 未確認** の 3 段階を区別して書く（`~/.claude/CLAUDE.md` の基本方針と同じ）。実行していないことを、実行したかのように滑らかに書かない。
+**実行して確認した / コードや文書を読んで推論した / 未確認** の 3 段階を区別して書く（`~/.agents/AGENTS.md` の基本方針と同じ）。実行していないことを、実行したかのように滑らかに書かない。
 
 ## LLM っぽい表現の禁止
 
-`~/.claude/skills/shared/llm-tone.md` を読んで従う（`japanese-doc-style` と共通の単一出典）。
+`~/.agents/skills/shared/llm-tone.md` を読んで従う（`japanese-doc-style` と共通の単一出典）。
 
 ## 書き上げたら点検する
 
