@@ -1,11 +1,17 @@
 ---
 name: japanese-doc-style
-description: Style guidelines for technical documents and book manuscripts in Japanese. It defines formatting (one sentence per line, block quotes, footnotes, column notation), paragraph and logical structure (paragraph writing), logical rigor (eliminating logical gaps), managing reader cognitive load, perspective and narrative voice, restraint in presentation, prohibition of LLM-like hollow phrases, and elimination of redundancy. Used when writing, proofreading, or rewriting technical book chapters, drafts, articles, and explanatory texts in Japanese.
+description: Style guidelines for Japanese technical documents that build an argument: book chapters, specifications, design documents, and explanatory texts. It defines formatting (one sentence per line, block quotes, footnotes, column notation), paragraph and logical structure (paragraph writing), logical rigor, managing reader cognitive load, perspective and narrative voice, restraint in presentation, and elimination of redundancy. Do NOT use for personal experience reports, blog posts, or Obsidian notes written in the author's own voice; use japanese-article-style for those.
 ---
 
 # 日本語技術文書の文章規範
 
-日本語で技術的な原稿（書籍の章、記事、解説文）を書く・推敲するときは、以下の規範に従う。
+日本語で技術的な原稿（書籍の章、仕様書、設計ドキュメント、解説文）を書く・推敲するときは、以下の規範に従う。
+
+## この規範を当てる範囲
+
+論証を積む文書に当てる。読者が段落単位で論理を追う文章が対象である。
+
+**個人の体験記、ブログ記事、Obsidian の記事ノートには当てない。** それらは `japanese-article-style` を使う。整形規範（一文ごとの改行、見出しの名詞句化）と冗長の排除をそのまま体験記へ当てると、短文が均等に並び、書き手の迷いや手戻りが削れて、かえって機械が書いたような文章になる（2026-09-01 に実際に起きた）。両方に共通する「LLM っぽい表現の禁止」だけは `shared/llm-tone.md` を単一出典として共有する。
 
 ## 整形
 
@@ -97,20 +103,7 @@ description: Style guidelines for technical documents and book manuscripts in Ja
 
 ## LLM っぽい表現の禁止
 
-LLM が大量生成する、中身のない型に誘惑されない。書き上げたら、この節で点検する。
-本書の術語（本質的複雑さ、回収、判断の配置など）を議論に使うのはよい。空虚な装飾として使うのが問題である。
-
-次のような言い回しは、論点を増やさず「ちゃんと書いている感」だけを付ける LLM 口調である。使わない。
-
-- **予告と総括**：「重要なのは〜である」「本章では〜を扱う／探求する」「ここでは〜について見ていく」「まとめると」「要するに」（直前の言い換えだけのとき）、「〜に他ならない」
-- **正面から系**：「正面から扱う」「正面から回収する」「正面から見る／書く／立てる」——中身の代わりに姿勢だけを宣言する
-- **空虚な形容**：「不可欠」「核心的」「鍵となる」「根本的な」（主張の中身を説明せず強調だけする）、「多角的」「包括的」「総合的」（何をどう見たかを書かない）
-- **空虚な動詞**：「掘り下げる」「深掘りする」「言語化する」（何をどう書いたかを示さず終わる）、「触れる」「言及する」（一段落で済ませるだけ）
-- **接続の型**：「〜において」「〜という側面から」「〜の観点から」（新情報なし）、「さらに」「また」「加えて」の連打
-- **弱い緩和と称賛**：「〜と言えるだろう」「〜かもしれない」（根拠なく主張を弱める場合だけ。推量・仮定・読者の疑念・作中人物の認識なら残す）、「非常に」「極めて」「大いに」（中身のない強調）
-
-悪い例：「本章では、〇〇の理論を正面から扱う」「この前提を、ここで正面から回収する」「多角的に分析すると、重要なのは〜である」。
-良い例：「本章では、〇〇の理論を扱う」「ここで、この前提を回収する」「評価の核心は、正しさを誰が知っているかにある」。
+`~/.claude/skills/shared/llm-tone.md` を読んで従う（`japanese-article-style` と共通の単一出典）。
 
 ## 冗長の排除
 
