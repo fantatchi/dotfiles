@@ -148,7 +148,7 @@ Claude Code の `settings.json`・有効化済みプラグイン・このリポ�
 | `/obsidian-log` | 作業ログを Obsidian に記録（自動記録についてはセクション参照） |
 | `/obsidian-mail` † | デイリーサマリーを Gmail SMTP でメール送信（日報・週報。`/obsidian-mail daily\|weekly [YYYY-MM-DD]` で明示呼び出し、または火〜土 8:00 / 月 8:00 のローカル routine 経由） |
 | `/obsidian-resource` † | 調査メモ・参考リンク・ブログドラフトを Obsidian Vault に保存（`/obsidian-resource auto` でセッション内容から自動ドラフト化） |
-| `/pr-review` | GitHub PR の URL または番号を渡すと、ブランチ切替・最新化、Copilot/discussion コメント取得、3-5 体のペルソナ並列レビュー、メインでの実コード裏取り、`.claude/reviews/pr-{NNN}-{branch-key}-{YYYY-MM-DD}.md` への所見草稿出力までを一気通貫で実施。投稿はしない（草稿のみ）。公式 `/code-review ultra` と棲み分け（本スキル=ローカル草稿・ペルソナ並列・MEMORY 運用ルール遵守、公式=inline 投稿）。投稿要否判断が残る所見は `/gtd-add` 起票を提案 |
+| `/pr-review` | GitHub PR の URL または番号を渡すと、ブランチ切替・最新化、Copilot/discussion コメント取得、3-5 体のペルソナ並列レビュー、メインでの実コード裏取り、`.claude/reviews/pr-{NNN}-{branch-key}-{YYYY-MM-DD}.md` への所見草稿出力までを一気通貫で実施。投稿はしない（草稿のみ）。公式 `/code-review ultra` と棲み分け（本スキル=ローカル草稿・ペルソナ並列・MEMORY 運用ルール遵守、公式=inline 投稿）。投稿要否判断が残る所見はそのリポジトリの `.claude/tasks.md` への起票を提案（起票自体は `/context-save` の担当） |
 | `/session-review` † | セッション振り返り（権限・CLAUDE.md・スキル・判断メモ圧縮の整理） |
 | `/session-save` | 作業ログ記録とコンテキスト保存をまとめて実行し、アウトプット提案（ブログ・リソース候補）も行う |
 | `/spec-writer` | 仕様書（specification / 設計ドキュメント / requirements / architecture / ADR / C4 / 用語集）の設計・作成・レビューを担うロール変換型スキル（旧 spec-design + dashboard-design を 2026-06 に統合）。読み手別入口・図種選択・ADR 形式・要件レベル語・Diátaxis 4 分類・テンプレ集を内蔵。HTML 補足ページは DADS v2.0.1 準拠（key-color = Blue 固定で JIS X 8341-3 AA 自動充足） |
