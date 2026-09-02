@@ -1,7 +1,7 @@
 ---
 name: obsidian-resource
-description: 調査メモ・参考リンク・ブログドラフトを Obsidian Vault に保存する。「調査結果をメモして」「参考リンクを記録」「ブログ書いて」「記事のドラフト作って」「この作業をブログにまとめて」といった依頼で使う。セッション内容からの自動ドラフト化（引数 `auto`）にも対応。
-argument-hint: [タグ... | auto]
+description: '調査メモ・参考リンク・ブログドラフトを Obsidian Vault に保存する。「調査結果をメモして」「参考リンクを記録」「ブログ書いて」「記事のドラフト作って」「この作業をブログにまとめて」といった依頼で使う。セッション内容からの自動ドラフト化（引数 `auto`）にも対応。'
+argument-hint: '[タグ... | auto]'
 disable-model-invocation: true
 allowed-tools: Read, Write, Glob, Bash(echo:*), Bash(mkdir:*), Bash(date:*)
 ---

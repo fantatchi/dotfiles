@@ -1,7 +1,7 @@
 ---
 name: obsidian-mail
-description: Obsidian デイリーノートの「## デイリーサマリー」セクションをメール向けに再構成して Gmail SMTP で送信する。日報・週報 2 モード。**自動発火しない設計**（`disable-model-invocation: true`）のため、Claude.app ローカルルーティーンまたは `/obsidian-mail daily|weekly [YYYY-MM-DD]` の明示呼び出しが必要。利用シーン: 日報メール送信、週報メール送信、サマリーをメールで配信（「日報メールして」「週報メール送って」「サマリーをメールで」等の依頼で想起）。
-argument-hint: daily|weekly [YYYY-MM-DD]
+description: 'Obsidian デイリーノートの「## デイリーサマリー」をメール向けに再構成して Gmail SMTP で送信する。日報・週報の 2 モード。「日報メールして」「週報メール送って」「サマリーをメールで」といった依頼、または Claude.app ローカルルーティーンから `/obsidian-mail daily|weekly [YYYY-MM-DD]` で明示呼び出しする（自動発火しない）。'
+argument-hint: 'daily|weekly [YYYY-MM-DD]'
 disable-model-invocation: true
 allowed-tools: Read, Bash(date:*), Bash(python3:*), Bash(ls:*), Bash(test:*), Bash(printenv:*)
 ---

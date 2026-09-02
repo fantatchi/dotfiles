@@ -1,7 +1,7 @@
 ---
 name: obsidian-daily
-description: GitHub アクティビティと作業ログから Obsidian デイリーノートの「## デイリーサマリー」セクションを生成・追記する。冒頭 KPI 行（commits / PRs / logs 件数）・「今日の要約」上配置・コミットのリポ別グルーピング・作業ログ折り畳み callout の構成。複数 GH アカウント（`fantatchi` + `kentem-at-kato`）の活動を `gh auth switch` で順次切替しながら集約。「今日のまとめ」「デイリーサマリー」「KPI」「リポ別コミット」「概況」「複数アカウント」「両アカウント集約」「個人と業務を合算」「fantatchi の commit も含めて」といった依頼で使う。**Obsidian Core Daily notes プラグインのテンプレ（`90_config/templates/daily_notes.md`）を SSOT として読み込む設計**（テンプレ未配置では `RuntimeError` で停止、6-a 節参照）。Thino プラグインと共存できるよう `# Journal` セクション前提のテンプレを推奨。
-argument-hint: [YYYY-MM-DD]
+description: 'GitHub アクティビティと作業ログから Obsidian デイリーノートの「## デイリーサマリー」セクションを生成・追記する。複数 GitHub アカウントの活動を集約する。「今日のまとめ」「デイリーサマリー」「KPI」「リポ別コミット」「両アカウント集約」「個人と業務を合算」といった依頼で使う。Obsidian Core Daily notes のテンプレを SSOT として読む前提（本文 6-a 節）。'
+argument-hint: '[YYYY-MM-DD]'
 allowed-tools: Read, Bash(gh:*), Bash(date:*), Bash(python:*), Bash(cat:*), Bash(ls:*), Bash(echo:*)
 ---
 

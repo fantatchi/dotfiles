@@ -1,6 +1,6 @@
 ---
 name: session-review
-description: セッション完了時に振り返りを行い、権限追加・CLAUDE.md更新・スキル洗練・判断メモ圧縮（context.md の判断メモを MEMORY.md へ昇格/統合/削除で仕分け）を一括で行う。**手動で `/session-review` を実行して発動**（`disable-model-invocation: true` で自動起動しない）。
+description: 'セッション完了時に振り返り、権限追加・CLAUDE.md 更新・スキル洗練・判断メモ圧縮（context.md の判断メモを MEMORY.md へ昇格/統合/削除）を一括で提案・適用する。手動 `/session-review` 専用（自動起動しない）。'
 disable-model-invocation: true
 allowed-tools: Read, Edit, Write, Glob, Grep
 ---

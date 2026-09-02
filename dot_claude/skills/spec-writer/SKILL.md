@@ -1,6 +1,6 @@
 ---
 name: spec-writer
-description: 仕様書 (specification / 設計ドキュメント / requirements / architecture / ADR / C4 / 用語集) の設計・作成・レビューを担うロール変換型スキル。読み手別入口・図種選択 (UML/C4/BPMN)・ADR Nygard/MADR・MUST/SHOULD/MAY 要件レベル語・テンプレ集を内蔵。出力は md がメイン (Docs as Code)、視覚情報が主役のページのみ HTML 補足 (デフォルトはデジタル庁デザインシステム DADS v2.0.1 準拠、key-color = Blue 固定で JIS X 8341-3 AA を自動充足)。「仕様書」「specification」「設計ドキュメント」「ドキュメントレビュー」「ADR」「アーキテクチャ図」「C4 図」「READMEを充実」「オンボーディング資料」「HTML 補足ページ」「HTML 補足ページの CSS 集約」「カラーパレット選定」「DADS」「デジタル庁デザインシステム」「key-color」「文書の配色・タイポグラフィ」等で自動起動。棲み分け: 対話的な文章共著は doc-coauthoring、単発の図描画 (コードレビュー補助図・スケッチ) には起動しない。
+description: '仕様書（specification / 設計ドキュメント / requirements / architecture / ADR / C4 / 用語集）の設計・作成・レビューを担うロール変換型スキル。読み手別入口・図種選択・ADR 形式・要件レベル語・テンプレ集を内蔵し、出力は md がメイン、視覚情報が主役のページのみ HTML 補足（デジタル庁デザインシステム DADS 準拠）。「仕様書」「設計ドキュメント」「ドキュメントレビュー」「ADR」「アーキテクチャ図」「C4 図」「README を充実」「オンボーディング資料」「HTML 補足ページ」「カラーパレット選定」「DADS」「文書の配色・タイポグラフィ」等で使う。単発の図解は eli5、対話的な文章共著は doc-coauthoring。'
 ---
 
 # 仕様書設計ロール

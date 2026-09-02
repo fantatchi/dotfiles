@@ -1,6 +1,6 @@
 ---
 name: japanese-doc-style
-description: Style guidelines for Japanese technical documents that build an argument: book chapters, specifications, design documents, and explanatory texts. It defines formatting (one sentence per line, block quotes, footnotes, column notation), paragraph and logical structure (paragraph writing), logical rigor, managing reader cognitive load, perspective and narrative voice, restraint in presentation, and elimination of redundancy. Do NOT use for personal experience reports, blog posts, or Obsidian notes written in the author's own voice; use japanese-article-style for those.
+description: 'Style guidelines for Japanese technical documents that build an argument: book chapters, specifications, design documents, and explanatory texts. It defines formatting (one sentence per line, block quotes, footnotes, column notation), paragraph and logical structure (paragraph writing), logical rigor, managing reader cognitive load, perspective and narrative voice, restraint in presentation, and elimination of redundancy. Do NOT use for personal experience reports, blog posts, or Obsidian notes written in the author''s own voice; use japanese-article-style for those.'
 ---
 
 # 日本語技術文書の文章規範

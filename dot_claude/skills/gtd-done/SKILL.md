@@ -1,7 +1,7 @@
 ---
 name: gtd-done
-description: 捕捉箱（tasks.md）の指定タスクを **完了** にし Done セクションへ移動する操作型スキル。動詞は「完了」専用（追加は gtd-add、表示は gtd-list）。「タスク完了」「あれ終わった」「完了マーク」「終わった」「タスク消化」といった依頼で使う。対象は捕捉箱（shared/integrations.md の task_store、既定 ~/ObsidianVault/00_meta/tasks.md）のみ。プロジェクトの作業キュー（.claude/tasks.md）の完了は行に `[x]` を付けておけば次の /context-save が Done へ整理する。
-argument-hint: <タスクタイトルの部分一致文字列>
+description: '捕捉箱（`~/ObsidianVault/00_meta/tasks.md`）の指定タスクを完了にし Done へ移動する。「タスク完了」「あれ終わった」「完了マーク」といった依頼で使う。追加は gtd-add、表示は gtd-list。プロジェクトの作業キュー（`.claude/tasks.md`）は行に `[x]` を付けておけば次の /context-save が整理する。'
+argument-hint: '<タスクタイトルの部分一致文字列>'
 allowed-tools: Read, Write, Edit, Bash(date:*)
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: context-save
-description: プロジェクトの作業状態を保存し、次回セッションで復帰可能にする。セッション終了時や作業の区切りで使う。Claude で行き詰まって Codex へ渡す（またはその逆の）**エージェント間の引き継ぎ・ハンドオフ**にも使う。コアは `.claude/context.md` の保存と `## 進行中の作業` の 14 日ローテーション + 完了 entry の圧縮（compress-on-complete）・`## 判断メモ` / ファイルサイズの肥大アラート・`.claude/tasks.md`（プロジェクトの作業キュー）への次アクション保存と `[x]` 行の Done 整理・`.claude/handoff.md`（他エージェントへの引き継ぎメモ。試して駄目だったこと / 仮説 / 再現手順）の書き出しで、外部依存なく単独で動く（Obsidian 不要）。連携が有効な環境では `.claude/progress.md` の更新・MEMORY.md 昇格提案・session-review への圧縮委譲まで行う。連携の有無は `shared/integrations.md` で判定し、未設定ならコアのみで完結する。UserPromptSubmit hook（`context-save-reminder.sh`、しきい値はスクリプト側で定義）からモデルが自律実行することを前提とした設定で、`disable-model-invocation: false` を意図的に指定（自動起動を許可）。手動 `/context-save` 起動も可。作業ログ記録 + コンテキスト保存 + アウトプット候補の提案までまとめて実行したい場合は、本スキルを内包する `/session-save` を使う。
+description: 'プロジェクトの作業状態を `.claude/context.md` に保存し、次回セッションで復帰可能にする。あわせて `.claude/tasks.md`（作業キュー）へ次アクションを保存し、`.claude/handoff.md`（他エージェントへの引き継ぎメモ）を書き出す。セッション終了時・作業の区切り・Claude と Codex 間のハンドオフで使う。UserPromptSubmit hook からの自律実行を許可している（理由は本文）。作業ログ記録まで含めて保存するなら本スキルを内包する `/session-save` を使う。'
 disable-model-invocation: false
 allowed-tools: Read, Write, Edit, Glob, Bash(git:*), Bash(echo:*), Bash(mkdir:*), Bash(basename:*), Bash(date:*), Bash(pwd), Bash(chezmoi source-path)
 ---

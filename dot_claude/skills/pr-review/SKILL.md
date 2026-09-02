@@ -1,7 +1,7 @@
 ---
 name: pr-review
-description: GitHub PR の URL または番号を渡すと、ブランチ切替・最新化、Copilot/discussion コメント取得、3-5 体のペルソナ並列レビュー、メインでの実コード裏取り、ローカル `.claude/reviews/` への所見草稿出力までを一気通貫で実施するオーケストレータスキル。投稿はしない（草稿のみ）。「PR レビュー」「pr/<番号> をレビュー」「<PR URL> を見て」「PR の差分どう」「<番号> 番見て」「これマージしていい？」「PR の感想」「ペルソナで PR 見て」等の依頼で発動。公式 `/code-review ultra <PR#>` も PR 自動レビュー機能を持つが、本スキルは (a) インライン投稿せず `.claude/reviews/` に草稿のみ出力 (b) ペルソナ並列で観点分割 (c) ユーザーの MEMORY 運用ルール（SR 系除外・useMemo speculation 抑制・防御コード speculation 抑制等）を冒頭明示遵守 の点で異なる。投稿前提なら公式、ローカル草稿・ペルソナ・運用ルール反映なら本スキル。
-argument-hint: <PR URL or PR番号>
+description: 'GitHub PR の URL または番号を渡すと、ブランチ切替・最新化、Copilot/discussion コメント取得、3-5 体のペルソナ並列レビュー、メインでの実コード裏取り、`.claude/reviews/` への所見草稿出力までを一気通貫で行う。投稿はしない（草稿のみ）。「PR レビュー」「<PR URL> を見て」「<番号> 番見て」「これマージしていい？」「ペルソナで PR 見て」等の依頼で使う。GitHub へ直接投稿したいなら公式 /code-review を使う。'
+argument-hint: '<PR URL or PR番号>'
 allowed-tools: Agent, Read, Glob, Grep, Bash(git:*), Bash(gh:*), Write, AskUserQuestion
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: eli5
-description: 難解な概念・未知のコードベースを「大きな図と最小の言葉」だけの自己完結 HTML に変換し、ローカル保存してブラウザで開く操作型スキル。解説文を書くのではなく図解ページを 1 枚ビルドする。「eli5」「ELI5」「図解して」「5 歳児にもわかるように」「ざっくり全体像を見せて」「アーキテクチャを可視化して」「この処理の流れを図で」といった依頼で使う。棲み分け: 仕様書・ADR・C4 図など「残す文書」の作成は spec-writer、日本語原稿の推敲は japanese-doc-style。本スキルの成果物は理解を早めるための使い捨てで、保守対象の文書ではない。
-argument-hint: [説明したい対象（概念 / ディレクトリ / ファイル / 関数）]
+description: '難解な概念・未知のコードベースを「大きな図と最小の言葉」だけの自己完結 HTML に変換し、ローカル保存してブラウザで開く。「eli5」「図解して」「5 歳児にもわかるように」「ざっくり全体像を見せて」「アーキテクチャを可視化して」「この処理の流れを図で」といった依頼で使う。成果物は理解用の使い捨てで、残す文書（仕様書・ADR・C4 図）は spec-writer、日本語原稿の推敲は japanese-doc-style。'
+argument-hint: '[説明したい対象（概念 / ディレクトリ / ファイル / 関数）]'
 disable-model-invocation: true
 allowed-tools: Read, Write, Glob, Grep, WebSearch, WebFetch, Bash(date:*), Bash(mkdir:*), Bash(git rev-parse:*), Bash(wslpath:*), Bash(wslview:*), Bash(explorer.exe:*), Bash(grep:*)
 ---
