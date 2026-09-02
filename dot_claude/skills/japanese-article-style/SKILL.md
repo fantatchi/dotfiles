@@ -1,6 +1,6 @@
 ---
 name: japanese-article-style
-description: Style guidelines for Japanese first-person articles: experience reports, blog posts, tech notes about what the author actually tried, and Obsidian resource notes. Removes the machine-written feel that comes from uniform structure rather than from vocabulary — fixed "overview / content / summary" skeletons, half the lines being bullets, one-sentence paragraphs, scattered bold, the even-handed comparison template, and deleted failures. Use when writing, drafting, or rewriting a Japanese article, blog post, or note that reports the author's own experience. For documents that build an argument (book chapters, specifications, design docs), use japanese-doc-style instead.
+description: 'Style guidelines for Japanese first-person articles: experience reports, blog posts, tech notes about what the author actually tried, and Obsidian resource notes. Removes the machine-written feel that comes from uniform structure rather than from vocabulary — fixed "overview / content / summary" skeletons, half the lines being bullets, one-sentence paragraphs, scattered bold, the even-handed comparison template, and deleted failures. Use when writing, drafting, or rewriting a Japanese article, blog post, or note that reports the author''s own experience. For documents that build an argument (book chapters, specifications, design docs), use japanese-doc-style instead.'
 ---
 
 # 日本語記事の文章規範（体験記・ブログ）
