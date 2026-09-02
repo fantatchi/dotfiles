@@ -11,6 +11,8 @@ allowed-tools: Read, Write, Edit, Glob, Bash(git:*), Bash(echo:*), Bash(mkdir:*)
 
 このスキルは **コア（`.claude/context.md` と `.claude/tasks.md` の保存、`.claude/handoff.md` の書き出しで完結・外部依存なし）** と **連携（progress.md / MEMORY / session-review が揃っていれば実行する任意処理）** に分かれる。**Obsidian は一切使わない**（捕捉箱 `~/ObsidianVault/00_meta/tasks.md` は `gtd-*` の担当で、本スキルは触らない）。連携の配線は `~/.claude/skills/shared/integrations.md`（resolver）で判定する。
 
+frontmatter の `disable-model-invocation: false` は明示指定で、UserPromptSubmit hook（`context-save-reminder`、しきい値はスクリプト側で定義）の通知からモデルが自律実行することを許可する意図。手動 `/context-save` も可。
+
 ## コア（単独完結・連携なしで動く）
 
 ### 書き出し先

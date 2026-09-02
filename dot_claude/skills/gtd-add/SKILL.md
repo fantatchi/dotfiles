@@ -2,7 +2,7 @@
 name: gtd-add
 description: '思いつきタスクを捕捉箱（`~/ObsidianVault/00_meta/tasks.md`）の Inbox に追加する。「タスクを追加」「TODO として残して」「思いつき記録」「Inbox にメモ」といった依頼で使う。完了は gtd-done、表示は gtd-list。プロジェクトの作業キュー（`.claude/tasks.md`）は context-save の担当で本スキルは触らない。'
 argument-hint: '[タスクタイトル]'
-allowed-tools: Read, Write, Edit, Bash(git:*), Bash(basename:*), Bash(pwd)
+allowed-tools: Read, Write, Edit
 ---
 
 # タスク追加
@@ -46,13 +46,7 @@ allowed-tools: Read, Write, Edit, Bash(git:*), Bash(basename:*), Bash(pwd)
 
 ### 4. タイトル文字数チェック (MUST、書き込み前)
 
-タイトル本体（プロジェクトタグを除いた部分）の文字数を数える。
-
-- **60-100 文字**: そのまま書き込み OK
-- **101-150 文字**: そのまま書き込み可だが、短縮の余地がないかユーザーに 1 度だけ提案 (拒否されたらそのまま進む)
-- **151 文字以上**: **書き込み禁止**。短縮版をユーザーに提案し、承認された短縮版で再チェック。ユーザーが原文維持を強く望む場合のみ例外として書き込み
-
-詳細は `~/.claude/skills/shared/tasks-format.md` の「タスク行のフォーマット」規則参照。
+タイトル本体（プロジェクトタグを除いた部分）の文字数を数え、`~/.claude/skills/shared/tasks-format.md` の「タイトルの文字数規則」に従う（101 文字以上は短縮を 1 度だけ提案、151 文字以上は短縮版の承認を得るまで書き込み禁止）。
 
 ### 5. Inbox セクションに追記
 

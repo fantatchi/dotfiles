@@ -57,7 +57,7 @@ core の 5000/h とは別枠で干渉しない。weekly 連続実行（7 日 × 
 
 `gh api` は **アクティブな `gh` user の token** で API を叩く。`fantatchi` token で `q=author:kentem-at-kato` を叩いても、**kentem-at-kato のみが visibility を持つ private repo の commit/PR は 0 件で返る**（search index は ACL で post-filter される）。
 
-過去事例: 2026-05-13 の `/obsidian-daily` 実行で kentem-at-kato の活動が完全に欠落した事故の有力な真因候補。当時は leading slash 罠を疑ったが、leading slash と auth 不一致は同時に効きうるので両方を塞ぐ。
+過去事例: 2026-05-13 の片アカウント欠落事故の真因候補（leading slash・`+` 衝突と同時に効きうるので全部塞ぐ）。
 
 各アカウントのクエリを叩く前に **アクティブアカウントを切り替える**:
 
@@ -77,7 +77,7 @@ done
 
 Git Bash 環境では `gh api '/search/...'` の **先頭スラッシュ** が Windows パス
 （`C:/Program Files/Git/search/...`）に書き換えられて `invalid API endpoint` で失敗する。
-**必ず先頭スラッシュを外す**こと（CLAUDE.md「Git Bash で `gh api` のエンドポイント先頭スラッシュ」参照）。
+**必ず先頭スラッシュを外す**こと（`~/.claude/docs/work-tips.md`「Git Bash で `gh api` のエンドポイント先頭スラッシュ」参照）。
 
 ### 日付絞り込みの TZ（必須）
 
@@ -95,7 +95,7 @@ TZ offset を省くと GitHub Search は **UTC として解釈** するため、
 
 **TZ offset の `+` は必ず `%2B` にエンコードする**こと（`T00:00:00%2B09:00`）。検証: 生の `+09:00` → `total_count=0` / `%2B09:00` → 正しくヒット。
 
-過去事例: 2026-06-01 の `/obsidian-daily` で全 commit/PR が 0 件になった真因（当日 13 commit + PR #322 マージが丸ごと欠落）。2026-05-13 の kentem-at-kato 活動欠落も auth 不一致だけでなくこの `+` 衝突が同時に効いていた可能性が高い。CLAUDE.md「Git Bash で `gh api` のクエリ内 `+` エンコード」参照。
+過去事例: 2026-06-01 の `/obsidian-daily` で全 commit/PR が 0 件になった真因。2026-05-13 の片アカウント欠落にも同時に効いていた可能性が高い（`~/.claude/docs/work-tips.md`「`gh api search/...` のクエリ内 `+` エンコード」参照）。
 
 ### 3a. コミット
 

@@ -15,8 +15,11 @@
 
 ユーザーに保存先を確認する:
 
-- **プロジェクト単位**: `.claude/settings.local.json`（このリポジトリのみ）
-- **ユーザー全体**: `~/.claude/settings.json`（全リポジトリ共通）
+- **プロジェクト単位**: `<project>/.claude/settings.local.json`（このリポジトリのみ）
+- **このマシンの全プロジェクト**: `~/.claude/settings.local.json`（マシン固有・プロジェクト固有の permissions の既定の置き場。迷ったらここ）
+- **全マシン共通**: `~/.claude/settings.json`（chezmoi 管理。全マシンで必要と分かったものだけ昇格）
+
+使い分けの正本は `~/.claude/CLAUDE.md`「Claude Code 設定ファイルの使い分け」。
 
 確認後、`Read` で対象ファイルを読み込み、現在の `permissions.allow` と `permissions.deny` を把握する。
 

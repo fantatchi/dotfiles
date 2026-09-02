@@ -192,5 +192,5 @@ python3 ~/.claude/skills/obsidian-mail/send-summary.py "$MODE" "$TARGET_DATE"
 - 週報は欠落日があっても残った日数（例: `5/7 日分`）で送信する。本文冒頭に欠落日を明記する
 - HTML レンダリングは `markdown` ライブラリの `extra` + `sane_lists` 拡張を使用（`nl2br` は外した。再構成後の本文は段落ベースなので `<br>` が増えすぎるとレイアウトが崩れる）。`### 今日の要約` 直下の `<p>` は HTML 後処理で `.tldr` 青ボックスに包む
 - TL;DR が複数段落の場合、メールでは **最初の段落のみ** 採用する（残りは Obsidian で見る前提）。全文を残すと `.tldr` ボックス外にこぼれてレイアウトが崩れる
-- アプリパスワードは Google 側でいつでも revoke できる。漏洩した場合は `https://myaccount.google.com/apppasswords` で削除し、settings.local.json も更新する
+- アプリパスワードは Google 側でいつでも revoke できる。漏洩した場合は `https://myaccount.google.com/apppasswords` で削除し、keyring に再登録する（前提セットアップ 2 節）
 - **Message-ID の domain は `obsidian-mail.local`**。リネーム前は `@obsidian-summary.local` だったため、Gmail で `from:` や `rfc822msgid:` の domain ベースのフィルタを組んでいる場合は **filter rule の更新が必要**。スレッディングは日次/週次の独立メールで連続性が薄いため副作用は軽微だが、Gmail 検索（`from:obsidian-summary.local`）が効かなくなる点に注意

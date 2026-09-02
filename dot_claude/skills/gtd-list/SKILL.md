@@ -2,7 +2,7 @@
 name: gtd-list
 description: '捕捉箱（`~/ObsidianVault/00_meta/tasks.md`）のタスクを表示する（--all / --done [N]）。「タスク一覧」「TODO を見せて」「Inbox 確認」といった依頼で使う。追加は gtd-add、完了は gtd-done。プロジェクトの作業キュー（`.claude/tasks.md`）は表示しない（そちらは /context-load）。'
 argument-hint: '[--all|--done [N]]'
-allowed-tools: Read, Write, Edit, Bash(git:*), Bash(basename:*), Bash(pwd), Bash(date:*)
+allowed-tools: Read, Write, Edit, Bash(date:*)
 ---
 
 # タスク一覧表示
