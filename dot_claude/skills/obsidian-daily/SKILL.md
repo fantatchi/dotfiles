@@ -323,9 +323,6 @@ author: at-kato
 
 ## 注意事項
 
-- GitHub Search API の日付絞り込みは **TZ 省略時 UTC 解釈**。JST 帯運用では 3 節「日付絞り込みの TZ」に従い `%2B09:00`（`+09:00` の URL エンコード）offset 付き range 構文を使う。**生の `+09:00` は `q=` 内でスペース扱いされ範囲が壊れて全件 0 になる**（3 節「TZ offset の `+` は必ず `%2B` にエンコード」参照）
-- 作業ログ のファイル名はタイムスタンプ（JST）ベースなので、`YYYYMMDD` の前方一致で正しくフィルタできる
+- 作業ログのファイル名はタイムスタンプ（JST）ベースなので、`YYYYMMDD` の前方一致で正しくフィルタできる
 - Obsidian のリンク記法（`[[]]`）やコールアウト（`> [!info]`）を活用する
-- Windows 環境で `python` が無い場合は Python 3 をインストールしてから実行すること（`python3` は MS Store スタブの可能性があるので避ける）
-- **JSON は必ずファイル経由で渡す**: `echo "$JSON" | python3 ...` / `cat <<EOF | python3 ...` / シェル変数展開は Windows (Git Bash) で cp932 化けを起こす。`sys.stdin.reconfigure` では救えない（Python 到達前にシェルが bytes 化しているため）。ステップ 6 の手順（Python ヒアドキュメントで UTF-8 ファイルに書き出し → パス引数）を必ず踏むこと
-- **`vault` の `~` 展開**: Python は `~` を自動展開しないため、`write-daily.py` 側で `os.path.expanduser()` を通している。JSON の `vault` には 2 節で解決した `<vault>`（既定 `~/ObsidianVault`）のチルダ込みパスをそのまま渡してよい（渡さないと literal `~` ディレクトリが作られるバグを過去に踏んだ）
+- 3 節（TZ offset の `%2B` エンコード）・5 節（`vault` はチルダ込みで渡す・プレースホルダを残さない）・6 節（JSON はファイル経由、`python3` でなく `python`）の罠はいずれも過去に実際に踏んだもの。routine 実行では失敗が静かな 0 件として埋もれるので、7 節の完了報告で件数を必ず出す
