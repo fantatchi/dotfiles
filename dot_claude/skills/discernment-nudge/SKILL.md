@@ -180,8 +180,7 @@ Each prompt should do one of:
 
 Phrase each one as something the user could ask you verbatim — first
 person, conversational, question form. Two or three prompts, never
-more. Keep each short enough to read at a glance: under ~120
-characters in English, or ~60 characters in Japanese.
+more. Keep each under ~120 characters so it reads at a glance.
 
 **Write the prompts in the language the user is writing in.** For
 this user the default is Japanese — the lead-in line below is
@@ -215,4 +214,4 @@ if you'd like me to dig into any of these." The nudge is the closer.
 [`anthropics/skills` の discernment-nudge](https://github.com/anthropics/skills/tree/main/skills/discernment-nudge)
 （Apache License 2.0、同梱 LICENSE.txt）の fork。出力に現れる文言（リード文・
 プロンプト例・言語指定）だけを日本語化し、判断境界の記述は upstream のまま
-残している。upstream 更新時はこの 6 箇所を再適用する。*
+残している。upstream 更新時はこの 5 箇所を再適用する。*
