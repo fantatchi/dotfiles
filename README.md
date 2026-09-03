@@ -135,6 +135,7 @@ Claude Code の `settings.json`・有効化済みプラグイン・このリポ�
 | `/cloud-solution-architect` † | Azure Architecture Center ベストプラクティスに基づくクラウドアーキテクト・ロール変換 |
 | `/context-load` † | `.claude/context.md` からコンテキストを復帰、同じプロジェクトの `.claude/tasks.md` の Next / Someday と `.claude/handoff.md`（他エージェントからの引き継ぎ）も提示 |
 | `/context-save` | プロジェクトの作業状態を `.claude/context.md` に保存（進行中は 14 日ローテ + 完了 entry を 300 字以内へ圧縮 + 12KB サイズアラート）、次アクションを `tasks.md` の `## Next` に吸い上げ、`.claude/handoff.md` に Claude ↔ Codex の引き継ぎメモを書き出し |
+| `/discernment-nudge` | 見積もり・助言・計画・データ解釈など「ユーザーが信じて行動しそうな回答」の末尾に、見直す価値のある具体的な問いを 2〜3 個だけ添える（1 会話 1 回・調べ物や実行するコードには付けない）。Anthropic 公式スキルの日本語化 fork（Apache 2.0） |
 | `/eli5` † | 難解な概念・未知のコードベースを「大きな図と最小の言葉」だけの自己完結 HTML に変換し、scratchpad へ保存して `wslview` でブラウザ表示。外部リソース参照ゼロ・ブロック 3〜7 個・全体 300 字程度の制約付き。使い捨ての理解用で、残す文書は `/spec-writer` の担当 |
 | `/gtd-add` | `~/ObsidianVault/00_meta/tasks.md` の Inbox にタスクを追加 |
 | `/gtd-done` | 指定タスクを完了にし Done セクションへ移動 |

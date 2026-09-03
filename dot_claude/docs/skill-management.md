@@ -11,7 +11,7 @@
 ### 新スキル追加時
 
 - [ ] `~/.claude/skills/<skill-name>/SKILL.md` を作成（frontmatter: `name` / `description` / `argument-hint` / `disable-model-invocation` / `allowed-tools` を適切に設定）
-- [ ] `~/.claude/CLAUDE.md` の「# スキルコマンド」セクションに 1 行追加（コマンド — 簡潔な説明）
+- [ ] `~/.claude/CLAUDE.md` の「# スキルコマンド」セクションに 1 行追加（コマンド — 簡潔な説明）。ただし **自動発動可のスキルは追加しない** — 同節は 2026-09-02 の圧縮以降「description が注入されない手動専用スキルと、使い分けで迷う点だけ」を残す方針で、自動発動可のスキルは description が毎セッション注入されるため重複になる
 - [ ] `~/.local/share/chezmoi/README.md` の「**スキル一覧:**」テーブルに 1 行追加
 - [ ] README の「使いどころ」テーブルにも必要なら追加（`/obsidian-*` 等の関連グループに属する場合）
 
