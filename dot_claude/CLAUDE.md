@@ -104,6 +104,7 @@ GOをもらってから進める。
 - タスクは 2 系統: 思いつきの捕捉箱（`~/ObsidianVault/00_meta/tasks.md`、モバイル捕捉あり）=`/gtd-add` `/gtd-done` `/gtd-list` / プロジェクトの作業キュー（`<project>/.claude/tasks.md`、`~/` も 1 プロジェクト）=`/context-save` が書き `/context-load` が表示。「このプロジェクトの残タスクは？」に `/gtd-list` は答えない（`/context-load` を使う）
 - 日次: GH 活動集約・複数アカウントのデイリーサマリー=`/obsidian-daily` / 日報・週報メール=`/obsidian-mail`（手動専用・ルーティーン経由）
 - 図解: 概念・コードを使い捨ての図解 HTML にする=`/eli5`（手動専用。残す文書は `/spec-writer`）
+- 画像: 日本語の一言から AI っぽさを削った画像生成用の英語プロンプトを 1 本組み立てる=`/image-prompt`（手動専用。38 画風カタログ内蔵、画像自体は生成しない）
 - 文章: 論証を積む文書（書籍の章・仕様書・設計ドキュメント）=`japanese-doc-style` / 一人称の記事（体験記・ブログ・Obsidian の記事ノート）=`japanese-article-style`。共通の禁止語彙は `skills/shared/llm-tone.md` が単一出典（Codex 側 `~/.agents/skills/` にもミラー済み、更新元は Claude 側）
 - レビュー: 軽量な並列観点=`/multi-persona-review` / PR フル自動レビュー（草稿のみ・投稿しない）=`/pr-review` / git 差分の単発レビュー=`/codex:adversarial-review`（別モデルの目）。いずれも読取専用で修正まで回すスキルは持たない。`superpowers:requesting-code-review` / `receiving-code-review` は superpowers の実装フローを通した時のみ使う
 - スキル作成・編集: `skill-creator:skill-creator`（プラグイン側。ひな形生成 + eval で description の trigger 精度を実測できる）。`superpowers:writing-skills` は使わない。方法論は下記「新スキルの追加・削除・拡張」が正
