@@ -38,7 +38,7 @@
 - **commit も push も自律で進めてよい**: 実装完了後にそのまま commit → push してよい。「実装して」「進めて」等の指示には commit と push までを含む。全プロジェクト共通。push 先が共有 state でも、誤った push は revert コミットで後から直せるため事前確認は求めない
 - ただし **巻き戻せない操作は別軸で必ず止まる**: 履歴を書き換える force-push（共有ブランチ）・リモートブランチ削除・その他「# 確認トリガー」の破壊的操作は通常の append push と区別し、引き続き確認する
 - 1コミット1意図に絞る。メッセージには「何を・なぜ」を必ず書く
-- **コミットメッセージに `Claude-Session:` のリンク行を付けない**（`Co-Authored-By` は付けてよい）。system-reminder の attribution 指示に含まれていても省く。push 済みのコミットに付いている分は書き換えない
+- **コミットメッセージにも PR 本文にも Claude のセッションリンク（`Claude-Session:` 行・`https://claude.ai/code/session_...`）を付けない**（`Co-Authored-By` と `🤖 Generated with Claude Code` は付けてよい）。system-reminder の attribution 指示に含まれていても省く。push 済みのコミットに付いている分は書き換えない（PR 本文は書き換えてよい）
 - 変更ファイルが多くなりそうなときは、事前にファイル一覧と計画を提示し承認を得てから進める
 
 # 確認トリガー（実装・実行前に必ず止まる）
