@@ -46,6 +46,7 @@ allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(echo:*), Bash(basename:*), Ba
 
 - ファイルが存在しない場合はスキップ
 - 抽出した内容は提示（ステップ 6）に含める
+- **8KB を超える場合は全文を出さない**。`最終更新` の最新 1 行と `## 現在地` の要点だけを要約して提示し、`⚠️ progress.md が N KB あります（全文は省略）。最終更新行の積み上がり・完了済み経緯の滞留を確認してください` を 1 行添える。**省略したことを必ず明示する**（2026-09-14 kabuto で 27KB になり Read の上限を超え、全文表示の指示どおりには出せなかった）
 - 後方互換: `.claude/progress.md` がなく、かつ `{project-root}/CLAUDE.md` に `## 進捗マップ` セクションがある場合は、そこから抽出する（旧形式）
 
 ### 4. 作業キューの読み込み
@@ -94,7 +95,7 @@ resolver の `project_task_store`（既定 `<project-root>/.claude/tasks.md`）�
 - **オープン PR 等**: （あれば）
 
 ### 進捗マップ（.claude/progress.md より）
-（progress.md の内容をそのまま表示）
+（progress.md の内容をそのまま表示。8KB 超なら要約 + 省略の明示 + 警告 1 行）
 
 ### 進行中の作業
 （作業内容）
