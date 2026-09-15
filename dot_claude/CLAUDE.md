@@ -89,7 +89,7 @@ GOをもらってから進める。
 `~/.claude/settings.json` と `~/.claude/settings.local.json` は Claude Code がマージして読む。新しい permission や設定を追加するときはどちらに書くかを必ず判断する。
 
 - **settings.json（chezmoi 管理、全マシン共通）**: hooks（すべて `run-hook.js` ラッパー経由）・プラグイン有効化・UI / 挙動の共通設定・全マシンで必要な permissions（基本 Bash 系、`deny` の secrets 系）
-- **settings.local.json（chezmoi 管理外、マシン固有）**: `model` 指定（`/model` は settings.json 側に書き戻すので、見つけたら local へ移す）・プロジェクト固有 permissions・マシン固有の MCP / WebFetch permissions・特定 PC のパスを含む permissions・マシン固有の `env`
+- **settings.local.json（chezmoi 管理外、マシン固有）**: `model` / `modelSettings` 指定（`/model` や effort 変更は settings.json 側に書き戻すので、見つけたら local へ移す）・プロジェクト固有 permissions・マシン固有の MCP / WebFetch permissions・特定 PC のパスを含む permissions・マシン固有の `env`
 - 迷ったら settings.local.json。後で全マシンで必要と分かったら settings.json に昇格させる（local から削除 → settings.json に追記 → `chezmoi re-add`）
 
 # 作業 Tips
