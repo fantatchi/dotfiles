@@ -110,6 +110,7 @@ GOをもらってから進める。
 - レビュー: 軽量な並列観点=`/multi-persona-review` / PR フル自動レビュー（草稿のみ・投稿しない）=`/pr-review` / git 差分の単発レビュー=`/codex:adversarial-review`（別モデルの目）。いずれも読取専用で修正まで回すスキルは持たない。`superpowers:requesting-code-review` / `receiving-code-review` は superpowers の実装フローを通した時のみ使う
 - スキル作成・編集: `skill-creator:skill-creator`（プラグイン側。ひな形生成 + eval で description の trigger 精度を実測できる）。`superpowers:writing-skills` は使わない。方法論は下記「新スキルの追加・削除・拡張」が正
 - 振り返り: 権限・CLAUDE.md・スキル整理・判断メモ圧縮=`/session-review`（手動専用）
+- 技術ロール（いずれも手動専用）: Azure 設計・WAF レビュー=`/cloud-solution-architect` / M365 Agents SDK（TypeScript）実装=`/m365-agents-ts` / Tailwind UI の実装ルール検証=`/baseline-ui`
 
 ## 新スキルの追加・削除・拡張
 
