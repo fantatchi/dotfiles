@@ -145,7 +145,9 @@ Claude Code、Codex、Obsidian は次のファイルを共有正本として扱�
 
 - `{project-root}/.claude/context.md`: プロジェクトの作業状態。
 - `{project-root}/.claude/progress.md`: チェックボックス形式の進捗マップ。存在する場合のみ使う。
-- `~/ObsidianVault/00_meta/tasks.md`: 全プロジェクト横断の GTD タスクストア。
+- `{project-root}/.claude/tasks.md`: プロジェクトの作業キュー（`## Next` / `## Someday` / `## Done`）。`context-save` が書き、`context-load` が表示する。
+- `{project-root}/.claude/handoff.md`: Claude と Codex の間の引き継ぎメモ。`context-save` が毎回上書きする。
+- `~/ObsidianVault/00_meta/tasks.md`: 思いつきの捕捉箱（`gtd-*` 専用）。どのプロジェクトの話か決まっていないものだけを置き、プロジェクト固有のタスクは置かない。
 
 `.claude/` はディレクトリ名にすぎず Claude 専用ではない。Codex も対等な writer として、書込み時は次を必須とする。
 
@@ -161,4 +163,4 @@ Claude Code、Codex、Obsidian は次のファイルを共有正本として扱�
 - `~/.claude/skills/shared/multi-writer.md`
 - `~/.claude/skills/shared/tasks-format.md`
 
-tasks.md を編集する場合は、5 セクションの重複、既存の類似タスク、タイトル 150 文字上限を事前確認し、編集後に各見出しが 1 回ずつ存在することと対象行を検証する。
+tasks.md を編集する場合は、セクション見出しの重複（捕捉箱は 5 つ、作業キューは 3 つ）、既存の類似タスク、タイトル 150 文字上限を事前確認し、編集後に各見出しが 1 回ずつ存在することと対象行を検証する。
