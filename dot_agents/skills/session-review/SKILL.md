@@ -20,9 +20,9 @@ description: セッション完了時に Codex の承認・AGENTS.md・ユーザ
 | 1. 権限レビュー | 手動で承認/拒否したツール呼び出しが1件以上 | `references/permission-review.md` |
 | 2. AGENTS.md 更新 | コマンド・パターン・設定の発見や gotcha があった | `references/claude-md-update.md` |
 | 3. スキル洗練 | 既存スキルの不備発見、繰り返しワークフロー、新スキル候補 | `references/skill-refine.md` |
-| 4. 判断メモ圧縮 | resolver `memory_promotion` が `on`（既定）かつ、context.md の `## 判断メモ` が肥大（context-save が「15件超」とアラート）/ セッションで普遍知見が生まれた | `references/memo-compaction.md` |
+| 4. 判断メモ圧縮 | resolver `memory_promotion` が `on`（既定）かつ、context.md の `## 判断メモ` が肥大（context-save の肥大アラートが発火）/ セッションで普遍知見が生まれた | `references/memo-compaction.md` |
 
-**連携 gate（判断メモ圧縮）**: Phase 4 は MEMORY.md への昇格が本体なので、resolver `~/.claude/skills/shared/integrations.md` の bool キー `memory_promotion` で gate する（context-save の連携3 と同じキー）。`memory_promotion` が `off` / 未設定 / resolver 不在なら Phase 4 を判定せず skip し、Step 2 で「Phase 4: 判断メモ圧縮 → スキップ（memory_promotion off）」と明示する。Phase 1〜3 は外部依存のない project-local / 環境整備なので gate しない（常に判定する）。
+**連携 gate（判断メモ圧縮）**: Phase 4 は MEMORY.md への昇格が本体なので、resolver `~/.claude/skills/shared/integrations.md` の bool キー `memory_promotion` で gate する（context-save の連携2 と同じキー）。`memory_promotion` が `off` / 未設定 / resolver 不在なら Phase 4 を判定せず skip し、Step 2 で「Phase 4: 判断メモ圧縮 → スキップ（memory_promotion off）」と明示する。Phase 1〜3 は外部依存のない project-local / 環境整備なので gate しない（常に判定する）。
 
 ### Step 2: 提案の一括提示
 
