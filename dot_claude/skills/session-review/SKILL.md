@@ -22,9 +22,9 @@ allowed-tools: Read, Edit, Write, Glob, Grep
 | 1. 権限レビュー | 手動で承認/拒否したツール呼び出しが1件以上 | `references/permission-review.md` |
 | 2. CLAUDE.md更新 | コマンド・パターン・設定の発見やgotchaがあった | `references/claude-md-update.md`（実作業は `/claude-md-management:revise-claude-md` スキルに委譲する） |
 | 3. スキル洗練 | 既存スキルの不備発見、繰り返しワークフロー、新スキル候補 | `references/skill-refine.md` |
-| 4. 判断メモ圧縮 | resolver `memory_promotion` が `on`（既定）かつ、context.md の `## 判断メモ` が肥大（context-save が「15件超」とアラート）/ セッションで普遍知見が生まれた | `references/memo-compaction.md` |
+| 4. 判断メモ圧縮 | resolver `memory_promotion` が `on`（既定）かつ、context.md の `## 判断メモ` が肥大（context-save の肥大アラートが発火）/ セッションで普遍知見が生まれた | `references/memo-compaction.md` |
 
-**連携 gate（判断メモ圧縮）**: Phase 4 は MEMORY.md への昇格が本体なので、resolver `~/.claude/skills/shared/integrations.md` の bool キー `memory_promotion` で gate する（context-save の連携3 と同じキー）。`memory_promotion` が `off` / 未設定 / resolver 不在なら Phase 4 を判定せず skip し、Step 2 で「Phase 4: 判断メモ圧縮 → スキップ（memory_promotion off）」と明示する。Phase 1〜3 は外部依存のない project-local / 環境整備なので gate しない（常に判定する）。
+**連携 gate（判断メモ圧縮）**: Phase 4 は resolver `~/.claude/skills/shared/integrations.md` の bool キー `memory_promotion` で gate する（context-save の連携2 と同じキー）。skip したときは Step 2 で「Phase 4: 判断メモ圧縮 → スキップ（memory_promotion off）」と明示する。Phase 1〜3 は gate しない。
 
 ### Step 2: 提案の一括提示
 
@@ -53,8 +53,4 @@ Phase 3: スキル洗練
 
 - **確認は1回だけ**。フェーズごとに個別確認しない
 - Phase 1 は当セッションの承認/拒否だけを扱う。transcript 横断で allowlist を集計するなら公式 `/fewer-permission-prompts` を使う
-- ユーザー確認なしに変更を適用しない
-- 「スキップ」の判断理由を簡潔に説明する
 - セッション中にユーザーが明示的に「これは一時的」と述べた承認は権限追加候補から除外する
-- 機密情報（APIキー、パスワード等）をCLAUDE.mdやスキルに含めない
-- ユーザーが「不要」と言った項目は即座にスキップする
