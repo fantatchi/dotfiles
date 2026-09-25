@@ -7,19 +7,11 @@ Claude・Codex など複数のエージェント（および Obsidian モバイ�
 単一の正本を全 writer で共有する。writer ごとのコピー（`.codex/context.md` 等）は作らない。
 
 - `{project-root}/.claude/context.md`（writer: context-save, session-review Phase 4）
-- `{project-root}/.claude/progress.md`（writer: context-save 連携2）
-- タスクストア tasks.md（writer: gtd-add / gtd-done / context-save 連携1 / Obsidian モバイル。場所は resolver `task_store`、フォーマットは `tasks-format.md` が SSOT）
+- `{project-root}/.claude/progress.md`（writer: context-save 連携1）
+- 捕捉箱 tasks.md（writer: gtd-add / gtd-done / gtd-list の昇格・剪定 / Obsidian モバイル。場所は resolver `task_store`）
+- 作業キュー tasks.md（writer: context-save コア / 人が `[x]` を付ける。場所は resolver `project_task_store`）
 
-Codex 等の外部エージェントも同じファイルを更新する writer として扱う。「相手が Claude 形式で書いている」ことを前提にしない。
-
-## 6 原則
-
-1. **既存内容を保持する**
-2. **最小範囲だけ変更する**
-3. **書込み直前に再読込する**
-4. **競合を検出したら停止する**
-5. **書込み後に構造だけ検証する**
-6. **不明な内容は削除しない**
+両 tasks.md のフォーマットは `tasks-format.md` が SSOT。Codex 等の外部エージェントも同じファイルを更新する writer として扱う。「相手が Claude 形式で書いている」ことを前提にしない。
 
 ## 共通書込みプロトコル（MUST）
 
@@ -31,8 +23,6 @@ Codex 等の外部エージェントも同じファイルを更新する writer 
    - 差分が編集対象範囲と**重なる・安全にマージできるか判断できない** → 自動書込みを**停止**し、双方の差分を提示してユーザーに競合を報告する
 5. **適用**: Edit を実行する
 6. **書込み後の構造チェック**: **見出し集合・frontmatter キー集合が編集意図以外で減っていないか**だけを確認する。複数 Edit の巻き添えによる欠落は Edit がエラーにせず、共有ファイルでは他 writer の内容ごと失われて巻き戻せないため、ここだけは確認する。**編集箇所が意図どおり適用されたかは再確認しない**（Edit は完全一致置換で、失敗すればエラーになる）。各ファイル固有の項目（tasks.md のセクション数・文字数上限等）は各スキル / tasks-format.md 側の規定に従う
-
-古いスナップショット（初回読取り時の内容）を根拠にファイル全体を上書きすることは、いかなる場合も禁止。
 
 ## 未知内容の扱い
 
