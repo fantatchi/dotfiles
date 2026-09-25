@@ -7,8 +7,6 @@ allowed-tools: Read, Write, Edit, Bash(date:*)
 
 # タスク完了
 
-指定したタスクをタスクストア（tasks.md）の `## Done` セクションに移動する。
-
 **単独動作**: このスキルは捕捉箱 1 ファイルだけに依存し、兄弟スキルが無くても動く。場所は resolver `~/.claude/skills/shared/integrations.md` の `task_store` で解決する（無ければ既定 `~/ObsidianVault/00_meta/tasks.md`）。連携なし。
 
 **対象は捕捉箱のみ**。プロジェクトの作業キュー（`<project>/.claude/tasks.md`）の完了は、行に `[x]` を付けておけば次の `/context-save` が Done へ整理する（本スキルは触らない）。
@@ -65,22 +63,9 @@ Done 以外の全セクション（Inbox / Next / Waiting / Someday）から、`
 
 ### 5. Done への移動
 
-**書込みは `~/.claude/skills/shared/tasks-format.md` の「書き込みプロトコル（複数 writer・MUST）」に従う**: 書き込み直前に tasks.md を再 Read し、重複見出し（同名セクション 2 回以上 → 自動編集停止）を確認し、対象タスク行がまだ存在するか（他 writer が先に完了/移動していないか）を確認してから編集する。書き込み後に再 Read して検証（5 見出しが各 1 回・移動行が Done に存在・元セクションから消えていること）する。
+**書込みは `~/.claude/skills/shared/tasks-format.md` の「書き込みプロトコル（複数 writer・MUST）」に従う**: 書き込み直前に tasks.md を再 Read し、重複見出し（同名セクション 2 回以上 → 自動編集停止）を確認し、対象タスク行がまだ存在するか（他 writer が先に完了/移動していないか）を確認してから編集する。書き込み後はセクション見出しが各 1 回のままかだけ確認する。
 
-#### 移動処理
-
-1. 元のセクションから該当タスク行を削除（Edit ツール）
-2. タスク行を `Done` フォーマットに変換：
-   - `- [ ] #project/xxx タイトル` → `- [x] YYYY-MM-DD #project/xxx タイトル`
-   - 日付は `date +%Y-%m-%d` で取得
-3. `## Done` セクションの**直後**に新しい行として挿入（Done の最新が一番上に来る）
-
-#### Edit の順序
-
-a. まず元の行を削除する（`old_string`: 該当行, `new_string`: 空文字）
-b. 次に Done セクションに追加する（`old_string`: `## Done\n`, `new_string`: `## Done\n\n- [x] YYYY-MM-DD ...\n`）
-
-空行の扱いに注意：削除時に空行が連続しないよう調整する。
+元のセクションから該当行を削除し、tasks-format.md の Done 形式（`- [x] YYYY-MM-DD ...`、日付は今日）に変換して `## Done` の**直後**（先頭）に挿入する。削除時に空行が連続しないよう調整する。
 
 ### 6. 完了報告
 
@@ -89,8 +74,3 @@ b. 次に Done セクションに追加する（`old_string`: `## Done\n`, `new_
 - [x] YYYY-MM-DD #project/xxx タイトル
 ```
 
-## 注意事項
-
-- tasks.md の場所は resolver の `task_store` が出典（既定 `~/ObsidianVault/00_meta/tasks.md`）
-- 既に Done のタスクは検索対象外（二重完了を防ぐ）
-- Done への挿入位置は Done セクションの先頭（新しい完了が上）
