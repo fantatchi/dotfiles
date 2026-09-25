@@ -12,10 +12,10 @@
 #       値は「on / off / 未設定」。on のみ有効、off・未設定は無効。probe 判定はしない
 #   ※ progress_map / project_task_store は外部資源でなく各リポジトリ内 .claude/ を見るだけの
 #     project-local キーだが、連携の on/off をここで集中管理するため同居させている
-task_store: ~/ObsidianVault/00_meta/tasks.md   # 捕捉箱（gtd-* 専用）の絶対パス。空 → gtd-* は案内して終了
+task_store: ~/ObsidianVault/00_meta/tasks.md   # 捕捉箱（gtd-* 専用）の絶対パス。空 → gtd-* は既定パス（この値）へフォールバック
 task_store_probe: ~/ObsidianVault/.obsidian    # 「配備済み」判定に使う存在チェック対象（Vault 同期ガード）
 project_task_store: .claude/tasks.md           # プロジェクトの作業キュー（context-* 専用・プロジェクトルートからの相対パス）。空 → context-* はタスク欄を出さずコアのみで完結
-vault: ~/ObsidianVault                          # Obsidian Vault ルート。空 → log/resource/daily/mail は案内終了
+vault: ~/ObsidianVault                          # Obsidian Vault ルート。空 → 既定 ~/ObsidianVault へフォールバックし、それも不在なら obsidian-* は案内終了、gtd-list / session-save の連携は skip
 vault_dirs:                                     # Vault サブディレクトリ名
   log: 20_log
   resource: 30_resource
@@ -31,12 +31,7 @@ gh_accounts:              # obsidian-daily が集約する GitHub アカウン�
 
 # Integrations resolver
 
-各スキルの「連携」が **どこを指すか・有効か** を 1 か所で宣言する。スキル本体は連携対象のパスや
-存在チェックを直書きせず、ここを参照する。これにより:
-
-- **単独動作 (standalone)**: このファイルや該当キーが無い環境でも、各スキルは「## コア」だけで完結する
-- **自動連携 (composable)**: 同じ環境に連携対象（tasks.md / Vault / 関連スキル）が揃っていれば、
-  各スキルがここを見て自動で噛み合う
+各スキルの「連携」が **どこを指すか・有効か** を 1 か所で宣言する。このファイルや該当キーが無い環境でも各スキルは「## コア」だけで完結し（standalone）、揃っていれば自動で噛み合う（composable）。
 
 ## 参照規約（各スキルの「## 連携」冒頭で行う三分岐）
 
@@ -55,22 +50,10 @@ gh_accounts:              # obsidian-daily が集約する GitHub アカウン�
 **bool 系キー**（memory_promotion / progress_map / daily_mail）の場合は probe 判定をせず:
    - キーが `on` → 実行 / `off`・未設定 → skip
 
-## キー一覧
-
-| キー | 用途 | 主な参照スキル | 未設定時（standalone） |
-|---|---|---|---|
-| `task_store` | 捕捉箱の絶対パス | gtd-add/done/list | gtd-* は案内して終了 |
-| `task_store_probe` | 捕捉箱の配備済み判定 | 同上 | `task_store` 自身の存在で代用 |
-| `project_task_store` | 作業キューの相対パス | context-save/load | タスク欄なしでコアのみ完結 |
-| `vault` | Obsidian Vault ルート | obsidian-log/daily/resource/mail, gtd-list(転記) | Vault 連携を案内して終了 |
-| `vault_dirs` | Vault サブディレクトリ名 | obsidian-* | 既定値（20_log / 30_resource / 10_daily / 00_meta） |
-| `memory_promotion` | 判断メモの MEMORY.md 昇格提案 | context-save, session-review | off（提案しない） |
-| `progress_map` | `.claude/progress.md` 連携 | context-save（context-load はコアで直接読む） | on（project-local で完結） |
-| `daily_mail` | デイリーサマリーのメール送信 | obsidian-mail | off |
-| `gh_accounts` | 集約対象 GitHub アカウント | obsidian-daily | アクティブ 1 アカウントのみ |
+各キーの用途・参照スキル・未設定時の挙動は frontmatter のインラインコメントが正本。`obsidian-mail` は `daily_mail` だけを見て、Vault パスはコード側の直書き（resolver を読まない）。
 
 ## 関連 shared ファイルとの役割分担
 
 - **integrations.md（本ファイル）** = 配線（パスと on/off）。他ファイルを参照しない
-- **vault-init.md** = Vault への書き方（ディレクトリ作成・ファイル名・frontmatter 規約）。Vault パスは本ファイルの `vault` を参照
-- **tasks-format.md** = tasks.md の中身フォーマット（行形式・文字数・セクション）。場所は本ファイルの `task_store` を参照
+- **vault-init.md** = Vault への書き方。Vault パスは本ファイルの `vault` を参照
+- **tasks-format.md** = 2 つの tasks.md の中身フォーマット。場所は本ファイルの `task_store` / `project_task_store` を参照
