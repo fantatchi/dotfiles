@@ -1,10 +1,10 @@
 # セキュリティレビュー 除外リスト（ペルソナ prompt 貼り付け用）
 
-公式 `/security-review`（Claude Code CLI 2.1.243 埋め込みプロンプト）の除外規定を**逐語**で保持したもの。
+公式 `/security-review`（Claude Code CLI 2.1.282 埋め込みプロンプト（文言の現存を 2026-09-25 に確認））の除外規定を**逐語**で保持したもの。
 セキュリティ観点のペルソナを立てる回に、この 2 リストを**要約せずそのまま** prompt へ貼る。
 
 なぜ逐語か: 要約するとペルソナが「レビュー対象側の主張」と誤認して偽陽性を生む
-（`[[feedback_pr_review_persona_prompt_verbatim]]`、PR #19 実例）。英語原文のまま貼ってよい。
+（`[[feedback_pr-review-persona-prompt-verbatim]]`、PR #19 実例）。英語原文のまま貼ってよい。
 
 貼り方の例:
 
@@ -65,5 +65,5 @@
 
 ## 参照元
 
-- 公式 `/security-review`: Claude Code CLI バイナリ埋め込み（`~/.local/share/claude/versions/<version>`、2.1.243 で確認）
+- 公式 `/security-review`: Claude Code CLI バイナリ埋め込み（`~/.local/share/claude/versions/<version>`、2.1.282 で確認）
 - 利用側: [`pr-review`](../pr-review/SKILL.md) Phase 2（security ペルソナを立てる回）
