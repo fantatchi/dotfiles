@@ -10,7 +10,7 @@ allowed-tools: Read, Skill, Write, Edit, Glob, Bash(git:*), Bash(echo:*), Bash(m
 
 **設計（orchestrator）**: 各処理の手順は持たず、`Skill` ツールでサブスキルを順に起動するだけ。書き出し先・フォーマット・ローテーション等の詳細はサブスキル側 SKILL.md が唯一の正本で、本ファイルでは再記述しない（齟齬防止）。**degradation（連携先が無いときの skip / フォールバック）は各サブスキルが内部で持つため、orchestrator は基本無条件で起動する**。例外は「起動自体が無意味になるキー」を持つサブスキルだけで、その場合のみ resolver を先読みして skip する（ここでは obsidian-log に対する `vault`）。
 
-> `allowed-tools` はこの orchestrator 自身が使う `Read` / `Skill` に加え、**サブスキル（obsidian-log / context-save）が要求するツールの和集合**を明示している。Claude Code の `allowed-tools` は「リスト内をプロンプトなしで許可」する宣言であって**リスト外を禁止しない**（リスト外ツールは通常の permission 設定に従う）ため、宣言漏れがあってもサブスキルが**無言で保存失敗することはなく**、最悪でも権限プロンプトが出るだけ。和集合を宣言しておくのは、その**プロンプトを抑制してサブの書き込みを滑らかに通すための保険**である。`Skill` 経由起動はメイン会話への SKILL.md 注入で別権限スコープを作らない（公式ドキュメント確認済み）が、入れ子時に親の `allowed-tools` へ絞られるかはドキュメント非明示のため、保険として和集合宣言を維持する。
+> `allowed-tools` はサブスキル（obsidian-log / context-save）が要求するツールの和集合。入れ子時に親の `allowed-tools` へ絞られるかはドキュメント非明示のため、権限プロンプトを抑える保険として維持する。
 
 ## 実行順序
 
@@ -24,7 +24,7 @@ obsidian-log は Vault を主資源とする「Vault 連携専用」スキルで
 
 ### ステップ 2: コンテキスト保存（context-save）
 
-`Skill` ツールで **context-save** を起動する（無条件。context-save 自身がコア＝`.claude/context.md` と `.claude/tasks.md`（作業キュー）の保存で完結し、progress.md 更新・MEMORY 昇格提案などの連携は内部で resolver を見て自己 degradation する）。session-save から起動しても context-save のコア＋有効な連携がすべて実行される。詳細は context-save SKILL.md 側が正本（本ファイルでは再記述しない）。
+`Skill` ツールで **context-save** を起動する（無条件。連携の degradation は context-save が内部で行う）。
 
 ### ステップ 3: アウトプット提案
 
@@ -65,14 +65,11 @@ obsidian-log は Vault を主資源とする「Vault 連携専用」スキルで
 ```
 セッションを保存しました:
 - 作業ログ: {ログファイル名}        ← skip した場合は「skip（Vault 未設定/未配置）」
-- コンテキスト: .claude/context.md
+- コンテキスト: .claude/context.md / tasks.md / handoff.md（内訳は context-save の報告のとおり）
 ```
 
 ※ ステップ 3 の提案がある場合は、完了報告の後に続けて出力する。
 
 ## 注意事項
 
-- **orchestrator はサブスキルを順に起動するだけ**。ステップ 1（obsidian-log）が skip / 失敗しても、ステップ 2（context-save）以降は実行する
-- 各ステップの詳細な仕様・degradation は個別のサブスキル定義（`obsidian-log` / `context-save`）が正本。本ファイルでは再記述しない
-- サブスキルによる共有正本（context.md / progress.md / .claude/tasks.md）への書込みは `~/.claude/skills/shared/multi-writer.md` の複数 writer 書込みプロトコルに従う（規定はサブスキル側 SKILL.md / tasks-format.md が正本。orchestrator は再記述しない）
-- 同セッションの作業ログが既に存在する場合に新規作成せず上書き更新するかどうかは obsidian-log 側の責務（本 orchestrator は関与しない）
+- ステップ 1（obsidian-log）が skip / 失敗しても、ステップ 2（context-save）以降は実行する
