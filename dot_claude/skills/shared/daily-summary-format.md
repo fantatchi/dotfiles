@@ -1,6 +1,6 @@
 # デイリーサマリー wire format（obsidian-daily ↔ obsidian-mail の契約）
 
-**shared ライブラリ**: `~/.claude/skills/shared/` 配下、`name:` 付きスキルではない（自動起動対象外）。`obsidian-daily`（producer）が書き、`obsidian-mail`（consumer）が読む「## デイリーサマリー」セクションの構造契約を 1 か所に集約する。両スキルが互いの SKILL.md を直接読み合う密結合を、この名前付き契約に置き換えるためのドキュメント。
+`obsidian-daily`（producer）が書き、`obsidian-mail`（consumer）が読む「## デイリーサマリー」セクションの構造契約。
 
 > **真の SSOT はコード**: 構造の正本は producer 側 `obsidian-daily/write-daily.py`（`SUMMARY_TEMPLATE` / `build_kpi_line` / `build_grouped_commits` / `build_logs_section`）と consumer 側 `obsidian-mail/extract-summary.py`（`_BULLET_RE` 等）。本ファイルは**両者が合意している契約の人間可読な要約**であり、コードと食い違ったらコードが優先。フォーマットを変えるときは必ず両コードを同時に直す（二重 SSOT を作らない）。
 
@@ -28,4 +28,4 @@
 
 PR の `labels` は `("作成", "マージ", "レビュー")` の**語固定**。producer の KPI 行が label 別に分解カウントするため、consumer・LLM 側で畳む／順序変更／別語置換をしない。
 
-詳細な振る舞いは各スキルの SKILL.md（`obsidian-daily` 5 節/6 節、`obsidian-mail` 2-b 節/2-c 節）とコードを参照。
+詳細な振る舞いは `obsidian-daily` SKILL.md 5 節/6 節と両コードを参照。手書きで追加した情報をメールに届けたい場合は Obsidian で直接見るか、consumer の拡張（未参照セクションを「その他」として末尾追加）を検討する。
