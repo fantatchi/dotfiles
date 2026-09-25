@@ -116,8 +116,9 @@ const client = new CopilotStudioClient(settings, async () => {
   return process.env.COPILOT_BEARER_TOKEN!;
 });
 
-const conversation = await client.startConversationAsync();
-const reply = await client.askQuestionAsync("Hello!", conversation.id);
+// startConversationAsync / askQuestionAsync are deprecated; use the streaming API
+// (startConversationStreaming / sendActivityStreaming). Verify the current
+// signatures via the microsoft-docs MCP before writing calls.
 ```
 
 ### 5.2 CORRECT: WebChat integration
