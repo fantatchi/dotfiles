@@ -7,8 +7,6 @@ allowed-tools: Read, Write, Edit
 
 # タスク追加
 
-思いつき・未分類のタスクを捕捉箱（tasks.md）の `## Inbox` セクションに追加する。
-
 **単独動作**: このスキルは捕捉箱 1 ファイルだけに依存し、兄弟スキルが無くても動く。場所は resolver `~/.claude/skills/shared/integrations.md` の `task_store` で解決する（無ければ既定 `~/ObsidianVault/00_meta/tasks.md`）。連携なし。
 
 **書き込み先は CWD で変わらない**（常に捕捉箱）。プロジェクト固有の「次にやること」は `/context-save` が各プロジェクトの `.claude/tasks.md` に保存するので、本スキルの守備範囲外。捕捉箱に落ちた思いつきを各プロジェクトへ振り分けるのは人の作業。
@@ -22,7 +20,6 @@ allowed-tools: Read, Write, Edit
 ### 1. 引数の確認
 
 - `$ARGUMENTS` が空の場合はユーザーにタスクタイトルを質問する
-- `$ARGUMENTS` にタイトルがあればそれを使う
 
 ### 2. プロジェクトタグ（任意）
 
@@ -46,7 +43,7 @@ allowed-tools: Read, Write, Edit
 
 ### 4. タイトル文字数チェック (MUST、書き込み前)
 
-タイトル本体（プロジェクトタグを除いた部分）の文字数を数え、`~/.claude/skills/shared/tasks-format.md` の「タイトルの文字数規則」に従う（101 文字以上は短縮を 1 度だけ提案、151 文字以上は短縮版の承認を得るまで書き込み禁止）。
+タイトル本体（プロジェクトタグを除いた部分）の文字数を数え、`~/.claude/skills/shared/tasks-format.md` の「タイトルの文字数規則」に従う（絶対上限を超える行は短縮版の承認を得るまで書き込まない）。
 
 ### 5. Inbox セクションに追記
 
@@ -59,8 +56,6 @@ allowed-tools: Read, Write, Edit
 - [ ] #project/<name> <タイトル>  ← 振り分け先が決まっている場合
 ```
 
-Edit ツールで `## Inbox\n\n## Next` のように空セクションの場合は、`## Inbox` の直後に挿入する。既存タスクがある場合は最後のタスク行の直後に挿入する。
-
 ### 6. 完了報告
 
 追加したタスク行を表示して完了を報告する：
@@ -72,7 +67,6 @@ Edit ツールで `## Inbox\n\n## Next` のように空セクションの場合�
 
 ## 注意事項
 
-- **タイトルは短く保つ** (60-100 文字中心、**150 文字絶対上限**)。ステップ 4 で文字数チェック必須。詳細・進捗・コミット ID・判断メモは context.md / Obsidian ノート / コミットメッセージへ逃がす（フォーマット詳細は `~/.claude/skills/shared/tasks-format.md` 参照）
-- 捕捉箱の場所は resolver の `task_store` が出典（既定 `~/ObsidianVault/00_meta/tasks.md`）。本スキルはプロジェクト側の `.claude/tasks.md` を作らない・書かない（それは `context-save` の責務）
+- 詳細・進捗・コミット ID・判断メモはタイトルに入れず context.md / Obsidian ノート / コミットメッセージへ逃がす
 - セクション見出しの表記（`## Inbox`）は変更しない
 - 既存のタスク行は一切変更しない
