@@ -2,16 +2,14 @@
 
 `~/.claude/CLAUDE.md` から外出ししたスキル運用の詳細。スキルの追加・削除・拡張時にだけ必要な情報のため、毎セッションで読み込まれる CLAUDE.md からは外している。
 
-> **注記**: 本ドキュメント内で言及している `spec-design` は **2026-06-18 に `spec-writer` へ改名**された（旧名は史実説明の文脈で残置）。現役パス参照は `spec-writer/references/` を読む。
-
 ## 新スキル追加・削除時のチェックリスト
 
-スキルを追加・削除した時は **同一コミットで** 以下を揃える（過去 `obsidian-summary` 追加時にここを抜かして `~/.claude/CLAUDE.md` / dotfiles README への反映が漏れ、後続セッションでスキルが認識されず誤作動を起こした。`consistency-check` 削除時も README から消し忘れた）。
+スキルを追加・削除した時は **同一コミットで** 以下を揃える（README への反映漏れで後続セッションがスキルを認識せず誤作動した事故が由来）。
 
 ### 新スキル追加時
 
 - [ ] `~/.claude/skills/<skill-name>/SKILL.md` を作成（frontmatter: `name` / `description` / `argument-hint` / `disable-model-invocation` / `allowed-tools` を適切に設定）
-- [ ] `~/.claude/CLAUDE.md` の「# スキルコマンド」セクションに 1 行追加（コマンド — 簡潔な説明）。ただし **自動発動可のスキルは追加しない** — 同節は 2026-09-02 の圧縮以降「description が注入されない手動専用スキルと、使い分けで迷う点だけ」を残す方針で、自動発動可のスキルは description が毎セッション注入されるため重複になる
+- [ ] `~/.claude/CLAUDE.md` の「# スキルコマンド」セクションに 1 行追加（コマンド — 簡潔な説明）。ただし **自動発動可のスキルは追加しない**（同節は「description が注入されない手動専用スキルと、使い分けで迷う点だけ」を残す方針）
 - [ ] `~/.local/share/chezmoi/README.md` の「**スキル一覧:**」テーブルに 1 行追加
 - [ ] README の「使いどころ」テーブルにも必要なら追加（`/obsidian-*` 等の関連グループに属する場合）
 
@@ -24,7 +22,7 @@
 
 ### 既存スキル機能拡張時（追加・削除ではない、機能のスコープが広がる場合）
 
-過去 `spec-design` に「ベースカラー Blue デフォルト / 伝わるデザイン原則 / 階調マッピング」を追加した時、`/spec-design` の説明文が古いままで「カラーパレット選定」「伝わるデザイン」のトリガー語が抜け、ユーザーから「機能が拡張されていることがリストから見えない」指摘を受けた。以下を確認する:
+機能を足したのに description のトリガー語が古いままだと、拡張されたことがリストから見えない。以下を確認する:
 
 - [ ] `~/.claude/CLAUDE.md` の「# スキルコマンド」の該当行の説明文に新機能の概要が反映されているか
 - [ ] `~/.local/share/chezmoi/README.md` の「**スキル一覧:**」テーブルの該当行も同様に反映されているか
@@ -33,7 +31,7 @@
 
 ### Codex 側ミラーの追従判断（`~/.agents/skills/` に同名スキルがある場合）
 
-Codex CLI 用のスキルは `~/.agents/skills/` に**別実体**として置かれている（symlink による 1 本化は検証のうえ不採用。理由と harness 依存差分の一覧は `~/.codex/design/claude-codex-skill-migration.md`）。Claude 側だけを編集すると Codex 側が古い仕様のまま取り残され、`context.md` / `tasks.md` / `handoff.md` のような**共有正本を古い規約で書かれる**（2026-08-25 に 26 コミット分の遅れを検出）。
+Codex CLI 用のスキルは `~/.agents/skills/` に**別実体**として置かれている（symlink による 1 本化は検証のうえ不採用。理由と harness 依存差分の一覧は `~/.codex/design/claude-codex-skill-migration.md`）。Claude 側だけを編集すると Codex 側が古い仕様のまま取り残され、`context.md` / `tasks.md` / `handoff.md` のような**共有正本を古い規約で書かれる**。
 
 - [ ] 編集したスキルが `~/.agents/skills/<skill-name>/` にも存在するか確認する
 - [ ] 存在する場合、その変更が **harness 依存か非依存か**を判断する。`allowed-tools` / `Skill` ツール / `$ARGUMENTS` / `CLAUDE.md` 参照 / `source: claude-*` / `/skill` 記法 / 主語の「Claude」に**該当しない**変更は harness 非依存なので、Codex 側にも同じ変更が要る
@@ -42,7 +40,7 @@ Codex CLI 用のスキルは `~/.agents/skills/` に**別実体**として置か
 
 ### chezmoi 反映（追加・削除・拡張すべてに共通、編集後 必須確認）
 
-`~/.claude/skills/` 配下は **chezmoi 管理下だが live を直接編集する**運用（context.md 運用ルール）。live 編集だけで止めると source と乖離し、後日 `chezmoi diff` に想定外差分が出て解釈に詰まる（2026-06-02 に `obsidian-daily/SKILL.md` を live のみ編集して source 反映が漏れた事故が由来）。**編集と同一セッションで source 反映まで必ず確認する**（2026-05-27 原則「live と source の乖離時間を最小化」）。
+`~/.claude/skills/` 配下は **chezmoi 管理下だが live を直接編集する**運用（context.md 運用ルール）。live 編集だけで止めると source と乖離し、後日 `chezmoi diff` に想定外差分が出て解釈に詰まる。**編集と同一セッションで source 反映まで必ず確認する**。
 
 - [ ] **新規ファイル**（新スキルの SKILL.md / references 等）は `chezmoi add <path>` で source に取り込む（`re-add` は未管理ファイルに対しては `not managed` エラーになる）
 - [ ] **既存ファイルの編集**は `chezmoi re-add <path>` で source を更新する
@@ -60,12 +58,11 @@ Codex CLI 用のスキルは `~/.agents/skills/` に**別実体**として置か
 
 ## スキル設計の判断軸（責務分担・入口・単一出典）
 
-複数スキルが共通ドメインを扱う時の構造判断。2026-05-13〜14 の視覚設計スキル群（spec-design / dashboard-design）整理で確立し、context.md の判断メモから昇格した。なお dashboard-design は 2026-06-17 に spec-design へ統合・削除済み（PDF / BI / ダッシュボード用途が使われず、唯一の実消費者が spec-design の HTML 補足ページのみだったため、分割の維持コストが価値を上回った）。視覚設計データ・原則は `spec-design/references/` に集約。<strong>分割スキルの非共有ユースケースが使われなくなったら統合する</strong>、という逆方向の判断例。
+複数スキルが共通ドメインを扱う時の構造判断。逆方向の判断例として、**分割スキルの非共有ユースケースが使われなくなったら統合する**（dashboard-design は唯一の実消費者が spec-writer の HTML 補足ページだけになり、spec-writer へ統合・削除した）。
 
 - **入口（トリガー語）の集約 vs 中身の参照誘導を分ける**: 複数スキルが共通ドメインを扱う場合、トリガー語は 1 つのスキルに集約しつつ、機能本体は references で相互参照させると、トリガー精度を保ったまま機能カバレッジを失わない（例: タスク操作のトリガー語は gtd-add / gtd-done / gtd-list と動詞別に分け、共通の tasks.md フォーマットは shared/tasks-format.md を単一出典として参照させる）
 - **複合スキルと単体スキルの棲み分けは単体側 description に明記する**: 複合 ⊃ 単体 の内包関係（例: session-save ⊃ context-save）は、単体側の description で「複合スキルが内包する旨」を書かないと、複合側を使うメリットが利用者から見えなくなる
-- **視覚設計データは責務軸で単一出典化する**: `spec-design/references/` 内で、パレット HEX の正本は `visual-encoding.md`、ベースカラー切替の階調マッピングは `base-color-mapping.md`、伝わるデザイン原則は `communicative-design.md` と責務別に分け、互いに内製で重複させない（2026-06-17 の dashboard-design 統合で spec-design 内に集約）
-- **共通リソースの「真の単一出典化」は責務軸で切る**: 「何の単一出典か」を軸にすると、マッピングルール（判断軸）/ パレット HEX（データ）/ 原則集（判断軸）と責務がきれいに分かれ、どれをどこへ置くか迷わない
+- **共通リソースの「真の単一出典化」は責務軸で切る**: `spec-writer/references/` では HEX 値の正本は `dads-tokens.md`、視覚エンコードは `visual-encoding.md`、伝わるデザイン原則は `communicative-design.md` と責務別に分け、互いに内製で重複させない。「何の単一出典か」を軸にすると、データ / 判断軸で置き場に迷わない
 
 ## スキルの種類と frontmatter 方針
 
@@ -73,14 +70,12 @@ Codex CLI 用のスキルは `~/.agents/skills/` に**別実体**として置か
 - **ロール変換型スキル**: エージェントを特定の専門家役に変身させ、その後の作業全般を導くため、`allowed-tools` を**指定しない**（指定するとトリガー後の実作業で権限不足になる）
 - **オーケストレータ型スキル**（`pr-review` / `multi-persona-review`。過去例に `codex-fix-loop`）: 並列 Agent 起動や反復ループで複数フェーズを回す。`allowed-tools` の要否は **「スキル自身が任意プロジェクトのコードを書き換えるか」** で決める
   - **書き換えない**（読取専用レビュー・草稿出力のみ）→ 列挙する。`pr-review` / `multi-persona-review` がこれ
-  - **書き換える**（レビュー結果を受けて修正まで行う）→ 指定しない。列挙すると修正フェーズやテスト実行で権限不足になる。`codex-fix-loop`（2026-08-18 撤去）がこれで、SKILL.md 内に「操作型だが指定しない」理由を明記していた。現存スキルに該当はないが、書き換える型を作るときの判断軸として残す
+  - **書き換える**（レビュー結果を受けて修正まで行う）→ 指定しない。列挙すると修正フェーズやテスト実行で権限不足になる（現存スキルに該当はない。撤去済みの `codex-fix-loop` がこの型だった）
   - どちらの場合も、二分類の既定から外れる判断をしたときは **SKILL.md 本文に理由を書く**（後から読んで判断を再現できるようにする）
 
 ## MEMORY.md（auto memory）への昇格運用
 
-`~/.claude/projects/<project>/memory/` 配下の **auto memory** システムは、ユーザー指示や Claude の自律判断で `feedback_*.md` / `user_*.md` / `project_*.md` / `reference_*.md` を保存し、`MEMORY.md` 索引から全セッションで参照される仕組み。
-
-context.md の判断メモが時間経過で肥大化するため、再利用性の高い知見は MEMORY.md に昇格させる運用ガイドを設ける（context-save SKILL.md からも参照する）。
+context.md の判断メモが時間経過で肥大化するため、再利用性の高い知見は auto memory（`~/.claude/projects/<project>/memory/`）に昇格させる。書式はハーネスのシステム指示に従う。
 
 ### 昇格判断の基準
 
@@ -97,19 +92,7 @@ context.md の `## 判断メモ` に書いた項目のうち、以下のいず�
 - **一過性のバグ修正経緯**: 特定 commit 由来の問題で再発しないもの
 - **作業の時系列ログ**: 「2026-MM-DD に X した」は context.md の進行中の作業セクション側
 
-### 昇格の手順
-
-1. context.md `## 判断メモ` で再利用候補を抽出
-2. memory 種別を判定（feedback / user / project / reference）
-3. `~/.claude/projects/<project>/memory/<type>_<slug>.md` を frontmatter 付き（`name` / `description` / `metadata.type`）で書く。本文は **Why** と **How to apply** を明示
-4. `~/.claude/projects/<project>/memory/MEMORY.md` 索引に 1 行追加（150 文字以内）
-5. context.md 側の元エントリは削除（移行完了）、または「→ MEMORY.md `<name>` 参照」と短縮
-
-### 注意
-
-- MEMORY.md は **`~/.claude/CLAUDE.md`** から auto memory システム指示で読み込まれる（claude code 起動時自動）。グローバル CLAUDE.md の指示と矛盾する内容は書かない
-- 「保存しない」とユーザーが言うものは保存しない（明示拒否を優先）
-- 機密・認証情報は絶対に書かない（CLAUDE.md「# 禁止パターン」準拠）
+昇格したら context.md 側の元エントリは削除するか「→ MEMORY.md `<name>` 参照」と短縮する。memory の `name` はファイル名（拡張子なし）に揃える。
 
 ## ステアリング手法の採否方針（外部ガイド適用の記録）
 
@@ -119,7 +102,7 @@ Anthropic 記事「Steering Claude Code: skills, hooks, rules, subagents and mor
 - **サブディレクトリ CLAUDE.md / `claudeMdExcludes` — 不採用**。モノレポ向けで対象が存在しない。
 - **managed settings — 不採用**。組織が端末を上書き不能に固定する用途。単一ユーザー環境では `permissions.deny` と強制力が同等で過剰。
 - **PreToolUse ガードレール hook（破壊的 SQL / push ブロック）— 不採用**。push は revert で回復可能なので hook どころか事前確認も不要（2026-06-22 に自律実行へ変更済み）、secrets は Edit/Write 経由で漏れ hook では塞げない（見せかけの安心）、破壊的 SQL のみ理論上は妥当だが WSL/Win 二重実装 + `run-hook.js` の exit code 伝播改修コストに見合わない。禁止事項は CLAUDE.md「# 確認トリガー」「# 禁止パターン」のプロンプト運用を継続する。
-- **`~/.claude/agents/` は空のまま維持**。カスタム subagent は新設しない（research / ログ分析は組込 Explore / Plan + `multi-persona-review` で充足、subagent 乱立が最大リスク）。
+- **`~/.claude/agents/` は空のまま維持**。カスタム subagent は新設しない（所在探索は組込 Explore、分析・監査は general-purpose か `multi-persona-review` で充足、subagent 乱立が最大リスク）。
 
 外部ガイドは一律全採用せず、既存環境のカバー状況との**差分**で 1 項目ずつ取り込む（メモリ `feedback_adopt-external-guidance-by-diff` 準拠）。
 
