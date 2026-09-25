@@ -8,10 +8,9 @@ allowed-tools: Read, Write, Glob, Bash(echo:*), Bash(mkdir:*), Bash(date:*)
 
 # リソース・ブログドラフトの記録
 
-Claude との作業内容・調べた内容・参考リソースを Obsidian Vault に記録する。
 frontmatter を Hugo 公開可能な形にしてあるため、後からそのままブログ化しやすい。
 
-**主資源と連携**: このスキルは Obsidian Vault（主資源）へのリソース／ドラフト書き出し専用で、Vault があれば兄弟スキル無しで動く。Vault パスは resolver `~/.claude/skills/shared/integrations.md` の `vault`（既定 `~/ObsidianVault`）から `vault-init.md` 経由で解決する。Vault が無い環境では `vault-init.md` 1 節の案内で終了する（standalone フォールバックは無い＝Vault 連携専用スキル）。それ以外の兄弟スキル連携は持たない。
+**主資源と連携**: Vault パスは resolver `~/.claude/skills/shared/integrations.md` の `vault` から `vault-init.md` 経由で解決する。Vault が無い環境では `vault-init.md` 1 節の案内で終了する（standalone フォールバックは無い）。
 
 ## 書き出し先・ファイル名
 
@@ -23,10 +22,7 @@ $ARGUMENTS で分岐する。
 
 ### 引数が `auto` の場合 — セッション内容から自動ドラフト化
 
-1. セッションの作業内容を振り返る
-2. 記事・メモになりそうなトピックを特定する
-3. 対話なしにドラフトを生成して保存する
-4. 「ドラフトを作成しました: （ファイル名）」と通知する
+セッション内容から記事・メモになりそうなトピックを特定し、対話なしにドラフトを生成・保存して「ドラフトを作成しました: （ファイル名）」と通知する。
 
 ### 引数がタグ指定の場合 — タグを付与して記録
 
@@ -36,7 +32,7 @@ $ARGUMENTS で分岐する。
 
 ### 引数なしの場合 — 内容をもとに自動タグで記録
 
-- `claude-resource` と自動生成タグのみで記録する（「タグの自動生成」ルールに従い、`claude-resource` を除いて最大 5 個）
+- `claude-resource` と自動生成タグのみで記録する
 - 引数に `auto` を指定するとセッション内容からドラフトを自動生成できる旨を 1 行案内する
 
 ## 出力フォーマット
@@ -47,47 +43,26 @@ $ARGUMENTS で分岐する。
 
 - `title`: 記事タイトル（内容から生成）
 - `date`: 作成日
-- `tags`: 3〜5 個。引数タグ＋自動生成タグ（`claude-resource` は常に含める、5 個カウントには含めない）
+- `tags`: 「タグの自動生成」のルールに従う
 - `categories`: 1 つ。`~/.claude/skills/obsidian-resource/references/categories.md` から選ぶ。該当なしなら新規追加して一覧も更新する
 - `draft: true`: 常に付与（Hugo 公開時に手動で false に切り替える）
 - `source` / `generation` / `summary_of`: 再帰要約劣化対策メタ。引数モードで出し分ける:
   - **手動 / 引数あり / 引数なし**: `source: claude-resource`, `generation: 0`（一次資料相当）。`summary_of` は付けない
-  - **`auto` モード**: `source: claude-summary`, `generation: 1`, `summary_of: ["[[元 session-log の wiki-link]]", ...]`（セッションログの要約なので要約扱い）。元 session-log が `~/ObsidianVault/20_log/` に存在する場合はその basename を `[[...]]` で並べる。存在しない場合は `summary_of: ["session"]` のような汎用ラベル 1 件で OK
+  - **`auto` モード**: `source: claude-summary`, `generation: 1`, `summary_of: ["[[元 session-log の wiki-link]]", ...]`（セッションログの要約なので要約扱い）。元 session-log が `<vault>/<vault_dirs.log>/` に存在する場合はその basename を `[[...]]` で並べる。存在しない場合は `summary_of: ["session"]` のような汎用ラベル 1 件で OK
 
 ### タグの自動生成
 
-引数タグに加え、内容から関連タグを自動生成して追加する。
-
-- 技術領域（例: typescript, react, aws, docker）
-- 情報の種類（例: tutorial, reference, comparison, troubleshooting）
-- 対象トピック（例: api, database, security, performance）
-
-ルール:
-- `claude-resource` は常に含める（5 個カウントに含めない）
-- 引数タグ＋自動生成タグの合計が最大 5 個になるようにする
-- 引数タグを優先し、残り枠を自動生成で埋める
+`claude-resource` は常に含め（数に入れない）、引数タグ＋自動生成タグの合計を最大 5 個にする。引数タグを優先し、残り枠を技術領域・情報の種類・対象トピックから自動生成で埋める。
 
 ### 本文の書き方
 
-- 後から読み返して（または Hugo で公開して）理解できるよう、文脈を含めて書く
-- コード例は言語指定付きのコードブロックを使う
-- 長い内容は見出しで構造化する
-- 公式ドキュメント・URL 等の情報源は参考リンクに記載
 - トーン: カジュアルで読みやすい。幅広いエンジニアを読者に想定
 - Hugo 用なので標準 Markdown のみ（ショートコードは使わない）
-- **文章規範は `japanese-article-style` スキルに従う**（体験記・記事ノート向け。骨格を毎回変える、箇条書きは全行の 4 分の 1 まで、失敗や手戻りを削らない）
-
-**本文の見出しは記事ごとに決める。定型の骨格を持たない。**
-以前は「概要 / 内容」を推奨構成として置いていたが、Vault の記事 74 本のうち 53 本が
-`## 概要` で始まる状態になり、どの記事も同じ形に見える原因になっていた（2026-09-01 に実測）。
-末尾の `参考リンク` と `関連メモ` だけは、あれば付ける（無ければ節ごと省略）。
+- **文章規範は `japanese-article-style` スキルに従う**。本文の見出しは記事ごとに決め、定型の骨格（「概要 / 内容」）を持たない。末尾の `参考リンク` と `関連メモ` だけは、あれば付ける
 
 ## 注意事項
 
-- ユーザーが記録を依頼した内容を整理して書くこと
-- 書き出し先ディレクトリが存在しない場合は作成すること
 - 既存ファイルがある場合は上書きせず確認する
-- ファイル書き込みは Write ツールで直書きする（書き出し用の補助スクリプトは持たない。テンプレ展開・frontmatter 組み立てを Claude 自身が行う設計）
-- Hugo 公開は別途 Hugo リポジトリへのコピー・リンク設定が必要。本スキルは ObsidianVault への下書き保存のみを担う
-- すべてのリソースは `30_resource/YYYYMM/` の月別フォルダに保存する。ブログドラフトと通常リソースを物理的に分離せず、frontmatter の `categories` / `tags` で区別する
-- 既存 resource ファイル 39 件は旧形式（`title` / `categories` / `draft` なし）と混在する。Dataview 等でクエリする場合は `WHERE file.frontmatter.categories != null` のようにガードを入れる
+- Hugo 公開は別途 Hugo リポジトリへのコピー・リンク設定が必要。本スキルは Vault への下書き保存のみを担う
+- ブログドラフトと通常リソースを物理的に分離せず、frontmatter の `categories` / `tags` で区別する
+- 既存 resource ファイルには旧形式（`title` / `categories` / `draft` なし）が混在する。Dataview 等でクエリする場合は `WHERE file.frontmatter.categories != null` のようにガードを入れる
