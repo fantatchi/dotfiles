@@ -10,7 +10,7 @@ allowed-tools: Read, Bash(date:*), Bash(python3:*), Bash(ls:*), Bash(test:*), Ba
 
 Obsidian デイリーノートの「## デイリーサマリー」セクションを **構造化パース → メール向けに再構成**して Gmail SMTP で送信する。Obsidian ノート形式をそのまま流すのではなく、「今日のひとこと → ハイライト → GitHub → 明日のタスク」の読み物形式にする。
 
-**主資源と連携**: 主資源は Obsidian Vault（`obsidian-daily` が書いたデイリーノートの読み出し元）。配線は resolver `~/.claude/skills/shared/integrations.md` の `vault`（既定 `~/ObsidianVault`、`extract-summary.py` が `os.path.expanduser` で解決）と、連携 on/off を持つ bool キー `daily_mail` で判定する。`daily_mail` が `off` / 未設定なら送信せず終了する（メール連携は composable な拡張で、無くても他スキルに影響しない）。読み取るサマリーの**文章規約は `obsidian-daily` の出力との契約**であり `~/.claude/skills/shared/daily-summary-format.md` に集約（ただし真の SSOT は両者のコード）。
+**主資源と連携**: 送信の on/off は resolver `~/.claude/skills/shared/integrations.md` の bool キー `daily_mail` で判定する。Vault パスは **`extract-summary.py` が `~/ObsidianVault` を直書きで持ち、resolver の `vault` は読まない**。読み取るサマリーの構造は `obsidian-daily` の出力との契約で `~/.claude/skills/shared/daily-summary-format.md` に要約がある（真の SSOT は両者のコード）。
 
 ## 引数仕様
 
@@ -24,16 +24,11 @@ $ARGUMENTS:
 
 ## 前提セットアップ（初回のみユーザー操作）
 
-### 1. Gmail アプリパスワードの取得
+Gmail の 2 段階認証と 16 文字のアプリパスワード（https://myaccount.google.com/apppasswords）が前提。
 
-1. https://myaccount.google.com/security で **2 段階認証プロセス**が有効であることを確認
-2. https://myaccount.google.com/apppasswords にアクセス
-3. アプリ名: `obsidian-mail` 等の任意名 → 「作成」
-4. 表示された 16 文字のパスワード（スペースなし）を控える
+### keyring に資格情報を登録（各 PC で 1 回ずつ）
 
-### 2. keyring に資格情報を登録（各 PC で 1 回ずつ）
-
-`send-summary.py` は Python `keyring` ライブラリ経由で OS 資格情報マネージャから SMTP 認証情報を取得する。**平文ファイルは持たない設計**（旧 `settings.local.json` env 経路は廃止）。
+`send-summary.py` は Python `keyring` ライブラリ経由で OS 資格情報マネージャから SMTP 認証情報を取得する。**平文ファイルは持たない設計**。
 
 **Windows** — claude.app ローカルルーティーンの本番経路:
 
@@ -55,29 +50,17 @@ OBSIDIAN_SUMMARY_SMTP_USER='...' OBSIDIAN_SUMMARY_SMTP_PASS='...' \
     python3 ~/.claude/skills/obsidian-mail/send-summary.py daily 2026-05-19
 ```
 
-恒久ストレージが必要なら `pip3 install --user keyrings.alt` 後に `python3 -m keyring set ...` で暗号化ファイルバックエンドが使えるが、master password が毎回必要になり routine 用途には不向き。
+### env 変数名（重要）
 
-### 3. env 変数名の命名について（重要）
+スキル名は `obsidian-mail` だが env 変数 prefix と keyring username は旧名由来の **`OBSIDIAN_SUMMARY_*` のまま**（変えると全マシンで keyring 再登録になる）。新規セットアップでも `OBSIDIAN_SUMMARY_*` で登録する。オプション: `OBSIDIAN_SUMMARY_MAIL_TO` / `OBSIDIAN_SUMMARY_MAIL_FROM`（既定は `SMTP_USER`）。
 
-スキル名は `obsidian-mail` だが env 変数 prefix（および keyring username）は `OBSIDIAN_SUMMARY_*` のまま据置している。これは旧スキル名 `obsidian-summary` 時代の命名で、リネームに合わせて変えると **全マシンで keyring 再登録が必要** になる移行コストを避けるための backward compat 措置。新規セットアップでも `OBSIDIAN_SUMMARY_*` で登録すること。
-
-オプション:
-- `OBSIDIAN_SUMMARY_MAIL_TO`: 送信先アドレス（デフォルト: `SMTP_USER` と同じ）
-- `OBSIDIAN_SUMMARY_MAIL_FROM`: 送信元アドレス（デフォルト: `SMTP_USER` と同じ）
-
-### 4. Python 依存
-
-- `keyring`（`pip3 install --user keyring` / Windows は `pip install keyring`）— OS 資格情報マネージャアクセス
-- `markdown`（`pip3 install --user markdown`）— HTML 変換
+Python 依存: `keyring`、`markdown`。
 
 ## 動作
 
 ### 0. 連携 gate の確認（daily_mail）
 
-resolver `~/.claude/skills/shared/integrations.md` を Read し `daily_mail` を確認する（bool 系キー：probe 判定なし）。
-
-- `daily_mail` が `off` / 未設定 / resolver 不在 → 「メール連携が無効（daily_mail off）のため送信をスキップします」と 1 行報告して **正常終了**
-- `daily_mail` が `on` → 以降の手順に進む
+`daily_mail` が `off` / 未設定 / resolver 不在 → 「メール連携が無効（daily_mail off）のため送信をスキップします」と 1 行報告して **正常終了**。
 
 ### 1. 引数解析と対象日決定
 
@@ -94,37 +77,7 @@ resolver `~/.claude/skills/shared/integrations.md` を Read し `daily_mail` を
 python3 ~/.claude/skills/obsidian-mail/send-summary.py "$MODE" "$TARGET_DATE"
 ```
 
-`send-summary.py` は内部で:
-
-1. `extract-summary.py` を呼んでサマリーを抽出 → 構造化パース → メール向けに再構成（plain Markdown + HTML 両方生成）
-2. `empty: true` の場合: 送信せず `{"sent": false, "reason": "empty"}` を返す
-3. それ以外: multipart/alternative メッセージを構築 → `smtp.gmail.com:465`（SSL）でログイン → 送信
-4. 結果 JSON を stdout に出力
-
-### 2-b. メール本文の構成（再構成ロジック）
-
-`extract-summary.py` は「## デイリーサマリー」セクションを以下の規約セクションに分解してパースし、メール向けに再構成する:
-
-| 入力（規約セクション） | 出力（メール） |
-|---|---|
-| 冒頭の KPI 行 `**今日の活動**: commits N (M repos) / PRs N (...) / logs N` | **除去**（メールには独自の `## GitHub` 集計行があるため不要） |
-| `> [!info]- 自動生成（メタデータ）` callout | **除去**（メタ情報、内部リンク `[[...]]` も除去） |
-| `### 今日の要約` | `## 今日のひとこと`（青ボックス `.tldr`、複数段落なら最初の 1 段落のみ）。obsidian-daily SKILL.md 5 節の仕様によりプロジェクト軸の箇条書き 2-4 行（`- <project>: <核心>`）が標準。`<p>` だけでなく `<ul>` も `.tldr` で wrap |
-| `### 作業ログ` 内の `> [!note]- 詳細（作業ログ N 件）` callout 配下の `> - **project**: body` bullet | `## ハイライト` — 各 bullet を 1 行に圧縮（body の最初の句のみ）。callout の `> ` 接頭辞は正規表現で許容 |
-| `### GitHub アクティビティ` の `#### コミット`（`##### owner/repo (N)` 小見出しでグルーピング） / `#### PR` | `## GitHub` — 集計行（コミット N / PR M（作成 X, マージ Y, レビュー Z））+ PR リンク一覧。リポ別小見出しは無視して bullet をフラットに集計 |
-| `### 明日以降のタスク` の `- [ ] #project body` | `## 明日のタスク` — 件数 + プロジェクト別内訳 + 抜粋 5 件 + `…ほか N 件` + `_待ち N 件は省略_` |
-
-### 2-c. 規約縛り（手書き追加コンテンツは静かに捨てる）
-
-このスキルは **obsidian-daily が出力する規約フォーマット** に依存する。以下は意図的に捨てる:
-
-- `## デイリーサマリー` セクションの **外** にあるもの（先頭の手書きメモ、別 h2 セクション）
-- `## デイリーサマリー` 内の **規約 4 セクション以外の `### xxx`**（手書きで追加した雑記など）
-- `### 作業ログ` 内の `- **project**: body` 形式以外の bullet（callout `> [!note]-` の内側でも外側でも、形式が合致すれば採用、合致しなければ捨てる。callout の構造そのものは判定に使わない）
-- `### 明日以降のタスク` 内の `- [ ] #project body` 形式以外の bullet
-- `### GitHub アクティビティ` 内の `#### コミット` / `#### PR` 以外の小見出し
-
-手書きで追加した情報をメールに届けたい場合は Obsidian で直接見るか、本スキルの拡張（未参照セクションを「その他」として末尾追加）を検討する。
+`send-summary.py` が抽出・再構成・SMTP 送信まで行い、結果 JSON を stdout に出す。対象が無ければ `{"sent": false, "reason": "empty"}`。メール本文の再構成規約（何を採り、手書き追加を静かに捨てるか）は `shared/daily-summary-format.md` を参照。
 
 ### 3. 「対象なし」スキップ判定
 
@@ -145,29 +98,7 @@ python3 ~/.claude/skills/obsidian-mail/send-summary.py "$MODE" "$TARGET_DATE"
   欠落: <missing_dates>（あれば）
 ```
 
-### 5. 週報の構成
-
-`weekly` モードは各日の構造化パース結果を **プロジェクト軸で集約** する（日別の縦並びは取らない）:
-
-```
-# YYYY-MM-DD 〜 YYYY-MM-DD 週報
-
-取得済み: N/7 日分（欠落: ...）
-
-## 週次集計
-- 動いたプロジェクト: N
-- GitHub: コミット N / PR M
-- 明日タスク累計: N 件
-
-## プロジェクト別ハイライト
-
-### {プロジェクト名} · N 件
-- [MM-DD] worklog の最初の句
-- [MM-DD] ...
-- …ほか N 件（1 プロジェクト最大 3 件表示、残りは件数のみ）
-```
-
-プロジェクトの並び順は活動件数の多い順 → アルファベット。各プロジェクトの bullet は worklog の `- **proj**: body` を `first_sentence(body)` で 1 行に圧縮し、日付付きで列挙する（最大 `PROJECT_TOP_N=3` 件、残りは件数表示）。週報では TL;DR / 個別タスクは出さない（俯瞰のための圧縮優先）。
+週報はプロジェクト軸で集約し、欠落日があっても残った日数で送信する（本文冒頭に欠落日を明記）。
 
 ## エラー処理
 
@@ -183,14 +114,9 @@ python3 ~/.claude/skills/obsidian-mail/send-summary.py "$MODE" "$TARGET_DATE"
 | Daily summary mail | 火〜土 8:00 | `/obsidian-mail daily` |
 | Weekly summary mail | 月 8:00 | `/obsidian-mail weekly` |
 
-> **リネーム時のルーティーン書き換え必須（重要）**: スキル名やプロンプトを変更した場合、Claude.app の **ローカルルーティーン側は自動更新されない**。旧プロンプト（例: `/obsidian-summary daily`）を登録したままだと次回発火時に「コマンド不明」で **サイレント失敗**（メールが来ない以外にエラー通知がない）する。スキルリネーム時は必ず Claude.app UI でルーティーンの slash command 文字列も書き換えること。気付くのは「メール来ないな」と能動的に思い出した時のみ、というのが地雷。
+> **リネーム時はルーティーンも書き換える**: Claude.app のローカルルーティーンは自動更新されず、旧プロンプトのままだと「コマンド不明」で**サイレント失敗**する（メールが来ない以外に通知がない）。
 
 ## 実装メモ
 
-- このスキルは Claude.app の **ローカルルーティーン**から呼ばれる前提。`disable-model-invocation: true` で自動発火しないため、routine プロンプトに `/obsidian-mail daily` のように明示記述する
 - `obsidian-daily` 側のハングで対象が無い場合は単純スキップする（ユーザー判断）。気付くためには `10_daily/` を時々目視するか、週報で欠落日表示を確認する
-- 週報は欠落日があっても残った日数（例: `5/7 日分`）で送信する。本文冒頭に欠落日を明記する
-- HTML レンダリングは `markdown` ライブラリの `extra` + `sane_lists` 拡張を使用（`nl2br` は外した。再構成後の本文は段落ベースなので `<br>` が増えすぎるとレイアウトが崩れる）。`### 今日の要約` 直下の `<p>` は HTML 後処理で `.tldr` 青ボックスに包む
-- TL;DR が複数段落の場合、メールでは **最初の段落のみ** 採用する（残りは Obsidian で見る前提）。全文を残すと `.tldr` ボックス外にこぼれてレイアウトが崩れる
-- アプリパスワードは Google 側でいつでも revoke できる。漏洩した場合は `https://myaccount.google.com/apppasswords` で削除し、keyring に再登録する（前提セットアップ 2 節）
-- **Message-ID の domain は `obsidian-mail.local`**。リネーム前は `@obsidian-summary.local` だったため、Gmail で `from:` や `rfc822msgid:` の domain ベースのフィルタを組んでいる場合は **filter rule の更新が必要**。スレッディングは日次/週次の独立メールで連続性が薄いため副作用は軽微だが、Gmail 検索（`from:obsidian-summary.local`）が効かなくなる点に注意
+- Message-ID の domain は `obsidian-mail.local`（Gmail のフィルタを domain で組むならこの値）
