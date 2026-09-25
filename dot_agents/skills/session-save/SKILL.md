@@ -62,7 +62,7 @@ obsidian-log は Vault を主資源とする「Vault 連携専用」スキルで
 ```
 セッションを保存しました:
 - 作業ログ: {ログファイル名}        ← skip した場合は「skip（Vault 未設定/未配置）」
-- コンテキスト: .claude/context.md
+- コンテキスト: .claude/context.md / tasks.md / handoff.md（内訳は context-save の報告のとおり）
 ```
 
 ※ ステップ 3 の提案がある場合は、完了報告の後に続けて出力する。
