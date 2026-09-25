@@ -63,6 +63,16 @@ Codex の作業ログは Claude と同じ `20_log/YYYYMM/`、リソースは `30
 | `pr-review` | 上記に加え、子エージェントへの `shared/security-review-exclusions.md` 逐語貼付、3 値 verdict（CONFIRMED / PLAUSIBLE / REFUTED、既定 PLAUSIBLE、REFUTED に立証責任）、ギャップ掃討フェーズ（新 5 節）、草稿テンプレの刷新 |
 | `spec-writer` | 本文の構造化（表・リスト）、具体例の使い方、公式語選定の 3 基準と What it is NOT、Appendix 節、アンチパターン 10〜13、`references/diagram-selection.md` の論理図パターン表 |
 
+2026-09-25 の追従（Claude 側 9/25 の 33 commit・スキル本文の圧縮と横断整合性の修正）: `pr-review` / `multi-persona-review` は 8/28・9/11 に規範を移植済みで、9/25 の差分は Claude 版にしか無い解説と壊れた Step 参照の削除だけだったので無変更。移植したのは Codex 版本文に再掲されていた旧値・旧記述の修正に限る。
+
+| スキル | 移植した規範 |
+|---|---|
+| `context-load` | PR 実査を OPEN / 未決だけに絞る、progress.md 8KB 超の要約提示、Next 件数目安を `tasks-format.md` 参照にする |
+| `context-save` | 文字数上限・件数目安を `tasks-format.md` 参照にする、連携3 の条件に `memory_promotion` on を足す、肥大アラートを件数またはサイズで発火 |
+| `session-review` | 連携番号の誤り（連携3 → 連携2）、`memo-compaction.md` の実行条件を件数・サイズ両方に広げる |
+| `session-save` | 完了報告に tasks.md / handoff.md を足す |
+| `japanese-article-style` | 「6 つの問い」→ 実際の 7 項目 |
+
 ## chezmoi と Windows
 
 ユーザー管理対象は `dot_codex/AGENTS.md`、`dot_agents/skills/`、`dot_codex/scripts/`、`dot_codex/design/` とする。認証、config、セッション、Plugin、cache、ログ、SQLite は管理しない。Codex がユーザー Skill を探索する正規の場所は `~/.agents/skills/` とする。Windows の `.codex` と `.agents` は実ディレクトリを維持し、`AGENTS.md` と `~/.agents/skills/*/SKILL.md` で検出した各 Skill ディレクトリだけを WSL 側へ SymbolicLink で共有する。Windows の `.codex/skills/.system` は OS ローカルのまま保持する。
