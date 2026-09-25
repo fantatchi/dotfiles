@@ -11,33 +11,10 @@ disable-model-invocation: true
 Build enterprise agents for Microsoft 365, Teams, and Copilot Studio using the Microsoft 365 Agents SDK with Express hosting, AgentApplication routing, streaming responses, and Copilot Studio client integrations.
 
 ## Before implementation
-- Use the microsoft-docs MCP to verify the latest API signatures for AgentApplication, startServer, and CopilotStudioClient.
+- Use the microsoft-docs MCP to verify the latest API signatures for AgentApplication, startServer, and CopilotStudioClient. The SDK moves quickly; the samples below are shape, not source of truth.
 - Confirm package versions on npm before wiring up samples or templates.
 
-## Installation
-
-```bash
-npm install @microsoft/agents-hosting @microsoft/agents-hosting-express @microsoft/agents-activity
-npm install @microsoft/agents-copilotstudio-client
-```
-
-## Environment Variables
-
-```bash
-PORT=3978
-AZURE_RESOURCE_NAME=<azure-openai-resource>
-AZURE_API_KEY=<azure-openai-key>
-AZURE_OPENAI_DEPLOYMENT_NAME=gpt-4o-mini
-
-TENANT_ID=<tenant-id>
-CLIENT_ID=<client-id>
-CLIENT_SECRET=<client-secret>
-
-COPILOT_ENVIRONMENT_ID=<environment-id>
-COPILOT_SCHEMA_NAME=<schema-name>
-COPILOT_CLIENT_ID=<copilot-app-client-id>
-COPILOT_BEARER_TOKEN=<copilot-jwt>
-```
+Environment: `PORT`, `AZURE_RESOURCE_NAME` / `AZURE_API_KEY` / `AZURE_OPENAI_DEPLOYMENT_NAME`, `TENANT_ID` / `CLIENT_ID` / `CLIENT_SECRET`, `COPILOT_ENVIRONMENT_ID` / `COPILOT_SCHEMA_NAME` / `COPILOT_CLIENT_ID` / `COPILOT_BEARER_TOKEN`.
 
 ## Core Workflow: Express-hosted AgentApplication
 
@@ -123,61 +100,11 @@ agent.onActivity("invoke", async (context: TurnContext) => {
 
 ## Copilot Studio client (Direct to Engine)
 
-```typescript
-import { CopilotStudioClient } from "@microsoft/agents-copilotstudio-client";
+Construct `CopilotStudioClient(settings, tokenProvider)` with `environmentId` / `schemaName` / `clientId` and an async token provider. **`startConversationAsync` / `askQuestionAsync` are deprecated**; look up the current streaming API (`startConversationStreaming` / `sendActivityStreaming`, which return activities rather than a conversation object) via the microsoft-docs MCP before writing calls. WebChat integration goes through `CopilotStudioWebChat.createConnection(client, opts)` as a Direct Line substitute.
 
-const settings = {
-  environmentId: process.env.COPILOT_ENVIRONMENT_ID!,
-  schemaName: process.env.COPILOT_SCHEMA_NAME!,
-  clientId: process.env.COPILOT_CLIENT_ID!,
-};
+Reuse CopilotStudioClient instances and cache tokens in the token provider. Call `endStream` in a `finally` block.
 
-const tokenProvider = async (): Promise<string> => {
-  return process.env.COPILOT_BEARER_TOKEN!;
-};
+## References
 
-const client = new CopilotStudioClient(settings, tokenProvider);
-
-const conversation = await client.startConversationAsync();
-const reply = await client.askQuestionAsync("Hello!", conversation.id);
-console.log(reply);
-```
-
-## Copilot Studio WebChat integration
-
-```typescript
-import { CopilotStudioWebChat } from "@microsoft/agents-copilotstudio-client";
-
-const directLine = CopilotStudioWebChat.createConnection(client, {
-  showTyping: true,
-});
-
-window.WebChat.renderWebChat({
-  directLine,
-}, document.getElementById("webchat")!);
-```
-
-## Best Practices
-
-1. Use AgentApplication for routing and keep handlers focused on one responsibility.
-2. Prefer streamingResponse for long-running completions and call endStream in finally blocks.
-3. Keep secrets out of source code; load tokens from environment variables or secure stores.
-4. Reuse CopilotStudioClient instances and cache tokens in your token provider.
-5. Validate invoke payloads before logging or persisting feedback.
-
-## Reference Files
-
-| File | Contents |
-| --- | --- |
-| [references/acceptance-criteria.md](references/acceptance-criteria.md) | Import paths, hosting pipeline, streaming, and Copilot Studio patterns |
-
-## Reference Links
-
-| Resource | URL |
-| --- | --- |
-| Microsoft 365 Agents SDK | https://learn.microsoft.com/en-us/microsoft-365/agents-sdk/ |
-| JavaScript SDK overview | https://learn.microsoft.com/en-us/javascript/api/overview/agents-overview?view=agents-sdk-js-latest |
-| @microsoft/agents-hosting-express | https://learn.microsoft.com/en-us/javascript/api/%40microsoft/agents-hosting-express?view=agents-sdk-js-latest |
-| @microsoft/agents-copilotstudio-client | https://learn.microsoft.com/en-us/javascript/api/%40microsoft/agents-copilotstudio-client?view=agents-sdk-js-latest |
-| Integrate with Copilot Studio | https://learn.microsoft.com/en-us/microsoft-365/agents-sdk/integrate-with-mcs |
-| GitHub samples | https://github.com/microsoft/Agents/tree/main/samples/nodejs |
+- [references/acceptance-criteria.md](references/acceptance-criteria.md): import paths, hosting pipeline, streaming, and Copilot Studio patterns (CORRECT / INCORRECT examples). Check the result against it before finishing.
+- https://learn.microsoft.com/en-us/microsoft-365/agents-sdk/ and https://github.com/microsoft/Agents/tree/main/samples/nodejs
