@@ -29,11 +29,8 @@ Enforces an opinionated UI baseline to prevent AI-generated interface slop.
 ## Components
 
 - MUST use accessible component primitives for anything with keyboard or focus behavior (`Base UI`, `React Aria`, `Radix`)
-- MUST use the project’s existing component primitives first
 - NEVER mix primitive systems within the same interaction surface
 - SHOULD prefer [`Base UI`](https://base-ui.com/react/components) for new primitives if compatible with the stack
-- MUST add an `aria-label` to icon-only buttons
-- NEVER rebuild keyboard or focus behavior by hand unless explicitly requested
 
 ## Interaction
 
@@ -42,7 +39,6 @@ Enforces an opinionated UI baseline to prevent AI-generated interface slop.
 - NEVER use `h-screen`, use `h-dvh`
 - MUST respect `safe-area-inset` for fixed elements
 - MUST show errors next to where the action happens
-- NEVER block paste in `input` or `textarea` elements
 
 ## Animation
 
@@ -53,7 +49,6 @@ Enforces an opinionated UI baseline to prevent AI-generated interface slop.
 - SHOULD use `ease-out` on entrance
 - NEVER exceed `200ms` for interaction feedback
 - MUST pause looping animations when off-screen
-- SHOULD respect `prefers-reduced-motion`
 - NEVER introduce custom easing curves unless explicitly requested
 - SHOULD avoid animating large images or full-screen surfaces
 
@@ -73,7 +68,6 @@ Enforces an opinionated UI baseline to prevent AI-generated interface slop.
 
 - NEVER animate large `blur()` or `backdrop-filter` surfaces
 - NEVER apply `will-change` outside an active animation
-- NEVER use `useEffect` for anything that can be expressed as render logic
 
 ## Design
 
@@ -83,4 +77,3 @@ Enforces an opinionated UI baseline to prevent AI-generated interface slop.
 - SHOULD use Tailwind CSS default shadow scale unless explicitly requested
 - MUST give empty states one clear next action
 - SHOULD limit accent color usage to one per view
-- SHOULD use existing theme or Tailwind CSS color tokens before introducing new ones
