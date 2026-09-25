@@ -66,4 +66,4 @@
 ## 参照元
 
 - 公式 `/security-review`: Claude Code CLI バイナリ埋め込み（`~/.local/share/claude/versions/<version>`、2.1.282 で確認）
-- 利用側: [`pr-review`](../pr-review/SKILL.md) Phase 2（security ペルソナを立てる回）
+- 利用側: [`pr-review`](../pr-review/SKILL.md) Phase 3（security ペルソナを立てる回）

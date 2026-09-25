@@ -1,8 +1,8 @@
 ---
 name: context-load
-description: '保存済みのプロジェクトコンテキスト（`.claude/context.md` / `progress.md` / `tasks.md` / `handoff.md`）を読み込み、git 状態と比較して前回の作業状態を復帰する。セッション開始時や Codex から作業を引き継ぐときに使う。読み込み専用で外部依存なし。'
+description: '保存済みのプロジェクトコンテキスト（`.claude/context.md` / `progress.md` / `tasks.md` / `handoff.md`）を読み込み、git 状態と比較して前回の作業状態を復帰する。セッション開始時や Codex から作業を引き継ぐときに使う。読み込み専用（PR 状態の実査に gh を使う）。'
 disable-model-invocation: true
-allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(echo:*), Bash(basename:*), Bash(pwd)
+allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(gh pr view:*), Bash(echo:*), Bash(basename:*), Bash(pwd)
 ---
 
 # コンテキスト読み込み

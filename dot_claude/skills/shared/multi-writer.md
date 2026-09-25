@@ -10,6 +10,7 @@ Claude・Codex など複数のエージェント（および Obsidian モバイ�
 - `{project-root}/.claude/progress.md`（writer: context-save 連携1）
 - 捕捉箱 tasks.md（writer: gtd-add / gtd-done / gtd-list の昇格・剪定 / Obsidian モバイル。場所は resolver `task_store`）
 - 作業キュー tasks.md（writer: context-save コア / 人が `[x]` を付ける。場所は resolver `project_task_store`）
+- `{project-root}/.claude/handoff.md`（writer: context-save。1 件だけ保持する揮発ファイルで**全面上書きの例外**。詳細は context-save）
 
 両 tasks.md のフォーマットは `tasks-format.md` が SSOT。Codex 等の外部エージェントも同じファイルを更新する writer として扱う。「相手が Claude 形式で書いている」ことを前提にしない。
 

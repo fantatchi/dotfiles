@@ -8,7 +8,7 @@
 
 | ストア | 実体（出典） | 中身 | writer | reader |
 |---|---|---|---|---|
-| **捕捉箱** | resolver `task_store`（既定 `~/ObsidianVault/00_meta/tasks.md`） | どのプロジェクトの話か決まっていない思いつき。`## Inbox` が主役 | 人（Obsidian モバイル / デスクトップ）+ `gtd-add` | `gtd-list` / `gtd-done` |
+| **捕捉箱** | resolver `task_store`（既定 `~/ObsidianVault/00_meta/tasks.md`） | どのプロジェクトの話か決まっていない思いつき。`## Inbox` が主役 | 人（Obsidian モバイル / デスクトップ）+ `gtd-add` / `gtd-done` / `gtd-list`（Done 昇格・剪定） | `gtd-list` |
 | **作業キュー** | resolver `project_task_store`（既定 `<project>/.claude/tasks.md`） | そのプロジェクトで次にやること | `context-save` + 人（`[x]` を付ける） | `context-load` |
 
 **設計意図**: 書き手が知っている文脈の場所にだけ書く。モバイルには CWD が無いので捕捉箱へ、Claude は CWD を持つのでプロジェクトの作業キューへ書く（1 ファイルに混在させると、人が見て何が重要か分からず、スキル間に暗黙結合ができる）。
@@ -21,7 +21,7 @@
 | スキル | 動詞 | ストア | 対象セクション |
 |---|---|---|---|
 | `gtd-add` | 追加（write） | 捕捉箱 | `## Inbox` |
-| `gtd-list` | 表示（read） | 捕捉箱 | 全セクション |
+| `gtd-list` | 表示（read。副作用で `[x]` 行の Done 昇格と Done 剪定） | 捕捉箱 | 全セクション |
 | `gtd-done` | 完了化（write） | 捕捉箱 | `## Done` へ移動 |
 | `context-save` | 追加・整理（write） | 作業キュー | `## Next` へ追加、`[x]` 行を `## Done` へ移動、古い Done を剪定 |
 | `context-load` | 表示（read） | 作業キュー | `## Next` / `## Someday` |
@@ -61,7 +61,7 @@
 
 ### Done の特別ルール
 
-Done に移動する際、タイトル先頭に完了日（`YYYY-MM-DD`）を付加する:
+Done の保持期間は **1 週間**（`gtd-list` が剪定し、削除前に Daily Note へ転記する）。Done に移動する際、タイトル先頭に完了日（`YYYY-MM-DD`）を付加する:
 
 ```markdown
 - [x] 2026-04-09 #project/claude-config タスク管理設計の合意
