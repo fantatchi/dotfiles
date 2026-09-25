@@ -7,28 +7,13 @@ allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(echo:*), Bash(basename:*), Ba
 
 # コンテキスト読み込み
 
-保存済みのプロジェクトコンテキストを読み込み、前回の作業状態を復帰する。
-
-このスキルは **`.claude/` 配下（context.md / progress.md / tasks.md / handoff.md）だけを読む project-local スキル**で、外部連携を持たない。Obsidian や他スキルが無い環境でもそのまま動く。参照先パスの配線のみ `~/.claude/skills/shared/integrations.md`（resolver）で解決する。
+`.claude/` 配下（context.md / progress.md / tasks.md / handoff.md）だけを読む project-local スキル。参照先パスの配線のみ `~/.claude/skills/shared/integrations.md`（resolver）で解決する。
 
 ## 手順
 
-### 読み込み元
-
-プロジェクトルートの `.claude/context.md`
-
-#### プロジェクトルートの決定
-
-1. `git rev-parse --show-toplevel` でリポジトリルートを取得
-2. git リポジトリ外の場合は CWD をプロジェクトルートとする
-
-#### ファイルが存在しない場合
-
-「コンテキストが保存されていません。`/context-save` で保存してください。」と案内して終了。
+プロジェクトルートは `git rev-parse --show-toplevel`、git 外なら CWD。`{project-root}/.claude/context.md` が無ければ「コンテキストが保存されていません。`/context-save` で保存してください。」と案内して終了。
 
 ### 1. コンテキストファイルの読み込み
-
-`{project-root}/.claude/context.md` を読み込み、内容を把握する。
 
 ### 2. 現在の git 状態との比較
 
@@ -37,8 +22,8 @@ allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(echo:*), Bash(basename:*), Ba
 - ブランチが異なる場合: 「保存時のブランチ: `xxx` → 現在: `yyy`」
 - 未コミットの変更がある場合: 注意喚起
 - 保存時以降に新しいコミットがある場合: その旨を表示
-- **context.md に PR 番号が出てくる場合は、提示前に `gh pr view <番号> --json state,isDraft,reviewDecision,mergeable` で実査する**（読み込み専用の原則には反しない。context.md は書き換えない）。PR の状態は他人の操作で変わるため保存時点の記述をそのまま提示すると、古い前提のまま作業方針を立ててしまう。実査できない場合（gh 未認証・ネットワーク不通）は「保存時点の記述」と明示して提示する
-  - **実査するのは OPEN / 未決（状態が明記されていない・「レビュー中」「approve 待ち」等）と読める PR だけに絞る**。context.md に「MERGED」「クローズ済み」と明記された PR は再実査しない。長く運用したプロジェクトでは PR 番号が 20 件以上出てくることがあり（2026-09-02 の cloud-cmp で実際に発生）、全件実査は現実的でない
+- **context.md に PR 番号が出てくる場合は、提示前に `gh pr view <番号> --json state,isDraft,reviewDecision,mergeable` で実査する**（PR の状態は他人の操作で変わる）。実査できない場合は「保存時点の記述」と明示して提示する
+  - **実査するのは OPEN / 未決と読める PR だけに絞る**。「MERGED」「クローズ済み」と明記された PR は再実査しない（PR 番号が 20 件以上出るプロジェクトがある）
 
 ### 3. 進捗マップの読み込み
 
@@ -46,7 +31,7 @@ allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(echo:*), Bash(basename:*), Ba
 
 - ファイルが存在しない場合はスキップ
 - 抽出した内容は提示（ステップ 6）に含める
-- **8KB を超える場合は全文を出さない**。`最終更新` の最新 1 行と `## 現在地` の要点だけを要約して提示し、`⚠️ progress.md が N KB あります（全文は省略）。最終更新行の積み上がり・完了済み経緯の滞留を確認してください` を 1 行添える。**省略したことを必ず明示する**（2026-09-14 kabuto で 27KB になり Read の上限を超え、全文表示の指示どおりには出せなかった）
+- **8KB を超える場合は全文を出さない**。`最終更新` の最新 1 行と `## 現在地` の要点だけを要約して提示し、`⚠️ progress.md が N KB あります（全文は省略）。最終更新行の積み上がり・完了済み経緯の滞留を確認してください` を 1 行添える。**省略したことを必ず明示する**
 - 後方互換: `.claude/progress.md` がなく、かつ `{project-root}/CLAUDE.md` に `## 進捗マップ` セクションがある場合は、そこから抽出する（旧形式）
 
 ### 4. 作業キューの読み込み
@@ -56,7 +41,7 @@ resolver の `project_task_store`（既定 `<project-root>/.claude/tasks.md`）�
 - `project_task_store` が空 / ファイルが存在しない場合はスキップし、提示の「次のステップ」セクションごと省略する
 - `## Someday`（条件待ち・保留）のタスクには 💤 マーカーを付けて Next と区別する
 - ファイルはあるが Next / Someday が 0 件の場合は「次のステップなし」と表示する
-- **Next が 15 件を超える場合は全件を並べず、上位 8 件 + 総件数を出す**（`（ほか N 件）`）。Someday は件数だけでよい。**間引いたことを必ず明示する**（黙って上位だけ出すと「これで全部」と読める）。あわせて `⚠️ Next が N 件あります。タスクでない行が混ざっていないか棚卸しを検討してください` を 1 行添える — 溜まるときはたいてい観測メモが混ざっている（2026-08-24 に degcloud で 34 件・提示の冒頭がノイズで埋まった）
+- **Next が tasks-format.md の件数目安を超える場合は全件を並べず、上位 8 件 + 総件数を出す**（`（ほか N 件）`）。Someday は件数だけでよい。**間引いたことを必ず明示する**。あわせて `⚠️ Next が N 件あります。タスクでない行が混ざっていないか棚卸しを検討してください` を 1 行添える
 - フォーマット規約は `~/.claude/skills/shared/tasks-format.md`（context-save と同じ SSOT）
 
 ### 5. 引き継ぎメモの読み込み（handoff.md）
@@ -113,18 +98,8 @@ resolver の `project_task_store`（既定 `<project-root>/.claude/tasks.md`）�
 
 ```
 
-- 「現在の状態」は context.md に `## 現在の状態` がある場合のみ表示する。git 管理外（ホームワークスペース等）でセクションが無ければ省略する（ブランチは冒頭の `**ブランチ**` で出すため重複させない）
-- 「進捗マップ」は `.claude/progress.md`（優先）または CLAUDE.md の `## 進捗マップ` セクション（後方互換）がある場合のみ表示する。どちらもない場合はセクションごと省略する
-- 「次のステップ」は `.claude/tasks.md` がある場合のみ表示する。無ければセクションごと省略する
-- 「関連リポジトリ」は context.md に `## 関連リポジトリ` セクションがある場合のみ表示する。ない場合はセクションごと省略する
-- 「引き継ぎ」は `.claude/handoff.md` がある場合のみ表示する。無ければセクションごと省略する。**表示する場合は他のどのセクションより先（`**ブランチ**` の直後）に置く**
-
 ## 注意事項
 
 - **読み込み専用**。context.md・progress.md・tasks.md・handoff.md を変更しない（タスクの追加・`[x]` の整理・引き継ぎメモの更新はいずれも `/context-save` の担当）
 - **handoff.md の消化状態は記録しない**。読んだことを示す `status: consumed` のようなフィールドは持たない設計で、次に `/context-save` が走ったときの上書きで自然に入れ替わる（読み込み専用の本スキルは書き戻せないため、状態を持たせると必ず腐る）
-- **Obsidian Vault は参照しない**。捕捉箱（`~/ObsidianVault/00_meta/tasks.md`）は `gtd-*` の担当で、本スキルとは無関係
-- **複数 writer 前提で読む**: 4 ファイルとも Claude・Codex 等が共有する正本であり（`~/.claude/skills/shared/multi-writer.md` 参照）、Claude 固有の記述だけが存在する前提にしない
-  - 未知の frontmatter キー・見出し・フィールドがあっても**エラーにせず有効データとして扱う**（保持対象。提示から黙って落とさず、未知セクションは提示の末尾で「その他のセクション」として言及する）
-  - Claude 固有の目印（frontmatter の `tags: claude-context` 等）が無いファイルも正常として読み込む
-- パスはプロジェクトルートからの相対パスで記録されているため、現在のマシンのパスと異なる場合がある
+- **複数 writer 前提で読む**（`~/.claude/skills/shared/multi-writer.md`）。未知の frontmatter キー・見出しは提示から黙って落とさず、末尾で「その他のセクション」として言及する。`tags: claude-context` が無いファイルも正常として読む
