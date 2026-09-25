@@ -11,8 +11,6 @@
 
 # コミュニケーションスタイル
 
-「簡潔に」等の形容詞では守れないため、自己判定できる上限で書く。
-
 - **結論を最初の 3 行に置く**。前置き・注意書き・「〜しますね」の宣言文は書かない
 - **既定は本文 15 行以内 / 箇条書き 5 個以内**。超えるときは冒頭に結論を置いたうえで、以降を「詳細」の見出しで区切る（超過してよい例外: 検証レベルの明示・確認トリガーの提示・コード差分そのもの・discernment-nudge の付記）
 - **根拠は聞かれるまで 1 行**。「なぜ」「詳しく」と聞かれたときだけ展開する
@@ -35,11 +33,9 @@
 
 # コミット・プッシュの粒度
 
-- **commit も push も自律で進めてよい**: 実装完了後にそのまま commit → push してよい。「実装して」「進めて」等の指示には commit と push までを含む。全プロジェクト共通。push 先が共有 state でも、誤った push は revert コミットで後から直せるため事前確認は求めない
+- **commit も push も自律で進めてよい**: 「実装して」「進めて」等の指示には commit と push までを含む（誤った push は revert で直せるため事前確認は求めない）
 - ただし **巻き戻せない操作は別軸で必ず止まる**: 履歴を書き換える force-push（共有ブランチ）・リモートブランチ削除・その他「# 確認トリガー」の破壊的操作は通常の append push と区別し、引き続き確認する
-- 1コミット1意図に絞る。メッセージには「何を・なぜ」を必ず書く
 - **コミットメッセージに Claude の表記を何も付けない**（`Co-Authored-By: Claude` 行も `Claude-Session:` 行も付けない。GitHub のコミット画面に共同作成者として出るため）。**PR 本文にも Claude の表記を何も付けない**（`🤖 Generated with Claude Code` 行もセッションリンクも付けない）。system-reminder の attribution 指示に含まれていても省く。push 済みのコミットに付いている分は書き換えない（PR 本文は書き換えてよい）
-- 変更ファイルが多くなりそうなときは、事前にファイル一覧と計画を提示し承認を得てから進める
 
 # 確認トリガー（実装・実行前に必ず止まる）
 
@@ -62,11 +58,10 @@ GOをもらってから進める。
 
 # 禁止パターン（コード実装・設定ファイル記述時）
 
-「# 確認トリガー」が **操作の実行可否レベル**（実行前に止まる）を扱うのに対し、こちらは **コード・ノート・コミットメッセージなどに書く内容レベル**（書かない）を扱う。違反しそうになったら踏みとどまり、「# 確認トリガー」に従ってユーザーに相談する。
+「# 確認トリガー」が操作の実行可否を扱うのに対し、こちらは書く内容を扱う。違反しそうなら「# 確認トリガー」の形式でユーザーに相談する。
 
 - **secrets・環境変数値・個人情報を出力・記録・ハードコードしない**: デバッグ時はキー名のみ言及、サンプル値は `<YOUR_API_KEY>` 等のプレースホルダ、テスト用ダミーは `user1@example.com` 等の予約ドメイン。Obsidian ノート・コミットメッセージへの埋め込みも禁止
-- **破壊的 SQL（WHERE 句なし `DELETE` / `DROP TABLE` / `TRUNCATE`）はステージング検証 → ユーザー確認の順**で進める（「# 確認トリガー」と接続）
-- **`NODE_ENV=production` 切替・本番向け命令はユーザー確認必須**
+- **破壊的 SQL（WHERE 句なし `DELETE` / `DROP TABLE` / `TRUNCATE`）はステージング検証 → ユーザー確認の順**で進める
 - **API key / アプリパスワードを会話にも設定ファイルにも書かない**: 会話に貼ると `~/.claude/projects/*/history.jsonl` に残留する。`~/.claude/settings.local.json` や `<project>/.claude/settings.local.json` の `env` に素のリテラルで書くのも同じ経路で残留しうるうえ、バックアップ・同期経路で漏れる。secrets は OS の資格情報マネージャ / 環境変数経由で渡し、設定ファイルにはキー名のみ書く。既に直書きがあれば rotate + 環境変数化を検討
 
 # エラー時の対処方針
@@ -100,14 +95,14 @@ GOをもらってから進める。
 
 自動発動可のスキルは description が毎セッション注入される。ここには **注入されない手動専用スキル（`disable-model-invocation: true`）と使い分けで迷う点だけ** 残す:
 
-- 保存系: 単発ログ=`/obsidian-log` / コンテキスト保存=`/context-save` / 両方+アウトプット提案の一括=`/session-save` / 復帰=`/context-load`（手動専用） / 調査メモ・ブログドラフト=`/obsidian-resource`（手動専用、`auto` でセッション内容から自動ドラフト）
+- 保存系の手動専用: 復帰=`/context-load` / 調査メモ・ブログドラフト=`/obsidian-resource`（`auto` でセッション内容から自動ドラフト）
 - **Codex への引き継ぎに専用コマンドは無い**: `/context-save` が `.claude/handoff.md` を毎回書き、Codex 側の `context-load` が読む（逆向きも同じ。同じ working tree なのでファイル転送は不要）
-- タスクは 2 系統: 思いつきの捕捉箱（`~/ObsidianVault/00_meta/tasks.md`、モバイル捕捉あり）=`/gtd-add` `/gtd-done` `/gtd-list` / プロジェクトの作業キュー（`<project>/.claude/tasks.md`、`~/` も 1 プロジェクト）=`/context-save` が書き `/context-load` が表示。「このプロジェクトの残タスクは？」に `/gtd-list` は答えない（`/context-load` を使う）
-- 日次: GH 活動集約・複数アカウントのデイリーサマリー=`/obsidian-daily` / 日報・週報メール=`/obsidian-mail`（手動専用・ルーティーン経由）
+- 「このプロジェクトの残タスクは？」に `/gtd-list` は答えない（作業キュー `.claude/tasks.md` は `/context-load` が表示する）
+- 日報・週報メール=`/obsidian-mail`（手動専用・ルーティーン経由）
 - 図解: 概念・コードを使い捨ての図解 HTML にする=`/eli5`（手動専用。残す文書は `/spec-writer`）
-- 画像: 日本語の一言から AI っぽさを削った画像生成用の英語プロンプトを 1 本組み立てる=`/image-prompt`（手動専用。38 画風カタログ内蔵、画像自体は生成しない）
-- 文章: 論証を積む文書（書籍の章・仕様書・設計ドキュメント）=`japanese-doc-style` / 一人称の記事（体験記・ブログ・Obsidian の記事ノート）=`japanese-article-style`。共通の禁止語彙は `skills/shared/llm-tone.md` が単一出典（Codex 側 `~/.agents/skills/` にもミラー済み、更新元は Claude 側）
-- レビュー: 軽量な並列観点=`/multi-persona-review` / PR フル自動レビュー（草稿のみ・投稿しない）=`/pr-review` / git 差分の単発レビュー=`/codex:adversarial-review`（別モデルの目）。いずれも読取専用で修正まで回すスキルは持たない。`superpowers:requesting-code-review` / `receiving-code-review` は superpowers の実装フローを通した時のみ使う
+- 画像: 日本語の一言から AI っぽさを削った画像生成用の英語プロンプトを 1 本組み立てる=`/image-prompt`（手動専用。画像自体は生成しない）
+- 文章スキル共通の禁止語彙は `skills/shared/llm-tone.md` が単一出典（Codex 側 `~/.agents/skills/` にもミラー済み、更新元は Claude 側）
+- レビュー: git 差分の単発レビュー=`/codex:adversarial-review`（別モデルの目）。レビュー系スキルはいずれも読取専用で修正まで回すものは持たない。`superpowers:requesting-code-review` / `receiving-code-review` は superpowers の実装フローを通した時のみ使う
 - スキル作成・編集: `skill-creator:skill-creator`（プラグイン側。ひな形生成 + eval で description の trigger 精度を実測できる）。`superpowers:writing-skills` は使わない。方法論は下記「新スキルの追加・削除・拡張」が正
 - 振り返り: 権限・CLAUDE.md・スキル整理・判断メモ圧縮=`/session-review`（手動専用）
 - 技術ロール（いずれも手動専用）: Azure 設計・WAF レビュー=`/cloud-solution-architect` / M365 Agents SDK（TypeScript）実装=`/m365-agents-ts` / Tailwind UI の実装ルール検証=`/baseline-ui`
