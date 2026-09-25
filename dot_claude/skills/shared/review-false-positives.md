@@ -25,7 +25,6 @@
      この例外は公式 `/code-review` の Angle A に由来する
 9. **プロジェクトの過去実測記録で反証済みの指摘** — 採否判定の前に `context.md` の判断メモ / MEMORY / docs の実測値と突き合わせる。
    ペルソナは過去セッションの検証履歴を知らないため、決着済みの論点を再提起しがち
-   （実例: RF `n_jobs` 非決定性の指摘が過去実測 Brier ~1e-9 で反証済みだった、2026-07-07 toto-predictor）
 
 ## 落とす側にも立証責任がある
 
@@ -39,7 +38,6 @@ falsy-zero、境界の off-by-one、リトライ嵐・部分失敗は現実的�
 
 ## 参照元
 
-- 公式 `/code-review` プラグイン（`~/.claude/plugins/marketplaces/claude-plugins-official/plugins/code-review/commands/code-review.md`）の偽陽性リスト
-- 公式 `/code-review` ビルトイン（CLI 2.1.243 埋め込み）の verify フェーズ判定基準
+- 公式 `/code-review` ビルトイン（CLI 2.1.282 で文言の現存を確認）の verify フェーズ判定基準
 - 利用側: [`pr-review`](../pr-review/SKILL.md) Phase 4 / [`multi-persona-review`](../multi-persona-review/SKILL.md) Step 3.5
 - セキュリティ観点に限った除外規定は [`security-review-exclusions.md`](security-review-exclusions.md)
