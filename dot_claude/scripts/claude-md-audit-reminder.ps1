@@ -94,6 +94,10 @@ if ($elapsedDays -lt $thresholdDays) { exit 0 }
 $lastFired = Read-Epoch $snoozeFile
 if ($lastFired -gt 0 -and (($nowEpoch - $lastFired) / 60) -lt $snoozeMin) { exit 0 }
 
+# スヌーズは出力より先に記録する。hook の timeout で出力中に kill されると末尾の記録が走らず、
+# 以後毎プロンプト spawn → timeout を繰り返すため（その回の通知は捨てられ 24h 黙る側に倒す）。
+try { Set-Content -Path $snoozeFile -Value $nowEpoch -Encoding ASCII -NoNewline } catch {}
+
 Write-Output @"
 <system-reminder>
 CLAUDE.md の最終監査から $elapsedDays 日経過しています（閾値: $thresholdDays 日）。
@@ -119,5 +123,4 @@ Vault が無い環境では ``[int][double]::Parse((Get-Date -UFormat %s)) | Set
 </system-reminder>
 "@
 
-try { Set-Content -Path $snoozeFile -Value $nowEpoch -Encoding ASCII -NoNewline } catch {}
 exit 0

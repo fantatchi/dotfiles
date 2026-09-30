@@ -84,6 +84,10 @@ if [ "$LAST_FIRED" -gt 0 ] && [ $(( (NOW - LAST_FIRED) / 60 )) -lt "$SNOOZE_MIN"
     exit 0
 fi
 
+# スヌーズは出力より先に記録する。hook の timeout で出力中に kill されると末尾の記録が走らず、
+# 以後毎プロンプト spawn → timeout を繰り返すため（その回の通知は捨てられ 24h 黙る側に倒す）。
+echo "$NOW" > "$SNOOZE_FILE" 2>/dev/null || true
+
 cat <<EOF
 <system-reminder>
 CLAUDE.md の最終監査から ${ELAPSED_DAYS} 日経過しています（閾値: ${THRESHOLD_DAYS} 日）。
@@ -109,5 +113,4 @@ Vault が無い環境では \`date +%s > ~/.claude/state/claude-md-audit/last-au
 </system-reminder>
 EOF
 
-echo "$NOW" > "$SNOOZE_FILE" 2>/dev/null || true
 exit 0
