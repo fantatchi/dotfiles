@@ -75,6 +75,8 @@ Codex の作業ログは Claude と同じ `20_log/YYYYMM/`、リソースは `30
 
 2026-10-01 の追従（A/B 検証で `japanese-article-style` を can't-know 5 節へ縮小）: Codex 版本文を Claude 版から再生成した。`shared/llm-tone.md` への参照は両 harness とも article-style から外し、Codex 側の `shared/llm-tone.md` は未参照になったため削除（`.chezmoiremove` に登録）。語彙の事後 grep は Claude 側の正本を使う。`obsidian-resource` の本文規範の再掲 5 点と template の定型節名の注記も削除し、スキル参照だけにした。
 
+2026-10-01 の追従（タスクの登録日 `@added:` と期間の 30 日統一）: Codex 版 `context-save` の Done 整理・追記書式・補完と、`context-load` の古いタスク件数を Claude 版と同じ文言にした。Codex 版 context-save にあった「2 週間」と `date -d "2 weeks ago"` の直書きは tasks-format.md 参照へ直した。
+
 ## chezmoi と Windows
 
 ユーザー管理対象は `dot_codex/AGENTS.md`、`dot_agents/skills/`、`dot_codex/scripts/`、`dot_codex/design/` とする。認証、config、セッション、Plugin、cache、ログ、SQLite は管理しない。Codex がユーザー Skill を探索する正規の場所は `~/.agents/skills/` とする。Windows の `.codex` と `.agents` は実ディレクトリを維持し、`AGENTS.md` と `~/.agents/skills/*/SKILL.md` で検出した各 Skill ディレクトリだけを WSL 側へ SymbolicLink で共有する。Windows の `.codex/skills/.system` は OS ローカルのまま保持する。

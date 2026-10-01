@@ -55,6 +55,7 @@ resolver の `project_task_store`（既定 `<project-root>/.claude/tasks.md`）�
 - `## Someday`（条件待ち・保留）のタスクには 💤 マーカーを付けて Next と区別する
 - ファイルはあるが Next / Someday が 0 件の場合は「次のステップなし」と表示する
 - **Next が tasks-format.md の件数目安を超える場合は全件を並べず、上位 8 件 + 総件数を出す**（`（ほか N 件）`）。Someday は件数だけでよい。**間引いたことを必ず明示する**。あわせて `⚠️ Next が N 件あります。タスクでない行が混ざっていないか棚卸しを検討してください` を 1 行添える
+- `## Next` / `## Someday` で `@added:` が tasks-format.md「登録日と期間」の期間より前の行を数え、0 件でなければ同節の文言で 1 行添える（Someday の分も含む）
 - フォーマット規約は `~/.claude/skills/shared/tasks-format.md`（context-save と同じ SSOT）
 
 ### 5. 引き継ぎメモの読み込み（handoff.md）
