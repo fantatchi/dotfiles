@@ -73,7 +73,7 @@ Codex の作業ログは Claude と同じ `20_log/YYYYMM/`、リソースは `30
 | `session-save` | 完了報告に tasks.md / handoff.md を足す |
 | `japanese-article-style` | 「6 つの問い」→ 実際の 7 項目 |
 
-2026-10-01 の追従（A/B 検証で `japanese-article-style` を can't-know 5 節へ縮小）: Codex 版本文を Claude 版から再生成した。`shared/llm-tone.md` への参照は両 harness とも article-style から外し、Codex 側の `shared/llm-tone.md` はどのスキルからも参照されないが事後 grep 用に残置。`obsidian-resource` の本文規範の再掲 5 点と template の定型節名の注記も削除し、スキル参照だけにした。
+2026-10-01 の追従（A/B 検証で `japanese-article-style` を can't-know 5 節へ縮小）: Codex 版本文を Claude 版から再生成した。`shared/llm-tone.md` への参照は両 harness とも article-style から外し、Codex 側の `shared/llm-tone.md` は未参照になったため削除（`.chezmoiremove` に登録）。語彙の事後 grep は Claude 側の正本を使う。`obsidian-resource` の本文規範の再掲 5 点と template の定型節名の注記も削除し、スキル参照だけにした。
 
 ## chezmoi と Windows
 

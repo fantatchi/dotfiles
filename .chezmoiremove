@@ -3,3 +3,4 @@
 .claude/skills/stop-redundant
 .claude/skills/codex-fix-loop
 .claude/skills/ks-name
+.agents/skills/shared
