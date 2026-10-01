@@ -44,6 +44,7 @@ Codex CLI 用のスキルは `~/.agents/skills/` に**別実体**として置か
 
 - [ ] **新規ファイル**（新スキルの SKILL.md / references 等）は `chezmoi add <path>` で source に取り込む（`re-add` は未管理ファイルに対しては `not managed` エラーになる）
 - [ ] **既存ファイルの編集**は `chezmoi re-add <path>` で source を更新する
+- [ ] 編集した本文が新たに参照する `~/.claude/...` のパスを抜き出し、各参照先が source に在るか（`ls ~/.local/share/chezmoi/<対応パス>`）を確かめる。無ければ `chezmoi add` する（re-add だけでは参照先の新規ファイルが取り残される。2026-05-14）
 - [ ] **削除**は live ディレクトリ削除後、source 側（`~/.local/share/chezmoi/dot_claude/skills/<skill-name>/`）も削除する
 - [ ] `chezmoi diff` で残差を確認する（`run_before_*` 由来の差分は常時出るので無視可、それ以外が消えていれば反映完了）
 - [ ] source 反映を確認してから commit する（live と source を 1 コミットに揃え、乖離状態のコミットを残さない）
@@ -63,6 +64,8 @@ Codex CLI 用のスキルは `~/.agents/skills/` に**別実体**として置か
 - **入口（トリガー語）の集約 vs 中身の参照誘導を分ける**: 複数スキルが共通ドメインを扱う場合、トリガー語は 1 つのスキルに集約しつつ、機能本体は references で相互参照させると、トリガー精度を保ったまま機能カバレッジを失わない（例: タスク操作のトリガー語は gtd-add / gtd-done / gtd-list と動詞別に分け、共通の tasks.md フォーマットは shared/tasks-format.md を単一出典として参照させる）
 - **複合スキルと単体スキルの棲み分けは単体側 description に明記する**: 複合 ⊃ 単体 の内包関係（例: session-save ⊃ context-save）は、単体側の description で「複合スキルが内包する旨」を書かないと、複合側を使うメリットが利用者から見えなくなる
 - **共通リソースの「真の単一出典化」は責務軸で切る**: `spec-writer/references/` では HEX 値の正本は `dads-tokens.md`、視覚エンコードは `visual-encoding.md`、伝わるデザイン原則は `communicative-design.md` と責務別に分け、互いに内製で重複させない。「何の単一出典か」を軸にすると、データ / 判断軸で置き場に迷わない
+- **shared 化は小さく留める**: SKILL.md は自己完結が望ましい。小さい重複を減らすより、別ファイルを読みに行く間接参照を増やさないほうが価値が高い。shared へ切り出すのは複数スキルが同じ規約を書き換え続ける場合に限る（2026-04-14 にスコープを縮小して実施した判断）
+- **文体・ロール変換型スキルの規則は、足す前と削る前に測る**: 同じ素材で「指示なし / 現行 / 変更案」の 3 稿を別々のサブエージェントに書かせ、ブラインドで比べる。機械的指標（箇条書き比率・太字・文長・禁止語）を先に確定し、別モデルと本人の評価を分けて記録する。手順・`metrics.py`・実例は `~/.claude/skills/japanese-article-style-workspace/`（2026-10-01、一般論の規範が AI 臭を減らさなかった例）
 
 ## スキルの種類と frontmatter 方針
 
