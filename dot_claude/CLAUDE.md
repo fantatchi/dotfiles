@@ -101,7 +101,7 @@ GOをもらってから進める。
 - 日報・週報メール=`/obsidian-mail`（手動専用・ルーティーン経由）
 - 図解: 概念・コードを使い捨ての図解 HTML にする=`/eli5`（手動専用。残す文書は `/spec-writer`）
 - 画像: 日本語の一言から AI っぽさを削った画像生成用の英語プロンプトを 1 本組み立てる=`/image-prompt`（手動専用。画像自体は生成しない）
-- 文章スキル共通の禁止語彙は `skills/shared/llm-tone.md` が単一出典（Codex 側 `~/.agents/skills/` にもミラー済み、更新元は Claude 側）
+- LLM っぽい語彙の禁止リスト `skills/shared/llm-tone.md` は `japanese-doc-style`（論証文書）だけが執筆中に参照する。`japanese-article-style`（一人称の記事）は環境固有の 5 節のみで、語彙は書き上げた後に grep で点検する（2026-10-01 の A/B 検証で一般論の規範は AI 臭を減らさなかった。経緯は `docs/japanese-article-style-retired.md`）
 - レビュー: git 差分の単発レビュー=`/codex:adversarial-review`（別モデルの目）。レビュー系スキルはいずれも読取専用で修正まで回すものは持たない。`superpowers:requesting-code-review` / `receiving-code-review` は superpowers の実装フローを通した時のみ使う
 - スキル作成・編集: `skill-creator:skill-creator`（プラグイン側。ひな形生成 + eval で description の trigger 精度を実測できる）。`superpowers:writing-skills` は使わない。方法論は下記「新スキルの追加・削除・拡張」が正
 - 振り返り: 権限・CLAUDE.md・スキル整理・判断メモ圧縮=`/session-review`（手動専用）
