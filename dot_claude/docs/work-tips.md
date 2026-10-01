@@ -21,7 +21,7 @@
   3. UNC パスに変換: `\\wsl.localhost\<distro>\<wsl-path>`（例: `\\wsl.localhost\Ubuntu\home\at-kato\.local\share\chezmoi\dot_claude\CLAUDE.md`）
   4. Read/Edit ツールで該当 UNC パスを直接操作可（cloud-cmp 等の `.claude/settings.local.json` 経由で permission を許可しておくとスムーズ）
   5. 編集後の target 反映: `wsl chezmoi apply`（commit は任意で `cd <source>` → `wsl git commit ...`）
-  - **補足 1: `wsl chezmoi ...` は非ログインシェルだと `command not found`**（chezmoi は `~/.local/bin` にあり PATH に載らない）。`wsl -d <distro> -- bash -lc 'chezmoi source-path'` のように**ログインシェル経由**で叩く
+  - **補足 1: `wsl chezmoi ...` は非ログインシェルだと `command not found`**（chezmoi は `~/.local/bin` にあり PATH に載らない）。`wsl -d <distro> --exec bash -lc 'chezmoi source-path'` のように**ログインシェル経由**で叩く。**`--` ではなく `--exec` を使う**: `--` だと WSL の既定シェル（zsh）が引数を解釈し直すため、`&&` や `;` でつないだ 2 つ目以降のコマンドが bash の外で走り `zsh:1: command not found: chezmoi` になる（単発のコマンドは `--` でも通るので気づきにくい。2026-10-01、asla）
   - **補足 2: WSL から `/mnt/c/Users/<user>/...` を読むと `Input/output error` になることがある**（2026-09-07 に発生。`cp` も `wc -c` も同じ経路で失敗した）。**逆向き＝ Windows 側から UNC パス（`\\wsl.localhost\...`）へ `Copy-Item` する**と通る。Windows → source の同期はこの向きで書く
   - **補足 3: この PC では Windows の `C:\Users\<user>\.claude` と WSL の `~/.claude` の中身が同一**（ハッシュ一致・Windows 側は symlink でもジャンクションでもない）。Windows 側だけを編集しても chezmoi の target 側は揃うので、残る作業は **source へのコピーと commit だけ**。`chezmoi status` が空なら target は既に一致している
 - **マシン固有の環境の罠は、プロジェクト配下の memory でなくここ（グローバル）に書く**: プロジェクト単位の memory（`~/.claude/projects/<project>/memory/`）に入れた環境の学びは、**別プロジェクトのセッションには読み込まれない**。マシンに紐づく罠はプロジェクト非依存なので、記録先を間違えると同じ罠を別プロジェクトで踏み直す。実例＝この PC の Codex は sandbox exe 不在で**シェルを一切使えない**のに `setup --json` が `ready: true` と嘘をつく、という事実が kabuto 側の project memory にしか無く、yoroi のセッションで同じ罠を 3 回踏み直した（2026-07-26）
