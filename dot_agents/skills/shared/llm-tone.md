@@ -1,6 +1,6 @@
 # LLM っぽい表現の禁止
 
-日本語の原稿を書く・推敲するときの共通規範。`japanese-article-style`（体験記・ブログ記事）が単一出典として参照する。正本は Claude 側の `~/.claude/skills/shared/llm-tone.md`。
+日本語の原稿を書く・推敲するときの共通規範。2026-10-01 以降、Codex 側のスキルからは参照されない（`japanese-article-style` は執筆中の語彙指示をやめた）。書き上げた後にこの語で grep して点検する用途で残す。正本は Claude 側の `~/.claude/skills/shared/llm-tone.md`。
 
 LLM が大量生成する、中身のない型に誘惑されない。書き上げたら、この節で点検する。
 その文書が導入した術語を議論に使うのはよい。空虚な装飾として使うのが問題である。

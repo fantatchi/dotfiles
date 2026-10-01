@@ -5,7 +5,7 @@ description: 'Style guidelines for Japanese technical documents that build an ar
 
 # 日本語技術文書の文章規範
 
-論証を積む文書（読者が段落単位で論理を追う文章）に当てる。**個人の体験記、ブログ記事、Obsidian の記事ノートには当てない**（`japanese-article-style` を使う。整形規範と冗長の排除を体験記へ当てると、書き手の迷いや手戻りが削れてかえって機械的な文章になる）。両方に共通する「LLM っぽい表現の禁止」は `shared/llm-tone.md` が単一出典。
+論証を積む文書（読者が段落単位で論理を追う文章）に当てる。**個人の体験記、ブログ記事、Obsidian の記事ノートには当てない**（`japanese-article-style` を使う。整形規範と冗長の排除を体験記へ当てると、書き手の迷いや手戻りが削れてかえって機械的な文章になる）。「LLM っぽい表現の禁止」は `shared/llm-tone.md` が単一出典。
 
 ## 整形
 
@@ -96,7 +96,7 @@ description: 'Style guidelines for Japanese technical documents that build an ar
 
 ## LLM っぽい表現の禁止
 
-`~/.claude/skills/shared/llm-tone.md` を読んで従う（`japanese-article-style` と共通の単一出典）。
+`~/.claude/skills/shared/llm-tone.md` を読んで従う。
 
 ## 冗長の排除
 

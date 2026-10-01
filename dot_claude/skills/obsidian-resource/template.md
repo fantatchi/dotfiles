@@ -12,8 +12,7 @@ generation: 0
 # auto モードのみ summary_of を追加（元 session-log への [[wiki-link]] リスト）
 ---
 
-（本文。見出しの骨格は記事ごとに決める。「概要」「内容」「まとめ」のような
-定型の節名は使わない。詳細は `japanese-article-style` スキル）
+（本文。文章規範は `japanese-article-style` スキル）
 
 ## 参考リンク
 
