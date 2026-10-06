@@ -38,31 +38,66 @@ if ($PSVersionTable.PSVersion.Major -ge 6) {
 #
 # How: $env:USERPROFILE\.claude-wsl-cache.txt にキャッシュした WSL .claude UNC パスを使う
 #      (キャッシュは setup-windows-claude.ps1 が書く)。キャッシュ未作成なら no-op で抜ける。
+#
+# ~/.claude-home: 職場 PC で個人アカウントを CLAUDE_CONFIG_DIR で分けるための 2 つ目の
+#      config dir (2026-10-06)。~/.claude (業務アカウント) と同じ包含リストを WSL に向け、
+#      projects/ だけは ~/.claude/projects へ向けてメモリと transcript を共有する
+#      (業務アカウントのトークン切れ時に claude-home --resume で続けるため)。
+#      dir が無い PC では何もしない。手順は setup-checklist.md 7-6 節
 
 $claudeWslCacheFile = "$env:USERPROFILE\.claude-wsl-cache.txt"
 if (Test-Path -LiteralPath $claudeWslCacheFile) {
     $claudeWslRoot = (Get-Content -LiteralPath $claudeWslCacheFile -Raw -Encoding UTF8).Trim()
     if ($claudeWslRoot -and (Test-Path -LiteralPath $claudeWslRoot)) {
-        $claudeWinRoot = "$env:USERPROFILE\.claude"
-        $rootItem = Get-Item -LiteralPath $claudeWinRoot -Force -ErrorAction SilentlyContinue
-        # ~/.claude が実ディレクトリの場合だけ自動補完 (SymLink/未設定なら setup 未完)
-        if ($rootItem -and ($rootItem.LinkType -notin @('SymbolicLink', 'Junction'))) {
-            $claudeInclude = @(
-                'CLAUDE.md', 'settings.json', 'settings.local.json', 'context.md',
-                'agents', 'docs', 'icon', 'scripts', 'skills', 'commands'
-            )
+        $claudeInclude = @(
+            'CLAUDE.md', 'settings.json', 'settings.local.json', 'context.md',
+            'agents', 'docs', 'icon', 'scripts', 'skills', 'commands'
+        )
+        foreach ($claudeWinRoot in @("$env:USERPROFILE\.claude", "$env:USERPROFILE\.claude-home")) {
+            $rootLabel = Split-Path -Leaf $claudeWinRoot
+            $rootItem = Get-Item -LiteralPath $claudeWinRoot -Force -ErrorAction SilentlyContinue
+            # 実ディレクトリの場合だけ自動補完 (SymLink/未設定なら setup 未完、.claude-home は未使用)
+            if (-not $rootItem -or ($rootItem.LinkType -in @('SymbolicLink', 'Junction'))) { continue }
             foreach ($name in $claudeInclude) {
                 $source   = Join-Path $claudeWslRoot $name
                 $linkPath = Join-Path $claudeWinRoot $name
                 if ((Test-Path -LiteralPath $source) -and -not (Test-Path -LiteralPath $linkPath)) {
                     try {
                         New-Item -ItemType SymbolicLink -Path $linkPath -Target $source -ErrorAction Stop | Out-Null
-                        Write-Host "claude-symlink: created $name"
+                        Write-Host "claude-symlink: created $rootLabel\$name"
                     } catch {
-                        Write-Warning "claude-symlink: failed for $name : $_"
+                        Write-Warning "claude-symlink: failed for $rootLabel\$name : $_"
                     }
                 }
             }
+            if ($rootLabel -eq '.claude-home') {
+                # projects/ は WSL でなく Windows 側 ~/.claude/projects を共有する
+                $source   = "$env:USERPROFILE\.claude\projects"
+                $linkPath = Join-Path $claudeWinRoot 'projects'
+                $linkItem = Get-Item -LiteralPath $linkPath -Force -ErrorAction SilentlyContinue
+                if (-not $linkItem) {
+                    if (Test-Path -LiteralPath $source) {
+                        try {
+                            New-Item -ItemType SymbolicLink -Path $linkPath -Target $source -ErrorAction Stop | Out-Null
+                            Write-Host "claude-symlink: created $rootLabel\projects"
+                        } catch {
+                            Write-Warning "claude-symlink: failed for $rootLabel\projects : $_"
+                        }
+                    }
+                } elseif ($linkItem.LinkType -notin @('SymbolicLink', 'Junction')) {
+                    # タブを開き直す前に claude-home を起動すると Claude Code が実ディレクトリを作る
+                    Write-Warning "claude-symlink: $linkPath が実ディレクトリのため共有されていません。中身を ~\.claude\projects へ移してから削除し、タブを開き直してください"
+                }
+            }
         }
+    }
+}
+
+# 個人アカウントで起動する (~/.claude-home がある PC だけ定義)
+if (Test-Path -LiteralPath "$env:USERPROFILE\.claude-home") {
+    function claude-home {
+        $prev = $env:CLAUDE_CONFIG_DIR
+        $env:CLAUDE_CONFIG_DIR = "$env:USERPROFILE\.claude-home"
+        try { claude @args } finally { $env:CLAUDE_CONFIG_DIR = $prev }
     }
 }
