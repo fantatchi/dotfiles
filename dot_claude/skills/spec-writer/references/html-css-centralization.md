@@ -82,12 +82,29 @@ docs/_html/
   </style>
 </head>
 <body class="page-{page-name}">
-  <header class="page">...</header>
-  <main>...</main>
-  <footer class="page">...</footer>
+  <!-- 節が 4 つ以上: 左に目次を固定する形 -->
+  <div class="layout">
+    <nav class="toc" aria-label="目次">
+      <p class="toc-title">目次</p>
+      <ol>
+        <li><a href="#overview" class="current">1. 全体構成</a></li>
+        <li><a href="#components">2. コンポーネント一覧</a></li>
+        ...
+      </ol>
+    </nav>
+    <main>
+      <header class="page">...</header>
+      <div class="tldr">...</div>
+      <section id="overview">...</section>
+      ...
+      <footer class="page">...</footer>
+    </main>
+  </div>
 </body>
 </html>
 ```
+
+節が 3 つ以下のページは `.layout` と `nav.toc` を省き、`<body>` 直下を `<main>` だけにする（本文 1 カラムで中央寄せになる）。`header.page` と `footer.page` はどちらの形でも `<main>` の中に置く。
 
 個別 HTML の **固有 `<style>`（2 つ目のブロック）** は **10〜30 行**（`:root` 固有変数のみ）に収める。`html, body { ... }` や `.toc { ... }` などのレイアウトは絶対に書かない（共通 CSS を上書きする事故の温床）。
 
@@ -122,80 +139,74 @@ LLM の手作業展開は「全文コピー漏れ・相対パスズレ・再展�
 
 > **配色・タイポトークンは デジタル庁デザインシステム (DADS) v2.0.1 由来**（MIT, Copyright (c) 2023 デジタル庁）。HEX 値の正本（SSOT）は [`dads-tokens.md`](./dads-tokens.md)。本ファイルで再掲する HEX は同ファイルからの引用であり、本ファイルでは値を変更しない（drift 防止）。
 
-**スタイル骨格の出典**: 本テンプレートは **DADS v2.0.1 準拠**（key-color = Blue 固定）。配色・タイポ・角丸・影は DADS トークンから引いている。各セクション冒頭にコメントで **用途** を明記しているので、不要なセクションは丸ごと削れる。
+**スタイル骨格の出典**: 本テンプレートは **DADS v2.0.1 準拠**（key-color = Blue 固定）。配色・タイポ・角丸は DADS トークンから引いている。見た目の方針は「影と角丸カードを使わず、罫線 1 本と余白で区切る」「h1 は 32px に抑える」「アクセント色（Blue）の面は要点（`.tldr`）だけにする」の 3 点（2026-10-06 に現行 + 4 案を比較して採用）。各セクション冒頭にコメントで **用途** を明記しているので、不要なセクションは丸ごと削れる。
 
 **規模・運用パターンの実証例**: cloud-dsc プロジェクトの `_shared/spec-page.css`（**3072 行、2026-05-14 時点**）。**配色は旧版 Blue 900 ベース** で運用されてきたが、現在は本テンプレ準拠（DADS）への移行対象。ファイル別 scope での全レイアウト統合パターン・3000 行規模の単一ファイル運用は本テンプレ採用時の参考になる。
 
-**`--accent` の値について**: 下記サンプルは DADS key-color (Blue 700 `#264af4`) を `--accent` に、Blue 900 `#0017c1` を `--accent-deep`（本文リンクで AAA pass）、Blue 50 `#e8f1fe` を `--accent-bg`、Solid Gray 900 `#1a1a1a` を `--accent-ink` として採用。**ベースカラーは Blue 固定**（spec-writer デフォルト）。ブランド要請等で別色を採用する場合は [`dads-tokens.md`](./dads-tokens.md) 2 節の DADS プリミティブ 10 色族（Light Blue / Cyan / Green / Lime / Yellow / Orange / Red / Magenta / Purple）から階調を選び、選定 ADR を残す（[`adr-format.md`](./adr-format.md) カラー選定 ADR）。
+**`--accent` の値について**: 下記サンプルは DADS key-color (Blue 700 `#264af4`) を `--accent` に、Blue 900 `#0017c1` を `--accent-deep`（本文リンクで AAA pass）、Blue 50 `#e8f1fe` を `--accent-bg`、Blue 200 `#c5d7fb` を `--accent-line`（要点の枠線）として採用。**ベースカラーは Blue 固定**（spec-writer デフォルト）。ブランド要請等で別色を採用する場合は [`dads-tokens.md`](./dads-tokens.md) 2 節の DADS プリミティブ 10 色族（Light Blue / Cyan / Green / Lime / Yellow / Orange / Red / Magenta / Purple）から階調を選び、選定 ADR を残す（[`adr-format.md`](./adr-format.md) カラー選定 ADR）。
 
 **フォントの選定について**: 日本語・等幅とも DADS 採用フォントを使う。日本語は `Noto Sans JP`（Google Fonts、SIL OFL 1.1）、等幅は `Noto Sans Mono`（CJK + Latin 対応）。UD フォント原則（[`./communicative-design.md`](./communicative-design.md) 原則 7）の保険として `BIZ UDPGothic` / `BIZ UDGothic` を fallback に並べ、Google Fonts CDN 遮断環境（社内 LAN proxy 等）では UD 保険へ自動 fallback する。ウェイトは DADS 採用の `400 (Normal) / 700 (Bold)` の 2 段階のみ。
 
 ```css
 /* ========== :root 変数（全ページ共通） ==========
- * 用途: DADS v2.0.1 準拠 (key-color = Blue) の配色・タイポ・角丸・影を仕様書 HTML
- *       へ単一出典化。基本色は Solid Gray ladder、リンクは Blue 900 (AAA pass)、
+ * 用途: DADS v2.0.1 準拠 (key-color = Blue) の配色・タイポ・角丸を仕様書 HTML へ
+ *       単一出典化。基本色は Solid Gray ladder、リンクは Blue 900 (AAA pass)、
  *       状態色は DADS セマンティック (Green/Red/Yellow)。
+ *       影 (box-shadow) は使わない。区切りは罫線 1 本と余白で表す。
  *       ページ固有色 (--feature 等) は個別 HTML の <style> :root に置く。
  *       HEX 値の出典は references/dads-tokens.md。 */
 :root {
   /* 基本色 — DADS Neutral Solid Gray ladder */
   --bg: #ffffff;              /* white = ページ背景 */
-  --bg-elev: #ffffff;
-  --surface: #f2f2f2;         /* Solid Gray 50 = card / inset surface */
-  --surface-soft: #f2f2f2;    /* Solid Gray 50 = code 背景等 */
+  --surface: #f2f2f2;         /* Solid Gray 50 = code / pre / 表見出し背景 */
   --text: #1a1a1a;            /* Solid Gray 900 = 本文 */
   --text-soft: #4d4d4d;       /* Solid Gray 700 = 補助本文 */
-  --muted: #4d4d4d;           /* Solid Gray 700 */
-  --muted-soft: #7f7f7f;      /* Solid Gray 500 = placeholder / mono eyebrow */
-  --border: #e6e6e6;          /* Solid Gray 100 = hairline */
-  --border-strong: #b3b3b3;   /* Solid Gray 300 = hairline-strong */
+  --muted: #666666;           /* Solid Gray 600 = ラベル・キャプション (on #ffffff で 約 5.7:1 AA) */
+  --border: #e6e6e6;          /* Solid Gray 100 = 罫線 */
+  --border-strong: #cccccc;   /* Solid Gray 200 = 表見出し下・強めの罫線 */
 
   /* アクセント色 — DADS key-color = Blue */
-  --accent: #264af4;          /* Blue 700 = key-color (UI primary、3:1 担保) */
+  --accent: #264af4;          /* Blue 700 = key-color (目次の現在位置・UI primary) */
   --accent-deep: #0017c1;     /* Blue 900 = 本文リンク (on #ffffff で 約 13.7:1 AAA) */
-  --accent-bg: #e8f1fe;       /* Blue 50 = badge / pill 背景 */
-  --accent-ink: #1a1a1a;      /* Solid Gray 900 = CTA black ink */
-  --accent-on-ink: #ffffff;
+  --accent-bg: #e8f1fe;       /* Blue 50 = TL;DR / badge 背景 */
+  --accent-line: #c5d7fb;     /* Blue 200 = TL;DR の枠線 */
 
   /* 状態色 — DADS セマンティック (success/error/warning)
-   * 11px の badge は通常テキスト扱い (Large 例外不可) のため、各 -2 階調 (濃いめ) を
-   * テキスト色に、対応 50 階調を背景に採用して 4.5:1 以上を担保。 */
+   * badge は 12px の通常テキスト扱いのため、濃い階調をテキスト色に、
+   * 対応する 50 階調を背景に採用して 4.5:1 以上を担保。 */
   --status-pass: #197a4b;       /* Green 800 (on #e6f5ec で AA pass) */
   --status-pass-bg: #e6f5ec;    /* Green 50 */
   --status-fail: #ce0000;       /* Red 900 (on #fdeeee で AA pass) */
   --status-fail-bg: #fdeeee;    /* Red 50 */
+  --status-fail-line: #ffbbbb;  /* Red 200 = 警告 callout の枠線 */
   --status-pending: #927200;    /* Yellow 900 (on #fbf5e0 で AA pass) */
   --status-pending-bg: #fbf5e0; /* Yellow 50 */
 
   /* タイポグラフィ — DADS 採用フォント (Noto Sans JP + Noto Sans Mono)
-   * 並び順: DADS 採用フォントを先頭に、Google Fonts CDN 遮断時の UD 保険として
-   * BIZ UDPGothic / BIZ UDGothic を 2 番目に並べる。これにより平時は Noto Sans JP、
-   * CDN 遮断環境では UD フォントへ自動 fallback (communicative-design.md 原則 7)。
-   * Noto Sans Mono は CJK + Latin 等幅対応のため、CJK 等幅 fallback も同フォントで
-   * 賄えるが、念のため BIZ UDGothic を保険として明示する。 */
+   * Google Fonts CDN 遮断時は UD フォント (BIZ UDPGothic / BIZ UDGothic) へ
+   * fallback する (communicative-design.md 原則 7)。 */
   --font-sans: 'Noto Sans JP', 'BIZ UDPGothic', system-ui, sans-serif;
   --font-mono: 'Noto Sans Mono', ui-monospace, 'BIZ UDGothic', monospace;
 
   /* 行長 (communicative-design.md 原則 8) */
   --reading-width: 70ch;
 
-  /* シャドウ — DADS elevation 8 段階を 3 段階 (1/3/5) に間引いて採用
-   * 単段ではなく多段 drop で「カードがページに乗っている」効果。
-   * xs は inset hairline のみ (DADS には該当なし、独自定義)。 */
-  --shadow-xs: 0 0 0 1px rgba(0, 0, 0, 0.06) inset;
-  --shadow-sm: 0 2px 8px 1px rgba(0,0,0,0.1), 0 1px 5px 0 rgba(0,0,0,0.3);   /* DADS elevation-1 */
-  --shadow-md: 0 4px 16px 3px rgba(0,0,0,0.1), 0 1px 6px 0 rgba(0,0,0,0.3);  /* DADS elevation-3 */
-  --shadow-lg: 0 8px 24px 5px rgba(0,0,0,0.1), 0 2px 10px 0 rgba(0,0,0,0.3); /* DADS elevation-5 */
+  /* 角丸 — DADS radius スケールから採用 */
+  --radius-sm: 4px;            /* badge / inline code */
+  --radius-md: 8px;            /* TL;DR・図・pre・callout */
+  --radius-pill: 9999px;       /* DADS full */
 
-  /* 角丸 — DADS radius スケール (4/6/8/12/16/24/32/full) から採用 */
-  --radius-sm: 4px;            /* badge / chip */
-  --radius-md: 8px;            /* ボタン・フォーム */
-  --radius-lg: 12px;           /* カード */
-  --radius-pill: 9999px;       /* DADS full = 完全な円弧 */
+  /* 旧骨格との互換 alias — 既存ページの固有 CSS が参照していても壊れないよう残す。新規には使わない */
+  --bg-elev: var(--bg);
+  --surface-soft: var(--surface);
+  --muted-soft: var(--muted);
+  --accent-ink: var(--text);
+  --accent-on-ink: #ffffff;
+  --radius-lg: 12px;
 }
 
 /* ========== リセット・基本タイポ ==========
- * 用途: ブラウザ既定値の差を吸収し、Noto Sans JP の組み合わせを全ページへ。
+ * 用途: ブラウザ既定値の差を吸収し、Noto Sans JP を全ページへ。
  *       font-feature-settings の pwid で約物の詰めを行う (Noto Sans JP は palt 未実装)。 */
 * { box-sizing: border-box; }
 
@@ -204,367 +215,404 @@ html, body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-sans);
-  font-feature-settings: 'pwid';   /* Noto Sans JP は palt 未実装 */
+  font-feature-settings: 'pwid';
   font-size: 16px;                 /* DADS 本文標準 */
-  line-height: 1.7;                /* DADS 本文推奨 (170%) */
+  line-height: 1.8;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-::selection { background: var(--text); color: #f2f2f2; }
+::selection { background: var(--accent-bg); color: var(--text); }
 
 main {
-  max-width: 1120px;
+  min-width: 0;
+  max-width: 880px;
   margin: 0 auto;
-  padding: 64px 32px 128px;
+  padding: 56px 32px 120px;
 }
 
-:target { scroll-margin-top: 16px; }
+:target { scroll-margin-top: 24px; }
 
-@media (max-width: 768px) {
-  main { padding: 40px 20px 96px; }
+@media (max-width: 900px) {
+  main { padding: 32px 20px 80px; }
+}
+
+/* ========== .layout + nav.toc（左の固定目次） ==========
+ * 用途: ページ内の節が 4 つ以上あるページで、左に目次を固定する。
+ *       <body> 直下に <div class="layout"><nav class="toc">…</nav><main>…</main></div>。
+ *       節が少ないページは .layout を使わず <main> だけにする (1 カラム中央寄せ)。
+ *       900px 以下では目次を隠して本文 1 カラムにする。
+ *       現在位置は a.current で示す (静的 HTML なので、ページ先頭の節に付けておく)。 */
+.layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 64px;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding-inline: 32px;
+}
+
+.layout > main { max-width: 780px; margin: 0; padding-inline: 0; }
+
+nav.toc {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  padding-block: 56px;
+  font-size: 13px;
+}
+
+nav.toc .toc-title {
+  margin: 0 0 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+nav.toc ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-left: 1px solid var(--border);
+}
+
+nav.toc a {
+  display: block;
+  padding: 6px 0 6px 16px;
+  margin-left: -1px;
+  border-left: 2px solid transparent;
+  color: var(--text-soft);
+  text-decoration: none;
+  line-height: 1.5;
+}
+
+nav.toc a:hover { color: var(--accent-deep); }
+nav.toc a.current { color: var(--accent-deep); border-left-color: var(--accent); font-weight: 700; }
+
+@media (max-width: 900px) {
+  .layout { grid-template-columns: minmax(0, 1fr); gap: 0; padding-inline: 0; }
+  .layout > main { padding-inline: 20px; }
+  nav.toc { display: none; }
 }
 
 /* ========== インラインリンク・コード ==========
- * 用途: a 要素は DADS Blue 900 (#0017c1) を採用。本文背景 #ffffff 上で約 13.7:1 で
- *       WCAG AAA pass。key-color = Blue 700 (#264af4) は本文リンクには 4.5:1 を
- *       下回るため、本文には Blue 900 を使う (UI primary としての key-color は別途)。
- *       WCAG 1.4.1 (色のみで情報伝達禁止) 対応のため **平常時から underline を付ける**。
- *       :focus-visible で keyboard navigation の可視性も担保 (WCAG 2.4.7)。
- *       code は surface 上のグレー背景、pre は ink 背景の code-editor-mockup 風。 */
+ * 用途: a 要素は DADS Blue 900 (#0017c1)。key-color の Blue 700 は本文リンクには
+ *       4.5:1 を下回るため使わない。WCAG 1.4.1 (色のみで情報伝達禁止) 対応のため
+ *       平常時から underline を付ける。:focus-visible でキーボード操作の位置を示す (WCAG 2.4.7)。
+ *       code / pre は薄いグレー地。黒地のコードブロックはページ内で最も重い面になり
+ *       要点より目立つため使わない。 */
 a {
-  color: var(--accent-deep);   /* Blue 900 #0017c1 on #ffffff で 約 13.7:1 AAA */
+  color: var(--accent-deep);
   text-decoration: underline;
   text-decoration-thickness: 1px;
-  text-underline-offset: 2px;
-  transition: text-decoration-thickness 0.15s;
+  text-underline-offset: 3px;
 }
 a:hover { text-decoration-thickness: 2px; }
 a:visited { color: #5109ad; }   /* DADS Purple 900 = visited 識別 (on #ffffff で 約 9.3:1 AAA) */
+nav.toc a:visited { color: var(--text-soft); }
 a:focus-visible,
 button:focus-visible,
 [tabindex]:focus-visible {
-  outline: 2px solid var(--accent-deep);   /* Blue 900 = link 色と整合 */
+  outline: 2px solid var(--accent-deep);
   outline-offset: 2px;
 }
 
 code {
   font-family: var(--font-mono);
-  font-size: 0.875em;
-  background: var(--surface-soft);
-  padding: 2px 6px;
-  border-radius: 4px;
-  color: var(--text);
+  font-size: 0.86em;
+  background: var(--surface);
+  padding: 1px 5px;
+  border-radius: var(--radius-sm);
 }
 
 pre {
-  background: var(--text);             /* Solid Gray 900 #1a1a1a = code-editor-mockup */
-  color: var(--accent-on-ink);
-  padding: 20px 24px;
-  border-radius: var(--radius-md);
+  margin: 16px 0;
+  padding: 16px 20px;
   overflow-x: auto;
+  background: var(--surface);
+  border-radius: var(--radius-md);
   font-family: var(--font-mono);
   font-size: 13px;
-  line-height: 1.65;
-  box-shadow: var(--shadow-md);
-  margin: 16px 0;
+  line-height: 1.7;
 }
 
-pre code {
-  background: transparent;
-  padding: 0;
-  color: inherit;
-  font-size: inherit;
-}
+pre code { background: none; padding: 0; font-size: inherit; }
 
 /* ========== header.page ==========
- * 用途: 各ページ最上部の見出しエリア。breadcrumb / h1 / subtitle を含む。
- *       breadcrumb は mono eyebrow、h1 は DADS heading scale 45px (display-md)、
- *       weight 700 (DADS は 400 / 700 の 2 段階のみ)。 */
-header.page {
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 40px;
-  margin-bottom: 64px;
-}
+ * 用途: 各ページ最上部。breadcrumb / h1 / subtitle / .meta-grid を含む。
+ *       h1 は 32px に抑え、本文との差は太さと余白で付ける。 */
+header.page { margin-bottom: 32px; }
 
 header.page .breadcrumb {
-  font-family: var(--font-mono);
-  color: var(--muted-soft);
-  font-size: 12px;
-  margin: 0 0 16px;
-  font-weight: 400;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--muted);
 }
+
+/* パンくずは <span> または <a> を並べる。区切りの「/」は CSS で入れる */
+header.page .breadcrumb > * + *::before { content: "/"; margin-right: 6px; color: var(--border-strong); }
 
 header.page h1 {
-  font-size: 45px;             /* DADS heading scale */
+  margin: 0;
+  font-size: 32px;
   font-weight: 700;            /* DADS は 400 / 700 の 2 段階 */
-  margin: 0 0 14px;
-  letter-spacing: -0.025em;    /* 和文見出しと混在する仕様書では弱めに抑える
-                                * (DADS 字詰めは 0 / 1% / 2% を提供するが、和欧混在では
-                                * 0 〜 -0.025em を選ぶ) */
-  line-height: 1.3;            /* DADS 見出し推奨 (130%) */
-}
-
-/* lang="ja" の見出しは tracking を完全に 0 へ (BIZ UDPGothic 等 fallback 時の保険)。
- * 仕様書 HTML は <html lang="ja"> 前提なので、実質的にこの値が適用される。 */
-header.page h1:lang(ja) {
-  letter-spacing: 0;
+  line-height: 1.4;
+  text-wrap: balance;
 }
 
 header.page .subtitle {
-  color: var(--muted);
-  font-size: 18px;
-  margin: 14px 0 28px;
-  max-width: 760px;
-  line-height: 1.55;
+  margin: 12px 0 24px;
+  font-size: 17px;
+  color: var(--text-soft);
+  max-width: 40em;
 }
 
-/* ========== .meta-grid（想定読者・読了時間・Status グリッド） ==========
- * 用途: ページ冒頭の「想定読者 / 読了時間 / Status / 関連 ADR」4 セルグリッド。
- *       label は mono eyebrow で技術ドキュメント voice を出す。 */
+/* ========== .meta-grid（想定読者・読了時間・Status・関連 ADR） ==========
+ * 用途: ページ冒頭のメタ情報。カードにせず、上下の罫線で挟んだ横並びにする。 */
 .meta-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  margin: 0 0 32px;
-  background: var(--border);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 40px;
+  padding-block: 14px;
+  border-block: 1px solid var(--border);
 }
 
-.meta-grid .item {
-  background: var(--surface);
-  padding: 16px 18px;
+.meta-grid .item { display: flex; flex-direction: column; gap: 2px; }
+.meta-grid .label { font-size: 12px; color: var(--muted); }
+.meta-grid .value { font-size: 14px; }
+
+/* ========== .tiles（概況ページ用の集計タイル） ==========
+ * 用途: 概況ランディング・サマリーページの冒頭で、件数や状態の集計を並べる。
+ *       数値そのものがページの主題のときだけ使う (説明ページの飾りにしない)。
+ *       .tile に .pass / .pending / .fail / .accent を付けるとラベル前に色の点が付く。
+ *       色の点は補助で、ラベル文字 (「稼働中」等) を必ず書く (WCAG 1.4.1)。 */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin: 24px 0 0;
+}
+
+.tile {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-}
-
-.meta-grid .item .label {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 400;
-  color: var(--muted-soft);
-}
-
-.meta-grid .item .value {
-  font-size: 14px;
-  color: var(--text);
-  font-weight: 500;
-}
-
-@media (max-width: 768px) {
-  .meta-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-/* ========== .tldr（TL;DR 装飾） ==========
- * 用途: 各ページ冒頭の TL;DR ブロック。左ボーダーを ink (黒) にして
- *       「sober で技術的」な印象に。label のみアクセントブルー。 */
-.tldr {
-  background: var(--surface);
+  padding: 14px 18px;
   border: 1px solid var(--border);
-  border-left: 3px solid var(--accent-ink);   /* black bar */
   border-radius: var(--radius-md);
-  padding: 24px 28px;
-  font-size: 16px;             /* DADS 本文標準 */
-  line-height: 1.75;           /* DADS 本文 (175%) */
-  box-shadow: var(--shadow-md);
-  margin: 0 0 32px;
+}
+
+.tile .t-label { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-soft); }
+.tile .t-value { font-size: 32px; font-weight: 700; line-height: 1.3; font-variant-numeric: tabular-nums; }
+.tile .t-note { font-size: 12px; color: var(--muted); }
+
+.tile.pass .t-label::before,
+.tile.pending .t-label::before,
+.tile.fail .t-label::before,
+.tile.accent .t-label::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.tile.pass .t-label::before    { color: var(--status-pass); }
+.tile.pending .t-label::before { color: var(--status-pending); }
+.tile.fail .t-label::before    { color: var(--status-fail); }
+.tile.accent .t-label::before  { color: var(--accent); }
+
+/* ========== .tldr（要点） ==========
+ * 用途: 各ページ冒頭の要点。ページ内で唯一の色付きの面にして、最初に目が行くようにする。 */
+.tldr {
+  margin: 0 0 8px;
+  padding: 18px 24px;
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-line);
+  border-radius: var(--radius-md);
 }
 
 .tldr .label {
-  display: inline-block;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 400;
-  color: var(--accent-deep);   /* Blue 900 on Blue 50 で AA pass */
-  background: var(--accent-bg);
-  padding: 3px 12px;
-  border-radius: var(--radius-pill);
-  margin-bottom: 12px;
+  display: block;
+  margin-bottom: 4px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-deep);   /* Blue 900 on Blue 50 で約 12.5:1 AAA */
 }
 
+.tldr ul, .tldr ol { margin: 0; padding-left: 1.2em; }
+.tldr p { margin: 0; }
+
 /* ========== section ==========
- * 用途: ページ内のセクション区切り。h2/h3 + 本文の基本レイアウト、行長制約も適用。
- *       DADS heading scale から h2=32px / h3=20px を採用、weight は 700 (DADS 2 段階)。 */
-section { margin: 96px 0; }
+ * 用途: ページ内の節。h2 は下罫線付き 24px、h3 は 18px。本文は行長を制約する。 */
+section { margin-top: 64px; }
 
 section > h2 {
-  font-size: 32px;             /* DADS heading */
+  margin: 0 0 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  font-size: 24px;
   font-weight: 700;
-  margin: 0 0 14px;
-  padding-bottom: 14px;
-  letter-spacing: -0.02em;
-  line-height: 1.3;            /* DADS 見出し (130%) */
+  line-height: 1.4;
+  text-wrap: balance;
 }
 
 section > h3 {
-  font-size: 20px;             /* DADS heading */
+  margin: 40px 0 8px;
+  font-size: 18px;
   font-weight: 700;
-  margin: 48px 0 12px;
-  letter-spacing: -0.01em;
-  line-height: 1.4;            /* DADS 見出し (140%) */
+  line-height: 1.5;
 }
 
 section > p,
 section > ul,
 section > ol {
   max-width: var(--reading-width);   /* 原則 8: 行長制約 */
+  margin-block: 0 16px;
 }
 
-/* ========== table（標準テーブル、横罫主体） ==========
- * 用途: 仕様一覧・比較・要件表など全般のテーブル基本スタイル。
- *       原則 11（罫線最小化・横罫主体）に従う。thead は mono eyebrow。 */
+/* ========== table（標準テーブル、横罫のみ） ==========
+ * 用途: 仕様一覧・比較・要件表など。原則 11（罫線最小化・横罫主体）に従う。
+ *       列が多い表は <div class="table-wrap"> で包み、狭い画面では表の中だけ横スクロールさせる。 */
+.table-wrap { overflow-x: auto; margin: 16px 0; }
+.table-wrap > table { margin: 0; }
+
 table {
+  width: 100%;
   border-collapse: collapse;
   font-size: 14px;
+  line-height: 1.6;
   margin: 16px 0;
 }
 
 table th, table td {
-  padding: 12px 14px;
+  padding: 10px 12px;
   text-align: left;
-  border-bottom: 1px solid var(--border);
   vertical-align: top;
+  border-bottom: 1px solid var(--border);
 }
 
 table thead th {
-  background: var(--surface-soft);
-  font-family: var(--font-mono);     /* data-table-cell の mono eyebrow */
-  font-weight: 400;
-  font-size: 12px;
-  color: var(--muted-soft);
-  letter-spacing: 0;
-  text-transform: none;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-soft);
+  border-bottom-color: var(--border-strong);
+  white-space: nowrap;
 }
 
 /* 原則 11: 5 行以上 × 4 列以上の表に zebra stripe */
-table.zebra tbody tr:nth-child(even) {
-  background: var(--surface-soft);
-}
+table.zebra tbody tr:nth-child(even) { background: #f8f8f8; }   /* Solid Gray 50 と白の中間 */
 
 table td.num, table th.num {
   text-align: right;
-  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
 }
 
-/* ========== badge (secondary + status バリアント) ==========
- * 用途: ステータス・ラベル表示。`.pass / .fail / .pending / .accent` を切り替え。
- * **運用規約 (MUST)**: `.pass / .fail / .pending` を使う時は **必ずテキストラベル**
- *   (例: 「合格」「失敗」「保留」「PASS」「FAIL」) を含めること。色のみでの情報伝達は
- *   WCAG 1.4.1 違反 + 色覚多様性 (P 型 / D 型) で判別困難になるため。 */
+/* ========== badge / .level ==========
+ * 用途: 状態ラベル。`.pass / .fail / .pending / .accent` を切り替える。先頭に色の点が付く。
+ * **運用規約 (MUST)**: 状態バリアントには必ずテキストラベル (「稼働中」「失敗」「保留」等) を
+ *   含める。色のみでの情報伝達は WCAG 1.4.1 違反 + 色覚多様性で判別困難になるため。
+ * .level は要件レベル語 (MUST / SHOULD / MAY) の表示用。MUST だけ赤で強調する。 */
 .badge {
   display: inline-flex;
   align-items: center;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  background: var(--surface-soft);
-  color: var(--muted);
+  gap: 6px;
   padding: 2px 10px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.badge.pass::before, .badge.fail::before, .badge.pending::before, .badge.accent::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
 }
 
 .badge.pass    { background: var(--status-pass-bg);    color: var(--status-pass); }
 .badge.fail    { background: var(--status-fail-bg);    color: var(--status-fail); }
 .badge.pending { background: var(--status-pending-bg); color: var(--status-pending); }
-.badge.accent  { background: var(--accent-bg);         color: var(--accent-deep); }  /* Blue 900 on Blue 50 で約 12.5:1 AAA */
+.badge.accent  { background: var(--accent-bg);         color: var(--accent-deep); }
 
-/* ========== .note-box / callout 系 ==========
- * 用途: 注記・補足の囲み。.callout-negative は警告（Red 固定で二重符号化）。 */
+.level { font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: var(--text-soft); }
+.level.must { color: var(--status-fail); }
+
+/* ========== .note-box / .callout-negative ==========
+ * 用途: .note-box は補足 (左に細い罫線だけ)。.callout-negative は警告 (Red の地 + 枠)。
+ *       警告は先頭の <strong> に結論を書く (色と太字の二重符号化)。 */
 .note-box {
-  background: var(--surface-soft);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 14px 18px;
-  font-size: 13px;
-  color: var(--muted);
   margin: 16px 0;
+  padding-left: 14px;
+  border-left: 2px solid var(--border-strong);
+  font-size: 14px;
+  color: var(--text-soft);
 }
 
 .callout-negative {
-  background: var(--status-fail-bg);
-  border-left: 3px solid var(--status-fail);
-  border-radius: var(--radius-md);
-  padding: 12px 16px;
-  font-size: 13px;
   margin: 16px 0;
+  padding: 14px 18px;
+  background: var(--status-fail-bg);
+  border: 1px solid var(--status-fail-line);
+  border-radius: var(--radius-md);
+  font-size: 15px;
 }
 
-/* ========== .svg-wrap（SVG 図のラッパー） ==========
- * 用途: インライン SVG / Mermaid 出力の囲み + キャプション。横スクロール許容。
+.callout-negative strong:first-child { display: block; color: var(--status-fail); }
+
+/* ========== .svg-wrap（図のラッパー） ==========
+ * 用途: インライン SVG / Mermaid 出力の囲み + キャプション。狭い画面では図の中だけ横スクロール。
  *       【self-contained 必須】図は必ず **インライン <svg>** か data URI で埋め込む。
- *       <img src="diagram.svg"> のような外部ファイル参照は単体配布で壊れる。
- *       figure-caption は mono にして技術ドキュメント voice を統一。 */
+ *       <img src="diagram.svg"> のような外部ファイル参照は単体配布で壊れる。 */
 .svg-wrap {
-  background: var(--surface);
+  margin: 16px 0 0;
+  padding: 24px;
+  overflow-x: auto;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  padding: 20px;
-  overflow-x: auto;
-  margin: 16px 0;
-  box-shadow: var(--shadow-sm);
 }
 
-.svg-wrap svg { display: block; max-width: 100%; height: auto; }
+.svg-wrap svg { display: block; max-width: 100%; height: auto; font-family: var(--font-sans); }
 
 .figure-caption {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--muted-soft);
   margin: 8px 0 24px;
-  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
 }
 
 /* ========== .page-nav（前後ナビ） ==========
- * 用途: ページ末の前/次ナビ。label-row は mono eyebrow、リンクは hover で accent。 */
+ * 用途: ページ末の前 / 次ナビ。罫線で挟み、左右に振り分ける。 */
 .page-nav {
-  margin-top: 48px;
-  padding: 18px 22px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  font-size: 13px;
-  box-shadow: var(--shadow-sm);
+  margin-top: 64px;
+  padding-block: 16px;
+  border-block: 1px solid var(--border);
+  font-size: 14px;
 }
 
-.page-nav .label-row {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--muted-soft);
-  margin-bottom: 4px;
-}
-
-.page-nav a {
-  color: inherit;
-  text-decoration: none;
-  font-weight: 500;
-  border: none;
-}
-
-.page-nav a:hover { color: var(--accent); }
+.page-nav > :last-child { text-align: right; }
+.page-nav .label-row { display: block; font-size: 12px; color: var(--muted); }
+.page-nav a { font-weight: 700; text-decoration: none; }
+.page-nav a:hover { text-decoration: underline; }
 
 /* ========== footer.page ==========
  * 用途: ページ末の改訂履歴 / メタ情報。table.history で履歴を表示。 */
 footer.page {
   margin-top: 80px;
-  padding-top: 32px;
+  padding-top: 24px;
   border-top: 1px solid var(--border);
-  color: var(--muted-soft);
   font-size: 13px;
+  color: var(--text-soft);
 }
 
-footer.page table.history { width: 100%; border-collapse: collapse; font-size: 12px; }
-footer.page table.history th {
-  font-family: var(--font-mono);
-  font-weight: 400;
-  color: var(--muted-soft);
-  background: var(--surface-soft);
-}
+footer.page table.history { font-size: 13px; }
 
 /* ========== body.page-X scope の例 ==========
  * 用途: ページ固有レイアウト。必ず body.page-X scope を付けて衝突を避ける。
@@ -573,32 +621,30 @@ footer.page table.history th {
 /* 例 1: アーキテクチャ context ページ専用の階層フロー */
 body.page-context .layer-flow {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
   margin: 20px 0;
 }
 
-/* 例 2: 用語集ページの 2 カラム用語表 (term は mono / accent) */
+/* 例 2: 用語集ページの 2 カラム用語表 */
 body.page-glossary .term-grid {
   display: grid;
-  grid-template-columns: 200px 1fr;
+  grid-template-columns: 10em minmax(0, 1fr);
   gap: 12px 24px;
-  align-items: baseline;
+  margin: 0;
 }
 
-body.page-glossary .term-grid dt {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  color: var(--accent);
-  font-weight: 500;
-}
+body.page-glossary .term-grid dt { font-weight: 700; }
+body.page-glossary .term-grid dd { margin: 0; color: var(--text-soft); }
 
-body.page-glossary .term-grid dd { margin: 0; color: var(--text); }
+@media (max-width: 900px) {
+  body.page-glossary .term-grid { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  body.page-glossary .term-grid dd { margin-bottom: 12px; }
+}
 
 /* ========== @page / @media print ==========
  * 用途: 印刷時に図・callout・pre が途中で切れないように break-inside: avoid。
- *       pre は ink 背景のままだとインク消費が多いので surface-soft へ反転。
- *       Chromium は印刷時に box-shadow を描画しないので、カード境界を border で補強。
+ *       目次と前後ナビは紙では使えないので消し、本文を全幅にする。
  *       @page で A4 マージン (18mm × 16mm) を明示し、業務 PDF 配布の安定性を確保。 */
 @page {
   size: A4;
@@ -606,23 +652,11 @@ body.page-glossary .term-grid dd { margin: 0; color: var(--text); }
 }
 
 @media print {
-  body { background: white; }
-  main { max-width: 100%; padding: 0; }
-  .svg-wrap, .note-box, .callout-negative, .tldr, pre { break-inside: avoid; }
-  a { color: var(--text); text-decoration: underline; outline: none; }
-  .page-nav, footer.page { display: none; }
-  /* Chromium 印刷で box-shadow は出ない → inset hairline も消えるためカード境界が
-   * 飛ぶ。border で明示補強し「白いカードが背景に溶ける」事故を防ぐ。 */
-  .meta-grid, .tldr, .svg-wrap, .page-nav {
-    box-shadow: none;
-    border: 1px solid #ccc;
-  }
-  pre {
-    background: var(--surface-soft);
-    color: var(--text);
-    box-shadow: none;
-    border: 1px solid var(--border);
-  }
+  .layout { display: block; padding: 0; }
+  main, .layout > main { max-width: 100%; padding: 0; }
+  nav.toc, .page-nav { display: none; }
+  .svg-wrap, .note-box, .callout-negative, .tldr, .tile, pre, table { break-inside: avoid; }
+  a { color: var(--text); }
 }
 ```
 
@@ -634,7 +668,7 @@ body.page-glossary .term-grid dd { margin: 0; color: var(--text); }
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Noto+Sans+Mono:wght@400;700&display=swap">
 ```
 
-このコア骨格（約 250 行）で「複数 HTML ページ + 視覚的一貫性 + 印刷対応」の必要最低限が揃う。プロジェクト固有のレイアウト（`.tree` / `.decision-grid` / `.pillars` など）は `body.page-X` scope で追加していく。
+このコア骨格（約 500 行）で「複数 HTML ページ + 視覚的一貫性 + 印刷対応」の必要最低限が揃う。節が 4 つ以上のページは `.layout` + `nav.toc` で左に目次を出し、概況ページは `.tiles` で集計を冒頭に並べる。プロジェクト固有のレイアウト（`.tree` / `.decision-grid` / `.pillars` など）は `body.page-X` scope で追加していく。
 
 ## ページ別 scope の書き方
 

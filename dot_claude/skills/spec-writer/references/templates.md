@@ -320,96 +320,54 @@ HTML 補足ページは **サマリー / 概況 / 比較・対比 / 配色で意
      * 実際の生成物ではこの位置に SSOT の【全文】を展開する（省略・要約・畳み込み禁止、
      * placeholder コメント自体を残さない）。展開は expand-shared-css.ts で機械化推奨。 */
   </style>
-  <style>
-    /* ===== summary.html 固有 CSS 変数のみ =====
-     * その他のスタイルは SSOT（_shared/spec-page.css）の body.page-summary scope に集約。
-     */
-    :root {
-      --kpi-positive: #059669;
-      --kpi-positive-bg: #d1fae5;
-      --kpi-warn: #d97706;
-      --kpi-warn-bg: #fef3c7;
-    }
-  </style>
 </head>
 <body class="page-summary">
-  <header class="page">
-    <p class="breadcrumb"><a href="../">Docs</a> / Summary</p>
-    <h1>[システム名]: 全体サマリー</h1>
-    <p class="subtitle">このページで何が分かるかを 1 行で</p>
-  </header>
-
   <main>
+    <header class="page">
+      <p class="breadcrumb"><a href="../">Docs</a><span>Summary</span></p>
+      <h1>[システム名] 全体サマリー</h1>
+      <p class="subtitle">このページで何が分かるかを 1 行で</p>
+      <!-- 集計タイル（共通部品 .tiles）。数値そのものがページの主題のときだけ使う。
+           状態タイルは .pass / .pending / .fail / .accent を付け、ラベル文字を必ず書く -->
+      <div class="tiles">
+        <div class="tile"><span class="t-label">対象システム</span><span class="t-value">12</span></div>
+        <div class="tile pass"><span class="t-label">稼働中</span><span class="t-value">9</span></div>
+        <div class="tile pending"><span class="t-label">移行中</span><span class="t-value">2</span><span class="t-note">2026-12 末に切替</span></div>
+        <div class="tile fail"><span class="t-label">停止中</span><span class="t-value">1</span></div>
+      </div>
+    </header>
+
+    <div class="tldr">
+      <span class="label">要点</span>
+      <ul>
+        <li>主要指標と現状を 2〜3 行で</li>
+      </ul>
+    </div>
+
     <section>
-      <div class="tldr">
-        <span class="label">TL;DR</span>
-        主要指標と現状サマリーを 2〜3 行で
+      <h2>内訳</h2>
+      <div class="table-wrap">
+        <table>...</table>
       </div>
     </section>
 
-    <section>
-      <h2>主要指標</h2>
-      <!-- ページ固有レイアウト .summary-grid / .card は共通 CSS の
-           body.page-summary scope で定義する -->
-      <div class="summary-grid">
-        <div class="card">
-          <h3>主要指標 1</h3>
-          <div class="value">123</div>
-        </div>
-        <div class="card">
-          <h3>主要指標 2</h3>
-          <div class="value">45%</div>
-        </div>
+    <nav class="page-nav">
+      <div>
+        <span class="label-row">前のページ</span>
+        <a href="./overview.html">概要</a>
       </div>
-    </section>
-
-    <footer class="page">
-      <nav class="page-nav">
-        <div>
-          <span class="label-row">前のページ</span>
-          <a href="./overview.html">概要</a>
-        </div>
-        <div>
-          <span class="label-row">次のページ</span>
-          <a href="./detail-a.html">詳細 A</a>
-        </div>
-      </nav>
-    </footer>
+      <div>
+        <span class="label-row">次のページ</span>
+        <a href="./detail-a.html">詳細 A</a>
+      </div>
+    </nav>
+    <footer class="page">...</footer>
   </main>
 </body>
 </html>
 ```
 
-共通 CSS（SSOT `_shared/spec-page.css`）側には以下を `body.page-summary` scope で追加し、各 HTML へ再展開する:
-
-```css
-body.page-summary .summary-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 16px;
-}
-
-body.page-summary .card {
-  background: var(--surface);
-  padding: 16px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-}
-
-body.page-summary .card h3 {
-  margin: 0 0 8px;
-  font-size: 14px;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-body.page-summary .card .value {
-  font-size: 28px;
-  font-weight: 700;             /* DADS は 400 / 700 の 2 段階 */
-  color: var(--text);
-}
-```
+集計タイルは共通 CSS の汎用部品なので、ページ固有の CSS 変数も `body.page-summary` scope の追加も要らない（固有 `<style>` ブロックごと省いてよい）。
 
 ### 比較・対比ページの最小骨格（SSOT + 生成時インライン展開型）
 
@@ -435,13 +393,13 @@ body.page-summary .card .value {
   </style>
 </head>
 <body class="page-compare">
-  <header class="page">
-    <p class="breadcrumb"><a href="../">Docs</a> / Compare</p>
-    <h1>[項目] の比較</h1>
-    <p class="subtitle">何を判断するための比較表か（読み手のための 1 行）</p>
-  </header>
-
   <main>
+    <header class="page">
+      <p class="breadcrumb"><a href="../">Docs</a><span>Compare</span></p>
+      <h1>[項目] の比較</h1>
+      <p class="subtitle">何を判断するための比較表か（読み手のための 1 行）</p>
+    </header>
+
     <section>
       <table class="compare zebra">
         <thead>
