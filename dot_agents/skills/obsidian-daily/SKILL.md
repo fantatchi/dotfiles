@@ -1,0 +1,210 @@
+---
+name: obsidian-daily
+description: 'GitHub アクティビティと作業ログから Obsidian デイリーノートの「## デイリーサマリー」セクションを生成・追記する。複数 GitHub アカウントの活動を集約する。「今日のまとめ」「デイリーサマリー」「KPI」「リポ別コミット」「両アカウント集約」「個人と業務を合算」といった依頼で使う。Obsidian Core Daily notes のテンプレを SSOT として読む前提（本文 6-a 節）。'
+argument-hint: '[YYYY-MM-DD]'
+allowed-tools: Read, Bash(gh:*), Bash(date:*), Bash(python:*), Bash(cat:*), Bash(ls:*), Bash(echo:*)
+---
+
+# デイリーサマリーの生成
+
+**主資源と連携**: 主資源は Obsidian Vault（デイリーノートの書き出し先）。配線はすべて resolver `~/.claude/skills/shared/integrations.md` から解決する — `vault`（書き出し先、無ければ案内終了）/ `vault_dirs`（サブディレクトリ名）/ `gh_accounts`（集約対象 GitHub アカウント、空ならアクティブ 1 アカウントのみ）。GitHub 収集とサマリー組み立て自体は Vault があれば兄弟スキル無しで動く。**タスクストアは参照しない**（デイリーは「その日やったこと」の集約に専念する。プロジェクトの残タスクは各 `.claude/tasks.md` に、思いつきは捕捉箱にあり、`/context-load` と `/gtd-list` が担当する）。
+
+## 1. 対象日の決定
+
+`$ARGUMENTS`（`YYYY-MM-DD`）か、空なら今日。以降 `TARGET_DATE`、派生の `YYYYMM` / `YYYYMMDD` として参照する。
+
+## 2. Vault パスの決定
+
+`~/.claude/skills/shared/vault-init.md` の **1 節「Vault パスの解決と存在確認」を実行** する（resolver `integrations.md` の `vault` を解決し、存在チェックと未配置時の案内を行う。既定 `~/ObsidianVault`）。以降この解決済みパスを `<vault>` と呼ぶ。WSL / Windows (Git Bash) いずれからも同じ相対パスで解決される前提も shared 側に集約済み。
+
+書き出しは `write-daily.py` が `<vault>/10_daily/YYYYMM/YYYY-MM-DD.md` に直接行う（vault-init.md の 2・3 節は使わない）。**`10_daily` は `write-daily.py` にハードコードされており、resolver `vault_dirs.daily` は未配線**。`daily-notes.json` は 6-a 節のテンプレ解決にのみ使う。
+
+## 3. GitHub データ収集
+
+`gh api` で各アカウントごとに 4 種類（commits / PR 作成 / PR マージ / レビュー）を収集する。
+
+### 対象アカウント
+
+集約対象の GitHub アカウントは resolver `~/.claude/skills/shared/integrations.md` の `gh_accounts` で解決する。**resolver を Read し、各要素を実値に置換した Bash 配列を組み立ててから**ループに入る:
+
+```bash
+# resolver の gh_accounts の各要素を「実アカウント名」に置換して並べる
+# 例: gh_accounts: [foo, bar] → accounts=("foo" "bar")
+accounts=( 解決した各アカウント名 )
+```
+
+- **literal 流出ガード（MUST・無人 routine 対策）**: `accounts` を `gh api` に渡す前に、各要素が**実在アカウント名**であること（`<...>` のようなプレースホルダ文字列・空要素を含まないこと）と、`gh_accounts` に値があるのに配列が 1 件へ畳まれていないことを確認する。プレースホルダのまま叩くと全クエリが 0 件で**静かに失敗**する
+- `gh_accounts` が **空 / 未設定** の場合は、現在アクティブな `gh` アカウント 1 つだけを対象にする（`gh auth status` の active user）。この場合「## アカウント切替」は不要。複数アカウント集約は composable な拡張で、単独環境では 1 アカウントで完結する
+- 値がある場合はその配列をそのまま使い、各要素を `${acc}` として以下のクエリに展開する
+
+各アカウントについて以下 4 クエリを **逐次実行**（search 専用の rate limit 枠 30 req/min を一気に使い切らないため）し、結果を 1 つの JSON に統合する。クエリの `<ACCOUNT>` は `${acc}`、`<TARGET_DATE>` は 1 節の日付に置換する。
+
+### アカウント切替（致命的、必須）
+
+`gh api` は **アクティブな `gh` user の token** で API を叩く。`fantatchi` token で `q=author:kentem-at-kato` を叩いても、**kentem-at-kato のみが visibility を持つ private repo の commit/PR は 0 件で返る**（search index は ACL で post-filter される）。
+
+各アカウントのクエリを叩く前に **アクティブアカウントを切り替える**:
+
+```bash
+for acc in "${accounts[@]}"; do
+  gh auth switch -u "$acc" >/dev/null 2>&1 || {
+    echo "WARN: auth switch failed for $acc, skipping" >&2
+    continue
+  }
+  # 3a〜3d を $acc + $TARGET_DATE で実行（後述）
+done
+```
+
+切替に失敗（未認証 / token 失効）したアカウントは **スキップ**し、7 節の完了報告で **必ず明示** する。
+
+### クエリの罠（必須・いずれも過去に踏んだもの）
+
+- エンドポイントの**先頭スラッシュは付けない**（Git Bash が Windows パスに書き換える。`~/.claude/docs/work-tips.md` 参照）
+- 日付絞り込みは **JST offset 付き range 構文**（`<FIELD>:<TARGET_DATE>T00:00:00%2B09:00..<TARGET_DATE>T23:59:59%2B09:00`）。省くと UTC 解釈になり JST 0〜9 時の活動が前日に漏れる
+- **TZ offset の `+` は必ず `%2B`**。生の `+` は GitHub Search がトークン区切りと解釈し、日付範囲が壊れて全件 0 で返る（`work-tips.md`「`gh api search/...` のクエリ内 `+` エンコード」参照）
+
+### 3a. コミット
+
+```bash
+gh api 'search/commits?q=author:<ACCOUNT>+committer-date:<TARGET_DATE>T00:00:00%2B09:00..<TARGET_DATE>T23:59:59%2B09:00&sort=committer-date&order=asc&per_page=100' \
+  --header 'Accept: application/vnd.github.cloak-preview+json'
+```
+
+抽出: sha（先頭7文字）、コミットメッセージ（1行目のみ）、リポジトリ名（full_name）、`commit.committer.date`（ISO-8601 文字列、マージソート用）
+
+※ `order=asc` で時系列順。`cloak-preview` header は commits search のみ必須（issues search では不要）。
+
+### 3b. PR（作成）
+
+```bash
+gh api 'search/issues?q=author:<ACCOUNT>+type:pr+created:<TARGET_DATE>T00:00:00%2B09:00..<TARGET_DATE>T23:59:59%2B09:00&per_page=100'
+```
+
+抽出: タイトル、URL（html_url）、リポジトリ名、状態
+
+### 3c. PR（マージ）
+
+```bash
+gh api 'search/issues?q=author:<ACCOUNT>+type:pr+merged:<TARGET_DATE>T00:00:00%2B09:00..<TARGET_DATE>T23:59:59%2B09:00&per_page=100'
+```
+
+抽出: タイトル、URL（html_url）、リポジトリ名
+
+### 3d. レビュー
+
+```bash
+gh api 'search/issues?q=reviewed-by:<ACCOUNT>+type:pr+updated:<TARGET_DATE>T00:00:00%2B09:00..<TARGET_DATE>T23:59:59%2B09:00&per_page=100'
+```
+
+抽出: タイトル、URL（html_url）、リポジトリ名、状態
+
+注意: `reviewed-by` × `updated` は **当日他人がコメント等で PR を更新した場合**にも反応する（精度より再現を優先する割り切り）。誤検出は 5 節の summary_text 生成段で人間目線でフィルタする運用。
+
+### マージと重複排除
+
+複数アカウント / 複数カテゴリで同じ commit / PR が出た場合の扱い:
+
+- **commits**: **`(sha, repo)` 複合キー** で重複排除。`sha` 単独だと同 commit が複数 repo に index されている（fork / PR base+head 両方）ケースで片方の repo 表示が消える。マージ後は `commit.committer.date` 昇順でソート（古→新）。**write-daily.py は入力順を保持する**ため、ソートは LLM 側の責務
+- **PR**: `html_url` をキーに重複排除。**labels は union**: 同 PR が複数カテゴリ（作成 / マージ / レビュー）に出るケース、複数アカウントで違うカテゴリに出るケースの両方とも labels に列挙する（例: fantatchi が作成 + kentem-at-kato がレビューした PR → `labels: ["作成", "レビュー"]`）。**`_PR_LABEL_ORDER` の `("作成", "マージ", "レビュー")` の語を使う** こと（write-daily.py の KPI 行が分解カウントする）
+
+### エラー処理
+
+- API エラー（403 rate limit / 401 認証 / 422 等）: 該当アカウント・該当セクションのみスキップし、他は継続
+- スキップが発生した場合は 7 節の完了報告で **「N アカウント中 X 件取得失敗（理由）」を必ず明示**（旧版の「取得エラー」ノート表示の代替。write-daily.py 側にはエラー表示機構がないため、報告で可視化する）
+- 全アカウント・全セクションが 0 件: 空配列 `[]` のまま JSON に詰める（write-daily.py が「なし」と表示）
+
+## 4. 作業ログ の収集
+
+```bash
+# <vault> は 2 節で解決した Vault パス、<log> は resolver vault_dirs.log（既定 20_log）
+ls <vault>/<log>/{YYYYMM}/{YYYYMMDD}*.md 2>/dev/null
+```
+
+各ファイルから以下を抽出する:
+1. ファイルパス（vault 相対、例: `20_log/202604/20260423-foo.md`）
+2. frontmatter の `project` を取得（`"[[xxx]]"` の wiki-link 形式の場合は `xxx` を取り出してプレーン文字列として扱う。例: `"[[u-veil]]"` → `u-veil`。スラッシュ区切りなど内部に複数値が入る場合もそのまま 1 つの文字列として保持）
+3. `## 概要` セクションのテキスト（1-2行）を取得
+
+作業ログ が 0 件の場合は「作業ログの記録なし」とする。
+
+`path` は `summary_of`（再帰要約劣化対策の一次情報源リンク）に使うため、必ず含める。
+
+## 5. サマリーデータの組み立て
+
+収集したデータを以下の JSON 形式に組み立てる:
+
+```json
+{
+  "vault": "~/ObsidianVault",
+  "target_date": "2026-03-31",
+  "commits": [
+    {"sha": "a3d1f9f", "message": "コミットメッセージ", "repo": "owner/repo", "date": "2026-03-31T09:12:00+09:00"}
+  ],
+  "prs": [
+    {"title": "PR タイトル", "url": "https://...", "labels": ["作成", "マージ"]}
+  ],
+  "logs": [
+    {"path": "20_log/202604/20260423-foo.md", "project": "project-name", "summary": "作業概要"}
+  ],
+  "summary_text": "- toto-predictor: Phase 2.2 完走 (Brier 0.7761)\n- kabuto: Phase 6-α ゲート 2/10 達成\n- cloud-dsc: PR #38-42 を 5 本作成・4 本マージ"
+}
+```
+
+- `vault` には 2 節で解決した `<vault>`（resolver `vault`、既定 `~/ObsidianVault`）をチルダ込みのまま入れる。**4 節の `ls` パスや本 JSON に `<vault>` / `<log>` のようなプレースホルダ文字列を literal のまま残さない**（write-daily.py は `vault` を `expanduser` するだけなので、literal が来ると `~/<vault>` ディレクトリを誤生成する）
+- `commits`, `prs`, `logs` が 0 件の場合は空配列 `[]` にする
+- `commits[].date` は 3a 節で抽出した `commit.committer.date`（ISO-8601）。`write-daily.py` 自体は使わない（入力順を保持してそのまま出力する）が、3 節マージ規約のソートで使うため **必ず含めて出力**
+- `prs[].labels` は `("作成", "マージ", "レビュー")` の **語固定**。write-daily.py の KPI 行が **label 別に分解カウント** する仕様（同 PR が `["作成", "マージ"]` を持つと breakdown で `作成 1・マージ 1`、ただし PR 件数自体は **1**）。LLM 側で labels を「代表 1 件に畳む」「順序を変える」「別語に置換」しないこと（畳むと breakdown が消える）
+- `summary_text` は全データを総合して LLM が**プロジェクト軸の箇条書き 2-4 行**で生成する
+  - 形式: `- <project>: <その日の核心 1 行>`
+  - プロジェクトは作業ログ / commits / PRs を総合して「動いたプロジェクト」を抽出
+  - 1 プロジェクト 1 行、長文ベタ書きは避ける（ジャンプ率を KPI 行と揃え、認知負荷を抑える）
+  - 全プロジェクトを羅列するのではなく、その日の **核心 2-4 件** に絞る
+  - 活動なし日（commits / PRs / logs すべて空）の場合のみ「特筆事項なし」を 1 行で出す
+- `logs[].path` は vault 相対パス。`write-daily.py` がこれを wiki-link 化して `summary_of` に展開する（再帰要約劣化対策）
+
+## 6. デイリーノートへの書き込み
+
+`~/.claude/skills/obsidian-daily/write-daily.py` が新規作成 / 末尾追記 / `## デイリーサマリー` の上書きを自動判定する。
+
+### 実行手順（必ずファイル経由）
+
+JSON をシェル経由（`echo` / `cat <<EOF` / 環境変数展開）で Python に流すと、
+Windows の Git Bash 環境では locale が cp932 のため Python に届く前に
+日本語が Shift-JIS 化けする。`sys.stdin.reconfigure` では救えない。
+したがって **必ず UTF-8 で一時ファイルに書き出してからパス引数で渡す**。
+
+```bash
+python - <<'PY'
+import json, os
+data = { ... }  # ステップ 5 で組み立てた JSON 構造
+path = os.path.expanduser('~/tmp_daily_summary.json')
+with open(path, 'w', encoding='utf-8') as f:
+    json.dump(data, f, ensure_ascii=False)
+print(path)
+PY
+
+python ~/.claude/skills/obsidian-daily/write-daily.py ~/tmp_daily_summary.json
+```
+
+**`python3` ではなく `python` を使う**: Windows (Git Bash) の `python3` は
+Microsoft Store のスタブランチャー (`AppData\Local\Microsoft\WindowsApps\python3`)
+に解決されることがあり、非対話実行で exit code 49 + 出力なしで黙って落ちる。
+`python` (`C:\Python313\python.exe` 等) を経由すれば安定動作する。WSL/macOS では
+`python` で Python 3 系が解決される前提（必要なら `alias python=python3`）。
+
+**一時ファイル**: `~/tmp_daily_summary.json` 固定名でホーム直下に置く（`/tmp/` は Git Bash と WSL でパス解釈が異なる）。`write-daily.py` が成功後に自分で削除するので `rm` は呼ばない。
+
+**出力フォーマットの SSOT**: セクション構造の正本は `write-daily.py` の実装（`SUMMARY_TEMPLATE` ほか）。`obsidian-mail` の reader（`extract-summary.py`）が依存するため、変更時は reader 側を必ず確認する。人間可読な契約は `~/.claude/skills/shared/daily-summary-format.md`。
+
+## 6-a. Obsidian テンプレート前提
+
+`write-daily.py` は **Obsidian Core Daily notes のテンプレート（`<vault>/.obsidian/daily-notes.json` の `template`）を SSOT として読む**。不在なら対処方法付きで `RuntimeError` になる。`{{date:FORMAT}}` の対応 token は `YYYY` / `YY` / `MM` / `DD` / `HH` / `mm` / `ss` / `M` / `D` のみで、未対応 token は警告のうえ正しく展開されない（追加は `_MOMENT_TOKEN_MAP`）。date 成分は `target_date`、time 成分は実行時刻で展開する（月跨ぎ実行でも tags / aliases は対象日に揃う）。Thino 共存のため `# Journal` はサマリーより上に置く前提（置換は次の `## ` 見出し直前で止まる）。
+
+## 7. 完了報告
+
+以下を**必ず**報告する:
+
+- 書き込んだファイルのパス
+- サマリーの概要: コミット数（× 何 repo）、PR 数（作成 / マージ / レビュー の breakdown）、ログ数
+- **アカウント別の取得件数**: 例 `fantatchi: commits 5 / PR 1` / `kentem-at-kato: commits 12 / PR 3`
+- **取得失敗があった場合は必ず明示**: 3 節「エラー処理」でスキップしたアカウント・セクションと理由（rate limit / auth / 422 等）。write-daily.py は失敗をノート上で可視化しないため、ここで報告しないと **静かな 0 件** として埋もれる

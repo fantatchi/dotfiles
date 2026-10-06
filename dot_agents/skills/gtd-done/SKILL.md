@@ -1,0 +1,76 @@
+---
+name: gtd-done
+description: '捕捉箱（`~/ObsidianVault/00_meta/tasks.md`）の指定タスクを完了にし Done へ移動する。「タスク完了」「あれ終わった」「完了マーク」といった依頼で使う。追加は gtd-add、表示は gtd-list。プロジェクトの作業キュー（`.claude/tasks.md`）は行に `[x]` を付けておけば次の /context-save が整理する。'
+argument-hint: '<タスクタイトルの部分一致文字列>'
+allowed-tools: Read, Write, Edit, Bash(date:*)
+---
+
+# タスク完了
+
+**単独動作**: このスキルは捕捉箱 1 ファイルだけに依存し、兄弟スキルが無くても動く。場所は resolver `~/.claude/skills/shared/integrations.md` の `task_store` で解決する（無ければ既定 `~/ObsidianVault/00_meta/tasks.md`）。連携なし。
+
+**対象は捕捉箱のみ**。プロジェクトの作業キュー（`<project>/.claude/tasks.md`）の完了は、行に `[x]` を付けておけば次の `/context-save` が Done へ整理する（本スキルは触らない）。
+
+## フォーマット仕様
+
+`~/.claude/skills/shared/tasks-format.md` を参照すること。
+
+## 手順
+
+### 1. 引数の確認
+
+- `$ARGUMENTS` が空の場合はユーザーに「完了するタスクの部分一致文字列」を質問する
+
+### 2. タスクストアの解決と読み込み
+
+1. resolver `~/.claude/skills/shared/integrations.md` を Read し `task_store` を取得する（resolver が無い / `task_store` が空なら既定 `~/ObsidianVault/00_meta/tasks.md`）。以降この解決済みパスを「tasks.md」と呼ぶ
+2. tasks.md を Read で読む。存在しない場合は「タスクが登録されていません。」と案内して終了
+
+### 3. タスク検索
+
+Done 以外の全セクション（Inbox / Next / Waiting / Someday）から、`$ARGUMENTS` を**部分一致**で検索する（大文字小文字を区別しない）。
+
+検索対象はタスク行全体（プロジェクトタグも含む）。
+
+### 4. 結果の分岐
+
+#### 0 件の場合
+
+```
+❌ 「<検索文字列>」に一致するタスクが見つかりません
+```
+
+とエラー表示して終了。
+
+#### 1 件の場合
+
+確認なしで Done に移動する（ステップ 5 へ）。
+
+#### 複数件の場合
+
+候補を番号付きで提示し、ユーザーに選ばせる：
+
+```
+複数のタスクが一致しました。番号で指定してください：
+
+1. [Next] #project/mlit APIキー取得
+2. [Waiting] #project/mlit APIキー発行待ち @since:2026-04-08
+
+番号を入力してください:
+```
+
+ユーザーの回答を待ってから次のステップへ進む。
+
+### 5. Done への移動
+
+**書込みは `~/.claude/skills/shared/tasks-format.md` の「書き込みプロトコル（複数 writer・MUST）」に従う**: 書き込み直前に tasks.md を再 Read し、重複見出し（同名セクション 2 回以上 → 自動編集停止）を確認し、対象タスク行がまだ存在するか（他 writer が先に完了/移動していないか）を確認してから編集する。書き込み後はセクション見出しが各 1 回のままかだけ確認する。
+
+元のセクションから該当行を削除し、tasks-format.md の Done 形式（`- [x] YYYY-MM-DD ...`、日付は今日。行末の `@added:` は外す）に変換して `## Done` の**直後**（先頭）に挿入する。削除時に空行が連続しないよう調整する。
+
+### 6. 完了報告
+
+```
+✓ タスクを完了にしました
+- [x] YYYY-MM-DD #project/xxx タイトル
+```
+
