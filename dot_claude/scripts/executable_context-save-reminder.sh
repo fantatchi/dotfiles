@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # context-save-reminder.sh - UserPromptSubmit hook
 #
-# .claude/context.md の frontmatter `updated:` と、セッション初回プロンプト時刻の
-# どちらか新しい方を基準として、閾値以上経過していたら stdout に system-reminder
+# .claude/context.md の frontmatter `updated:`（= 最終 save）と、セッション開始 / 最終
+# /context-load 時刻のどちらか新しい方を基準として、閾値以上経過していたら stdout に system-reminder
 # ブロックを出力し、Claude に /context-save の実行を促す。
 # 閾値未満なら何も出力せず exit 0（無音）。
 #
@@ -16,6 +16,8 @@
 # を保持し、前回プロンプトからの gap が長い場合は resume とみなしてセッション開始を
 # リセットする。これにより `claude --continue` / IDE Resume で session_id が再利用
 # されても古い「初回プロンプト時刻」を基準にせず済む。
+# プロンプトが /context-load のときもセッション開始 epoch を NOW に書き直して無音 exit する
+# （load 直後に save を促さない）。
 
 set -uo pipefail
 
@@ -26,9 +28,14 @@ MARKER_TTL_DAYS=7
 
 # stdin の JSON から session_id を取得（jq があれば優先、なければ sed フォールバック）
 SESSION_ID=""
+IS_CONTEXT_LOAD=0
 if STDIN_JSON=$(cat); then
     if command -v jq >/dev/null 2>&1; then
         SESSION_ID=$(printf '%s' "$STDIN_JSON" | jq -r '.session_id // empty' 2>/dev/null)
+        # jq が無い環境では load 検出をスキップ（従来どおり save/セッション開始だけで判定）
+        if printf '%s' "$STDIN_JSON" | jq -e '(.prompt // "") | test("^\\s*/context-load\\b|<command-name>/context-load</command-name>")' >/dev/null 2>&1; then
+            IS_CONTEXT_LOAD=1
+        fi
     fi
     if [ -z "$SESSION_ID" ]; then
         # 雑な抽出（jq が無い環境向け）
@@ -72,6 +79,12 @@ if [ -n "$SESSION_ID" ]; then
     # セッション開始 epoch を NOW に書き直して silent exit。
     if [ "$LAST_PROMPT_EPOCH" -gt 0 ] \
         && [ $(( (NOW_EPOCH - LAST_PROMPT_EPOCH) / 60 )) -ge "$RESUME_DETECT_MIN" ]; then
+        echo "$NOW_EPOCH" > "$MARKER_FILE" 2>/dev/null || true
+        exit 0
+    fi
+
+    # /context-load: load 直後なので基準を NOW に書き直して silent exit。
+    if [ "$IS_CONTEXT_LOAD" = 1 ]; then
         echo "$NOW_EPOCH" > "$MARKER_FILE" 2>/dev/null || true
         exit 0
     fi
