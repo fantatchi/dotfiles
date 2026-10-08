@@ -129,9 +129,9 @@
     }
   },
   "alwaysThinkingEnabled": true,
-  "effortLevel": "medium",
   "autoUpdatesChannel": "latest",
   "tui": "fullscreen",
-  "skipAutoPermissionPrompt": true,
-  "agentPushNotifEnabled": true
+  "theme": "dark",
+  "agentPushNotifEnabled": true,
+  "skipAutoPermissionPrompt": true
 }
