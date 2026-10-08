@@ -22,7 +22,7 @@ $stateDir = Join-Path $env:USERPROFILE '.claude\state\chezmoi-drift'
 $stateFile = Join-Path $stateDir 'last-notified.txt'
 $checkFile = Join-Path $stateDir 'last-check.txt'
 
-$nowEpoch = [int][double]::Parse((Get-Date -UFormat %s))
+$nowEpoch = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
 
 # チェック間隔ゲート: 前回チェックから $checkIntervalMin 未満なら status を実行せず無音 exit
 if (Test-Path $checkFile) {

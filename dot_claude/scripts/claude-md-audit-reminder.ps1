@@ -63,7 +63,7 @@ function Read-SharedAuditEpoch($probe, $path) {
     return 0
 }
 
-$nowEpoch = [int][double]::Parse((Get-Date -UFormat %s))
+$nowEpoch = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
 
 # 監査実施時刻の解決: Vault（全 PC 共通の正）→ ローカル（フォールバック）の順
 $lastAudit = Read-SharedAuditEpoch $vaultProbe $sharedState
@@ -116,9 +116,9 @@ CLAUDE.md の最終監査から $elapsedDays 日経過しています（閾値: 
 
 **監査を実施したら必ず** ``$env:USERPROFILE\ObsidianVault\00_meta\claude-state.md`` の frontmatter を更新してください
 （全 PC 共通の記録。1 台で監査すれば他の PC でも黙る）:
-- ``last_audit:`` を ``[int][double]::Parse((Get-Date -UFormat %s))`` の値へ（機械可読の正）
+- ``last_audit:`` を ``[DateTimeOffset]::UtcNow.ToUnixTimeSeconds()`` の値へ（機械可読の正）
 - ``last_audit_at:`` を ``Get-Date -Format 'yyyy-MM-ddTHH:mm:sszzz'`` の値へ（人間が読むための併記）
-Vault が無い環境では ``[int][double]::Parse((Get-Date -UFormat %s)) | Set-Content ~\.claude\state\claude-md-audit\last-audit.txt``（このマシンのみ有効）。
+Vault が無い環境では ``[DateTimeOffset]::UtcNow.ToUnixTimeSeconds() | Set-Content ~\.claude\state\claude-md-audit\last-audit.txt``（このマシンのみ有効）。
 頻度調整: ``export CLAUDE_MD_AUDIT_THRESHOLD_DAYS=14`` などで延長可。
 </system-reminder>
 "@
