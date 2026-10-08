@@ -8,7 +8,7 @@ allowed-tools: Read, Bash(date:*), Bash(python3:*), Bash(ls:*), Bash(test:*), Ba
 
 # obsidian-mail — デイリーサマリーをメール送信
 
-Obsidian デイリーノートの「## デイリーサマリー」セクションを **構造化パース → メール向けに再構成**して Gmail SMTP で送信する。Obsidian ノート形式をそのまま流すのではなく、「今日のひとこと → ハイライト → GitHub → 明日のタスク」の読み物形式にする。
+Obsidian デイリーノートの「## デイリーサマリー」セクションを **構造化パース → メール向けに再構成**して Gmail SMTP で送信する。Obsidian ノート形式をそのまま流すのではなく、日報は「今日のひとこと → ハイライト → GitHub」、週報は「終わったこと → 決めたこと → 持ち越し」の読み物形式にする（今日の要約の `[済]` / `[決定]` / `[残]` ラベルを集計。ラベルの無い旧形式の週は作業ログのハイライトに戻る）。
 
 **主資源と連携**: 送信の on/off は resolver `~/.claude/skills/shared/integrations.md` の bool キー `daily_mail` で判定する。Vault パスは **`extract-summary.py` が `~/ObsidianVault` を直書きで持ち、resolver の `vault` は読まない**。読み取るサマリーの構造は `obsidian-daily` の出力との契約で `~/.claude/skills/shared/daily-summary-format.md` に要約がある（真の SSOT は両者のコード）。
 

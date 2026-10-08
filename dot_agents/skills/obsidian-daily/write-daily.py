@@ -163,7 +163,11 @@ def _is_noise_repo(repo: str) -> bool:
 
 
 def build_grouped_commits(commits_list: list[Commit]) -> str:
-    """コミットをリポジトリ軸でグルーピングして整形する。
+    """コミットをリポジトリ軸でグルーピングし、折りたたみ callout に入れて整形する。
+
+    一覧は読み物としての価値が低く日報を羅列に見せるため、件数だけを callout の
+    見出しに出して本体は畳む。`#### コミット` 見出しは呼び出し側（テンプレート）が
+    callout の外に置く（obsidian-mail が節判定に使うため）。
 
     並び順:
       1. ノイズリポ（`_NOISE_REPO_PATTERNS` 該当）は末尾固定
@@ -182,18 +186,14 @@ def build_grouped_commits(commits_list: list[Commit]) -> str:
     ...     {"sha": "b2", "message": "msg-b2", "repo": "o/beta"},
     ... ]
     >>> print(build_grouped_commits(commits))
-    ##### o/beta (2)
-    <BLANKLINE>
-    - msg-b1 (`b1`)
-    - msg-b2 (`b2`)
-    <BLANKLINE>
-    ##### o/alpha (1)
-    <BLANKLINE>
-    - msg-a (`a1`)
-    <BLANKLINE>
-    ##### o/obsidian-vault (1)
-    <BLANKLINE>
-    - auto-backup (`v1`)
+    > [!note]- コミット 4 件（3 repos）
+    > ##### o/beta (2)
+    > - msg-b1 (`b1`)
+    > - msg-b2 (`b2`)
+    > ##### o/alpha (1)
+    > - msg-a (`a1`)
+    > ##### o/obsidian-vault (1)
+    > - auto-backup (`v1`)
     """
     if not commits_list:
         return "なし"
@@ -209,18 +209,20 @@ def build_grouped_commits(commits_list: list[Commit]) -> str:
         key=lambda kv: (_is_noise_repo(kv[0]), -len(kv[1]), kv[0]),
     )
 
-    parts: list[str] = []
+    # callout 内に空行を入れると callout が切れるので詰めて書く
+    parts: list[str] = [f"> [!note]- コミット {len(commits_list)} 件（{len(by_repo)} repos）"]
     for repo, commits in sorted_repos:
-        parts.append(f"##### {repo} ({len(commits)})")
-        parts.append("")
+        parts.append(f"> ##### {repo} ({len(commits)})")
         for c in commits:
-            parts.append(f"- {c['message']} (`{c['sha']}`)")
-        parts.append("")
-    return "\n".join(parts).rstrip()
+            parts.append(f"> - {c['message']} (`{c['sha']}`)")
+    return "\n".join(parts)
 
 
 def build_logs_section(logs_list: list[Log]) -> str:
     """作業ログを「プロジェクト × 件数」フラットサマリー + collapsible callout で整形する。
+
+    同じプロジェクトのログは 1 行にまとめる（入力順で ` ／ ` 連結）。session-save / log が
+    多い日にプロジェクト名だけが並ぶ羅列になるのを防ぐ。
 
     件数があるときは:
         1. 折り畳み**外**に「プロジェクト別件数: proj-A 4 / proj-B 2 / ...」の 1 行サマリー
@@ -239,8 +241,7 @@ def build_logs_section(logs_list: list[Log]) -> str:
     プロジェクト別件数: alpha 2 / beta 1
     <BLANKLINE>
     > [!note]- 詳細（作業ログ 3 件）
-    > - **alpha**: s1
-    > - **alpha**: s2
+    > - **alpha**: s1 ／ s2
     > - **beta**: s3
     """
     if not logs_list:
@@ -253,9 +254,15 @@ def build_logs_section(logs_list: list[Log]) -> str:
     sorted_counts = sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))
     breakdown = "プロジェクト別件数: " + " / ".join(f"{p} {n}" for p, n in sorted_counts)
 
-    lines = [breakdown, "", f"> [!note]- 詳細（作業ログ {len(logs_list)} 件）"]
+    # dict は挿入順を保つので、プロジェクトは初出順・ログは入力順になる
+    by_project: dict[str, list[str]] = {}
     for log in logs_list:
-        lines.append(f"> - **{log['project']}**: {log['summary']}")
+        proj = log.get("project") or "(unknown)"
+        by_project.setdefault(proj, []).append(log.get("summary", ""))
+
+    lines = [breakdown, "", f"> [!note]- 詳細（作業ログ {len(logs_list)} 件）"]
+    for proj, summaries in by_project.items():
+        lines.append(f"> - **{proj}**: {' ／ '.join(summaries)}")
     return "\n".join(lines)
 
 
@@ -284,6 +291,20 @@ def build_summary_of(data: SummaryInput) -> str:
     return "\n".join(f">   - {item}" for item in items)
 
 
+def normalize_summary(text: str) -> str:
+    """summary_text から空行を除き、1 段落にする。
+
+    obsidian-mail は `### 今日の要約` の最初の 1 段落だけを使う。空行が入ると
+    `[決定]` / `[残]` の行がメールから落ちるため、ここで詰める。
+
+    >>> normalize_summary("- [済] a: x\\n\\n- [決定] a: y\\n  \\n- [残] b: z\\n")
+    '- [済] a: x\\n- [決定] a: y\\n- [残] b: z'
+    >>> normalize_summary("特筆事項なし")
+    '特筆事項なし'
+    """
+    return "\n".join(line.rstrip() for line in text.splitlines() if line.strip())
+
+
 def build_summary(data: SummaryInput) -> str:
     """JSON データからサマリーセクションの Markdown を生成する。"""
     now = datetime.now(JST)
@@ -309,7 +330,7 @@ def build_summary(data: SummaryInput) -> str:
     # 作業ログ（collapsible callout で畳む）
     logs_section = build_logs_section(data.get("logs", []))
 
-    summary_text = data.get("summary_text", "特筆事項なし")
+    summary_text = normalize_summary(data.get("summary_text", "")) or "特筆事項なし"
 
     return SUMMARY_TEMPLATE.format(
         timestamp=timestamp,

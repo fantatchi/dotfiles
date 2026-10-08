@@ -22,6 +22,8 @@ Output (stdout, JSON):
 設計:
     daily ノートの「## デイリーサマリー」セクションをパースし、
     メール向けに「ひとこと / ハイライト / GitHub / 明日のタスク」へ再構成する。
+    週報は「今日の要約」の `[済]` / `[決定]` / `[残]` ラベル行を集計する（ラベルの
+    無い週は作業ログのプロジェクト別ハイライトにフォールバック）。
     元のフォーマット仕様（obsidian-daily が出力する形）に依存する。
 
 Exit codes:
@@ -71,9 +73,17 @@ class TaskEntry(TypedDict):
     waiting: bool
 
 
+class TldrItem(TypedDict):
+    """`### 今日の要約` 配下の `- [済|決定|残] project: body` 行を抽出した 1 件。"""
+    label: str
+    project: str
+    body: str
+
+
 class ParsedSummary(TypedDict):
     """`parse_summary()` の戻り値。obsidian-mail/SKILL.md 2-b 節の規約と同期。"""
     tldr: str
+    tldr_items: list[TldrItem]
     worklog: list[WorklogEntry]
     gh_commits: list[str]
     gh_prs: list[PREntry]
@@ -218,6 +228,26 @@ def parse_worklog(text: str) -> list[WorklogEntry]:
     return out
 
 
+TLDR_LABELS: tuple[str, ...] = ("済", "決定", "残")  # obsidian-daily SKILL.md 5 節と語固定
+_TLDR_RE = re.compile(r"^\s*-\s*\[(済|決定|残)\]\s*([^:：]+?)\s*[:：]\s*(.+)$")
+
+
+def parse_tldr_labels(text: str) -> list[TldrItem]:
+    """`### 今日の要約` のラベル付き bullet を抽出する。ラベルの無い行（旧形式）は拾わない。
+
+    >>> parse_tldr_labels("- [済] alpha: 公開した\\n- [決定] beta / gamma：終値で判定\\n- [残] alpha: レビュー待ち")
+    [{'label': '済', 'project': 'alpha', 'body': '公開した'}, {'label': '決定', 'project': 'beta / gamma', 'body': '終値で判定'}, {'label': '残', 'project': 'alpha', 'body': 'レビュー待ち'}]
+    >>> parse_tldr_labels("- alpha: 旧形式の要約")
+    []
+    """
+    out: list[TldrItem] = []
+    for line in text.splitlines():
+        m = _TLDR_RE.match(line)
+        if m:
+            out.append({"label": m.group(1), "project": m.group(2).strip(), "body": m.group(3).strip()})
+    return out
+
+
 def first_sentence(text: str) -> str:
     """Return first sentence ending in '。' (else the full text)."""
     m = re.match(r"^(.+?。)", text)
@@ -256,13 +286,26 @@ def parse_github(text: str) -> tuple[list[str], list[PREntry]]:
     (3, 2)
     >>> prs[0]['type'], prs[1]['type']
     ('authored_merged', 'review')
+
+    新形式（コミット一覧を callout に畳む）も同じく数える:
+
+    >>> folded = '''#### コミット
+    ...
+    ... > [!note]- コミット 2 件（1 repos）
+    ... > ##### o/repo-a (2)
+    ... > - msg-a1 (`a1`)
+    ... > - msg-a2 (`a2`)
+    ... '''
+    >>> parse_github(folded)[0]
+    ['msg-a1 (`a1`)', 'msg-a2 (`a2`)']
     """
     commits: list[str] = []
     prs: list[PREntry] = []
     current: str | None = None
     pr_link_re = re.compile(r"\[([^\]]+)\]\(([^)]+)\)\s*[—-]\s*(.+)$")
     for raw in text.splitlines():
-        s = raw.rstrip()
+        # 新形式はコミット一覧を `> [!note]-` callout に畳むので、行頭の `> ` を剥がして判定する
+        s = re.sub(r"^>\s?", "", raw.rstrip())
         if s.startswith("#### "):
             head = s[5:].strip()
             if head.startswith(GH_SUBSECTION_COMMITS):
@@ -449,6 +492,7 @@ def parse_summary(body: str) -> ParsedSummary:
     tasks = parse_tasks(sections.get("明日以降のタスク", ""))
     return {
         "tldr": tldr,
+        "tldr_items": parse_tldr_labels(tldr),
         "worklog": worklog,
         "gh_commits": commits,
         "gh_prs": prs,
@@ -524,7 +568,8 @@ def render_daily_body(target: dt.date, parsed: ParsedSummary) -> str:
         parts.append(parsed["tldr"])
         parts.append("")
     if parsed["worklog"]:
-        parts.append(f"## ハイライト（{len(parsed['worklog'])} プロジェクト）")
+        n_projects = len({w["project"] for w in parsed["worklog"]})
+        parts.append(f"## ハイライト（{n_projects} プロジェクト）")
         parts.append("")
         for w in parsed["worklog"]:
             parts.append(f"- **{w['project']}** — {first_sentence(w['body'])}")
@@ -534,7 +579,98 @@ def render_daily_body(target: dt.date, parsed: ParsedSummary) -> str:
     return "\n".join(parts).rstrip() + "\n"
 
 
-MAX_BULLETS_PER_PROJECT = 3  # 週報「プロジェクト別ハイライト」の各プロジェクト最大表示件数
+MAX_BULLETS_PER_PROJECT = 3  # 週報「プロジェクト別ハイライト」（フォールバック）の各プロジェクト最大表示件数
+MAX_DONE_PER_PROJECT = 5  # 週報「終わったこと」の各プロジェクト最大表示件数
+
+
+def _render_labeled_week(day_entries: list[dict]) -> list[str]:
+    """今日の要約の `[済]` / `[決定]` / `[残]` を週で集計する。
+
+    - 終わったこと: `[済]` をプロジェクト別（件数の多い順）に日付付きで
+    - 決めたこと: `[決定]` を全件、日付順に
+    - 持ち越し: 週内で最後に要約がある日の `[残]` だけ（前日までの `[残]` は解消済みか
+      最終日に引き継がれているはずなので、重ねて出さない）
+
+    >>> e = lambda d, items: {"date": dt.date(2026, 10, d), "parsed": {"tldr_items": items}}
+    >>> it = lambda l, p, b: {"label": l, "project": p, "body": b}
+    >>> week = [
+    ...     e(6, [it("済", "alpha", "公開した"), it("残", "beta", "レビュー待ち")]),
+    ...     e(7, [it("済", "alpha", "直した"), it("決定", "gamma", "終値で判定"),
+    ...           it("残", "alpha", "第3回の推敲")]),
+    ...     e(8, []),  # 旧形式の日（ラベルなし）は無視
+    ... ]
+    >>> print("\\n".join(_render_labeled_week(week)))
+    ## 終わったこと
+    <BLANKLINE>
+    ### alpha · 2 件
+    <BLANKLINE>
+    - [10-06] 公開した
+    - [10-07] 直した
+    <BLANKLINE>
+    ## 決めたこと
+    <BLANKLINE>
+    - [10-07] gamma: 終値で判定
+    <BLANKLINE>
+    ## 持ち越し（10-07 時点）
+    <BLANKLINE>
+    - alpha: 第3回の推敲
+    <BLANKLINE>
+    """
+    done: dict[str, list[tuple[dt.date, str]]] = {}
+    decided: list[tuple[dt.date, TldrItem]] = []
+    last_remaining: tuple[dt.date, list[TldrItem]] | None = None
+    for entry in day_entries:
+        d: dt.date = entry["date"]
+        items = entry["parsed"].get("tldr_items", [])
+        if not items:
+            continue
+        for it in items:
+            if it["label"] == "済":
+                done.setdefault(it["project"], []).append((d, it["body"]))
+            elif it["label"] == "決定":
+                decided.append((d, it))
+        last_remaining = (d, [it for it in items if it["label"] == "残"])
+
+    parts: list[str] = []
+    if done:
+        parts += ["## 終わったこと", ""]
+        for proj, rows in sorted(done.items(), key=lambda x: (-len(x[1]), x[0])):
+            parts += [f"### {proj} · {len(rows)} 件", ""]
+            for d, body in rows[:MAX_DONE_PER_PROJECT]:
+                parts.append(f"- [{d.strftime('%m-%d')}] {body}")
+            rest = len(rows) - MAX_DONE_PER_PROJECT
+            if rest > 0:
+                parts.append(f"- …ほか {rest} 件")
+            parts.append("")
+    if decided:
+        parts += ["## 決めたこと", ""]
+        for d, it in decided:
+            parts.append(f"- [{d.strftime('%m-%d')}] {it['project']}: {it['body']}")
+        parts.append("")
+    if last_remaining and last_remaining[1]:
+        d, rem = last_remaining
+        parts += [f"## 持ち越し（{d.strftime('%m-%d')} 時点）", ""]
+        for it in rem:
+            parts.append(f"- {it['project']}: {it['body']}")
+        parts.append("")
+    return parts
+
+
+def _render_worklog_highlights(proj_bullets: dict[str, list[dict]]) -> list[str]:
+    """ラベル付き要約が 1 日も無い週のフォールバック: 作業ログのプロジェクト別ハイライト。"""
+    if not proj_bullets:
+        return []
+    parts = ["## プロジェクト別ハイライト", ""]
+    proj_sorted = sorted(proj_bullets.items(), key=lambda x: (-len(x[1]), x[0]))
+    for proj, bullets in proj_sorted:
+        parts += [f"### {proj} · {len(bullets)} 件", ""]
+        for b in bullets[:MAX_BULLETS_PER_PROJECT]:
+            parts.append(f"- [{b['date'].strftime('%m-%d')}] {b['summary']}")
+        rest = len(bullets) - MAX_BULLETS_PER_PROJECT
+        if rest > 0:
+            parts.append(f"- …ほか {rest} 件")
+        parts.append("")
+    return parts
 
 
 def render_weekly_body(monday: dt.date, sunday: dt.date,
@@ -548,49 +684,29 @@ def render_weekly_body(monday: dt.date, sunday: dt.date,
         parts.append(f"取得済み: {len(day_entries)}/7 日分")
     parts.append("")
 
-    # プロジェクト別に worklog bullets を集約
+    # プロジェクト別に worklog bullets を集約（フォールバック表示と「動いたプロジェクト」数に使う）
     proj_bullets: dict[str, list[dict]] = {}
     for entry in day_entries:
         d: dt.date = entry["date"]
         for w in entry["parsed"]["worklog"]:
-            proj = w["project"]
-            proj_bullets.setdefault(proj, []).append({
+            proj_bullets.setdefault(w["project"], []).append({
                 "date": d,
                 "summary": first_sentence(w["body"]),
             })
+    projects = set(proj_bullets) | {
+        it["project"] for e in day_entries for it in e["parsed"].get("tldr_items", [])
+    }
 
-    # 集計
     total_commits = sum(len(d["parsed"]["gh_commits"]) for d in day_entries)
     total_prs = sum(len(d["parsed"]["gh_prs"]) for d in day_entries)
-    total_tasks = sum(
-        len([t for t in d["parsed"]["tasks"] if not t["waiting"]])
-        for d in day_entries
-    )
     parts.append("## 週次集計")
     parts.append("")
-    parts.append(f"- 動いたプロジェクト: {len(proj_bullets)}")
+    parts.append(f"- 動いたプロジェクト: {len(projects)}")
     parts.append(f"- GitHub: コミット {total_commits} / PR {total_prs}")
-    parts.append(f"- 明日タスク累計: {total_tasks} 件")
     parts.append("")
 
-    # プロジェクト別ハイライト（活動件数の多い順）
-    if proj_bullets:
-        parts.append("## プロジェクト別ハイライト")
-        parts.append("")
-        proj_sorted = sorted(
-            proj_bullets.items(),
-            key=lambda x: (-len(x[1]), x[0]),
-        )
-        for proj, bullets in proj_sorted:
-            parts.append(f"### {proj} · {len(bullets)} 件")
-            parts.append("")
-            for b in bullets[:MAX_BULLETS_PER_PROJECT]:
-                mmdd = b["date"].strftime("%m-%d")
-                parts.append(f"- [{mmdd}] {b['summary']}")
-            rest = len(bullets) - MAX_BULLETS_PER_PROJECT
-            if rest > 0:
-                parts.append(f"- …ほか {rest} 件")
-            parts.append("")
+    labeled = _render_labeled_week(day_entries)
+    parts.extend(labeled if labeled else _render_worklog_highlights(proj_bullets))
 
     return "\n".join(parts).rstrip() + "\n"
 
