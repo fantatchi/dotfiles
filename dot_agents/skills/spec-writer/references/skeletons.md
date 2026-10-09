@@ -21,32 +21,34 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{タイトル}}</title>
 <style>
-  /* DADS v2.0.1 準拠 (HEX 出典: references/dads-tokens.md) */
-  :root { --bg:#ffffff; --surface:#f2f2f2; --text:#1a1a1a; --muted:#4d4d4d; --border:#e6e6e6; --accent:#264af4; --accent-deep:#0017c1; --accent-bg:#e8f1fe; }
-  body { margin:0; background:var(--bg); color:var(--text); font-family:'Noto Sans JP','BIZ UDPGothic',system-ui,sans-serif; line-height:1.7; }
-  main { max-width:1000px; margin:0 auto; padding:40px 24px; }
-  header.page { border-bottom:1px solid var(--border); padding-bottom:24px; margin-bottom:32px; }
-  header.page h1 { font-size:26px; font-weight:700; margin:0 0 6px; }
+  /* DADS v2.0.1 準拠 (HEX 出典: references/dads-tokens.md)。影と角丸カードは使わず、罫線と余白で区切る */
+  :root { --bg:#ffffff; --surface:#f2f2f2; --text:#1a1a1a; --muted:#4d4d4d; --border:#e6e6e6; --accent:#264af4; --accent-deep:#0017c1; --accent-bg:#e8f1fe; --accent-line:#c5d7fb; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family:'Noto Sans JP','BIZ UDPGothic',system-ui,sans-serif; line-height:1.8; }
+  main { max-width:880px; margin:0 auto; padding:48px 20px 96px; }
+  header.page { margin-bottom:32px; }
+  header.page h1 { font-size:32px; font-weight:700; line-height:1.4; margin:0 0 12px; }
+  header.page .meta { font-size:13px; color:var(--muted); padding-block:10px; border-block:1px solid var(--border); }
   a { color:var(--accent-deep); text-decoration:underline; }
-  .tldr { background:var(--surface); border:1px solid var(--border); border-left:4px solid var(--accent); border-radius:8px; padding:14px 18px; }
-  .tldr .label { display:inline-block; font-size:11px; font-weight:700; color:var(--accent-deep); background:var(--accent-bg); padding:2px 8px; border-radius:4px; margin-bottom:8px; }
-  section { margin:40px 0; }
-  section > h2 { font-size:20px; font-weight:700; border-bottom:1px solid var(--border); padding-bottom:8px; }
-  table { width:100%; border-collapse:collapse; border:1px solid var(--border); border-radius:8px; font-size:13px; }
+  .tldr { background:var(--accent-bg); border:1px solid var(--accent-line); border-radius:8px; padding:18px 24px; }
+  .tldr .label { display:block; font-size:13px; font-weight:700; color:var(--accent-deep); margin-bottom:4px; }
+  .tldr p { margin:0; }
+  section { margin-top:56px; }
+  section > h2 { font-size:24px; font-weight:700; border-bottom:1px solid var(--border); padding-bottom:10px; }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
   th, td { padding:10px 14px; text-align:left; border-bottom:1px solid var(--border); vertical-align:top; }
-  thead th { background:var(--surface); }
+  thead th { font-size:13px; color:var(--muted); border-bottom-color:#cccccc; }
 </style>
 </head>
 <body>
 <main>
   <header class="page">
     <h1>{{タイトル}}</h1>
-    <div class="tldr">
-      <span class="label">TL;DR</span>
-      <p>{{2-3 行の要約}}</p>
-    </div>
-    <p>想定読者: {{...}} / 読了時間: 約 {{NN}} 分 / Status: Draft</p>
+    <p class="meta">想定読者: {{...}} / 読了時間: 約 {{NN}} 分 / Status: Draft</p>
   </header>
+  <div class="tldr">
+    <span class="label">要点</span>
+    <p>{{2-3 行の要約}}</p>
+  </div>
   <section><h2>1. Context</h2><p>{{背景}}</p></section>
   <section><h2>2. Goals / Non-Goals</h2><h3>Goals</h3><ul><li>{{...}}</li></ul><h3>Non-Goals</h3><ul><li>{{...}}</li></ul></section>
   <section><h2>3. Design</h2><p>{{何を決めたか}}</p></section>

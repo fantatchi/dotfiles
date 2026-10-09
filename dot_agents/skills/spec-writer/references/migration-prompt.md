@@ -66,7 +66,7 @@
    - grep -rl 'data-shared-source' で全対象が移行済み、ローカル CSS への <link> 参照が
      残っていないことを確認
 
-6. プロジェクト側ドキュメント（AGENTS.md・README 等）に旧 <link> 参照型の記述があれば
+6. プロジェクト側ドキュメント（CLAUDE.md・README 等）に旧 <link> 参照型の記述があれば
    同時更新する
 
 7. 完了したら 1 コミットにまとめる（push はしない）。コミットメッセージに
@@ -151,7 +151,7 @@ key-color = Blue 固定）へ移行して。HEX 全量・タイポ・角丸・�
    - 単純な Vercel → DADS の置き換えで業種固有事情がなければ ADR 不要
 
 9. プロジェクト側ドキュメントの更新:
-   - AGENTS.md / README 等に「Vercel inspired」「base-color-mapping」言及があれば
+   - CLAUDE.md / README 等に「Vercel inspired」「base-color-mapping」言及があれば
      同時更新（DADS 準拠 / dads-tokens.md 参照）
 
 10. 自己検証:
@@ -179,7 +179,7 @@ key-color = Blue 固定）へ移行して。HEX 全量・タイポ・角丸・�
 
 本プロンプトは spec-writer スキルの一部として配布されているので、各リポでセッションを開いて以下を投げるだけで再利用できる:
 
-1. `$spec-writer` を起動（または自然文で「DADS 移行をやって」）
+1. `/spec-writer` を起動（または自然文で「DADS 移行をやって」）
 2. 「`~/.agents/skills/spec-writer/references/migration-prompt.md` の Part A / Part B を実施して」と指示
 3. エージェントが上記手順を順番に進める
 

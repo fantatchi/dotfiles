@@ -348,7 +348,7 @@ DADS スケール: `4 / 6 / 8 / 12 / 16 / 24 / 32 / full(9999px = 完全な円�
 
 ## 7. 影（elevation、box-shadow CSS）
 
-DADS は 8 段階。spec-writer は drop-shadow を多用しない方針のため、`2 / 4 / 6` の 3 段階を主に採用（hover / focus / modal）。
+DADS は 8 段階。**spec-writer の HTML 補足ページは影を使わず、罫線 1 本と余白で区切る**（2026-10-06 に見た目を刷新した際に撤去。影付きカードが全ブロックで同じ強さで主張し、要点が埋もれたため）。下表は参照用に残す。
 
 | Level | box-shadow |
 |---|---|

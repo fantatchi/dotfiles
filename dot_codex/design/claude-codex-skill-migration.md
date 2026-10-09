@@ -77,6 +77,15 @@ Codex の作業ログは Claude と同じ `20_log/YYYYMM/`、リソースは `30
 
 2026-10-01 の追従（タスクの登録日 `@added:` と期間の 30 日統一）: Codex 版 `context-save` の Done 整理・追記書式・補完と、`context-load` の古いタスク件数を Claude 版と同じ文言にした。Codex 版 context-save にあった「2 週間」と `date -d "2 weeks ago"` の直書きは tasks-format.md 参照へ直した。
 
+2026-10-10 の追従（9/25〜10/08 分の棚卸し。両ディレクトリを `diff -r` し chezmoi 履歴と突き合わせ）: `shared/` 経由の変更（tasks-format の `@added:`、context-save の 20KB / 40KB）と `obsidian-daily` / `obsidian-mail` は反映済みだった。`multi-persona-review` は 9/25 判定どおり無変更。
+
+| スキル | 移植した規範 |
+|---|---|
+| `spec-writer` references | 10/06 の CSS 骨格刷新（影なし・罫線と余白、`--accent-line`、TL;DR の位置）を 6 ファイルまるごと Claude 版からコピーし、`~/.claude/skills/spec-writer/references/` のパス参照だけ `~/.agents/...` に再適応 |
+| `obsidian-log` | 同じセッションでも日付が変わったらログを新規作成する |
+| `pr-review` | 子エージェントに所見を 2 通以上に分けて送らせる、フォールバック後に遅れて届いた所見を 4 節の裏取り対象に取り込む |
+| `eli5` / `image-prompt` | 9/25 の圧縮版から再生成（frontmatter 簡略化、`$ARGUMENTS` → 引数表現、ツール読み替え注記、eli5 の保存先 `/tmp/eli5/`、`&&` の permission 注記は Claude 固有なので削除） |
+
 ## chezmoi と Windows
 
 ユーザー管理対象は `dot_codex/AGENTS.md`、`dot_agents/skills/`、`dot_codex/scripts/`、`dot_codex/design/` とする。認証、config、セッション、Plugin、cache、ログ、SQLite は管理しない。Codex がユーザー Skill を探索する正規の場所は `~/.agents/skills/` とする。Windows の `.codex` と `.agents` は実ディレクトリを維持し、`AGENTS.md` と `~/.agents/skills/*/SKILL.md` で検出した各 Skill ディレクトリだけを WSL 側へ SymbolicLink で共有する。Windows の `.codex/skills/.system` は OS ローカルのまま保持する。
