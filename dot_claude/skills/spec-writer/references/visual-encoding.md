@@ -41,8 +41,9 @@ spec-writer のデフォルトは **key-color = Blue** 固定。下表はそれ�
 | テキスト (White) | White | `#FFFFFF` |
 | 本文テキスト | Solid Gray 900 | `#1a1a1a` |
 | ラベル・補助 | Solid Gray 500 | `#7f7f7f` |
-| 本文リンク | Blue 900 | `#0017c1` (白背景で AAA) |
-| 訪問済リンク | Purple 900 | `#5109ad` (白背景で AAA) |
+| 本文リンク | Blue 1000 | `#00118f` (白背景で 約 14.2:1) |
+| 訪問済リンク | Magenta 900 | `#8b008b` (白背景で 約 8.5:1) |
+| 表の罫線 | Solid Gray 420 | `#949494` (白背景で 約 3.03:1) |
 | 背景 | White | `#ffffff` |
 | カード・surface | Solid Gray 50 | `#f2f2f2` |
 | key-color (UI primary) | Blue 700 | `#264af4` |

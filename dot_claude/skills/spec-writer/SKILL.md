@@ -110,13 +110,19 @@ HTML 補足ページを新規に生成する際の **既定のスタイルは �
 
 | 項目 | デフォルト値 | 出典・参照 |
 |---|---|---|
-| `--accent-deep` (本文リンク) | `#0017c1` (Blue 900) | `references/dads-tokens.md` 1 節 |
+| `--link` (本文リンク) | `#00118f` (Blue 1000)。訪問済み `#8b008b` (Magenta 900) | `references/dads-tokens.md` 1 節 |
+| フォーカス表示 | 黒 4px + `#ffd43d` (Yellow 300) の縁取り。**変更しない** | 同上 |
+| 文字の最小サイズ | 14px（DADS の必須要件） | `references/dads-tokens.md` 5 節 |
+| 表の罫線 | `#949494` (Solid Gray 420)、見出し行の下線は黒 | `references/dads-tokens.md` 3 節 |
+| `--accent-deep` (要点ラベル・目次の現在位置) | `#0017c1` (Blue 900) | 同上 |
 | `--accent` (UI primary = key-color) | `#264af4` (Blue 700) | 同上 |
 | `--accent-bg` (badge 背景) | `#e8f1fe` (Blue 50) | 同上 |
 | `--accent-ink` (本文・濃文字) | `#1a1a1a` (Solid Gray 900) | `references/dads-tokens.md` 3 節 |
 | 日本語フォント | Noto Sans JP | `references/dads-tokens.md` 5 節 |
 | 等幅フォント | Noto Sans Mono | 同上 |
 | UD 保険 fallback | BIZ UDPGothic / BIZ UDGothic | `references/communicative-design.md` 原則 7 |
+
+部品（表・目次・用語集・callout・バッジなど）を足す・直すときは、DADS の HTML 版コードスニペットの対応部品を [references/dads-snippets.md](references/dads-snippets.md) で引き、値と構造を共通 CSS のクラスに写す。
 
 優先順位:
 
@@ -202,3 +208,4 @@ HTML 補足ページの本数に応じて要件レベルを切り替える:
 
 - [テクニカルライティングガイドライン（フューチャー株式会社）](https://future-architect.github.io/arch-guidelines/documents/forTechnicalWriting/technical_writing_guidelines.html) — 本文の構造化・用語選定の出典
 - [デジタル庁デザインシステム DADS](https://design.digital.go.jp/dads/) / [@digital-go-jp/design-tokens](https://github.com/digital-go-jp/design-tokens) — 取込版は v2.0.1、`references/dads-tokens.md` に静的転記
+- [DADS HTML 版コードスニペット](https://github.com/digital-go-jp/design-system-example-components-html)（[Storybook](https://design.digital.go.jp/dads/html/)） — リンク・フォーカス・表の罫線・文字の最小サイズの出典。部品の対応は `references/dads-snippets.md`

@@ -114,7 +114,8 @@ key-color = Blue 固定）へ移行して。HEX 全量・タイポ・角丸・�
      - --accent-bg: #e8f1fe (Blue 50)
      - --font-sans: 'Noto Sans JP', 'BIZ UDPGothic', system-ui, sans-serif
      - --font-mono: 'Noto Sans Mono', ui-monospace, 'BIZ UDGothic', monospace
-     - a:visited: #5109ad (Purple 900, AAA)
+     - a: #00118f (Blue 1000) / a:visited: #8b008b (Magenta 900)
+     - :focus-visible: 黒 4px + Yellow 300 #ffd43d の縁取り（DADS 既定。変更しない）
    - hero-mesh-gradient セクションが残っていたら削除（spec-writer の装飾排除原則と矛盾）
 
 3. 各 HTML の Google Fonts <link> を DADS 採用フォントに更新:
@@ -135,7 +136,7 @@ key-color = Blue 固定）へ移行して。HEX 全量・タイポ・角丸・�
 6. コントラスト比検証 (DADS / JIS X 8341-3 AA 準拠):
    - Chrome DevTools → Elements → Accessibility → Contrast 表示で本文リンク / badge /
      状態色を点検
-   - 本文リンク (Blue 900 on #ffffff) は約 13.7:1 (AAA pass) を確認
+   - 本文リンク (Blue 1000 on #ffffff) は約 14.2:1 (AAA pass) を確認
    - .badge.accent / .success / .error / .warning が各 4.5:1 以上を確認
    - 失敗があれば dads-tokens.md 1 節の用途別マッピングを参照して階調を上げる
 

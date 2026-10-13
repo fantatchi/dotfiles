@@ -22,21 +22,24 @@
 <title>{{タイトル}}</title>
 <style>
   /* DADS v2.0.1 準拠 (HEX 出典: references/dads-tokens.md)。影と角丸カードは使わず、罫線と余白で区切る */
-  :root { --bg:#ffffff; --surface:#f2f2f2; --text:#1a1a1a; --muted:#4d4d4d; --border:#e6e6e6; --accent:#264af4; --accent-deep:#0017c1; --accent-bg:#e8f1fe; --accent-line:#c5d7fb; }
+  :root { --bg:#ffffff; --surface:#f2f2f2; --text:#1a1a1a; --muted:#4d4d4d; --border:#e6e6e6; --accent:#264af4; --accent-deep:#0017c1; --accent-bg:#e8f1fe; --accent-line:#c5d7fb; --link:#00118f; --link-visited:#8b008b; --focus-ring:#ffd43d; --border-table:#949494; }
   body { margin:0; background:var(--bg); color:var(--text); font-family:'Noto Sans JP','BIZ UDPGothic',system-ui,sans-serif; line-height:1.8; }
   main { max-width:880px; margin:0 auto; padding:48px 20px 96px; }
   header.page { margin-bottom:32px; }
   header.page h1 { font-size:32px; font-weight:700; line-height:1.4; margin:0 0 12px; }
-  header.page .meta { font-size:13px; color:var(--muted); padding-block:10px; border-block:1px solid var(--border); }
-  a { color:var(--accent-deep); text-decoration:underline; }
+  header.page .meta { font-size:14px; color:var(--muted); padding-block:10px; border-block:1px solid var(--border); }
+  a { color:var(--link); text-decoration:underline; text-underline-offset:3px; }
+  a:visited { color:var(--link-visited); }
+  :focus-visible { outline:4px solid #000000; outline-offset:2px; border-radius:4px; box-shadow:0 0 0 2px var(--focus-ring); }  /* DADS 既定。変更しない */
+  a:focus-visible { background-color:var(--focus-ring); }
   .tldr { background:var(--accent-bg); border:1px solid var(--accent-line); border-radius:8px; padding:18px 24px; }
-  .tldr .label { display:block; font-size:13px; font-weight:700; color:var(--accent-deep); margin-bottom:4px; }
+  .tldr .label { display:block; font-size:14px; font-weight:700; color:var(--accent-deep); margin-bottom:4px; }
   .tldr p { margin:0; }
   section { margin-top:56px; }
   section > h2 { font-size:24px; font-weight:700; border-bottom:1px solid var(--border); padding-bottom:10px; }
   table { width:100%; border-collapse:collapse; font-size:14px; }
-  th, td { padding:10px 14px; text-align:left; border-bottom:1px solid var(--border); vertical-align:top; }
-  thead th { font-size:13px; color:var(--muted); border-bottom-color:#cccccc; }
+  th, td { padding:10px 14px; text-align:left; border-bottom:1px solid var(--border-table); vertical-align:top; }
+  thead th { font-size:14px; color:var(--muted); border-bottom-color:#000000; }
 </style>
 </head>
 <body>

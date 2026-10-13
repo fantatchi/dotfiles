@@ -7,6 +7,7 @@ DADS は **デジタル庁デザインシステム (Digital Agency Design System
 - 取込版: **v2.0.1**（リリース 2026-05-28）
 - 取込日: 2026-06-18
 - 出典: https://github.com/digital-go-jp/design-tokens
+- リンク・フォーカス・表の罫線の出典: https://github.com/digital-go-jp/design-system-example-components-html （コミット af8b665、2026-09-09。部品の対応は [`dads-snippets.md`](./dads-snippets.md)）
 - 公式サイト: https://design.digital.go.jp/dads/
 - ライセンス: 末尾「## ライセンス・出典」参照
 
@@ -38,11 +39,17 @@ key-color の各階調は Blue プリミティブを参照する:
 
 | 用途 | 推奨 Level | HEX | 備考 |
 |---|---|---|---|
-| 本文リンク (`a`) | Blue-900 | `#0017c1` | 白背景でコントラスト約 13.7:1 (AAA) |
-| 訪問済リンク (`a:visited`) | Purple-900 | `#5109ad` | 白背景でコントラスト約 9.3:1 (AAA) |
-| 強調・アクセント深 | Blue-1000 | `#00118f` | hover 等 |
+| 本文リンク (`a`) | Blue-1000 | `#00118f` | 白背景でコントラスト約 14.2:1 (AAA) |
+| リンク hover | Blue-900 | `#0017c1` | 約 11.1:1。下線を 3px にする |
+| 訪問済リンク (`a:visited`) | Magenta-900 | `#8b008b` | 約 8.5:1 (AAA) |
+| リンク押下中 (`a:active`) | Orange-800 | `#c74700` | 約 4.85:1 (AA) |
+| 要点ラベル・目次の現在位置 | Blue-900 | `#0017c1` | `--accent-deep` |
 | アクセント面（badge 等の背景） | Blue-50 | `#e8f1fe` | text は Blue-1000 と組合せ |
 | key-color (UI primary) | Blue-700 | `#264af4` | 非テキスト UI で 3:1 担保 |
+
+リンクの 4 状態は DADS HTML 版スニペットの `global.css` / `link.css` の値（取込コミット af8b665）。
+
+**フォーカス表示（変更不可）**: `outline: 4px solid #000000; outline-offset: 2px; border-radius: 4px; box-shadow: 0 0 0 2px #ffd43d`（Yellow-300）。リンクだけ背景も Yellow-300 にする。DADS ガイダンス「ローカルデザインシステム」でフォーカスインジケーターは変更してはならないとされている。
 
 ---
 
@@ -234,7 +241,7 @@ key-color の各階調は Blue プリミティブを参照する:
 
 ## 3. ニュートラルカラー
 
-### Solid Gray（10 階調）
+### Solid Gray（12 階調）
 
 | Level | HEX |
 |---|---|
@@ -243,7 +250,9 @@ key-color の各階調は Blue プリミティブを参照する:
 | 200 | `#cccccc` |
 | 300 | `#b3b3b3` |
 | 400 | `#999999` |
+| 420 | `#949494` |
 | 500 | `#7f7f7f` |
+| 536 | `#767676` |
 | 600 | `#666666` |
 | 700 | `#4d4d4d` |
 | 800 | `#333333` |
@@ -288,7 +297,7 @@ JSON 上は 2 階調ペアで定義（`-1` = 軽め、`-2` = 濃いめ）。spec
 | warning-orange | 1 | Orange-600 | `#fb5b01` |
 | warning-orange | 2 | Orange-800 | `#c74700` |
 
-> **未定義**: link / link-visited / focus / hover / border / background のセマンティックは DADS JSON に定義なし。spec-writer 側で「## 1. key-color」の用途別マッピングを採用する。
+> **トークン JSON には未定義**: link / focus / border のセマンティックは design-tokens の JSON に無い。値は DADS HTML 版スニペットの `global.css`・`link.css`・`table.css` を出典にして「## 1. key-color」の用途別マッピングに置く。420 は表の罫線（白地で 3:1）、536 は白地で 4.5:1 を満たす最も淡いグレー。
 
 ---
 
@@ -312,11 +321,13 @@ DADS は `14, 16, 17, 18, 20, 22, 24, 26, 28, 32, 36, 45, 48, 57, 64` を提供�
 | 用途 | 推奨 px |
 |---|---|
 | 本文 | 16 |
-| 補助テキスト・キャプション | 14 |
-| h3 | 20 |
-| h2 | 32 |
-| h1 (ページタイトル) | 45 |
-| Display (hero) | 57 / 64 |
+| 補助テキスト・キャプション・ラベル・バッジ | 14 |
+| h3 | 18 |
+| h2 | 24 |
+| h1 (ページタイトル) | 32 |
+
+- **14px 未満は使わない**（DADS ガイダンスの必須要件。HTML 版スニペットも最小 14px）
+- 見出しを 32 / 24 / 18 に抑えるのは 2026-10-06 の見た目の刷新で決めた値（本文との差は太さと余白で付ける）
 
 ### line-height スケール（%、8 段階）
 

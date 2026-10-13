@@ -153,13 +153,18 @@ HTML 補足ページを新規に生成する際の **既定のスタイルは �
 
 | 項目 | デフォルト値 | 出典・参照 |
 |---|---|---|
-| `--link` (本文リンク) | `#0017c1` (Blue 900) | `references/dads-tokens.md` 1 節 |
+| `--link` (本文リンク) | `#00118f` (Blue 1000)。訪問済み `#8b008b` (Magenta 900) | `references/dads-tokens.md` 1 節 |
+| フォーカス表示 | 黒 4px + `#ffd43d` (Yellow 300) の縁取り。**変更しない** | 同上 |
+| 文字の最小サイズ | 14px（DADS の必須要件） | `references/dads-tokens.md` 5 節 |
+| 表の罫線 | `#949494` (Solid Gray 420)、見出し行の下線は黒 | `references/dads-tokens.md` 3 節 |
 | `--key-color` (UI primary) | `#264af4` (Blue 700) | 同上 |
 | `--accent-bg` (badge 背景) | `#e8f1fe` (Blue 50) | 同上 |
 | `--accent-ink` (本文・濃文字) | `#1a1a1a` (Solid Gray 900) | `references/dads-tokens.md` 3 節 |
 | 日本語フォント | Noto Sans JP | `references/dads-tokens.md` 5 節 |
 | 等幅フォント | Noto Sans Mono | 同上 |
 | UD 保険 fallback | BIZ UDPGothic / BIZ UDGothic | `references/communicative-design.md` 原則 7 |
+
+部品（表・目次・用語集・callout・バッジなど）を足す・直すときは、DADS の HTML 版コードスニペットの対応部品を [references/dads-snippets.md](references/dads-snippets.md) で引き、値と構造を共通 CSS のクラスに写す。
 
 採用理由: DADS は **JIS X 8341-3:2016 AA 準拠** を担保する公的標準で、配色・タイポ・コントラスト体系がアクセシビリティ要件を自動充足する。Noto Sans JP は DADS 採用フォントで OS 横断の高い可読性を提供し、Noto Sans Mono は CJK + Latin 等幅で技術文書のコード / 数値表示にも対応する。「なぜこの色 / フォントか」の説明コストが消え、プロジェクトを跨いだ一貫性が得られる。
 
@@ -382,4 +387,5 @@ Step 1 で把握したスタイルを踏襲して生成。CSS / breadcrumb / foo
 - [Stripe API Reference](https://docs.stripe.com/api) — 3 カラム DX の参考
 - [Docs as Code (Write the Docs)](https://www.writethedocs.org/guide/docs-as-code/) — Docs as Code 方法論
 - [デジタル庁デザインシステム DADS](https://design.digital.go.jp/dads/) — HTML 補足ページの視覚設計が準拠する公的標準
+- [DADS HTML 版コードスニペット](https://github.com/digital-go-jp/design-system-example-components-html)（[Storybook](https://design.digital.go.jp/dads/html/)） — リンク・フォーカス・表の罫線・文字の最小サイズの出典。部品の対応は `references/dads-snippets.md`
 - [@digital-go-jp/design-tokens (GitHub)](https://github.com/digital-go-jp/design-tokens) — DADS デザイントークンの配布元（取込版は v2.0.1、本スキルでは `references/dads-tokens.md` に静的転記）

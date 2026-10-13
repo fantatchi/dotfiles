@@ -139,11 +139,11 @@ LLM の手作業展開は「全文コピー漏れ・相対パスズレ・再展�
 
 > **配色・タイポトークンは デジタル庁デザインシステム (DADS) v2.0.1 由来**（MIT, Copyright (c) 2023 デジタル庁）。HEX 値の正本（SSOT）は [`dads-tokens.md`](./dads-tokens.md)。本ファイルで再掲する HEX は同ファイルからの引用であり、本ファイルでは値を変更しない（drift 防止）。
 
-**スタイル骨格の出典**: 本テンプレートは **DADS v2.0.1 準拠**（key-color = Blue 固定）。配色・タイポ・角丸は DADS トークンから引いている。見た目の方針は「影と角丸カードを使わず、罫線 1 本と余白で区切る」「h1 は 32px に抑える」「アクセント色（Blue）の面は要点（`.tldr`）だけにする」の 3 点（2026-10-06 に現行 + 4 案を比較して採用）。各セクション冒頭にコメントで **用途** を明記しているので、不要なセクションは丸ごと削れる。
+**スタイル骨格の出典**: 本テンプレートは **DADS v2.0.1 準拠**（key-color = Blue 固定）。配色・タイポ・角丸は DADS トークンから、リンク・フォーカス・表の罫線・文字の最小 14px は DADS の HTML 版コードスニペットから引いている。部品を足すときの参照先は [`dads-snippets.md`](./dads-snippets.md)。見た目の方針は「影と角丸カードを使わず、罫線 1 本と余白で区切る」「h1 は 32px に抑える」「アクセント色（Blue）の面は要点（`.tldr`）だけにする」の 3 点（2026-10-06 に現行 + 4 案を比較して採用）。各セクション冒頭にコメントで **用途** を明記しているので、不要なセクションは丸ごと削れる。
 
 **規模・運用パターンの実証例**: cloud-dsc プロジェクトの `_shared/spec-page.css`（**3072 行、2026-05-14 時点**）。**配色は旧版 Blue 900 ベース** で運用されてきたが、現在は本テンプレ準拠（DADS）への移行対象。ファイル別 scope での全レイアウト統合パターン・3000 行規模の単一ファイル運用は本テンプレ採用時の参考になる。
 
-**`--accent` の値について**: 下記サンプルは DADS key-color (Blue 700 `#264af4`) を `--accent` に、Blue 900 `#0017c1` を `--accent-deep`（本文リンクで AAA pass）、Blue 50 `#e8f1fe` を `--accent-bg`、Blue 200 `#c5d7fb` を `--accent-line`（要点の枠線）として採用。**ベースカラーは Blue 固定**（spec-writer デフォルト）。ブランド要請等で別色を採用する場合は [`dads-tokens.md`](./dads-tokens.md) 2 節の DADS プリミティブ 10 色族（Light Blue / Cyan / Green / Lime / Yellow / Orange / Red / Magenta / Purple）から階調を選び、選定 ADR を残す（[`adr-format.md`](./adr-format.md) カラー選定 ADR）。
+**`--accent` の値について**: 下記サンプルは DADS key-color (Blue 700 `#264af4`) を `--accent` に、Blue 900 `#0017c1` を `--accent-deep`（要点ラベル・目次の現在位置）、Blue 50 `#e8f1fe` を `--accent-bg`、Blue 200 `#c5d7fb` を `--accent-line`（要点の枠線）として採用。**ベースカラーは Blue 固定**（spec-writer デフォルト）。ブランド要請等で別色を採用する場合は [`dads-tokens.md`](./dads-tokens.md) 2 節の DADS プリミティブ 10 色族（Light Blue / Cyan / Green / Lime / Yellow / Orange / Red / Magenta / Purple）から階調を選び、選定 ADR を残す（[`adr-format.md`](./adr-format.md) カラー選定 ADR）。
 
 **フォントの選定について**: 日本語・等幅とも DADS 採用フォントを使う。日本語は `Noto Sans JP`（Google Fonts、SIL OFL 1.1）、等幅は `Noto Sans Mono`（CJK + Latin 対応）。UD フォント原則（[`./communicative-design.md`](./communicative-design.md) 原則 7）の保険として `BIZ UDPGothic` / `BIZ UDGothic` を fallback に並べ、Google Fonts CDN 遮断環境（社内 LAN proxy 等）では UD 保険へ自動 fallback する。ウェイトは DADS 採用の `400 (Normal) / 700 (Bold)` の 2 段階のみ。
 
@@ -167,12 +167,24 @@ LLM の手作業展開は「全文コピー漏れ・相対パスズレ・再展�
 
   /* アクセント色 — DADS key-color = Blue */
   --accent: #264af4;          /* Blue 700 = key-color (目次の現在位置・UI primary) */
-  --accent-deep: #0017c1;     /* Blue 900 = 本文リンク (on #ffffff で 約 13.7:1 AAA) */
+  --accent-deep: #0017c1;     /* Blue 900 = 要点ラベル・目次の現在位置 (on #ffffff で 約 11.1:1 AAA) */
   --accent-bg: #e8f1fe;       /* Blue 50 = TL;DR / badge 背景 */
   --accent-line: #c5d7fb;     /* Blue 200 = TL;DR の枠線 */
 
+  /* リンク・フォーカス — DADS HTML 版スニペット (global.css / link.css) の値をそのまま採用。
+   * フォーカス表示は DADS ガイダンスで変更不可とされている。 */
+  --link: #00118f;            /* Blue 1000 (on #ffffff で 約 14.2:1) */
+  --link-hover: #0017c1;      /* Blue 900 (約 11.1:1) */
+  --link-visited: #8b008b;    /* Magenta 900 (約 8.5:1) */
+  --link-active: #c74700;     /* Orange 800 (約 4.85:1) */
+  --focus-ring: #ffd43d;      /* Yellow 300 = フォーカス枠の外側の縁取り */
+
+  /* 表の罫線 — DADS table.css。白地で 3:1 を満たす濃さ */
+  --border-table: #949494;    /* Solid Gray 420 (約 3.03:1) */
+  --border-table-zebra: #7f7f7f; /* Solid Gray 500 = 縞の地 (#f2f2f2) でも 3:1 を保つ */
+
   /* 状態色 — DADS セマンティック (success/error/warning)
-   * badge は 12px の通常テキスト扱いのため、濃い階調をテキスト色に、
+   * badge は 14px の通常テキスト扱いのため、濃い階調をテキスト色に、
    * 対応する 50 階調を背景に採用して 4.5:1 以上を担保。 */
   --status-pass: #197a4b;       /* Green 800 (on #e6f5ec で AA pass) */
   --status-pass-bg: #e6f5ec;    /* Green 50 */
@@ -259,12 +271,12 @@ nav.toc {
   top: 0;
   align-self: start;
   padding-block: 56px;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 nav.toc .toc-title {
   margin: 0 0 12px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--muted);
 }
@@ -296,26 +308,33 @@ nav.toc a.current { color: var(--accent-deep); border-left-color: var(--accent);
 }
 
 /* ========== インラインリンク・コード ==========
- * 用途: a 要素は DADS Blue 900 (#0017c1)。key-color の Blue 700 は本文リンクには
- *       4.5:1 を下回るため使わない。WCAG 1.4.1 (色のみで情報伝達禁止) 対応のため
- *       平常時から underline を付ける。:focus-visible でキーボード操作の位置を示す (WCAG 2.4.7)。
+ * 用途: a 要素は DADS HTML 版スニペットの link.css に揃える (通常 Blue 1000 /
+ *       hover Blue 900 + 下線 3px / 訪問済み Magenta 900 / 押下中 Orange 800)。
+ *       WCAG 1.4.1 (色のみで情報伝達禁止) 対応のため平常時から underline を付ける。
+ *       フォーカスは DADS global.css の :focus-visible をそのまま写す (黒 4px + Yellow 300 の縁取り)。
+ *       DADS ガイダンスで変更不可とされているので、ページ固有 CSS でも上書きしない (WCAG 2.4.7)。
  *       code / pre は薄いグレー地。黒地のコードブロックはページ内で最も重い面になり
  *       要点より目立つため使わない。 */
 a {
-  color: var(--accent-deep);
+  color: var(--link);
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
 }
-a:hover { text-decoration-thickness: 2px; }
-a:visited { color: #5109ad; }   /* DADS Purple 900 = visited 識別 (on #ffffff で 約 9.3:1 AAA) */
-nav.toc a:visited { color: var(--text-soft); }
-a:focus-visible,
-button:focus-visible,
-[tabindex]:focus-visible {
-  outline: 2px solid var(--accent-deep);
-  outline-offset: 2px;
+a:visited { color: var(--link-visited); }
+@media (hover: hover) {
+  a:hover { color: var(--link-hover); text-decoration-thickness: 3px; }
 }
+a:active { color: var(--link-active); text-decoration-thickness: 1px; }
+nav.toc a:visited { color: var(--text-soft); }
+
+:focus-visible {
+  outline: 4px solid #000000;
+  outline-offset: 2px;
+  border-radius: 4px;
+  box-shadow: 0 0 0 2px var(--focus-ring);
+}
+a:focus-visible { background-color: var(--focus-ring); }
 
 code {
   font-family: var(--font-mono);
@@ -332,7 +351,7 @@ pre {
   background: var(--surface);
   border-radius: var(--radius-md);
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.7;
 }
 
@@ -348,7 +367,7 @@ header.page .breadcrumb {
   flex-wrap: wrap;
   gap: 6px;
   margin: 0 0 12px;
-  font-size: 13px;
+  font-size: 14px;
   color: var(--muted);
 }
 
@@ -381,7 +400,7 @@ header.page .subtitle {
 }
 
 .meta-grid .item { display: flex; flex-direction: column; gap: 2px; }
-.meta-grid .label { font-size: 12px; color: var(--muted); }
+.meta-grid .label { font-size: 14px; color: var(--muted); }
 .meta-grid .value { font-size: 14px; }
 
 /* ========== .tiles（概況ページ用の集計タイル） ==========
@@ -404,9 +423,9 @@ header.page .subtitle {
   border-radius: var(--radius-md);
 }
 
-.tile .t-label { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-soft); }
+.tile .t-label { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-soft); }
 .tile .t-value { font-size: 32px; font-weight: 700; line-height: 1.3; font-variant-numeric: tabular-nums; }
-.tile .t-note { font-size: 12px; color: var(--muted); }
+.tile .t-note { font-size: 14px; color: var(--muted); }
 
 .tile.pass .t-label::before,
 .tile.pending .t-label::before,
@@ -436,7 +455,7 @@ header.page .subtitle {
 .tldr .label {
   display: block;
   margin-bottom: 4px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--accent-deep);   /* Blue 900 on Blue 50 で約 12.5:1 AAA */
 }
@@ -474,6 +493,7 @@ section > ol {
 
 /* ========== table（標準テーブル、横罫のみ） ==========
  * 用途: 仕様一覧・比較・要件表など。原則 11（罫線最小化・横罫主体）に従う。
+ *       罫線の濃さは DADS table.css (Solid Gray 420、見出し行の下線は黒) に揃える。
  *       列が多い表は <div class="table-wrap"> で包み、狭い画面では表の中だけ横スクロールさせる。 */
 .table-wrap { overflow-x: auto; margin: 16px 0; }
 .table-wrap > table { margin: 0; }
@@ -490,19 +510,20 @@ table th, table td {
   padding: 10px 12px;
   text-align: left;
   vertical-align: top;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-table);
 }
 
 table thead th {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--text-soft);
-  border-bottom-color: var(--border-strong);
+  border-bottom-color: #000000;   /* DADS table.css: 見出し行の下線は黒 */
   white-space: nowrap;
 }
 
 /* 原則 11: 5 行以上 × 4 列以上の表に zebra stripe */
-table.zebra tbody tr:nth-child(even) { background: #f8f8f8; }   /* Solid Gray 50 と白の中間 */
+table.zebra tbody tr:nth-child(even) { background: #f2f2f2; }   /* Solid Gray 50 (DADS の縞模様の表と同じ) */
+table.zebra :is(th, td) { border-bottom-color: var(--border-table-zebra); }
 
 table td.num, table th.num {
   text-align: right;
@@ -522,7 +543,7 @@ table td.num, table th.num {
   border-radius: var(--radius-sm);
   background: var(--surface);
   color: var(--text-soft);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   white-space: nowrap;
 }
@@ -540,7 +561,7 @@ table td.num, table th.num {
 .badge.pending { background: var(--status-pending-bg); color: var(--status-pending); }
 .badge.accent  { background: var(--accent-bg);         color: var(--accent-deep); }
 
-.level { font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: var(--text-soft); }
+.level { font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: var(--text-soft); }
 .level.must { color: var(--status-fail); }
 
 /* ========== .note-box / .callout-negative ==========
@@ -581,7 +602,7 @@ table td.num, table th.num {
 
 .figure-caption {
   margin: 8px 0 24px;
-  font-size: 13px;
+  font-size: 14px;
   color: var(--muted);
 }
 
@@ -598,7 +619,7 @@ table td.num, table th.num {
 }
 
 .page-nav > :last-child { text-align: right; }
-.page-nav .label-row { display: block; font-size: 12px; color: var(--muted); }
+.page-nav .label-row { display: block; font-size: 14px; color: var(--muted); }
 .page-nav a { font-weight: 700; text-decoration: none; }
 .page-nav a:hover { text-decoration: underline; }
 
@@ -608,11 +629,11 @@ footer.page {
   margin-top: 80px;
   padding-top: 24px;
   border-top: 1px solid var(--border);
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text-soft);
 }
 
-footer.page table.history { font-size: 13px; }
+footer.page table.history { font-size: 14px; }
 
 /* ========== body.page-X scope の例 ==========
  * 用途: ページ固有レイアウト。必ず body.page-X scope を付けて衝突を避ける。
@@ -640,6 +661,14 @@ body.page-glossary .term-grid dd { margin: 0; color: var(--text-soft); }
 @media (max-width: 900px) {
   body.page-glossary .term-grid { grid-template-columns: minmax(0, 1fr); gap: 2px; }
   body.page-glossary .term-grid dd { margin-bottom: 12px; }
+}
+
+/* ========== 強制カラーモード ==========
+ * 用途: Windows のハイコントラスト表示では background が消え、バッジ・タイルの色の点が見えなくなる。
+ *       DADS heading.css と同じく CanvasText で塗り直す。 */
+@media (forced-colors: active) {
+  .badge.pass::before, .badge.fail::before, .badge.pending::before, .badge.accent::before,
+  .tile .t-label::before { background: CanvasText; }
 }
 
 /* ========== @page / @media print ==========
