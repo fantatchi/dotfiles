@@ -199,10 +199,13 @@ def split_by_h3(body: str) -> dict[str, str]:
 # >>> bool(_BULLET_RE.match("- proj: body"))  # `**` なし → 拒否
 # False
 _BULLET_RE = re.compile(r"^\s*(?:>\s+)?-\s*\*\*([^*]+)\*\*\s*[:：]\s*(.+)$")
+# 2026-10-13〜: `> - **project**` の親項目に `>     - body` の子項目が続く入れ子形式
+_WORKLOG_PROJECT_RE = re.compile(r"^\s*(?:>\s+)?-\s*\*\*([^*]+)\*\*\s*$")
+_WORKLOG_CHILD_RE = re.compile(r"^\s*(?:>)?\s{2,}-\s*(.+)$")
 
 
 def parse_worklog(text: str) -> list[WorklogEntry]:
-    """Parse `- **project**: body` bullets.
+    """Parse `- **project**: body` bullets（入れ子形式は子項目 1 件を 1 エントリにする）.
 
     契約: `obsidian-mail/SKILL.md 2-b 節` の規約テーブルと同期。
     `### 作業ログ` 配下の `[> ]- **project**: body` 形式 bullet を抽出する。
@@ -219,12 +222,19 @@ def parse_worklog(text: str) -> list[WorklogEntry]:
     []
     >>> parse_worklog("> 普通の引用文 **重要**: なんとか")  # bullet ではない → 拒否
     []
+    >>> parse_worklog("> - **alpha**\\n>     - body-a1\\n>     - body-a2\\n> - **beta**\\n>     - body-b")
+    [{'project': 'alpha', 'body': 'body-a1'}, {'project': 'alpha', 'body': 'body-a2'}, {'project': 'beta', 'body': 'body-b'}]
     """
     out: list[WorklogEntry] = []
+    project: str | None = None
     for line in text.splitlines():
-        m = _BULLET_RE.match(line)
-        if m:
+        if m := _BULLET_RE.match(line):
             out.append({"project": m.group(1).strip(), "body": m.group(2).strip()})
+            project = None
+        elif m := _WORKLOG_PROJECT_RE.match(line):
+            project = m.group(1).strip()
+        elif (m := _WORKLOG_CHILD_RE.match(line)) and project:
+            out.append({"project": project, "body": m.group(1).strip()})
     return out
 
 

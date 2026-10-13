@@ -221,8 +221,8 @@ def build_grouped_commits(commits_list: list[Commit]) -> str:
 def build_logs_section(logs_list: list[Log]) -> str:
     """作業ログを「プロジェクト × 件数」フラットサマリー + collapsible callout で整形する。
 
-    同じプロジェクトのログは 1 行にまとめる（入力順で ` ／ ` 連結）。session-save / log が
-    多い日にプロジェクト名だけが並ぶ羅列になるのを防ぐ。
+    プロジェクトを親項目、ログ 1 件を子項目にした入れ子のリストにする（プロジェクトは
+    初出順、ログは入力順）。同じプロジェクトのログが多い日も 1 件ずつ読める。
 
     件数があるときは:
         1. 折り畳み**外**に「プロジェクト別件数: proj-A 4 / proj-B 2 / ...」の 1 行サマリー
@@ -241,8 +241,11 @@ def build_logs_section(logs_list: list[Log]) -> str:
     プロジェクト別件数: alpha 2 / beta 1
     <BLANKLINE>
     > [!note]- 詳細（作業ログ 3 件）
-    > - **alpha**: s1 ／ s2
-    > - **beta**: s3
+    > - **alpha**
+    >     - s1
+    >     - s2
+    > - **beta**
+    >     - s3
     """
     if not logs_list:
         return "作業ログの記録なし"
@@ -262,7 +265,8 @@ def build_logs_section(logs_list: list[Log]) -> str:
 
     lines = [breakdown, "", f"> [!note]- 詳細（作業ログ {len(logs_list)} 件）"]
     for proj, summaries in by_project.items():
-        lines.append(f"> - **{proj}**: {' ／ '.join(summaries)}")
+        lines.append(f"> - **{proj}**")
+        lines.extend(f">     - {s}" for s in summaries)
     return "\n".join(lines)
 
 
