@@ -22,7 +22,7 @@ Output (stdout, JSON):
 設計:
     daily ノートの「## デイリーサマリー」セクションをパースし、
     メール向けに「ひとこと / ハイライト / GitHub / 明日のタスク」へ再構成する。
-    週報は「今日の要約」の `[済]` / `[決定]` / `[残]` ラベル行を集計する（ラベルの
+    週報は「今日の要約」の `完了` / `決定` / `残り` ラベルを集計する（ラベルの
     無い週は作業ログのプロジェクト別ハイライトにフォールバック）。
     元のフォーマット仕様（obsidian-daily が出力する形）に依存する。
 
@@ -74,7 +74,7 @@ class TaskEntry(TypedDict):
 
 
 class TldrItem(TypedDict):
-    """`### 今日の要約` 配下の `- [済|決定|残] project: body` 行を抽出した 1 件。"""
+    """`### 今日の要約` のラベル付き項目 1 件。label は内部キー `済` / `決定` / `残` に正規化済み。"""
     label: str
     project: str
     body: str
@@ -228,22 +228,34 @@ def parse_worklog(text: str) -> list[WorklogEntry]:
     return out
 
 
-TLDR_LABELS: tuple[str, ...] = ("済", "決定", "残")  # obsidian-daily SKILL.md 5 節と語固定
-_TLDR_RE = re.compile(r"^\s*-\s*\[(済|決定|残)\]\s*([^:：]+?)\s*[:：]\s*(.+)$")
+# obsidian-daily SKILL.md 5 節と語固定。子項目のラベル語 → 内部キー
+TLDR_LABELS: dict[str, str] = {"完了": "済", "決定": "決定", "残り": "残"}
+_TLDR_PROJECT_RE = re.compile(r"^-\s*\*\*(.+?)\*\*\s*$")
+_TLDR_CHILD_RE = re.compile(r"^\s+-\s*(完了|決定|残り)\s*[:：]\s*(.+)$")
+# 2026-10-08〜10-13 の旧形式: `- [済] project: body`（Obsidian がチェックボックスに描画するので廃止）
+_TLDR_FLAT_RE = re.compile(r"^\s*-\s*\[(済|決定|残)\]\s*([^:：]+?)\s*[:：]\s*(.+)$")
 
 
 def parse_tldr_labels(text: str) -> list[TldrItem]:
-    """`### 今日の要約` のラベル付き bullet を抽出する。ラベルの無い行（旧形式）は拾わない。
+    """`### 今日の要約` のラベル付き項目を抽出する。ラベルの無い行（〜10-07 の形式）は拾わない。
 
+    現行形式は `- **project**` の親項目に `    - 完了|決定|残り: body` の子項目が続く。
+
+    >>> parse_tldr_labels("- **alpha**\\n    - 完了: 公開した\\n    - 残り: レビュー待ち\\n- **beta / gamma**\\n    - 決定：終値で判定")
+    [{'label': '済', 'project': 'alpha', 'body': '公開した'}, {'label': '残', 'project': 'alpha', 'body': 'レビュー待ち'}, {'label': '決定', 'project': 'beta / gamma', 'body': '終値で判定'}]
     >>> parse_tldr_labels("- [済] alpha: 公開した\\n- [決定] beta / gamma：終値で判定\\n- [残] alpha: レビュー待ち")
     [{'label': '済', 'project': 'alpha', 'body': '公開した'}, {'label': '決定', 'project': 'beta / gamma', 'body': '終値で判定'}, {'label': '残', 'project': 'alpha', 'body': 'レビュー待ち'}]
     >>> parse_tldr_labels("- alpha: 旧形式の要約")
     []
     """
     out: list[TldrItem] = []
+    project: str | None = None
     for line in text.splitlines():
-        m = _TLDR_RE.match(line)
-        if m:
+        if m := _TLDR_PROJECT_RE.match(line):
+            project = m.group(1).strip()
+        elif (m := _TLDR_CHILD_RE.match(line)) and project:
+            out.append({"label": TLDR_LABELS[m.group(1)], "project": project, "body": m.group(2).strip()})
+        elif m := _TLDR_FLAT_RE.match(line):
             out.append({"label": m.group(1), "project": m.group(2).strip(), "body": m.group(3).strip()})
     return out
 
@@ -584,11 +596,11 @@ MAX_DONE_PER_PROJECT = 5  # 週報「終わったこと」の各プロジェク�
 
 
 def _render_labeled_week(day_entries: list[dict]) -> list[str]:
-    """今日の要約の `[済]` / `[決定]` / `[残]` を週で集計する。
+    """今日の要約の `完了` / `決定` / `残り`（内部キー 済 / 決定 / 残）を週で集計する。
 
-    - 終わったこと: `[済]` をプロジェクト別（件数の多い順）に日付付きで
-    - 決めたこと: `[決定]` を全件、日付順に
-    - 持ち越し: 週内で最後に要約がある日の `[残]` だけ（前日までの `[残]` は解消済みか
+    - 終わったこと: `済` をプロジェクト別（件数の多い順）に日付付きで
+    - 決めたこと: `決定` を全件、日付順に
+    - 持ち越し: 週内で最後に要約がある日の `残` だけ（前日までの `残` は解消済みか
       最終日に引き継がれているはずなので、重ねて出さない）
 
     >>> e = lambda d, items: {"date": dt.date(2026, 10, d), "parsed": {"tldr_items": items}}
@@ -726,17 +738,20 @@ def md_to_html(md_text: str) -> str:
     >>> html_ul = md_to_html("## 今日のひとこと\\n\\n- proj-a: x\\n- proj-b: y")
     >>> '<div class="tldr">' in html_ul and '<ul>' in html_ul and '<li>proj-a: x</li>' in html_ul
     True
+    >>> html_nest = md_to_html("## 今日のひとこと\\n\\n- **a**\\n    - 完了: x\\n- **b**\\n    - 残り: y\\n\\n## ハイライト\\n\\n- z")
+    >>> box = html_nest.split('<div class="tldr">', 1)[1].split('</div>', 1)[0]
+    >>> '残り: y' in box and box.count('<ul>') == 3 and '<h2>' not in box
+    True
     """
     body_html = markdown.markdown(
         md_text,
         extensions=["extra", "sane_lists"],
     )
-    # h2「今日のひとこと」直後の <p>...</p> または <ul>...</ul> に class を付与して
-    # 青ボックス化。obsidian-daily SKILL.md 5 節の summary_text 仕様（プロジェクト軸の
-    # 箇条書き 2-4 行）では bullet → <ul> に変換されるため、両ブロックを受ける。
-    # re.DOTALL は markdown が段落内改行を <p>...\n...</p> 展開した場合の保険。
+    # h2「今日のひとこと」から次の h2（無ければ末尾）までを青ボックス化する。
+    # summary_text は入れ子の箇条書き（obsidian-daily SKILL.md 5 節）なので、
+    # `<ul>.*?</ul>` だと内側の </ul> で切れて 2 件目以降のプロジェクトがはみ出す。
     body_html = re.sub(
-        r"(<h2>今日のひとこと</h2>)\s*(<p>.*?</p>|<ul>.*?</ul>)",
+        r"(<h2>今日のひとこと</h2>)\s*(.*?)\s*(?=<h2>|\Z)",
         r'\1<div class="tldr">\2</div>',
         body_html,
         count=1,

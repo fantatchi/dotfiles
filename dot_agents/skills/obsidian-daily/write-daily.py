@@ -295,10 +295,12 @@ def normalize_summary(text: str) -> str:
     """summary_text から空行を除き、1 段落にする。
 
     obsidian-mail は `### 今日の要約` の最初の 1 段落だけを使う。空行が入ると
-    `[決定]` / `[残]` の行がメールから落ちるため、ここで詰める。
+    2 件目以降のプロジェクトがメールから落ちるため、ここで詰める。子項目の字下げは保つ。
 
     >>> normalize_summary("- [済] a: x\\n\\n- [決定] a: y\\n  \\n- [残] b: z\\n")
     '- [済] a: x\\n- [決定] a: y\\n- [残] b: z'
+    >>> normalize_summary("- **a**\\n    - 完了: x\\n\\n    - 残り: y\\n")
+    '- **a**\\n    - 完了: x\\n    - 残り: y'
     >>> normalize_summary("特筆事項なし")
     '特筆事項なし'
     """
