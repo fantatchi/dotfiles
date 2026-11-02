@@ -97,13 +97,6 @@
         "hooks": [
           {
             "type": "command",
-            "if": "Bash(git commit *)",
-            "command": "node -e \"require(require('os').homedir()+'/.claude/scripts/run-hook.js')('context-save-git-trigger')\"",
-            "timeout": 10
-          },
-          {
-            "type": "command",
-            "if": "Bash(gh pr create *)",
             "command": "node -e \"require(require('os').homedir()+'/.claude/scripts/run-hook.js')('context-save-git-trigger')\"",
             "timeout": 10
           }

@@ -81,6 +81,11 @@ const gates = {
 };
 
 module.exports = function (hookName) {
+  // 保存 hook は OS 共通。PowerShell の文字コード変換やシェルの二重起動を避ける。
+  if (hookName === 'context-save-git-trigger' || hookName === 'context-save-reminder') {
+    require('./context-save-hooks.js').run(hookName);
+    return;
+  }
   const gate = gates[hookName];
   if (gate) {
     try {

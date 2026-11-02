@@ -1,49 +1,12 @@
-# context-save-git-trigger.ps1 - PostToolUse hook (Windows, matcher: Bash, if: git commit / gh pr create)
-#
-# コミット・PR 作成の直後に /context-save を促す。仕様・意図は context-save-git-trigger.sh の
-# ヘッダを参照（.sh が SSOT）。定数を変えたら .sh と同時に更新すること。
-
-$ErrorActionPreference = 'SilentlyContinue'
-$ProgressPreference = 'SilentlyContinue'
-[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
-
-$commitFreshSec = 120
-$debounceMin = 15
-
-$command = ''
-try {
-    $reader = New-Object System.IO.StreamReader([Console]::OpenStandardInput(), (New-Object System.Text.UTF8Encoding($false)))
-    $stdinText = $reader.ReadToEnd()
-    if ($stdinText) {
-        $json = $stdinText | ConvertFrom-Json -ErrorAction Stop
-        if ($json.tool_input -and $json.tool_input.command) { $command = [string]$json.tool_input.command }
-    }
-} catch {}
-
-$repoRoot = (& git rev-parse --show-toplevel 2>$null)
-if (-not $repoRoot) { exit 0 }
-$contextFile = Join-Path $repoRoot '.claude/context.md'
-if (-not (Test-Path -LiteralPath $contextFile)) { exit 0 }
-
-$nowEpoch = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
-
-# 先頭か区切り直後の git commit かつ HEAD が新しければコミット、先頭か区切り直後の gh pr create なら PR 作成（.sh 参照）
-$headEpoch = (& git log -1 --format=%ct 2>$null)
-if ($command -match '(^|[;&|])\s*git(\s+-C\s+\S+)?\s+commit\b' -and $headEpoch -and ($nowEpoch - [int64]$headEpoch) -le $commitFreshSec) {
-    $eventLabel = 'コミット'
-} elseif ($command -match '(^|[;&|])\s*gh\s+pr\s+create\b') {
-    $eventLabel = 'PR 作成'
-} else {
-    exit 0
-}
-
-$content = Get-Content -LiteralPath $contextFile -Raw -Encoding UTF8
-if ($content -match '(?ms)^---\r?\n(.*?)\r?\n---' -and $matches[1] -match '(?m)^updated:\s*(.+?)\s*$') {
-    try {
-        $updated = [DateTime]::Parse($matches[1])
-        if (((Get-Date) - $updated).TotalMinutes -lt $debounceMin) { exit 0 }
-    } catch {}
-}
-
-Write-Output ('{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"' + $eventLabel + 'が完了し、作業の区切りです。ユーザーへの報告の前に context-save スキルを実行して、判断メモ・次のステップを含めた最新状態を .claude/context.md に書き出してください。"}}')
-exit 0
+# Compatibility entry point; run-hook.js normally calls Node.js directly.
+# Inherit raw stdin/stdout so Windows PowerShell 5.1 never re-encodes UTF-8.
+$scriptDir = $PSScriptRoot
+if (-not $scriptDir) { $scriptDir = Join-Path $env:USERPROFILE '.claude\scripts' }
+$nodeScript = Join-Path $scriptDir 'context-save-hooks.js'
+$startInfo = New-Object System.Diagnostics.ProcessStartInfo
+$startInfo.FileName = (Get-Command node -ErrorAction Stop).Source
+$startInfo.Arguments = '"' + $nodeScript + '" context-save-git-trigger'
+$startInfo.UseShellExecute = $false
+$process = [System.Diagnostics.Process]::Start($startInfo)
+$process.WaitForExit()
+exit $process.ExitCode

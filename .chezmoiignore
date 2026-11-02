@@ -11,3 +11,5 @@ Thumbs.db
 .claude/settings.local.json
 **/__pycache__
 *.pyc
+tests
+tests/**
