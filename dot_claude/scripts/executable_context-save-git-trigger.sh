@@ -6,7 +6,7 @@
 # JSON で返す。
 #
 # - 成否判定: Bash の tool_response に exit code が無いので、git commit は HEAD のコミット時刻が
-#   COMMIT_FRESH_SEC 以内なら成功とみなす。gh pr create は判定せず通す
+#   COMMIT_FRESH_SEC 以内なら成功とみなす。gh pr create は成否を判定せず通す
 # - デバウンス: context.md の updated が DEBOUNCE_MIN 以内なら無音（連続コミット・保存直後の再発火防止）
 # - context.md が無いプロジェクトでは何もしない（初回は手動 /context-save 前提。reminder と同じ）
 
@@ -27,15 +27,16 @@ CONTEXT_FILE="${REPO_ROOT}/.claude/context.md"
 
 NOW_EPOCH=$(date +%s)
 
-# gh pr create 以外（= git commit）は HEAD が新しいときだけ成功とみなす
-case "$COMMAND" in
-    *"gh pr create"*) EVENT="PR 作成" ;;
-    *)
-        EVENT="コミット"
-        HEAD_EPOCH=$(git log -1 --format=%ct 2>/dev/null) || exit 0
-        [ $(( NOW_EPOCH - HEAD_EPOCH )) -le "$COMMIT_FRESH_SEC" ] || exit 0
-        ;;
-esac
+# HEAD が新しければコミット成功とみなす。そうでなければ、コマンドの先頭か区切り（; & |）直後の
+# gh pr create のときだけ PR 作成とみなす（コミットメッセージ本文中の文字列に反応しないため）
+HEAD_EPOCH=$(git log -1 --format=%ct 2>/dev/null || echo 0)
+if [ $(( NOW_EPOCH - HEAD_EPOCH )) -le "$COMMIT_FRESH_SEC" ]; then
+    EVENT="コミット"
+elif printf '%s' "$COMMAND" | grep -qE '(^|[;&|])[[:space:]]*gh[[:space:]]+pr[[:space:]]+create\b'; then
+    EVENT="PR 作成"
+else
+    exit 0
+fi
 
 UPDATED=$(awk '
     /^---$/ { fc++; if(fc==1) fm=1; else if(fc==2) { fm=0; exit }; next }

@@ -27,13 +27,14 @@ if (-not (Test-Path -LiteralPath $contextFile)) { exit 0 }
 
 $nowEpoch = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
 
-if ($command -like '*gh pr create*') {
+# HEAD が新しければコミット成功、そうでなければ先頭か区切り直後の gh pr create のみ PR 作成（.sh 参照）
+$headEpoch = (& git log -1 --format=%ct 2>$null)
+if ($headEpoch -and ($nowEpoch - [int64]$headEpoch) -le $commitFreshSec) {
+    $eventLabel = 'コミット'
+} elseif ($command -match '(^|[;&|])\s*gh\s+pr\s+create\b') {
     $eventLabel = 'PR 作成'
 } else {
-    $eventLabel = 'コミット'
-    $headEpoch = (& git log -1 --format=%ct 2>$null)
-    if (-not $headEpoch) { exit 0 }
-    if (($nowEpoch - [int64]$headEpoch) -gt $commitFreshSec) { exit 0 }
+    exit 0
 }
 
 $content = Get-Content -LiteralPath $contextFile -Raw -Encoding UTF8
