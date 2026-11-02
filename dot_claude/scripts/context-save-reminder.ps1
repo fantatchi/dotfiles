@@ -51,7 +51,7 @@ try {
 } catch {
     $sessionId = $null
 }
-$isContextLoad = $prompt -match '^\s*/context-load\b|<command-name>/context-load</command-name>'
+$isContextLoad = $prompt -match '^\s*[/$]context-load\b|<command-name>/context-load</command-name>'
 
 # マーカーディレクトリ作成 & 古いマーカー掃除（best-effort）
 if (-not (Test-Path $markerDir)) {
@@ -179,7 +179,7 @@ if (-not $hasChange) { exit 0 }
 Write-Output @"
 <system-reminder>
 最後の context 保存またはセッション開始から $diffMin 分経過し、保存後の変更があります（閾値: $thresholdMin 分）。
-このターンの応答に入る前に /context-save スキルを実行して、判断メモ・次のステップを含めた最新状態を .claude/context.md に書き出してください。
+このターンの応答に入る前に context-save スキルを実行して、判断メモ・次のステップを含めた最新状態を .claude/context.md に書き出してください。
 保存が終わったら、続けてユーザーの本来のリクエストに応答してください。
 </system-reminder>
 "@

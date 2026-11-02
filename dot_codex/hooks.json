@@ -1,0 +1,41 @@
+{
+  "description": "context 引き継ぎの自動化（スクリプトは ~/.claude/scripts を Claude Code と共有）",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"require(require('os').homedir()+'/.claude/scripts/run-hook.js')('context-inject')\"",
+            "timeout": 10,
+            "additionalContextLimit": 6000
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"require(require('os').homedir()+'/.claude/scripts/run-hook.js')('context-save-git-trigger')\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"require(require('os').homedir()+'/.claude/scripts/run-hook.js')('context-save-reminder')\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

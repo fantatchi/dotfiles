@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# context-save-git-trigger.sh - PostToolUse hook (matcher: Bash, if: git commit / gh pr create)
+# context-save-git-trigger.sh - PostToolUse hook (matcher: Bash。Claude は if で git commit / gh pr create に絞る。Codex は if が無いので本スクリプトで絞る)
 #
 # コミット・PR 作成は作業の区切りとほぼ一致するので、その直後に /context-save を促す。
 # PostToolUse は plain stdout を Claude に見せないため、hookSpecificOutput.additionalContext の
@@ -27,10 +27,12 @@ CONTEXT_FILE="${REPO_ROOT}/.claude/context.md"
 
 NOW_EPOCH=$(date +%s)
 
-# HEAD が新しければコミット成功とみなす。そうでなければ、コマンドの先頭か区切り（; & |）直後の
-# gh pr create のときだけ PR 作成とみなす（コミットメッセージ本文中の文字列に反応しないため）
+# コマンドの先頭か区切り（; & |）直後の git commit で、かつ HEAD が新しければコミット成功とみなす。
+# gh pr create も同じく先頭か区切り直後のときだけ PR 作成とみなす（コミットメッセージ本文中の文字列に
+# 反応しないため）。Codex の hooks には Claude の `if` が無く、全 Bash 実行で呼ばれるのでここで絞る
 HEAD_EPOCH=$(git log -1 --format=%ct 2>/dev/null || echo 0)
-if [ $(( NOW_EPOCH - HEAD_EPOCH )) -le "$COMMIT_FRESH_SEC" ]; then
+if printf '%s' "$COMMAND" | grep -qE '(^|[;&|])[[:space:]]*git([[:space:]]+-C[[:space:]]+[^[:space:]]+)?[[:space:]]+commit\b' \
+    && [ $(( NOW_EPOCH - HEAD_EPOCH )) -le "$COMMIT_FRESH_SEC" ]; then
     EVENT="コミット"
 elif printf '%s' "$COMMAND" | grep -qE '(^|[;&|])[[:space:]]*gh[[:space:]]+pr[[:space:]]+create\b'; then
     EVENT="PR 作成"
@@ -47,6 +49,6 @@ if [ -n "$UPDATED" ] && UPDATED_EPOCH=$(date -d "$UPDATED" +%s 2>/dev/null); the
 fi
 
 cat <<EOF
-{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"${EVENT}が完了し、作業の区切りです。ユーザーへの報告の前に /context-save スキルを実行して、判断メモ・次のステップを含めた最新状態を .claude/context.md に書き出してください。"}}
+{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"${EVENT}が完了し、作業の区切りです。ユーザーへの報告の前に context-save スキルを実行して、判断メモ・次のステップを含めた最新状態を .claude/context.md に書き出してください。"}}
 EOF
 exit 0

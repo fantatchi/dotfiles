@@ -34,7 +34,7 @@ if STDIN_JSON=$(cat); then
     if command -v jq >/dev/null 2>&1; then
         SESSION_ID=$(printf '%s' "$STDIN_JSON" | jq -r '.session_id // empty' 2>/dev/null)
         # jq が無い環境では load 検出をスキップ（従来どおり save/セッション開始だけで判定）
-        if printf '%s' "$STDIN_JSON" | jq -e '(.prompt // "") | test("^\\s*/context-load\\b|<command-name>/context-load</command-name>")' >/dev/null 2>&1; then
+        if printf '%s' "$STDIN_JSON" | jq -e '(.prompt // "") | test("^\\s*[/$]context-load\\b|<command-name>/context-load</command-name>")' >/dev/null 2>&1; then
             IS_CONTEXT_LOAD=1
         fi
     fi
@@ -152,7 +152,7 @@ has_change_since_save || exit 0
 cat <<EOF
 <system-reminder>
 最後の context 保存またはセッション開始から ${DIFF_MIN} 分経過し、保存後の変更があります（閾値: ${THRESHOLD_MIN} 分）。
-このターンの応答に入る前に /context-save スキルを実行して、判断メモ・次のステップを含めた最新状態を .claude/context.md に書き出してください。
+このターンの応答に入る前に context-save スキルを実行して、判断メモ・次のステップを含めた最新状態を .claude/context.md に書き出してください。
 保存が終わったら、続けてユーザーの本来のリクエストに応答してください。
 </system-reminder>
 EOF

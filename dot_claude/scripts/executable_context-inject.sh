@@ -46,7 +46,7 @@ OUT=$(
         echo "compact の要約で落ちた作業状態を補うため、保存済みの要点を再掲する。保存後の作業は要約側が正。"
     else
         echo "## 前回の作業状態（.claude/context.md 最終保存: ${UPDATED:-不明}）"
-        echo "SessionStart hook による自動注入。PR の実査・progress.md・handoff.md まで見るなら /context-load。"
+        echo "SessionStart hook による自動注入。PR の実査・progress.md・handoff.md まで見るなら context-load スキル。"
     fi
 
     if [ -f "$TASKS_FILE" ]; then

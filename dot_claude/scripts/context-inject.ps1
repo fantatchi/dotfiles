@@ -54,7 +54,7 @@ if ($source -eq 'compact') {
     [void]$sb.AppendLine('compact の要約で落ちた作業状態を補うため、保存済みの要点を再掲する。保存後の作業は要約側が正。')
 } else {
     [void]$sb.AppendLine("## 前回の作業状態（.claude/context.md 最終保存: $shownUpdated）")
-    [void]$sb.AppendLine('SessionStart hook による自動注入。PR の実査・progress.md・handoff.md まで見るなら /context-load。')
+    [void]$sb.AppendLine('SessionStart hook による自動注入。PR の実査・progress.md・handoff.md まで見るなら context-load スキル。')
 }
 
 if (Test-Path -LiteralPath $tasksFile) {

@@ -144,3 +144,5 @@ Claude Code、Codex、Obsidian は次のファイルを共有正本として扱�
 - `~/.claude/skills/shared/tasks-format.md`
 
 tasks.md を編集する場合は、セクション見出しの重複（捕捉箱は 5 つ、作業キューは 3 つ）、既存の類似タスク、タイトル 150 文字上限を事前確認し、編集後に各見出しが 1 回ずつ存在することと対象行を検証する。
+
+`~/.codex/hooks.json` の hook（スクリプトは `~/.claude/scripts/` を Claude Code と共有）が、起動時と compact 後に作業状態を注入し、`git commit` / `gh pr create` の直後と長時間の未保存時に `context-save` を促す。促されたら従う。hooks.json を変えたら `/hooks` で再 trust が要る。

@@ -27,9 +27,9 @@ if (-not (Test-Path -LiteralPath $contextFile)) { exit 0 }
 
 $nowEpoch = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
 
-# HEAD が新しければコミット成功、そうでなければ先頭か区切り直後の gh pr create のみ PR 作成（.sh 参照）
+# 先頭か区切り直後の git commit かつ HEAD が新しければコミット、先頭か区切り直後の gh pr create なら PR 作成（.sh 参照）
 $headEpoch = (& git log -1 --format=%ct 2>$null)
-if ($headEpoch -and ($nowEpoch - [int64]$headEpoch) -le $commitFreshSec) {
+if ($command -match '(^|[;&|])\s*git(\s+-C\s+\S+)?\s+commit\b' -and $headEpoch -and ($nowEpoch - [int64]$headEpoch) -le $commitFreshSec) {
     $eventLabel = 'コミット'
 } elseif ($command -match '(^|[;&|])\s*gh\s+pr\s+create\b') {
     $eventLabel = 'PR 作成'
@@ -45,5 +45,5 @@ if ($content -match '(?ms)^---\r?\n(.*?)\r?\n---' -and $matches[1] -match '(?m)^
     } catch {}
 }
 
-Write-Output ('{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"' + $eventLabel + 'が完了し、作業の区切りです。ユーザーへの報告の前に /context-save スキルを実行して、判断メモ・次のステップを含めた最新状態を .claude/context.md に書き出してください。"}}')
+Write-Output ('{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"' + $eventLabel + 'が完了し、作業の区切りです。ユーザーへの報告の前に context-save スキルを実行して、判断メモ・次のステップを含めた最新状態を .claude/context.md に書き出してください。"}}')
 exit 0
