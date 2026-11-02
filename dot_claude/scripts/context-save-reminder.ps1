@@ -2,7 +2,9 @@
 #
 # .claude/context.md の frontmatter `updated:`（= 最終 save）と、セッション開始 / 最終
 # /context-load 時刻のどちらか新しい方を基準として、閾値以上経過していたら stdout に system-reminder
-# ブロックを出力し、Claude に /context-save の実行を促す。閾値未満なら無音 exit 0。
+# ブロックを出力し、Claude に /context-save の実行を促す。閾値未満、または保存後に git の変化
+# （コミット・作業ファイル更新）が無ければ無音 exit 0。主トリガーは context-save-git-trigger で、
+# この時間基準は保険。
 #
 # セッション開始基準: 各 session_id ごとに `~\.claude\.session-markers\<session_id>`
 # を作成する。マーカーには:
@@ -149,13 +151,36 @@ if ($sessionStart -and $sessionStart -gt $baseline) {
 }
 
 $diffMin = [int]((Get-Date) - $baseline).TotalMinutes
-if ($diffMin -ge $thresholdMin) {
-    Write-Output @"
+if ($diffMin -lt $thresholdMin) { exit 0 }
+
+# git 変化ゲート: 保存後にコミットも作業ファイルの更新も無ければ、時間が経っていても無音。
+# 主トリガーは PostToolUse の context-save-git-trigger（commit / PR 作成直後）で、ここは保険。
+# context-save 自身が書くファイル（.claude/ 配下の 4 本）は変化に数えない。
+$updatedEpoch = ([DateTimeOffset]$updated).ToUnixTimeSeconds()
+$hasChange = $false
+$commits = (& git log --since="@$updatedEpoch" --oneline -n 1 2>$null)
+if ($commits) {
+    $hasChange = $true
+} else {
+    $selfFiles = @('.claude/context.md', '.claude/tasks.md', '.claude/handoff.md', '.claude/progress.md')
+    $statusLines = (& git -C $repoRoot -c core.quotepath=false status --porcelain --untracked-files=all 2>$null)
+    foreach ($line in $statusLines) {
+        if ($line.Length -lt 4) { continue }
+        $path = $line.Substring(3) -replace '^.* -> ', '' -replace '^"(.*)"$', '$1'
+        if ($selfFiles -contains $path) { continue }
+        $full = Join-Path $repoRoot $path
+        # 削除は mtime を持たないので変化とみなす
+        if (-not (Test-Path -LiteralPath $full)) { $hasChange = $true; break }
+        if ((Get-Item -LiteralPath $full).LastWriteTime -gt $updated) { $hasChange = $true; break }
+    }
+}
+if (-not $hasChange) { exit 0 }
+
+Write-Output @"
 <system-reminder>
-最後の context 保存またはセッション開始から $diffMin 分経過しています（閾値: $thresholdMin 分）。
+最後の context 保存またはセッション開始から $diffMin 分経過し、保存後の変更があります（閾値: $thresholdMin 分）。
 このターンの応答に入る前に /context-save スキルを実行して、判断メモ・次のステップを含めた最新状態を .claude/context.md に書き出してください。
 保存が終わったら、続けてユーザーの本来のリクエストに応答してください。
 </system-reminder>
 "@
-}
 exit 0

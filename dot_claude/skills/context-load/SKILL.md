@@ -9,6 +9,8 @@ allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(gh pr view:*), Bash(echo:*), 
 
 `.claude/` 配下（context.md / progress.md / tasks.md / handoff.md）だけを読む project-local スキル。参照先パスの配線のみ `~/.claude/skills/shared/integrations.md`（resolver）で解決する。
 
+起動時と compact 直後は SessionStart hook（`scripts/context-inject`）が tasks.md の Next・進行中の作業・判断メモ・保存後の git 変化を自動注入する。本スキルは PR 実査・progress.md・handoff.md まで見る詳細版。
+
 ## 手順
 
 プロジェクトルートは `git rev-parse --show-toplevel`、git 外なら CWD。`{project-root}/.claude/context.md` が無ければ「コンテキストが保存されていません。`/context-save` で保存してください。」と案内して終了。
