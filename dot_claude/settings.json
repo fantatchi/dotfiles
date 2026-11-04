@@ -131,7 +131,8 @@
     "modern-web-guidance@googlechrome": true,
     "claude-code-setup@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true,
-    "code-simplifier@claude-plugins-official": true
+    "code-simplifier@claude-plugins-official": true,
+    "prompt-rail@oikon48": true
   },
   "extraKnownMarketplaces": {
     "anthropic-agent-skills": {
@@ -160,6 +161,12 @@
         "repo": "GoogleChrome/modern-web-guidance"
       },
       "autoUpdate": true
+    },
+    "oikon48": {
+      "source": {
+        "source": "github",
+        "repo": "oikon48/prompt-rail"
+      }
     }
   },
   "alwaysThinkingEnabled": true,
