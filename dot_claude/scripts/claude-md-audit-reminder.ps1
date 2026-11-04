@@ -98,7 +98,7 @@ if ($lastFired -gt 0 -and (($nowEpoch - $lastFired) / 60) -lt $snoozeMin) { exit
 # 以後毎プロンプト spawn → timeout を繰り返すため（その回の通知は捨てられ 24h 黙る側に倒す）。
 try { Set-Content -Path $snoozeFile -Value $nowEpoch -Encoding ASCII -NoNewline } catch {}
 
-Write-Output @"
+$msg = @"
 <system-reminder>
 CLAUDE.md の最終監査から $elapsedDays 日経過しています（閾値: $thresholdDays 日）。
 
@@ -122,5 +122,7 @@ Vault が無い環境では ``[DateTimeOffset]::UtcNow.ToUnixTimeSeconds() | Set
 頻度調整: ``export CLAUDE_MD_AUDIT_THRESHOLD_DAYS=14`` などで延長可。
 </system-reminder>
 "@
+# 出力は hook の JSON（additionalContext）にする（2026-11-04 変更。理由は .sh 版のコメント参照）
+@{ hookSpecificOutput = @{ hookEventName = 'UserPromptSubmit'; additionalContext = $msg } } | ConvertTo-Json -Compress -Depth 3
 
 exit 0

@@ -88,7 +88,7 @@ fi
 # 以後毎プロンプト spawn → timeout を繰り返すため（その回の通知は捨てられ 24h 黙る側に倒す）。
 echo "$NOW" > "$SNOOZE_FILE" 2>/dev/null || true
 
-cat <<EOF
+MSG=$(cat <<EOF
 <system-reminder>
 CLAUDE.md の最終監査から ${ELAPSED_DAYS} 日経過しています（閾値: ${THRESHOLD_DAYS} 日）。
 
@@ -112,5 +112,21 @@ Vault が無い環境では \`date +%s > ~/.claude/state/claude-md-audit/last-au
 頻度調整: \`export CLAUDE_MD_AUDIT_THRESHOLD_DAYS=14\` などで延長可。
 </system-reminder>
 EOF
+)
+
+# 出力は hook の JSON（additionalContext）にする（2026-11-04 変更）。plain text は「hook 成功メッセージ」
+# として別枠で Claude に渡り、Mod（reminder-band）が横取りできないため。Mod が無い環境でも
+# additionalContext は Claude の文脈に入るので、届く内容は従来と同じ。
+# JSON エスケープは bash の置換だけで行う（hook のプロセス生成を増やさないため）。
+json_escape() {
+    local s=$1
+    s=${s//\\/\\\\}
+    s=${s//\"/\\\"}
+    s=${s//$'\t'/\\t}
+    s=${s//$'\r'/}
+    s=${s//$'\n'/\\n}
+    printf '%s' "$s"
+}
+printf '{"hookSpecificOutput":{"hookEventName":"UserPromptSubmit","additionalContext":"%s"}}\n' "$(json_escape "$MSG")"
 
 exit 0

@@ -65,7 +65,7 @@ fi
 DRIFT_HEAD=$(printf '%s\n' "$DRIFT" | head -n 15)
 DRIFT_COUNT=$(printf '%s\n' "$DRIFT" | wc -l | tr -d ' ')
 
-cat <<EOF
+MSG=$(cat <<EOF
 <system-reminder>
 chezmoi のドリフト（source と target の差分）が ${DRIFT_COUNT} 件あります:
 
@@ -78,6 +78,22 @@ live 編集が正なら \`chezmoi re-add <path>\`、source が正なら \`chezmo
 無関係な作業中なら無視して通常応答へ。
 </system-reminder>
 EOF
+)
+
+# 出力は hook の JSON（additionalContext）にする（2026-11-04 変更）。plain text は「hook 成功メッセージ」
+# として別枠で Claude に渡り、Mod（reminder-band）が横取りできないため。Mod が無い環境でも
+# additionalContext は Claude の文脈に入るので、届く内容は従来と同じ。
+# JSON エスケープは bash の置換だけで行う（hook のプロセス生成を増やさないため）。
+json_escape() {
+    local s=$1
+    s=${s//\\/\\\\}
+    s=${s//\"/\\\"}
+    s=${s//$'\t'/\\t}
+    s=${s//$'\r'/}
+    s=${s//$'\n'/\\n}
+    printf '%s' "$s"
+}
+printf '{"hookSpecificOutput":{"hookEventName":"UserPromptSubmit","additionalContext":"%s"}}\n' "$(json_escape "$MSG")"
 
 { printf '%s\n%s\n' "$NOW_EPOCH" "$HASH" > "$STATE_FILE"; } 2>/dev/null || true
 exit 0

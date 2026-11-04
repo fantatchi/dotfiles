@@ -65,7 +65,7 @@ if ($hash -eq $lastHash -and (($nowEpoch - $lastEpoch) / 60) -lt $renotifyMin) {
 $driftHead = ($drift | Select-Object -First 15) -join "`n"
 $driftCount = $drift.Count
 
-Write-Output @"
+$msg = @"
 <system-reminder>
 chezmoi のドリフト（source と target の差分）が $driftCount 件あります:
 
@@ -78,6 +78,8 @@ live 編集が正なら ``chezmoi re-add <path>``、source が正なら ``chezmo
 無関係な作業中なら無視して通常応答へ。
 </system-reminder>
 "@
+# 出力は hook の JSON（additionalContext）にする（2026-11-04 変更。理由は .sh 版のコメント参照）
+@{ hookSpecificOutput = @{ hookEventName = 'UserPromptSubmit'; additionalContext = $msg } } | ConvertTo-Json -Compress -Depth 3
 
 try { Set-Content -Path $stateFile -Value "$nowEpoch`n$hash" -Encoding ASCII -NoNewline } catch {}
 exit 0
