@@ -105,9 +105,9 @@ function resetText(resetsAt, now) {
   return isToday ? hm : `${r.getMonth() + 1}/${r.getDate()}(${WEEKDAYS[r.getDay()]})${hm}`;
 }
 
-// 例: 「☀ 5h 晴れ 12→35% ↺15:30」。天気の部分だけ天気の色、残りは DIM。
+// 例: 「☀ 5h 12→35% ↺15:30」。天気の言葉は出さず記号だけ（word は判定・テスト用に保持）。
 function forecastText(f, now) {
-  const head = colorize(f.weather.color, `${f.weather.icon} ${f.label} ${f.weather.word}`);
+  const head = colorize(f.weather.color, `${f.weather.icon} ${f.label}`);
   const nums = f.projected !== undefined ? ` ${f.used}→${f.projected}%` : ` ${f.used}%`;
   const reset = f.resetsAt !== undefined ? ` ↺${resetText(f.resetsAt, now)}` : '';
   return head + colorize(DIM, nums + reset);
