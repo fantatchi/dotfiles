@@ -1,4 +1,4 @@
-// statusline-command.js - Claude Code statusline: model name / git branch / context usage
+// statusline-command.js - Claude Code statusline: model name / git branch / context usage / 利用枠の天気予報
 //
 // 使い方 (settings.json の statusLine.command から):
 //   node -e "require(require('os').homedir()+'/.claude/scripts/statusline-command.js')()"
@@ -22,6 +22,8 @@ const CYAN = '\x1b[2;36m';
 const YELLOW = '\x1b[2;33m';
 const GREEN = '\x1b[2;32m';
 const MAGENTA = '\x1b[2;35m';
+const BLUE = '\x1b[2;34m';
+const RED = '\x1b[2;31m';
 
 function colorize(color, text) {
   return color + text + RESET;
@@ -46,6 +48,69 @@ function pct(value) {
   return typeof value === 'number' && Number.isFinite(value) ? String(Math.round(value)) : null;
 }
 
+// --- 利用枠（5h / 1w）の天気予報 -----------------------------------------------------------
+// 消費ペースからリセット時点の使用率を予測し、天気で表す（2026-11-04 追加。Mod 版 usage-weather から移植）。
+//   予測 = 使用率 × 窓の長さ ÷ max(経過, 窓の 10%)  ← 10% の下限はリセット直後に予測が跳ねるのを抑える
+// 天気は予測と現在値の悪い方で決め、現在値 95% 以上は予測に関係なく台風。
+// 記号は 1 文字幅のもの（絵文字は端末で幅がずれる）。
+
+const MIN_MS = 60 * 1000;
+const WINDOWS = {
+  five_hour: { label: '5h', lengthMs: 300 * MIN_MS },
+  seven_day: { label: '1w', lengthMs: 10080 * MIN_MS },
+};
+const MIN_ELAPSED_RATIO = 0.1;
+const BANDS = [
+  { below: 50, icon: '☀', word: '晴れ', color: YELLOW },
+  { below: 80, icon: '☁', word: 'くもり', color: CYAN },
+  { below: 100, icon: '☂', word: '雨', color: BLUE },
+  { below: 130, icon: '☇', word: '雷雨', color: MAGENTA },
+];
+const TYPHOON = { icon: '↯', word: '台風', color: RED };
+const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'];
+
+function weatherFor(projected, used) {
+  if (used >= 95) return TYPHOON;
+  const worst = Math.max(projected, used);
+  return BANDS.find((b) => worst < b.below) || TYPHOON;
+}
+
+// limit: statusline JSON の rate_limits.<kind>（used_percentage, resets_at = epoch 秒）。
+// 対象外の kind・使用率が数値でない枠は null。resets_at が無ければ予測せず現在値だけ。
+function forecast(kind, limit, now) {
+  const win = WINDOWS[kind];
+  if (!win || !limit || typeof limit.used_percentage !== 'number' || !Number.isFinite(limit.used_percentage)) {
+    return null;
+  }
+  const used = Math.round(limit.used_percentage);
+  if (typeof limit.resets_at !== 'number' || !Number.isFinite(limit.resets_at)) {
+    return { label: win.label, used, weather: weatherFor(used, used) };
+  }
+  const resetsAt = limit.resets_at * 1000;
+  const remaining = Math.max(0, resetsAt - now);
+  const elapsed = Math.max(win.lengthMs - remaining, win.lengthMs * MIN_ELAPSED_RATIO);
+  const projected = Math.round((limit.used_percentage * win.lengthMs) / elapsed);
+  return { label: win.label, used, projected, resetsAt, weather: weatherFor(projected, used) };
+}
+
+// 今日なら「15:30」、別の日なら「11/6(金)18:00」（実行環境のローカル時刻）
+function resetText(resetsAt, now) {
+  const r = new Date(resetsAt);
+  const n = new Date(now);
+  const hm = `${String(r.getHours()).padStart(2, '0')}:${String(r.getMinutes()).padStart(2, '0')}`;
+  const isToday =
+    r.getFullYear() === n.getFullYear() && r.getMonth() === n.getMonth() && r.getDate() === n.getDate();
+  return isToday ? hm : `${r.getMonth() + 1}/${r.getDate()}(${WEEKDAYS[r.getDay()]})${hm}`;
+}
+
+// 例: 「☀ 5h 晴れ 12→35% ↺15:30」。天気の部分だけ天気の色、残りは DIM。
+function forecastText(f, now) {
+  const head = colorize(f.weather.color, `${f.weather.icon} ${f.label} ${f.weather.word}`);
+  const nums = f.projected !== undefined ? ` ${f.used}→${f.projected}%` : ` ${f.used}%`;
+  const reset = f.resetsAt !== undefined ? ` ↺${resetText(f.resetsAt, now)}` : '';
+  return head + colorize(DIM, nums + reset);
+}
+
 module.exports = function () {
   let input;
   try {
@@ -65,15 +130,19 @@ module.exports = function () {
   const ctx = pct(input.context_window && input.context_window.used_percentage);
   if (ctx !== null) parts.push(colorize(GREEN, `Ctx:${ctx}%`));
 
-  // Claude.ai サブスクのレート制限使用率 (/usage 相当)。未契約 or 初回応答前は該当フィールドが
-  // 無いので省略する。
+  // Claude.ai サブスクの利用枠 (/usage 相当)。未契約 or 初回応答前は rate_limits が無く、
+  // 枠ごとにも欠けうるので、ある枠だけ出す。
   const limits = input.rate_limits || {};
-  const five = pct(limits.five_hour && limits.five_hour.used_percentage);
-  const week = pct(limits.seven_day && limits.seven_day.used_percentage);
-  const rl = [five !== null ? `5h:${five}%` : null, week !== null ? `7d:${week}%` : null]
+  const now = Date.now();
+  const rl = Object.keys(WINDOWS)
+    .map((kind) => forecast(kind, limits[kind], now))
     .filter(Boolean)
-    .join(' ');
-  if (rl) parts.push(colorize(MAGENTA, rl));
+    .map((f) => forecastText(f, now))
+    .join('  ');
+  if (rl) parts.push(rl);
 
   process.stdout.write(parts.join(colorize(DIM, ' | ')) + '\n');
 };
+
+// テスト用に純粋関数を公開する（呼び出し形 require(...)() は変えない）
+Object.assign(module.exports, { forecast, weatherFor, resetText });
