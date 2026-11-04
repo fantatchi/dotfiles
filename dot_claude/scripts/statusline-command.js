@@ -15,15 +15,17 @@
 const { execFileSync } = require('child_process');
 const { readFileSync } = require('fs');
 
-// terminal は statusline を dim 表示するが、明示的に指定しておく
-const DIM = '\x1b[2m';
+// 色は 256 色パレットの中間調。dim (\x1b[2m) は薄すぎ、通常色は強すぎるため（2026-11-04 変更）。
+// 調整するときは番号だけ変える（16-231 は 6x6x6 の色立方体、232-255 はグレー）。
+const fg = (n) => `\x1b[38;5;${n}m`;
+const DIM = fg(245); // 区切り・数値: 明るめのグレー
 const RESET = '\x1b[0m';
-const CYAN = '\x1b[2;36m';
-const YELLOW = '\x1b[2;33m';
-const GREEN = '\x1b[2;32m';
-const MAGENTA = '\x1b[2;35m';
-const BLUE = '\x1b[2;34m';
-const RED = '\x1b[2;31m';
+const CYAN = fg(73);
+const YELLOW = fg(179);
+const GREEN = fg(108);
+const MAGENTA = fg(139);
+const BLUE = fg(110);
+const RED = fg(167);
 
 function colorize(color, text) {
   return color + text + RESET;
