@@ -1,0 +1,10 @@
+{
+  "name": "reminder-band",
+  "version": "0.1.0",
+  "description": "UserPromptSubmit hook のリマインダー（CLAUDE.md 監査・chezmoi ドリフト）を Claude に注入せず、入力欄の上の帯とボタンで直接出す",
+  "author": {
+    "name": "fantatchi"
+  },
+  "license": "MIT",
+  "types": "./types/index.d.ts"
+}

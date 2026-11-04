@@ -13,3 +13,8 @@ Thumbs.db
 *.pyc
 tests
 tests/**
+
+# Mod（skills 配下の plugin）を engine が読み込むと生成する型定義。生成物なので管理しない
+.claude/skills/*/.claude-plugin/types
+.claude/skills/*/.claude-plugin/types/**
+.claude/skills/*/tsconfig.json
