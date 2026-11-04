@@ -86,6 +86,11 @@ module.exports = function (hookName) {
     require('./context-save-hooks.js').run(hookName);
     return;
   }
+  // 捕捉箱の 1 日 1 回ダイジェスト。Node のみで完結するため spawn しない。
+  if (hookName === 'gtd-digest') {
+    require('./gtd-digest-hook.js').run();
+    return;
+  }
   const gate = gates[hookName];
   if (gate) {
     try {

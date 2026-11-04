@@ -81,6 +81,16 @@
     ],
     "SessionStart": [
       {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"require(require('os').homedir()+'/.claude/scripts/run-hook.js')('gtd-digest')\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
         "matcher": "startup|compact",
         "hooks": [
           {
