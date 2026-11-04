@@ -16,7 +16,9 @@ function fixture(t) {
   fs.mkdirSync(repo); fs.mkdirSync(home);
   const empty = path.join(dir, 'empty'); fs.mkdirSync(empty);
   const config = path.join(dir, 'gitconfig'); fs.writeFileSync(config, '');
-  const env = { ...process.env, HOME: home, USERPROFILE: home,
+  // Claude Code の中で実行しても結果が変わらないよう、出力形式を切り替える CLAUDECODE は外す。
+  const { CLAUDECODE: _claudecode, ...base } = process.env;
+  const env = { ...base, HOME: home, USERPROFILE: home,
     GIT_CONFIG_GLOBAL: config, GIT_CONFIG_NOSYSTEM: '1',
     GIT_AUTHOR_NAME: 'Test', GIT_COMMITTER_NAME: 'Test',
     GIT_AUTHOR_EMAIL: 'user1@example.com', GIT_COMMITTER_EMAIL: 'user1@example.com',
@@ -48,9 +50,9 @@ function fixture(t) {
     fs.utimesSync(file, new Date(timestamp), new Date(timestamp));
     return file;
   };
-  const run = (name, input, cwd = repo) => spawnSync(process.execPath,
+  const run = (name, input, cwd = repo, extra = {}) => spawnSync(process.execPath,
     ['-e', `require(${JSON.stringify(path.join(scripts, 'run-hook.js'))})(${JSON.stringify(name)})`],
-    { cwd, env, input: JSON.stringify(input), encoding: 'utf8' });
+    { cwd, env: { ...env, ...extra }, input: JSON.stringify(input), encoding: 'utf8' });
   return { dir, repo, home, env, git, now, saved, context, marker, active, write, run };
 }
 
@@ -128,6 +130,20 @@ test('保存前からある日本語・空白・矢印入りパスを削除と�
   f.write('日本語.txt', f.now);
   result = f.run('context-save-reminder', { session_id: 'session', prompt: '日本語の依頼' });
   assert.match(result.stdout, /保存後の変更があります/);
+});
+
+test('保存リマインダーは Claude Code からは JSON、それ以外（Codex）は plain text で出す', t => {
+  const f = fixture(t);
+  f.write('changed.txt', f.now);
+  const input = { session_id: 'session', prompt: '依頼' };
+  const plain = f.run('context-save-reminder', input);
+  assert.equal(plain.status, 0, plain.stderr);
+  assert.match(plain.stdout, /^<system-reminder>\n最後の context 保存/);
+  const json = f.run('context-save-reminder', input, f.repo, { CLAUDECODE: '1' });
+  assert.equal(json.status, 0, json.stderr);
+  const out = JSON.parse(json.stdout).hookSpecificOutput;
+  assert.equal(out.hookEventName, 'UserPromptSubmit');
+  assert.equal(out.additionalContext + '\n', plain.stdout);
 });
 
 test('rename の移動元と保存ファイルを変更対象に数えない', t => {

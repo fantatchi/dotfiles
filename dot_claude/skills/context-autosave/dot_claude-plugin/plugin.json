@@ -1,0 +1,7 @@
+{
+  "name": "context-autosave",
+  "version": "0.1.0",
+  "description": "context-save を、保存リマインダーの条件を満たしたターンの後と、自動 compact の前に自動で実行する",
+  "author": { "name": "fantatchi" },
+  "license": "MIT"
+}

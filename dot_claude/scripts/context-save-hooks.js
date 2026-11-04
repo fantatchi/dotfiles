@@ -226,7 +226,17 @@ function run(name) {
   if (!input || typeof input !== 'object') return;
   const output = name === 'context-save-git-trigger' ? gitTrigger(input)
     : name === 'context-save-reminder' ? reminder(input) : '';
-  if (output) process.stdout.write(output + '\n');
+  if (!output) return;
+  // Claude Code から呼ばれたときだけ、保存リマインダーを JSON の additionalContext で出す（2026-11-04）。
+  // plain text は「hook 成功メッセージ」として別枠で渡り、Mod（context-autosave）が横取りできないため。
+  // Codex も同じ hook を共有しており、JSON 形式を受け付けるか未確認なので、CLAUDECODE が無いときは従来どおり。
+  if (name === 'context-save-reminder' && process.env.CLAUDECODE) {
+    process.stdout.write(JSON.stringify({
+      hookSpecificOutput: { hookEventName: 'UserPromptSubmit', additionalContext: output },
+    }) + '\n');
+    return;
+  }
+  process.stdout.write(output + '\n');
 }
 
 module.exports = { events, statusPaths, gitTrigger, reminder, hasChangeSinceSave, run };
