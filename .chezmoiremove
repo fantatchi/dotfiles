@@ -4,3 +4,5 @@
 .claude/skills/codex-fix-loop
 .claude/skills/ks-name
 .agents/skills/shared
+.agents/skills/obsidian-daily
+.agents/skills/obsidian-mail

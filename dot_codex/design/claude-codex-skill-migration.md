@@ -79,6 +79,8 @@ Codex の作業ログは Claude と同じ `20_log/YYYYMM/`、リソースは `30
 
 2026-10-10 の追従（9/25〜10/08 分の棚卸し。両ディレクトリを `diff -r` し chezmoi 履歴と突き合わせ）: `shared/` 経由の変更（tasks-format の `@added:`、context-save の 20KB / 40KB）と `obsidian-daily` / `obsidian-mail` は反映済みだった。`multi-persona-review` は 9/25 判定どおり無変更。
 
+2026-11-06: `obsidian-daily` / `obsidian-mail` の Codex 版（`dot_agents/skills/`）を撤去し、`.chezmoiremove` に登録した。5 行目の「Claude 専用で維持する」と配備の実態が食い違い、Codex がメール送信や `gh auth switch` を自動で起動しうるため。同梱スクリプトも `~/.claude/` 側を呼んでいて使われていなかった。
+
 | スキル | 移植した規範 |
 |---|---|
 | `spec-writer` references | 10/06 の CSS 骨格刷新（影なし・罫線と余白、`--accent-line`、TL;DR の位置）を 6 ファイルまるごと Claude 版からコピーし、`~/.claude/skills/spec-writer/references/` のパス参照だけ `~/.agents/...` に再適応 |
