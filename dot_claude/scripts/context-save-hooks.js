@@ -215,7 +215,7 @@ function reminder(input, { cwd = process.cwd(), home = os.homedir(), now = Date.
   if (minutes < THRESHOLD_MIN || !hasChangeSinceSave(root, updated)) return '';
   return `<system-reminder>
 最後の context 保存またはセッション開始から ${minutes} 分経過し、保存後の変更があります（閾値: ${THRESHOLD_MIN} 分）。
-このターンの応答に入る前に context-save スキルを実行して、判断メモ・次のステップを含めた最新状態を .claude/context.md に書き出してください。
+このターンの応答に入る前に context-save スキルを実行して、最新状態を .claude/ 配下（context.md / tasks.md / handoff.md）に書き出してください。
 保存が終わったら、続けてユーザーの本来のリクエストに応答してください。
 </system-reminder>`;
 }
