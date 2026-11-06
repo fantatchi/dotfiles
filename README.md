@@ -134,7 +134,7 @@ Claude Code の `settings.json`・有効化済みプラグイン・このリポ�
 | `/baseline-ui` † | Tailwind プロジェクトの UI ベースライン検証（アニメーション時間・タイポスケール・アクセシビリティ） |
 | `/cloud-solution-architect` † | Azure Architecture Center ベストプラクティスに基づくクラウドアーキテクト・ロール変換 |
 | `/context-load` † | `.claude/context.md` からコンテキストを復帰、同じプロジェクトの `.claude/tasks.md` の Next / Someday と `.claude/handoff.md`（他エージェントからの引き継ぎ）も提示 |
-| `/context-save` | プロジェクトの作業状態を `.claude/context.md` に保存（進行中は 14 日ローテ + 完了 entry を 300 字以内へ圧縮 + 20KB 注意 / 40KB 警告の 2 段サイズアラート）、次アクションを `tasks.md` の `## Next` に吸い上げ、`.claude/handoff.md` に Claude ↔ Codex の引き継ぎメモを書き出し |
+| `/context-save` | プロジェクトの作業状態を `.claude/context.md` に保存（進行中の完了 entry は 14 日ローテ + 完了 entry を 300 字以内へ圧縮 + 20KB 注意 / 40KB 警告の 2 段サイズアラート）、次アクションを `tasks.md` の `## Next` に吸い上げ、`.claude/handoff.md` に Claude ↔ Codex の引き継ぎメモを書き出し |
 | `/discernment-nudge` | 見積もり・助言・計画・データ解釈など「ユーザーが信じて行動しそうな回答」の末尾に、見直す価値のある具体的な問いを 2〜3 個だけ添える（1 会話 1 回・調べ物や実行するコードには付けない）。Anthropic 公式スキルの日本語化 fork（Apache 2.0） |
 | `/eli5` † | 難解な概念・未知のコードベースを「大きな図と最小の言葉」だけの自己完結 HTML に変換し、scratchpad へ保存して `wslview` でブラウザ表示。外部リソース参照ゼロ・ブロック 3〜7 個・全体 300 字程度の制約付き。使い捨ての理解用で、残す文書は `/spec-writer` の担当 |
 | `/gtd-add` | `~/ObsidianVault/00_meta/tasks.md` の Inbox にタスクを追加 |
@@ -248,14 +248,14 @@ tags:
 - **`context.md`**: そのプロジェクトの「**状態**」（進行中の作業、判断メモ、重要ファイル）。プロジェクトルート毎に独立
 - **`<project>/.claude/tasks.md`** の `## Next`: そのプロジェクトの「**次にやること**」（プロジェクトごとに独立した**作業キュー**。2026-07-27 に思いつきの捕捉箱と分離した）
 - `/context-save` は「次のステップ」を `context.md` に書かず、必ず同じプロジェクトの `.claude/tasks.md` の `## Next` に追記する。`#project/<name>` タグは**付けない**（ファイルの場所がプロジェクトを表すため冗長）
-- `context.md` の `## 進行中の作業` は **日付プレフィックス付き entry** で時系列ログとして記録され、`/context-save` 実行時に **14 日より古い entry が自動削除** される（最低 3 件は保証）。永続的な保存ではないため、長く残したいものは別途 obsidian-log 等の外部ログに逃がす
+- `context.md` の `## 進行中の作業` は **日付プレフィックス付き entry** で時系列ログとして記録され、`/context-save` 実行時に **14 日より古い完了済み entry が自動削除** される（未完了は残し、最低 3 件は保証）。永続的な保存ではないため、長く残したいものは別途 obsidian-log 等の外部ログに逃がす
 
 **handoff.md（Claude ↔ Codex の引き継ぎ）:**
 
 Claude で行き詰まったら Codex へ、Codex で行き詰まったら Claude へ渡す往復のために、`/context-save` は `<project-root>/.claude/handoff.md` を**毎回**書き出す（`/context-load` が読んで冒頭に提示する）。両者は同じ working tree を共有しているため転送は発生せず、操作は「片方で save → もう片方で load」の 2 つだけで済む。
 
 - **なぜ context.md と分けるか**: `## 進行中の作業` は「何を成したか」の完了要約で、引き継ぎで相手が本当に必要とする「**試して駄目だったこと**（negative results）・現在の仮説・再現手順」を置く場所がない。かつこれらは揮発情報なので、恒久ファイルに混ぜるとローテーション対象の判断が増える
-- **1 件だけを保持する揮発ファイル**（毎回 全面上書き）。相手 writer の handoff を上書きする場合は、末尾に `> 前の引き継ぎ（from: ..., at: ...）` の 1 行だけ痕跡を残す
+- **1 件だけを保持する揮発ファイル**（毎回 全面上書き）。相手 writer の handoff を上書きする場合は、相手の「未解決」「試して駄目だったこと」を新しい本文へ移し（解決済みのみ落とす）、末尾に `> 前の引き継ぎ（from: ..., at: ...）` の痕跡 1 行を残す
 - `from` / `at` / `topic` の frontmatter を持ち、読み手は `from` で「自分が書いたもの」と「相手からの引き継ぎ」を区別する。消化状態（`status`）は**持たない**（読み手の `/context-load` は読取専用で書き戻せず、状態を持たせると必ず腐るため）
 - `.chezmoiignore` 対象（`context.md` / `tasks.md` と同じく高頻度更新のため chezmoi 管理外）
 
