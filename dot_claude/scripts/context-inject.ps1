@@ -1,6 +1,6 @@
 # context-inject.ps1 - SessionStart hook (Windows, matcher: startup|compact)
 #
-# 起動時と compact 直後に、.claude/context.md / tasks.md の要点と「保存後の git 変化」を
+# 起動時と compact 直後に、「保存後の git 変化」と .claude/context.md / tasks.md の要点を
 # plain stdout で出力する。仕様・意図は context-inject.sh のヘッダを参照（.sh が SSOT）。
 # stdin を UTF-8 で読む理由は context-save-reminder.ps1 のヘッダ参照（PS 5.1 の cp932 罠）。
 
@@ -57,15 +57,6 @@ if ($source -eq 'compact') {
     [void]$sb.AppendLine('SessionStart hook による自動注入。PR の実査・progress.md・handoff.md まで見るなら context-load スキル。')
 }
 
-if (Test-Path -LiteralPath $tasksFile) {
-    $next = Get-Section $tasksFile 'Next'
-    if ($next) { [void]$sb.AppendLine("`n### 次にやること（tasks.md の Next）`n$next") }
-}
-$wip = Get-Section $contextFile '進行中の作業'
-if ($wip) { [void]$sb.AppendLine("`n### 進行中の作業`n$wip") }
-$decisions = Get-Section $contextFile '判断メモ'
-if ($decisions) { [void]$sb.AppendLine("`n### 判断メモ`n$decisions") }
-
 [void]$sb.AppendLine("`n### 保存後の git 変化")
 if ($updatedStr) {
     try {
@@ -84,6 +75,15 @@ if (& git -C $repoRoot status --porcelain -- . ':!.claude/context.md' ':!.claude
 } else {
     [void]$sb.AppendLine('- 未コミットの変更: なし')
 }
+
+if (Test-Path -LiteralPath $tasksFile) {
+    $next = Get-Section $tasksFile 'Next'
+    if ($next) { [void]$sb.AppendLine("`n### 次にやること（tasks.md の Next）`n$next") }
+}
+$wip = Get-Section $contextFile '進行中の作業'
+if ($wip) { [void]$sb.AppendLine("`n### 進行中の作業`n$wip") }
+$decisions = Get-Section $contextFile '判断メモ'
+if ($decisions) { [void]$sb.AppendLine("`n### 判断メモ`n$decisions") }
 
 $out = $sb.ToString().TrimEnd()
 if ($out.Length -gt $maxChars) {

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # context-inject.sh - SessionStart hook (matcher: startup|compact)
 #
-# 起動時と compact 直後に、.claude/context.md / tasks.md の要点と「保存後の git 変化」を
+# 起動時と compact 直後に、「保存後の git 変化」と .claude/context.md / tasks.md の要点を
 # plain stdout で出力する。SessionStart は plain stdout を Claude の文脈に入れる仕様
 # （上限 10,000 字。超えるとファイル退避 + 2,000 字プレビューになるため手前で打ち切る）。
 # 詳細な復帰（PR 実査・progress.md・handoff.md）は手動の /context-load が担う。
@@ -49,17 +49,6 @@ OUT=$(
         echo "SessionStart hook による自動注入。PR の実査・progress.md・handoff.md まで見るなら context-load スキル。"
     fi
 
-    if [ -f "$TASKS_FILE" ]; then
-        NEXT=$(section "$TASKS_FILE" "Next")
-        [ -n "$NEXT" ] && printf '\n### 次にやること（tasks.md の Next）\n%s\n' "$NEXT"
-    fi
-
-    WIP=$(section "$CONTEXT_FILE" "進行中の作業")
-    [ -n "$WIP" ] && printf '\n### 進行中の作業\n%s\n' "$WIP"
-
-    DECISIONS=$(section "$CONTEXT_FILE" "判断メモ")
-    [ -n "$DECISIONS" ] && printf '\n### 判断メモ\n%s\n' "$DECISIONS"
-
     printf '\n### 保存後の git 変化\n'
     if [ -n "$UPDATED" ]; then
         COMMITS=$(git log --since="$UPDATED" --oneline 2>/dev/null)
@@ -75,6 +64,18 @@ OUT=$(
     else
         echo "- 未コミットの変更: なし"
     fi
+
+    if [ -f "$TASKS_FILE" ]; then
+        NEXT=$(section "$TASKS_FILE" "Next")
+        [ -n "$NEXT" ] && printf '\n### 次にやること（tasks.md の Next）\n%s\n' "$NEXT"
+    fi
+
+    WIP=$(section "$CONTEXT_FILE" "進行中の作業")
+    [ -n "$WIP" ] && printf '\n### 進行中の作業\n%s\n' "$WIP"
+
+    DECISIONS=$(section "$CONTEXT_FILE" "判断メモ")
+    [ -n "$DECISIONS" ] && printf '\n### 判断メモ\n%s\n' "$DECISIONS"
+
 )
 
 if [ "${#OUT}" -gt "$MAX_CHARS" ]; then
