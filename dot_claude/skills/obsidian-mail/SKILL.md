@@ -8,7 +8,7 @@ allowed-tools: Read, Bash(date:*), Bash(python:*), Bash(python3:*), Bash(ls:*), 
 
 # obsidian-mail — デイリーサマリーをメール送信
 
-Obsidian デイリーノートの「## デイリーサマリー」セクションを **構造化パース → メール向けに再構成**して Gmail SMTP で送信する。Obsidian ノート形式をそのまま流すのではなく、日報は「今日のひとこと → ハイライト → GitHub」、週報は「終わったこと → 決めたこと → 持ち越し」の読み物形式にする（今日の要約の `完了` / `決定` / `残り` ラベルを集計。ラベルの無い旧形式の週は作業ログのハイライトに戻る）。
+Obsidian デイリーノートの「## デイリーサマリー」セクションを **構造化パース → メール向けに再構成**して Gmail SMTP で送信する。Obsidian ノート形式をそのまま流すのではなく、日報は「今日のひとこと → ハイライト → GitHub」、週報は「終わったこと → 決めたこと → 最終記録日の残り」の読み物形式にする（今日の要約の `完了` / `決定` / `残り` ラベルを集計。ラベルの無い旧形式の週は作業ログのハイライトに戻る）。
 
 **主資源と連携**: 送信の on/off は resolver `~/.claude/skills/shared/integrations.md` の bool キー `daily_mail` で判定する。Vault パスは **`extract-summary.py` が `~/ObsidianVault` を直書きで持ち、resolver の `vault` は読まない**。読み取るサマリーの構造は `obsidian-daily` の出力との契約で `~/.claude/skills/shared/daily-summary-format.md` に要約がある（真の SSOT は両者のコード）。
 
@@ -74,8 +74,8 @@ Python 依存: `keyring`、`markdown`。
 ### 2. 送信スクリプト実行
 
 ```bash
-PY=python; "$PY" -c '' 2>/dev/null || PY=python3
-"$PY" ~/.claude/skills/obsidian-mail/send-summary.py "$MODE" "$TARGET_DATE"
+PYBIN=python; "$PYBIN" -c '' 2>/dev/null || PYBIN=python3
+"$PYBIN" ~/.claude/skills/obsidian-mail/send-summary.py "$MODE" "$TARGET_DATE"
 ```
 
 Python は `python` を優先し、動かなければ `python3` を使う。Windows（Git Bash）の `python3` は Microsoft Store のスタブに解決されて、出力なしの exit 49 で黙って落ちることがある。一方 WSL には `python` が無く `python3` しかない（obsidian-daily 6 節と同じ事情）。

@@ -2,7 +2,7 @@
 name: obsidian-daily
 description: 'GitHub アクティビティと作業ログから Obsidian デイリーノートの「## デイリーサマリー」セクションを生成・追記する。複数 GitHub アカウントの活動を集約する。「今日のまとめ」「デイリーサマリー」「KPI」「リポ別コミット」「両アカウント集約」「個人と業務を合算」といった依頼で使う。Obsidian Core Daily notes のテンプレを SSOT として読む前提（本文 6-a 節）。'
 argument-hint: '[YYYY-MM-DD]'
-allowed-tools: Read, Bash(gh:*), Bash(date:*), Bash(python:*), Bash(cat:*), Bash(ls:*), Bash(echo:*)
+allowed-tools: Read, Bash(gh:*), Bash(date:*), Bash(python:*), Bash(python3:*), Bash(cat:*), Bash(ls:*), Bash(echo:*)
 ---
 
 # デイリーサマリーの生成
@@ -47,6 +47,11 @@ accounts=( 解決した各アカウント名 )
 
 ```bash
 orig=$(gh api user --jq .login 2>/dev/null)   # 終わったら元のアカウントへ戻すために控える
+if [ -z "$orig" ]; then
+  # 戻し先が分からないまま切り替えると、別アカウントがアクティブのまま残る。切り替えずに今のアカウントだけで取る
+  echo "WARN: 元の gh アカウントを特定できないため、アカウント切替をせず現在のアカウントだけで取得する" >&2
+  accounts=()
+fi
 for acc in "${accounts[@]}"; do
   gh auth switch -u "$acc" >/dev/null 2>&1 || {
     echo "WARN: auth switch failed for $acc, skipping" >&2
@@ -54,10 +59,13 @@ for acc in "${accounts[@]}"; do
   }
   # 3a〜3d を $acc + $TARGET_DATE で実行（後述）
 done
-[ -n "$orig" ] && gh auth switch -u "$orig" >/dev/null 2>&1
+# orig が空のとき（上の分岐）は、現在のアカウントで 3a〜3d を 1 回だけ実行する
+if [ -n "$orig" ]; then
+  gh auth switch -u "$orig" >/dev/null 2>&1 || echo "WARN: 元のアカウント（$orig）へ戻せなかった" >&2
+fi
 ```
 
-ループの後で**必ず元のアカウントへ戻す**。戻さないと、最後に処理したアカウントがアクティブのまま残り、その後の push や PR 作成が意図しないアカウントで行われる。
+ループの後で**必ず元のアカウントへ戻す**。戻さないと、最後に処理したアカウントがアクティブのまま残り、その後の push や PR 作成が意図しないアカウントで行われる。元のアカウントを特定できないときは、そもそも切り替えない。上の 2 種類の WARN は、7 節の完了報告で必ずそのまま報告する。
 
 切替に失敗（未認証 / token 失効）したアカウントは **スキップ**し、7 節の完了報告で **必ず明示** する。
 
@@ -187,7 +195,8 @@ Windows の Git Bash 環境では locale が cp932 のため Python に届く前
 したがって **必ず UTF-8 で一時ファイルに書き出してからパス引数で渡す**。
 
 ```bash
-python - <<'PY'
+PYBIN=python; "$PYBIN" -c '' 2>/dev/null || PYBIN=python3
+"$PYBIN" - <<'PY'
 import json, os
 data = { ... }  # ステップ 5 で組み立てた JSON 構造
 path = os.path.expanduser('~/tmp_daily_summary.json')
@@ -196,14 +205,14 @@ with open(path, 'w', encoding='utf-8') as f:
 print(path)
 PY
 
-python ~/.claude/skills/obsidian-daily/write-daily.py ~/tmp_daily_summary.json
+"$PYBIN" ~/.claude/skills/obsidian-daily/write-daily.py ~/tmp_daily_summary.json
 ```
 
-**`python3` ではなく `python` を使う**: Windows (Git Bash) の `python3` は
+**`python` を優先し、動かなければ `python3` を使う**（上の `PYBIN=` の 1 行。obsidian-mail と同じ）: Windows (Git Bash) の `python3` は
 Microsoft Store のスタブランチャー (`AppData\Local\Microsoft\WindowsApps\python3`)
 に解決されることがあり、非対話実行で exit code 49 + 出力なしで黙って落ちる。
 `python` (`C:\Python313\python.exe` 等) を経由すれば安定動作する。WSL/macOS では
-`python` で Python 3 系が解決される前提（必要なら `alias python=python3`）。
+`python` が無く `python3` しかないことがある（このユーザーの WSL がそう。非対話シェルでは alias も効かない）ので、固定せず判定する。
 
 **一時ファイル**: `~/tmp_daily_summary.json` 固定名でホーム直下に置く（`/tmp/` は Git Bash と WSL でパス解釈が異なる）。`write-daily.py` が成功後に自分で削除するので `rm` は呼ばない。
 
@@ -218,7 +227,8 @@ Microsoft Store のスタブランチャー (`AppData\Local\Microsoft\WindowsApp
 以下を**必ず**報告する:
 
 - 書き込んだファイルのパス
-- **write-daily.py が `WARN: 作業ログ N 件のうち M 件だけ集約` を出した場合は必ずそのまま報告する**。別 PC からの同期待ちか 4 節の収集漏れで、日報に載らないログがある
+- **write-daily.py が `WARN: 作業ログ …` を出した場合は必ずそのまま報告する**。別 PC からの同期待ちか 4 節の収集漏れで、日報に載らないログがある。ノートのサマリー末尾にも `> ⚠️ 未集約の作業ログ` の 1 行が残るので、4 節を見直して再実行すれば消える
+- **3 節の gh アカウントの WARN**（元のアカウントを特定できない／戻せなかった）も必ず報告する
 - サマリーの概要: コミット数（× 何 repo）、PR 数（作成 / マージ / レビュー の breakdown）、ログ数
 - **アカウント別の取得件数**: 例 `fantatchi: commits 5 / PR 1` / `kentem-at-kato: commits 12 / PR 3`
 - **取得失敗があった場合は必ず明示**: 3 節「エラー処理」でスキップしたアカウント・セクションと理由（rate limit / auth / 422 等）。write-daily.py は失敗をノート上で可視化しないため、ここで報告しないと **静かな 0 件** として埋もれる

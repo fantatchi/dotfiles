@@ -610,7 +610,7 @@ def _render_labeled_week(day_entries: list[dict]) -> list[str]:
 
     - 終わったこと: `済` をプロジェクト別（件数の多い順）に日付付きで
     - 決めたこと: `決定` を全件、日付順に
-    - 持ち越し: 週内で最後に要約がある日の `残` だけ（前日までの `残` は解消済みか
+    - 最終記録日の残り: 週内で最後に要約がある日の `残` だけ（前日までの `残` は解消済みか
       最終日に引き継がれているはずなので、重ねて出さない）
 
     >>> e = lambda d, items: {"date": dt.date(2026, 10, d), "parsed": {"tldr_items": items}}
@@ -633,7 +633,7 @@ def _render_labeled_week(day_entries: list[dict]) -> list[str]:
     <BLANKLINE>
     - [10-07] gamma: 終値で判定
     <BLANKLINE>
-    ## 持ち越し（10-07 時点）
+    ## 最終記録日の残り（10-07）
     <BLANKLINE>
     - alpha: 第3回の推敲
     <BLANKLINE>
@@ -671,7 +671,7 @@ def _render_labeled_week(day_entries: list[dict]) -> list[str]:
         parts.append("")
     if last_remaining and last_remaining[1]:
         d, rem = last_remaining
-        parts += [f"## 持ち越し（{d.strftime('%m-%d')} 時点）", ""]
+        parts += [f"## 最終記録日の残り（{d.strftime('%m-%d')}）", ""]
         for it in rem:
             parts.append(f"- {it['project']}: {it['body']}")
         parts.append("")

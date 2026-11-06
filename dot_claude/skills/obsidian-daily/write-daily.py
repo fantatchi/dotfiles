@@ -487,36 +487,85 @@ def replace_summary(content: str, summary_section: str) -> str:
     return content_new.rstrip("\n") + "\n"
 
 
-def log_gap_warning(data: SummaryInput) -> str:
-    """Vault にある対象日の作業ログの件数と、集約した logs の件数を比べ、差があれば警告を返す。
+def find_log_gap(data: SummaryInput) -> tuple[int, int, list[str]]:
+    """対象日の作業ログのうち、日報に集約されなかったものを探す。
 
-    別 PC からの同期待ちや収集漏れで、ログが日報に載らないまま埋もれるのを防ぐ
-    （2026-11-06 のレビューで、直近 482 件中 190 件がどのデイリーからも辿れなかった）。
+    戻り値は (Vault にある件数, 集約した件数, 集約されなかったファイル名)。
+    ファイル名の集合で比べるので、件数が同じでも入れ替わっていれば検出する。
+    `path` の無い log が混ざっているときは、ファイル名で照合できないので件数だけで比べる
+    （このとき 3 つ目は空）。別 PC からの同期待ちや 4 節の収集漏れで、ログが日報に載らないまま
+    埋もれるのを防ぐ（2026-11-06 のレビューで、直近 482 件中 190 件がどのデイリーからも辿れなかった）。
 
     >>> import tempfile
     >>> d = tempfile.mkdtemp()
     >>> os.makedirs(os.path.join(d, "20_log", "202611"))
     >>> for n in ("20261104091500_a.md", "20261104131600_b.md", "20261105090000_c.md"):
     ...     open(os.path.join(d, "20_log", "202611", n), "w").close()
-    >>> log_gap_warning({"vault": d, "target_date": "2026-11-04", "logs": [{"project": "p", "summary": "s"}]})
-    'WARN: 作業ログ 2 件のうち 1 件だけ集約（20_log/202611/20261104*.md を確認）'
-    >>> log_gap_warning({"vault": d, "target_date": "2026-11-04", "logs": [{}, {}]})
-    ''
-    >>> log_gap_warning({"vault": d, "target_date": "2026-11-03", "logs": []})
-    ''
+    >>> base = {"vault": d, "target_date": "2026-11-04"}
+    >>> find_log_gap({**base, "logs": [{"path": "20_log/202611/20261104091500_a.md"}]})
+    (2, 1, ['20261104131600_b.md'])
+    >>> find_log_gap({**base, "logs": [{"path": "20_log/202611/20261104091500_a.md"}] * 2})
+    (2, 2, ['20261104131600_b.md'])
+    >>> find_log_gap({**base, "logs": [{}, {}]})
+    (2, 2, [])
+    >>> find_log_gap({**base, "target_date": "2026-11-03", "logs": []})
+    (0, 0, [])
     """
     vault = os.path.expanduser(data["vault"])
     ymd = data["target_date"].replace("-", "")
-    log_dir = data.get("log_dir", "20_log")
-    folder = os.path.join(vault, log_dir, ymd[:6])
+    folder = os.path.join(vault, data.get("log_dir", "20_log"), ymd[:6])
     try:
-        on_disk = [n for n in os.listdir(folder) if n.startswith(ymd) and n.endswith(".md")]
+        on_disk = sorted(n for n in os.listdir(folder) if n.startswith(ymd) and n.endswith(".md"))
     except OSError:
-        return ""
-    collected = len(data.get("logs", []))
-    if len(on_disk) <= collected:
-        return ""
-    return f"WARN: 作業ログ {len(on_disk)} 件のうち {collected} 件だけ集約（{log_dir}/{ymd[:6]}/{ymd}*.md を確認）"
+        on_disk = []
+    logs = data.get("logs", [])
+    paths = [log.get("path") for log in logs]
+    if all(paths):
+        collected = {os.path.basename(p) for p in paths}
+        missing = [n for n in on_disk if n not in collected]
+    else:
+        missing = []
+    return len(on_disk), len(logs), missing
+
+
+def log_gap_warning(data: SummaryInput) -> str:
+    """集約漏れがあれば、完了報告に出す WARN を返す（無ければ空文字）。
+
+    >>> import tempfile
+    >>> d = tempfile.mkdtemp()
+    >>> os.makedirs(os.path.join(d, "20_log", "202611"))
+    >>> for n in ("20261104091500_a.md", "20261104131600_b.md"):
+    ...     open(os.path.join(d, "20_log", "202611", n), "w").close()
+    >>> log_gap_warning({"vault": d, "target_date": "2026-11-04", "logs": [{"path": "x/20261104091500_a.md"}]})
+    'WARN: 作業ログ 2 件のうち 1 件が日報に集約されていない（20261104131600_b.md）'
+    >>> log_gap_warning({"vault": d, "target_date": "2026-11-04", "logs": [{}]})
+    'WARN: 作業ログ 2 件のうち 1 件だけ集約（20_log/202611/20261104*.md を確認）'
+    >>> log_gap_warning({"vault": d, "target_date": "2026-11-04", "logs": [{}, {}]})
+    ''
+    """
+    on_disk, collected, missing = find_log_gap(data)
+    if missing:
+        names = "、".join(missing[:3]) + ("ほか" if len(missing) > 3 else "")
+        return f"WARN: 作業ログ {on_disk} 件のうち {len(missing)} 件が日報に集約されていない（{names}）"
+    if on_disk > collected:
+        ymd = data["target_date"].replace("-", "")
+        return f"WARN: 作業ログ {on_disk} 件のうち {collected} 件だけ集約（{data.get('log_dir', '20_log')}/{ymd[:6]}/{ymd}*.md を確認）"
+    return ""
+
+
+def log_gap_note(data: SummaryInput) -> str:
+    """集約漏れがあれば、デイリーサマリーの末尾に残す 1 行を返す（無ければ空文字）。
+
+    実行時の報告だけだと、後でノートを読んだときに完全に集約されたように見えるため、
+    ノートにも残す。メール側（extract-summary.py）は、どのサブセクションにも属さないこの行を拾わない。
+    """
+    on_disk, collected, missing = find_log_gap(data)
+    if missing:
+        names = "、".join(missing[:3]) + ("ほか" if len(missing) > 3 else "")
+        return f"> ⚠️ 未集約の作業ログ: {len(missing)} 件（{names}）"
+    if on_disk > collected:
+        return f"> ⚠️ 未集約の作業ログ: {on_disk - collected} 件"
+    return ""
 
 
 def write_daily(data: SummaryInput) -> str:
@@ -531,6 +580,9 @@ def write_daily(data: SummaryInput) -> str:
     daily_path = os.path.join(daily_dir, f"{target_date}.md")
 
     summary_section = build_summary(data)
+    note = log_gap_note(data)
+    if note:
+        summary_section = summary_section.rstrip("\n") + "\n\n" + note
 
     if not os.path.exists(daily_path):
         # ケース 1: ファイルが存在しない → 新規作成
