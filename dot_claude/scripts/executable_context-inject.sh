@@ -4,8 +4,10 @@
 # 起動時と compact 直後に、「保存後の git 変化」「handoff.md の要約」と .claude/context.md / tasks.md の要点を
 # plain stdout で出力する。SessionStart は plain stdout を Claude の文脈に入れる仕様
 # （上限 10,000 字。超えるとファイル退避 + 2,000 字プレビューになるため手前で打ち切る）。
-# Codex も同じスクリプトを使い、上限が 6,000 字（~/.codex/hooks.json の additionalContextLimit）なので、
-# 打ち切り注記まで含めて収まるよう MAX_CHARS は 5,800 にしている。
+# MAX_CHARS=5,800 は、この 10,000 字に余裕を取った値（仕様上の根拠はない）。
+# Codex も同じスクリプトを使う。~/.codex/hooks.json の additionalContextLimit: 6000 の単位は「おおよそのトークン数」で、
+# 字数ではない（既定 2,500）。公式ドキュメントでは additionalContext だけに効くとあり、plain stdout で出す
+# この hook に効いているかは未確認（2026-11-06 時点）。
 # handoff.md は要約（書き手・topic・未解決の先頭 2 行）だけを出す。自分側の自動保存が、相手の引き継ぎを
 # 読む前に上書きしないようにするため（2026-11-06 のレビュー）。詳細な復帰は手動の /context-load が担う。
 # git 外（ホームワークスペース等）では CWD の .claude/ を読み、git 変化は「git 管理外」と出す。
