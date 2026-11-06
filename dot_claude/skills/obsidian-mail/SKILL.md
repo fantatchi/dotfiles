@@ -3,7 +3,7 @@ name: obsidian-mail
 description: 'Obsidian デイリーノートの「## デイリーサマリー」をメール向けに再構成して Gmail SMTP で送信する。日報・週報の 2 モード。「日報メールして」「週報メール送って」「サマリーをメールで」といった依頼、または Claude.app ローカルルーティーンから `/obsidian-mail daily|weekly [YYYY-MM-DD]` で明示呼び出しする（自動発火しない）。'
 argument-hint: 'daily|weekly [YYYY-MM-DD]'
 disable-model-invocation: true
-allowed-tools: Read, Bash(date:*), Bash(python3:*), Bash(ls:*), Bash(test:*), Bash(printenv:*)
+allowed-tools: Read, Bash(date:*), Bash(python:*), Bash(python3:*), Bash(ls:*), Bash(test:*), Bash(printenv:*)
 ---
 
 # obsidian-mail — デイリーサマリーをメール送信
@@ -74,8 +74,11 @@ Python 依存: `keyring`、`markdown`。
 ### 2. 送信スクリプト実行
 
 ```bash
-python3 ~/.claude/skills/obsidian-mail/send-summary.py "$MODE" "$TARGET_DATE"
+PY=python; "$PY" -c '' 2>/dev/null || PY=python3
+"$PY" ~/.claude/skills/obsidian-mail/send-summary.py "$MODE" "$TARGET_DATE"
 ```
+
+Python は `python` を優先し、動かなければ `python3` を使う。Windows（Git Bash）の `python3` は Microsoft Store のスタブに解決されて、出力なしの exit 49 で黙って落ちることがある。一方 WSL には `python` が無く `python3` しかない（obsidian-daily 6 節と同じ事情）。
 
 `send-summary.py` が抽出・再構成・SMTP 送信まで行い、結果 JSON を stdout に出す。対象が無ければ `{"sent": false, "reason": "empty"}`。メール本文の再構成規約（何を採り、手書き追加を静かに捨てるか）は `shared/daily-summary-format.md` を参照。
 

@@ -46,6 +46,7 @@ accounts=( 解決した各アカウント名 )
 各アカウントのクエリを叩く前に **アクティブアカウントを切り替える**:
 
 ```bash
+orig=$(gh api user --jq .login 2>/dev/null)   # 終わったら元のアカウントへ戻すために控える
 for acc in "${accounts[@]}"; do
   gh auth switch -u "$acc" >/dev/null 2>&1 || {
     echo "WARN: auth switch failed for $acc, skipping" >&2
@@ -53,7 +54,10 @@ for acc in "${accounts[@]}"; do
   }
   # 3a〜3d を $acc + $TARGET_DATE で実行（後述）
 done
+[ -n "$orig" ] && gh auth switch -u "$orig" >/dev/null 2>&1
 ```
+
+ループの後で**必ず元のアカウントへ戻す**。戻さないと、最後に処理したアカウントがアクティブのまま残り、その後の push や PR 作成が意図しないアカウントで行われる。
 
 切替に失敗（未認証 / token 失効）したアカウントは **スキップ**し、7 節の完了報告で **必ず明示** する。
 
@@ -214,6 +218,7 @@ Microsoft Store のスタブランチャー (`AppData\Local\Microsoft\WindowsApp
 以下を**必ず**報告する:
 
 - 書き込んだファイルのパス
+- **write-daily.py が `WARN: 作業ログ N 件のうち M 件だけ集約` を出した場合は必ずそのまま報告する**。別 PC からの同期待ちか 4 節の収集漏れで、日報に載らないログがある
 - サマリーの概要: コミット数（× 何 repo）、PR 数（作成 / マージ / レビュー の breakdown）、ログ数
 - **アカウント別の取得件数**: 例 `fantatchi: commits 5 / PR 1` / `kentem-at-kato: commits 12 / PR 3`
 - **取得失敗があった場合は必ず明示**: 3 節「エラー処理」でスキップしたアカウント・セクションと理由（rate limit / auth / 422 等）。write-daily.py は失敗をノート上で可視化しないため、ここで報告しないと **静かな 0 件** として埋もれる

@@ -786,16 +786,28 @@ def read_summary(target: dt.date) -> str | None:
     return extract_section(md)
 
 
+def has_summary(section: str | None) -> bool:
+    r"""サマリーセクションに中身があるか。見出しだけ・空白だけは「無い」と扱う。
+
+    見出しだけの空サマリーを「対象あり」と判定して、空の日報を送っていた（2026-11-06 のレビュー）。
+
+    >>> has_summary(None), has_summary(""), has_summary("\n  \n"), has_summary("- 作業")
+    (False, False, False, True)
+    """
+    return bool(section and section.strip())
+
+
 def build_daily(target: dt.date) -> dict:
     section = read_summary(target)
-    available = [target.isoformat()] if section else []
-    missing = [] if section else [target.isoformat()]
-    empty = section is None
+    found = has_summary(section)
+    available = [target.isoformat()] if found else []
+    missing = [] if found else [target.isoformat()]
+    empty = not found
     subject = f"[{target.isoformat()}] 日報"
     if empty:
         body_md = (
             f"# {target.isoformat()} 日報\n\n"
-            f"対象日のサマリーセクションが見つかりませんでした。\n\n"
+            f"対象日のサマリーセクションが見つからないか、空でした。\n\n"
             f"想定パス: `~/ObsidianVault/10_daily/{target.strftime('%Y%m')}/{target.isoformat()}.md`\n"
         )
     else:
@@ -827,7 +839,7 @@ def build_weekly(any_day: dt.date) -> dict:
     entries: list[dict] = []
     for d in days:
         s = read_summary(d)
-        if s is None:
+        if not has_summary(s):
             missing.append(d.isoformat())
             continue
         available.append(d.isoformat())

@@ -459,6 +459,66 @@ def render_obsidian_template(vault: str, target_date: str) -> str:
     )
 
 
+def replace_summary(content: str, summary_section: str) -> str:
+    r"""既存の `## デイリーサマリー` セクションを summary_section に置き換える。
+
+    "## デイリーサマリー" から次の "## " (level-2 見出し) 直前まで、次の "## " がなければ
+    ファイル末尾までを置換する。後ろのセクションに書かれたエントリを守るため。
+    置換文字列は関数で渡す。文字列で渡すと、コミットメッセージ中の `\d` や `C:\Users` が
+    re のエスケープとして解釈されて例外になり、`\\` は黙って `\` に化ける（2026-11-06 のレビュー）。
+    見出しが複数あっても置き換えるのは最初の 1 つだけ。
+
+    >>> old = "# t\n\n## デイリーサマリー\n古い\n\n## メモ\n残す\n"
+    >>> print(replace_summary(old, "## デイリーサマリー\nfix regex \\d+ in C:\\Users\\foo / a \\\\n b"), end="")
+    # t
+    <BLANKLINE>
+    ## デイリーサマリー
+    fix regex \d+ in C:\Users\foo / a \\n b
+    <BLANKLINE>
+    ## メモ
+    残す
+    >>> print(replace_summary("## デイリーサマリー\nA\n", "## デイリーサマリー\nB"), end="")
+    ## デイリーサマリー
+    B
+    """
+    pattern = r"## デイリーサマリー.*?(?=\n## |\Z)"
+    content_new = re.sub(pattern, lambda _: summary_section + "\n", content, count=1, flags=re.DOTALL)
+    # 末尾の改行を正規化
+    return content_new.rstrip("\n") + "\n"
+
+
+def log_gap_warning(data: SummaryInput) -> str:
+    """Vault にある対象日の作業ログの件数と、集約した logs の件数を比べ、差があれば警告を返す。
+
+    別 PC からの同期待ちや収集漏れで、ログが日報に載らないまま埋もれるのを防ぐ
+    （2026-11-06 のレビューで、直近 482 件中 190 件がどのデイリーからも辿れなかった）。
+
+    >>> import tempfile
+    >>> d = tempfile.mkdtemp()
+    >>> os.makedirs(os.path.join(d, "20_log", "202611"))
+    >>> for n in ("20261104091500_a.md", "20261104131600_b.md", "20261105090000_c.md"):
+    ...     open(os.path.join(d, "20_log", "202611", n), "w").close()
+    >>> log_gap_warning({"vault": d, "target_date": "2026-11-04", "logs": [{"project": "p", "summary": "s"}]})
+    'WARN: 作業ログ 2 件のうち 1 件だけ集約（20_log/202611/20261104*.md を確認）'
+    >>> log_gap_warning({"vault": d, "target_date": "2026-11-04", "logs": [{}, {}]})
+    ''
+    >>> log_gap_warning({"vault": d, "target_date": "2026-11-03", "logs": []})
+    ''
+    """
+    vault = os.path.expanduser(data["vault"])
+    ymd = data["target_date"].replace("-", "")
+    log_dir = data.get("log_dir", "20_log")
+    folder = os.path.join(vault, log_dir, ymd[:6])
+    try:
+        on_disk = [n for n in os.listdir(folder) if n.startswith(ymd) and n.endswith(".md")]
+    except OSError:
+        return ""
+    collected = len(data.get("logs", []))
+    if len(on_disk) <= collected:
+        return ""
+    return f"WARN: 作業ログ {len(on_disk)} 件のうち {collected} 件だけ集約（{log_dir}/{ymd[:6]}/{ymd}*.md を確認）"
+
+
 def write_daily(data: SummaryInput) -> str:
     """メイン処理。デイリーノートにサマリーを書き込む。"""
     # Python は `~` を自動展開しないため明示的に expanduser する。
@@ -499,10 +559,7 @@ def write_daily(data: SummaryInput) -> str:
     # 次の "## " がなければファイル末尾まで置換。Thino 等が後ろのセクションに
     # エントリを書いた場合の保護が目的（旧実装は re.DOTALL で末尾まで貪欲マッチ
     # していたためサマリー後ろの追記が消失していた）。
-    pattern = r"## デイリーサマリー.*?(?=\n## |\Z)"
-    content_new = re.sub(pattern, summary_section + "\n", content, flags=re.DOTALL)
-    # 末尾の改行を正規化
-    content_new = content_new.rstrip("\n") + "\n"
+    content_new = replace_summary(content, summary_section)
     with open(daily_path, "w", encoding="utf-8") as f:
         f.write(content_new)
     return f"replaced:{daily_path}"
@@ -528,6 +585,9 @@ def main():
 
     result = write_daily(data)
     print(result)
+    warning = log_gap_warning(data)
+    if warning:
+        print(warning)
 
     # 一時 JSON ファイルのクリーンアップ（書き込み成功後のみ）。
     # シェル側で rm を呼ばずに済ませることで Bash(rm:*) 権限要求を回避する。
