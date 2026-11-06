@@ -165,7 +165,7 @@ Claude に話しかけてタスクを追加・一覧・完了させる GTD ベ�
 **場所と同期:**
 
 - 保存先: `~/ObsidianVault/00_meta/tasks.md`
-- **chezmoi 管理外**（`.gitignore` 済み）。各 PC ローカルで持ち、他 PC とは同期しない
+- **chezmoi 管理外**（`.gitignore` 済み）。Obsidian Sync で全 PC・モバイル共有
 - フォーマット仕様は `~/.claude/skills/shared/tasks-format.md` を参照
 
 **セクション構造（固定）:**

@@ -2,7 +2,7 @@
 name: gtd-done
 description: '捕捉箱（`~/ObsidianVault/00_meta/tasks.md`）の指定タスクを完了にし Done へ移動する。「タスク完了」「あれ終わった」「完了マーク」といった依頼で使う。追加は gtd-add、表示は gtd-list。プロジェクトの作業キュー（`.claude/tasks.md`）は行に `[x]` を付けておけば次の /context-save が整理する。'
 argument-hint: '<タスクタイトルの部分一致文字列>'
-allowed-tools: Read, Write, Edit, Bash(date:*)
+allowed-tools: Read, Write, Edit, Bash(date:*), Bash(tasklist.exe:*)
 ---
 
 # タスク完了
@@ -28,9 +28,9 @@ allowed-tools: Read, Write, Edit, Bash(date:*)
 
 ### 3. タスク検索
 
-Done 以外の全セクション（Inbox / Next / Waiting / Someday）から、`$ARGUMENTS` を**部分一致**で検索する（大文字小文字を区別しない）。
+Done 以外の全セクション（Inbox / Next / Waiting / Someday）の **`- [ ]` 行だけ**から、`$ARGUMENTS` を**部分一致**で検索する（大文字小文字を区別しない）。
 
-検索対象はタスク行全体（プロジェクトタグも含む）。
+照合するのはタイトル本体だけ。`#project/*` タグ、`@...` メタ、`[x]` 行、`<!-- inbox-anchor -->` などのコメント行は対象にしない（URL の一部やタグ名で無関係な行が 1 件だけ当たるのを防ぐ）。
 
 ### 4. 結果の分岐
 
@@ -44,7 +44,7 @@ Done 以外の全セクション（Inbox / Next / Waiting / Someday）から、`
 
 #### 1 件の場合
 
-確認なしで Done に移動する（ステップ 5 へ）。
+`$ARGUMENTS` がタイトル本体と完全一致するときだけ、確認なしで Done に移動する（ステップ 5 へ）。部分一致で 1 件当たったときは、対象行を示して「この行を完了にしますか？」と確認してから移す。
 
 #### 複数件の場合
 
@@ -65,7 +65,7 @@ Done 以外の全セクション（Inbox / Next / Waiting / Someday）から、`
 
 **書込みは `~/.claude/skills/shared/tasks-format.md` の「書き込みプロトコル（複数 writer・MUST）」に従う**: 書き込み直前に tasks.md を再 Read し、重複見出し（同名セクション 2 回以上 → 自動編集停止）を確認し、対象タスク行がまだ存在するか（他 writer が先に完了/移動していないか）を確認してから編集する。書き込み後はセクション見出しが各 1 回のままかだけ確認する。
 
-元のセクションから該当行を削除し、tasks-format.md の Done 形式（`- [x] YYYY-MM-DD ...`、日付は今日。行末の `@added:` は外す）に変換して `## Done` の**直後**（先頭）に挿入する。削除時に空行が連続しないよう調整する。
+tasks-format.md の Done 形式（`- [x] YYYY-MM-DD ...`、日付は今日。行末の `@added:` と `@captured-on-mobile` は外す）に変換して `## Done` の**直後**（先頭）に挿入し、そのあと元のセクションから該当行を削除する（挿入が先。途中で止まっても行が消えず重複で済む）。削除時に空行が連続しないよう調整する。
 
 ### 6. 完了報告
 

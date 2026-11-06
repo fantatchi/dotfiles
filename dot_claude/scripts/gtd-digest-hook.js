@@ -55,7 +55,9 @@ function digest(text, now) {
   const active = Object.keys(sections).filter(s => s !== 'Done').flatMap(s => sections[s]);
   const checked = active.filter(l => /^- \[x\]/i.test(l)).length;
   const threshold = localDate(new Date(now.getTime() - OLD_DAYS * 86400000));
-  const old = active.filter(l => {
+  // Someday は寝かせる箱なので「古い」に数えない（数えると常に警告が出て、対処しても消えない）
+  const aging = Object.keys(sections).filter(s => s !== 'Done' && s !== 'Someday').flatMap(s => sections[s]);
+  const old = aging.filter(l => {
     const m = l.startsWith('- [ ]') && l.match(/@added:(\d{4}-\d{2}-\d{2})/);
     return m && m[1] < threshold;
   }).length;

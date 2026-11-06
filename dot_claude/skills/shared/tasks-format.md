@@ -21,7 +21,7 @@
 | スキル | 動詞 | ストア | 対象セクション |
 |---|---|---|---|
 | `gtd-add` | 追加（write） | 捕捉箱 | `## Inbox` |
-| `gtd-list` | 表示（read。副作用で `[x]` 行の Done 昇格と Done 剪定） | 捕捉箱 | 全セクション |
+| `gtd-list` | 表示（read。副作用で `[x]` 行の Done 昇格、`@added:` の補完、Done 剪定） | 捕捉箱 | 全セクション |
 | `gtd-done` | 完了化（write） | 捕捉箱 | `## Done` へ移動 |
 | `context-save` | 追加・整理（write） | 作業キュー | `## Next` へ追加、`[x]` 行を `## Done` へ移動、古い Done を剪定 |
 | `context-load` | 表示（read） | 作業キュー | `## Next` / `## Someday` |
@@ -36,15 +36,16 @@
 # Tasks
 
 ## Inbox
+<!-- inbox-anchor -->
 （未分類の新規タスク＝このストアの主役）
 
 ## Next
 ## Waiting
 ## Someday
-（人が Obsidian 上で使いたければ使う。スキルは書き込まない）
+（人が Obsidian 上で使いたければ使う。スキルが書くのは `[x]` 行の Done 昇格と `@added:` の補完だけ）
 
 ## Done
-（gtd-done で完了化した分）
+（gtd-done と gtd-list の昇格で完了化した分）
 ```
 
 セクションの順序と名称は固定。欠けている場合、スキルは該当セクションを追加してよい。
@@ -56,7 +57,7 @@
 ```
 
 - 先頭は `- [ ]`（未完了）または `- [x]`（完了）
-- `#project/<name>` は**任意**。振り分け先が決まっているなら書く（後でその作業キューへ移すときの目印になる）。決まっていなければ付けない
+- `#project/<name>` は**任意**。振り分け先が決まっているなら書く（後でその作業キューへ移すときの目印になる）。決まっていなければ付けない。例外として、QuickAdd が付ける `#project/global` は「振り分け先未定」の印として扱う
 - 任意メタデータ（`@key:value`）を末尾に追加してよい: `@since:2026-04-08`（Waiting 開始日）/ `@due:2026-04-15`（期限）/ `@captured-on-mobile`（モバイル捕捉）
 - 未完了行は登録日 `@added:YYYY-MM-DD` を持つ（後述「登録日と期間」）
 
@@ -110,8 +111,8 @@ Done の保持期間は「登録日と期間」の期間と同じ（`gtd-list` �
 - **書式**: 未完了行の末尾に `@added:YYYY-MM-DD`（`- [ ] タイトル @added:2026-10-01`）。タイトルの文字数には数えない
 - **付ける**: 行を新しく書くスキル（`gtd-add`・`context-save`）は当日の日付を付ける
 - **補う**: 走査するスキル（`gtd-list`・`context-save`）は、`@added:` の無い未完了行に当日の日付を補う。モバイルの QuickAdd や人が手で足した行も、次の実行で「初めて見た日」が付く
-- **外す**: Done へ移すときは `@added:` を外し、完了日だけにする
-- **知らせる**: 表示するスキル（`gtd-list`・`context-load`）は、`@added:` が期間より前の未完了行の件数を 1 行で出す: `⏳ 登録から 30 日を超えたタスクが N 件あります`。行ごとの経過日数は出さない。0 件なら出さない
+- **外す**: Done へ移すときは `@added:` と `@captured-on-mobile` を外し、完了日だけにする
+- **知らせる**: 表示するスキル（`gtd-list`・`context-load`）は、`@added:` が期間より前の未完了行の件数を 1 行で出す: `⏳ 登録から 30 日を超えたタスクが N 件あります`。行ごとの経過日数は出さない。0 件なら出さない。捕捉箱の `## Someday` は寝かせる箱なので数えない（数えると警告が常に出て、対処しても消えない）
 - **起動時ダイジェスト**: SessionStart hook `scripts/gtd-digest-hook.js` が捕捉箱の Inbox / Next を PC ごとに 1 日 1 回表示し、「知らせる」と同じ文言を使う（読むだけで書き込まない。日数は本節をミラー）
 - 2026-10-01 より前から在った行の `@added:` は推定値（セッション記録が残る下限の `2026-09-01` を含む）
 
@@ -140,7 +141,13 @@ Done の保持期間は「登録日と期間」の期間と同じ（`gtd-list` �
 
 ### Obsidian モバイルアプリからのクイック追加
 
-QuickAdd プラグインの `Quick Task` choice を Capture format `- [ ] {{VALUE}} @captured-on-mobile` で設定し、`## Inbox` 直後に追記する。iOS では Advanced URI 経由でショートカット.app から 1 タップ起動可能:
+QuickAdd プラグインの `Quick Task` choice は、次の設定で Inbox に追記する（2026-11-06 時点の `.obsidian/plugins/quickadd/data.json`）:
+
+- Capture format: `- [ ] #project/global {{VALUE}} @captured-on-mobile  ` + 改行
+- 挿入位置: `<!-- inbox-anchor -->` 行の直後（`insertAfter.after`）。見つからないときは作らない（`createIfNotFound: false`）
+
+**`<!-- inbox-anchor -->` 行はどの処理でも消さない・動かさない（MUST）**。消えるとモバイルからの捕捉が止まる。PC の `gtd-add` は Inbox の末尾に足すので、Inbox の並びはモバイル分が上、PC 分が下になる。
+iOS では Advanced URI 経由でショートカット.app から 1 タップ起動可能:
 
 ```
 obsidian://adv-uri?vault=<iOS の Vault 名>&filepath=00_meta%2Ftasks.md&commandid=quickadd%3Achoice%3A<choice-id>
@@ -168,15 +175,15 @@ obsidian://adv-uri?vault=<iOS の Vault 名>&filepath=00_meta%2Ftasks.md&command
 Done は 30 日で剪定され、各日の Daily Note の `## Done アーカイブ` へ転記される。
 ```
 
-以下に空の `## Inbox` / `## Next` / `## Waiting` / `## Someday` / `## Done` を続ける。
+以下に空の `## Inbox` / `## Next` / `## Waiting` / `## Someday` / `## Done` を続け、`## Inbox` の直下に `<!-- inbox-anchor -->` を置く（モバイル運用を参照）。
 
 ## 書き込みプロトコル（複数 writer・MUST）
 
 共通原則は `~/.claude/skills/shared/multi-writer.md` を SSOT とし、tasks.md 固有の適用だけを以下に定める。
 
 - ファイルが存在しない場合、初期テンプレートを生成してよいのは捕捉箱では `gtd-add`、作業キューでは `context-save`
-- Done セクションは追記のみ（新しいものが上）
-- **捕捉箱は Obsidian 起動中なら 1 行警告する**（WSL のみ・ブロックしない）: 書き込み前に `tasklist.exe /FI "IMAGENAME eq Obsidian.exe"` で起動を確かめ、起動中なら `⚠️ Obsidian が起動中です。外部編集が Sync で巻き戻る場合があります` と添えてから書く。1 行の小さな編集は残ることが多いので止めはしない。複数行の書き換え（推定日の一括付与など）は終了してもらってから行う（memory `feedback_obsidian-sync-external-edit-conflict`）
+- Done セクションは追記のみ（新しいものが上）。セクション間の移動は「移動先へ挿入 → 元の行を削除」の順にする（途中で止まっても行が消えず重複で済む）
+- **捕捉箱は Obsidian 起動中なら 1 行警告する**（WSL のみ・ブロックしない）: 書き込み前に `tasklist.exe /FI "IMAGENAME eq Obsidian.exe"` で起動を確かめ、起動中なら `⚠️ Obsidian が起動中です。外部編集が Sync で巻き戻る場合があります` と添えてから書く。1 行の小さな編集は残ることが多いので止めはしない。複数行の書き換え（推定日の一括付与など）は終了してもらってから行う。`gtd-list` の Done 剪定（削除を伴う lossy 処理）は起動中なら見送る（memory `feedback_obsidian-sync-external-edit-conflict`）
 - **重複セクションの検出**: 同名のセクション見出しが **2 回以上出現**する場合、Sync 競合等でファイルが二重化している疑いがある。セクションを anchor に編集すると意図しない側をサイレントに書き換えるため、**自動編集せずユーザーに警告**し、競合解消を促す
 - **重複タスクの追加禁止**: 同内容のタスクが既存セクションにある場合（部分一致で判定）、既存行の存在を報告してスキップする
 - 書き込み後の構造チェックは**セクション見出しが各 1 回のままか**だけ。文字数は書き込み前チェックで担保済み

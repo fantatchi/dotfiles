@@ -2,7 +2,7 @@
 name: gtd-add
 description: '思いつきタスクを捕捉箱（`~/ObsidianVault/00_meta/tasks.md`）の Inbox に追加する。「タスクを追加」「TODO として残して」「思いつき記録」「Inbox にメモ」といった依頼で使う。完了は gtd-done、表示は gtd-list。プロジェクトの作業キュー（`.claude/tasks.md`）は context-save の担当で本スキルは触らない。'
 argument-hint: '[タスクタイトル]'
-allowed-tools: Read, Write, Edit
+allowed-tools: Read, Write, Edit, Bash(tasklist.exe:*)
 ---
 
 # タスク追加
