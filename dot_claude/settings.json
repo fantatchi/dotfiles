@@ -173,7 +173,7 @@
   "pluginConfigs": {
     "prompt-rail@oikon48": {
       "options": {
-        "mode": "horizontal"
+        "mode": "vertical"
       }
     }
   },
