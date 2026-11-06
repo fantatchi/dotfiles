@@ -170,6 +170,13 @@
     }
   },
   "alwaysThinkingEnabled": true,
+  "pluginConfigs": {
+    "prompt-rail@oikon48": {
+      "options": {
+        "mode": "horizontal"
+      }
+    }
+  },
   "autoUpdatesChannel": "latest",
   "tui": "fullscreen",
   "theme": "dark",
