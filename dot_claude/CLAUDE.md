@@ -97,7 +97,7 @@ GOをもらってから進める。
 
 - 保存系の手動専用: 復帰=`/context-load` / 調査メモ・ブログドラフト=`/obsidian-resource`（`auto` でセッション内容から自動ドラフト）
 - **Codex への引き継ぎに専用コマンドは無い**: `/context-save` が `.claude/handoff.md` を毎回書き、Codex 側の `context-load` が読む（逆向きも同じ。同じ working tree なのでファイル転送は不要）
-- 「このプロジェクトの残タスクは？」に `/gtd-list` は答えない（作業キュー `.claude/tasks.md` は `/context-load` が表示する）
+- 捕捉箱（`~/ObsidianVault/00_meta/tasks.md`）の一覧=`/gtd-list`（手動専用。`--all` / `--done [N]`）。「このプロジェクトの残タスクは？」には答えない（作業キュー `.claude/tasks.md` は `/context-load` が表示する）
 - 日報・週報メール=`/obsidian-mail`（手動専用・ルーティーン経由）
 - 図解: 概念・コードを使い捨ての図解 HTML にする=`/eli5`（手動専用。残す文書は `/spec-writer`）
 - 画像: 日本語の一言から AI っぽさを削った画像生成用の英語プロンプトを 1 本組み立てる=`/image-prompt`（手動専用。画像自体は生成しない）
