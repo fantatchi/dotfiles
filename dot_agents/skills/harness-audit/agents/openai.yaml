@@ -1,0 +1,4 @@
+interface:
+  display_name: "判断メモ圧縮"
+  short_description: "共有 context.md の判断メモを仕分けし、外したものは作業ログへ退避して自動適用する"
+  default_prompt: "$harness-audit を使って判断メモを圧縮してください。"
