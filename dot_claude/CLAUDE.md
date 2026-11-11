@@ -104,7 +104,7 @@ GOをもらってから進める。
 - LLM っぽい語彙の禁止リスト `skills/shared/llm-tone.md` は `japanese-doc-style`（論証文書）だけが執筆中に参照する。`japanese-article-style`（一人称の記事）は環境固有の 5 節のみで、語彙は書き上げた後に grep で点検する（2026-10-01 の A/B 検証で一般論の規範は AI 臭を減らさなかった。経緯は `docs/japanese-article-style-retired.md`）
 - レビュー: git 差分の単発レビュー=`/codex:adversarial-review`（別モデルの目）。自作のレビュー系スキルはいずれも読取専用。修正まで回すなら組み込みの `/code-review --fix` か `/simplify`。`superpowers:requesting-code-review` / `receiving-code-review` は superpowers の実装フローを通した時のみ使う
 - スキル作成・編集: `skill-creator:skill-creator`（プラグイン側。ひな形生成 + eval で description の trigger 精度を実測できる）。`superpowers:writing-skills` は使わない。方法論は下記「新スキルの追加・削除・拡張」が正
-- 振り返り: 権限・CLAUDE.md・スキル整理・判断メモ圧縮=`/session-review`（手動専用）
+- 振り返り: セッションの知見を CLAUDE.md・スキルへ戻す=`/session-review` / 週次点検（CLAUDE.md 監査・memory の陳腐化・スキルの利用実績・判断メモ圧縮の自動適用）=`/harness-audit`（`memo` で判断メモ圧縮だけ。週次の通知は hook が出す）（いずれも手動専用）
 - 技術ロール（いずれも手動専用）: Azure 設計・WAF レビュー=`/cloud-solution-architect` / M365 Agents SDK（TypeScript）実装=`/m365-agents-ts` / Tailwind UI の実装ルール検証=`/baseline-ui`
 
 ## 新スキルの追加・削除・拡張

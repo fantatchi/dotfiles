@@ -140,6 +140,7 @@ Claude Code の `settings.json`・有効化済みプラグイン・このリポ�
 | `/gtd-add` | `~/ObsidianVault/00_meta/tasks.md` の Inbox にタスクを追加 |
 | `/gtd-done` | 指定タスクを完了にし Done セクションへ移動 |
 | `/gtd-list` | `~/ObsidianVault/00_meta/tasks.md` からタスクを表示 |
+| `/harness-audit` † | 週次点検: CLAUDE.md 監査（claude-md-improver に委譲）・memory の陳腐化・スキルの利用実績（`scripts/skill-usage.js` と Vault の台帳 `00_meta/skill-usage.json`）・判断メモ圧縮（自動適用。外したエントリは作業ログへ退避）。`/harness-audit memo` で判断メモ圧縮だけ。週次の通知は `claude-md-audit-reminder` hook が出す（Codex 側 `~/.agents/skills/` には判断メモ圧縮だけのミラーあり） |
 | `/image-prompt` † | 「こんな画像が欲しい」という日本語の一言から、AI っぽさを削った画像生成用の英語プロンプトを 1 本組み立てて返す。38 種の画風カタログ（手描き / フラット / ポップ / 印刷・版画 / 漫画 / 実務・教材）と AI っぽさ除去ブロックを内蔵し、用途から画風を自動選択。`SUBJECT / VISUAL STYLE / HUMAN-MADE CHARACTER / COMPOSITION / AVOID` の 5 ブロック構成で出力。画像自体は生成しない（Codex 側 `~/.agents/skills/` にミラーあり） |
 | `japanese-doc-style` | 論証を積む日本語文書（書籍の章・仕様書・設計ドキュメント）のスタイル規約（ロール変換型、執筆・推敲時に自動発動） |
 | `japanese-article-style` | 一人称の記事（体験記・ブログ・Obsidian 記事ノート）向けに、モデルが知り得ない環境固有の事項だけを定める: 書き手はユーザー・内輪の語の言い換え・観測範囲の明示・事実の等級・段落整形（ロール変換型、自動発動。Codex 側 `~/.agents/skills/` にミラーあり。文章一般論は 2026-10-01 の A/B 検証で撤去、`docs/japanese-article-style-retired.md`） |
@@ -150,7 +151,7 @@ Claude Code の `settings.json`・有効化済みプラグイン・このリポ�
 | `/obsidian-mail` † | デイリーサマリーを Gmail SMTP でメール送信（日報・週報。`/obsidian-mail daily\|weekly [YYYY-MM-DD]` で明示呼び出し、または火〜土 8:00 / 月 8:00 のローカル routine 経由） |
 | `/obsidian-resource` † | 調査メモ・参考リンク・ブログドラフトを Obsidian Vault に保存（`/obsidian-resource auto` でセッション内容から自動ドラフト化） |
 | `/pr-review` | GitHub PR の URL または番号を渡すと、ブランチ切替・最新化、Copilot/discussion コメント取得、3-5 体のペルソナ並列レビュー、メインでの実コード裏取り、`.claude/reviews/pr-{NNN}-{branch-key}-{YYYY-MM-DD}.md` への所見草稿出力までを一気通貫で実施。投稿はしない（草稿のみ）。公式 `/code-review ultra` と棲み分け（本スキル=ローカル草稿・ペルソナ並列・MEMORY 運用ルール遵守、公式=inline 投稿）。投稿要否判断が残る所見はそのリポジトリの `.claude/tasks.md` への起票を提案（起票自体は `/context-save` の担当） |
-| `/session-review` † | セッション振り返り（権限・CLAUDE.md・スキル・判断メモ圧縮の整理） |
+| `/session-review` † | セッション振り返り（CLAUDE.md への知見の追記・スキルの洗練）。権限レビューと判断メモ圧縮は 2026-11-11 に外した |
 | `/session-save` | 作業ログ記録とコンテキスト保存をまとめて実行する（アウトプット提案は 2026-11-06 に撤去。リソース化は手動の `/obsidian-resource`） |
 | `/spec-writer` | 仕様書（specification / 設計ドキュメント / requirements / architecture / ADR / C4 / 用語集）の設計・作成・レビューを担うロール変換型スキル（旧 spec-design + dashboard-design を 2026-06 に統合）。読み手別入口・図種選択・ADR 形式・要件レベル語・Diátaxis 4 分類・テンプレ集を内蔵。HTML 補足ページは DADS v2.0.1 準拠（key-color = Blue 固定で JIS X 8341-3 AA 自動充足） |
 

@@ -1,4 +1,4 @@
-# Phase 2: CLAUDE.md 更新 詳細手順
+# Phase 1: CLAUDE.md 更新 詳細手順
 
 ## Step 1: セッションの知見を抽出
 
