@@ -6,7 +6,7 @@ Claude・Codex など複数のエージェント（および Obsidian モバイ�
 
 単一の正本を全 writer で共有する。writer ごとのコピー（`.codex/context.md` 等）は作らない。
 
-- `{project-root}/.claude/context.md`（writer: context-save, session-review Phase 4）
+- `{project-root}/.claude/context.md`（writer: context-save, harness-audit Phase 4）
 - `{project-root}/.claude/progress.md`（writer: context-save 連携1）
 - 捕捉箱 tasks.md（writer: gtd-add / gtd-done / gtd-list の昇格・剪定 / Obsidian モバイル。場所は resolver `task_store`）
 - 作業キュー tasks.md（writer: context-save コア / 人が `[x]` を付ける。場所は resolver `project_task_store`）

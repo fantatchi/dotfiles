@@ -2,7 +2,8 @@
 # claude-md-audit-reminder.sh - UserPromptSubmit hook
 #
 # 最後の「監査実施」から N 日以上経過していたら <system-reminder> を stdout
-# 出力し、Claude にユーザーへ CLAUDE.md 監査スキルの実行を提案させる。
+# 出力し、Claude にユーザーへ週次点検スキル /harness-audit の実行を提案させる
+# （2026-11-11 に誘導先を claude-md-improver 単体から harness-audit へ変更。state は従来どおり）。
 # 閾値未満なら無音 exit 0。
 #
 # state を 2 ファイルに分離する（2026-07-07 改訂）:
@@ -90,25 +91,15 @@ echo "$NOW" > "$SNOOZE_FILE" 2>/dev/null || true
 
 MSG=$(cat <<EOF
 <system-reminder>
-CLAUDE.md の最終監査から ${ELAPSED_DAYS} 日経過しています（閾値: ${THRESHOLD_DAYS} 日）。
+前回の週次点検から ${ELAPSED_DAYS} 日経過しています（閾値: ${THRESHOLD_DAYS} 日）。
 
-このセッションのキリの良いタイミングで、以下のいずれかの audit 実行をユーザーに提案してください:
-
-1. グローバル (~/.claude/CLAUDE.md)
-   - 起動方法: \`cd ~/.local/share/chezmoi/dot_claude && /claude-md-management:claude-md-improver\`
-   - 編集対象は chezmoi source。完了後ユーザーが \`chezmoi apply\` で target 同期 + 任意で commit
-
-2. 現在プロジェクト (./CLAUDE.md)
-   - 起動方法: そのまま \`/claude-md-management:claude-md-improver\`
+このセッションのキリの良いタイミングで、ユーザーに \`/harness-audit\`（週次点検: CLAUDE.md 監査・
+memory の陳腐化・スキルの利用実績・判断メモ圧縮）の実行を提案してください。
+実行手順と、完了時の \`last_audit\` 更新（\`~/ObsidianVault/00_meta/claude-state.md\`。全 PC 共通の記録）は
+スキル本文が持っています。
 
 ユーザーが「やる」と言うまで待つ。すぐ作業に入りたい場合は無視して通常応答へ
 （実施するまで 24h ごとに再通知されます）。
-
-**監査を実施したら必ず** \`~/ObsidianVault/00_meta/claude-state.md\` の frontmatter を更新してください
-（全 PC 共通の記録。1 台で監査すれば他の PC でも黙る）:
-- \`last_audit:\` を \`date +%s\` の出力へ（機械可読の正）
-- \`last_audit_at:\` を \`date -Iseconds\` の出力へ（人間が読むための併記）
-Vault が無い環境では \`date +%s > ~/.claude/state/claude-md-audit/last-audit.txt\`（このマシンのみ有効）。
 頻度調整: \`export CLAUDE_MD_AUDIT_THRESHOLD_DAYS=14\` などで延長可。
 </system-reminder>
 EOF
