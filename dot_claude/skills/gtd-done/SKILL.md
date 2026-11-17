@@ -2,6 +2,7 @@
 name: gtd-done
 description: '捕捉箱（`~/ObsidianVault/00_meta/tasks.md`）の指定タスクを完了にし Done へ移動する。「タスク完了」「あれ終わった」「完了マーク」といった依頼で使う。追加は gtd-add、表示は gtd-list。プロジェクトの作業キュー（`.claude/tasks.md`）は行に `[x]` を付けておけば次の /context-save が整理する。'
 argument-hint: '<タスクタイトルの部分一致文字列>'
+disable-model-invocation: true
 allowed-tools: Read, Write, Edit, Bash(date:*), Bash(tasklist.exe:*)
 ---
 

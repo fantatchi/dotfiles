@@ -28,7 +28,7 @@
 
 # タスクの進め方
 
-- コード・設定の変更はスコープ合意後に Plan モードで計画を立て、承認を得てから実行する（定型の記録・文書更新は対象外）
+- コード・設定の変更はスコープ合意後に Plan モードで計画を立て、承認を得てから実行する（定型の記録・文書更新、および既存設定の revert 可能な小修正は対象外）
 
 # コミット・プッシュの粒度
 
@@ -97,12 +97,12 @@ GOをもらってから進める。
 
 - 保存系の手動専用: 復帰=`/context-load` / 調査メモ・ブログドラフト=`/obsidian-resource`（`auto` でセッション内容から自動ドラフト）
 - **Codex への引き継ぎに専用コマンドは無い**: `/context-save` が `.claude/handoff.md` を毎回書き、Codex 側の `context-load` が読む（逆向きも同じ。同じ working tree なのでファイル転送は不要）
-- 捕捉箱（`~/ObsidianVault/00_meta/tasks.md`）の一覧=`/gtd-list`（手動専用。`--all` / `--done [N]`）。「このプロジェクトの残タスクは？」には答えない（作業キュー `.claude/tasks.md` は `/context-load` が表示する）
+- 捕捉箱（`~/ObsidianVault/00_meta/tasks.md`）: 追加=`/gtd-add` / 完了=`/gtd-done` / 一覧=`/gtd-list`（いずれも手動専用。一覧は `--all` / `--done [N]`）。「TODO として残して」等の依頼でも捕捉箱へは `/gtd-add` を案内する。「このプロジェクトの残タスクは？」には答えない（作業キュー `.claude/tasks.md` は `/context-load` が表示する）
 - 日報・週報メール=`/obsidian-mail`（手動専用・ルーティーン経由）
 - 朝会の業務報告（前営業日の ks-kentem 分を Issue 単位の短い箇条書きに）=`/ks-standup`（手動専用。`[YYYY-MM-DD]`）
 - 図解: 概念・コードを使い捨ての図解 HTML にする=`/eli5`（手動専用。残す文書は `/spec-writer`）
 - 画像: 日本語の一言から AI っぽさを削った画像生成用の英語プロンプトを 1 本組み立てる=`/image-prompt`（手動専用。画像自体は生成しない）
-- LLM っぽい語彙の禁止リスト `skills/shared/llm-tone.md` は `japanese-doc-style`（論証文書）だけが執筆中に参照する。`japanese-article-style`（一人称の記事）は環境固有の 5 節のみで、語彙は書き上げた後に grep で点検する（2026-10-01 の A/B 検証で一般論の規範は AI 臭を減らさなかった。経緯は `docs/japanese-article-style-retired.md`）
+- LLM っぽい語彙の禁止リスト `skills/shared/llm-tone.md` は `japanese-doc-style`（論証文書）だけが執筆中に参照する。`japanese-article-style`（一人称の記事）は書いた後に grep で点検する（経緯は `docs/japanese-article-style-retired.md`）
 - レビュー: git 差分の単発レビュー=`/codex:adversarial-review`（別モデルの目）。自作のレビュー系スキルはいずれも読取専用。修正まで回すなら組み込みの `/code-review --fix` か `/simplify`。`superpowers:requesting-code-review` / `receiving-code-review` は superpowers の実装フローを通した時のみ使う
 - スキル作成・編集: `skill-creator:skill-creator`（プラグイン側。ひな形生成 + eval で description の trigger 精度を実測できる）。`superpowers:writing-skills` は使わない。方法論は下記「新スキルの追加・削除・拡張」が正
 - 振り返り: セッションの知見を CLAUDE.md・スキルへ戻す=`/session-review` / 週次点検（CLAUDE.md 監査・memory の陳腐化・スキルの利用実績・判断メモ圧縮の自動適用）=`/harness-audit`（`memo` で判断メモ圧縮だけ。週次の通知は hook が出す）（いずれも手動専用）

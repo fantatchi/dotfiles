@@ -136,9 +136,9 @@ Claude Code の `settings.json`・有効化済みプラグイン・このリポ�
 | `/context-load` † | `.claude/context.md` からコンテキストを復帰、同じプロジェクトの `.claude/tasks.md` の Next / Someday と `.claude/handoff.md`（他エージェントからの引き継ぎ）も提示 |
 | `/context-save` | プロジェクトの作業状態を `.claude/context.md` に保存（進行中の完了 entry は 14 日ローテ + 完了 entry を 300 字以内へ圧縮 + 20KB 注意 / 40KB 警告の 2 段サイズアラート）、次アクションを `tasks.md` の `## Next` に吸い上げ、`.claude/handoff.md` に Claude ↔ Codex の引き継ぎメモを書き出し |
 | `/eli5` † | 難解な概念・未知のコードベースを「大きな図と最小の言葉」だけの自己完結 HTML に変換し、scratchpad へ保存して `wslview` でブラウザ表示。外部リソース参照ゼロ・ブロック 3〜7 個・全体 300 字程度の制約付き。使い捨ての理解用で、残す文書は `/spec-writer` の担当 |
-| `/gtd-add` | `~/ObsidianVault/00_meta/tasks.md` の Inbox にタスクを追加 |
-| `/gtd-done` | 指定タスクを完了にし Done セクションへ移動 |
-| `/gtd-list` | `~/ObsidianVault/00_meta/tasks.md` からタスクを表示 |
+| `/gtd-add` † | `~/ObsidianVault/00_meta/tasks.md` の Inbox にタスクを追加 |
+| `/gtd-done` † | 指定タスクを完了にし Done セクションへ移動 |
+| `/gtd-list` † | `~/ObsidianVault/00_meta/tasks.md` からタスクを表示 |
 | `/harness-audit` † | 週次点検: CLAUDE.md 監査（claude-md-improver に委譲）・memory の陳腐化・スキルの利用実績（`scripts/skill-usage.js` と Vault の台帳 `00_meta/skill-usage.json`）・判断メモ圧縮（自動適用。外したエントリは作業ログへ退避）。`/harness-audit memo` で判断メモ圧縮だけ。週次の通知は `claude-md-audit-reminder` hook が出す（Codex 側 `~/.agents/skills/` には判断メモ圧縮だけのミラーあり） |
 | `/image-prompt` † | 「こんな画像が欲しい」という日本語の一言から、AI っぽさを削った画像生成用の英語プロンプトを 1 本組み立てて返す。38 種の画風カタログ（手描き / フラット / ポップ / 印刷・版画 / 漫画 / 実務・教材）と AI っぽさ除去ブロックを内蔵し、用途から画風を自動選択。`SUBJECT / VISUAL STYLE / HUMAN-MADE CHARACTER / COMPOSITION / AVOID` の 5 ブロック構成で出力。画像自体は生成しない（Codex 側 `~/.agents/skills/` にミラーあり） |
 | `japanese-doc-style` | 論証を積む日本語文書（書籍の章・仕様書・設計ドキュメント）のスタイル規約（ロール変換型、執筆・推敲時に自動発動） |
@@ -201,9 +201,9 @@ Claude に話しかけてタスクを追加・一覧・完了させる GTD ベ�
 
 | コマンド | 使う場面 |
 |----------|----------|
-| `/gtd-add` | 「このタスク追加して」「TODO として残して」 |
-| `/gtd-list` | 「タスク一覧」「今やること」「TODO を見せて」 |
-| `/gtd-done` | 「あれ終わった」「タスク完了」 |
+| `/gtd-add` † | 「このタスク追加して」「TODO として残して」 |
+| `/gtd-list` † | 「タスク一覧」「今やること」「TODO を見せて」 |
+| `/gtd-done` † | 「あれ終わった」「タスク完了」 |
 
 ### CWD = `$HOME` のときの挙動（ホームワークスペース）
 

@@ -12,3 +12,5 @@
 .agents/skills/session-review/references/memo-compaction.md
 .claude/skills/discernment-nudge
 .agents/skills/discernment-nudge
+.agents/skills/documentation-writer
+.agents/skills/frontend-patterns
