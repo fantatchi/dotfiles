@@ -143,6 +143,7 @@ Claude Code の `settings.json`・有効化済みプラグイン・このリポ�
 | `/image-prompt` † | 「こんな画像が欲しい」という日本語の一言から、AI っぽさを削った画像生成用の英語プロンプトを 1 本組み立てて返す。38 種の画風カタログ（手描き / フラット / ポップ / 印刷・版画 / 漫画 / 実務・教材）と AI っぽさ除去ブロックを内蔵し、用途から画風を自動選択。`SUBJECT / VISUAL STYLE / HUMAN-MADE CHARACTER / COMPOSITION / AVOID` の 5 ブロック構成で出力。画像自体は生成しない（Codex 側 `~/.agents/skills/` にミラーあり） |
 | `japanese-doc-style` | 論証を積む日本語文書（書籍の章・仕様書・設計ドキュメント）のスタイル規約（ロール変換型、執筆・推敲時に自動発動） |
 | `japanese-article-style` | 一人称の記事（体験記・ブログ・Obsidian 記事ノート）向けに、モデルが知り得ない環境固有の事項だけを定める: 書き手はユーザー・内輪の語の言い換え・観測範囲の明示・事実の等級・段落整形（ロール変換型、自動発動。Codex 側 `~/.agents/skills/` にミラーあり。文章一般論は 2026-10-01 の A/B 検証で撤去、`docs/japanese-article-style-retired.md`） |
+| `/ks-standup` † | 朝会の業務報告。前営業日（または `[YYYY-MM-DD]`）の org `ks-kentem` 分だけを、作業ログと GitHub の実績から「完了 / 対応中 / レビュー」の短い箇条書きにしてターミナルに出す（担当分は Issue 単位、レビューは提出日時で拾う PR 単位。gh で確かめられない事項は本文外の「要確認」へ） |
 | `/m365-agents-ts` † | Microsoft 365 Agents SDK (TypeScript) の開発支援リファレンス |
 | `/multi-persona-review` | 3〜5 人の専門ペルソナを並列 Agent で起動して読取専用レビューを行い、見落とし・別仮説・推奨アクションを統合 |
 | `/obsidian-daily` | GitHub アクティビティと作業ログからデイリーサマリーを生成（KPI 行・リポ別コミットグルーピング・作業ログ折り畳み callout の構成）。**複数 GH アカウント (`fantatchi` + `kentem-at-kato`) 対応**。Obsidian Core Daily notes テンプレ (`90_config/templates/daily_notes.md`) を SSOT として動的読み込み、Thino プラグインとの共存を考慮した `# Journal` セクション前提 |
