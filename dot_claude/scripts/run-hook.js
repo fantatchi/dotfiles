@@ -56,6 +56,9 @@ const gates = {
   // chezmoi-drift-reminder.{sh,ps1} のチェック間隔ゲートをミラー: 前回 check から 30 分未満なら
   // .sh/.ps1 は chezmoi status を実行せず無音 exit する。その shadow では powershell を起こさない。
   'chezmoi-drift-reminder'() {
+    // Windows では無効（2026-11-18 ユーザー判断）。node → powershell → chezmoi の起動が
+    // 15s の timeout を頻繁に超えるため。ドリフト検知は WSL 側の .sh に任せる。
+    if (process.platform === 'win32') return true;
     const CHECK_INTERVAL_MIN = 30; // mirror: chezmoi-drift-reminder.{sh,ps1}
     const lastCheck = readEpoch(
       join(homedir(), '.claude', 'state', 'chezmoi-drift', 'last-check.txt')
