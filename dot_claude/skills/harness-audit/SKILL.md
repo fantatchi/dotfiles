@@ -32,7 +32,7 @@ allowed-tools: Read, Edit, Write, Glob, Grep, Bash, Skill
 
 `/claude-md-management:claude-md-improver` に委譲する。対象は 2 つ:
 
-- グローバル: chezmoi source の `~/.local/share/chezmoi/dot_claude/CLAUDE.md`（live の `~/.claude/CLAUDE.md` は編集しない）。適用後は `chezmoi apply ~/.claude/CLAUDE.md` で live に反映する
+- グローバル: live の `~/.claude/CLAUDE.md` を編集し、`chezmoi re-add ~/.claude/CLAUDE.md` で source に反映する（スキルと同じ運用。source を直接編集して apply する手順は 2026-09-02 に廃止）
 - 今いるプロジェクトの `./CLAUDE.md`（あれば）
 
 監査の基準は memory `feedback_claude-md-audit-cant-know`（モデルが知り得ないことだけ残す）。
