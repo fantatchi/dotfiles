@@ -1,0 +1,1 @@
+{ "name": "session-save-next", "version": "0.1.0", "description": "session-save の完了後に、続ける（/clear → /context-load）か終了（/exit）かを選ばせる" }
