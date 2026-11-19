@@ -30,9 +30,10 @@ allowed-tools: Read, Edit, Write, Glob, Grep, Bash, Skill
 
 ### Phase 1: CLAUDE.md 監査
 
-`/claude-md-management:claude-md-improver` に委譲する。対象は 2 つ:
+`/claude-md-management:claude-md-improver` に委譲する。対象は 3 つ:
 
 - グローバル: live の `~/.claude/CLAUDE.md` を編集し、`chezmoi re-add ~/.claude/CLAUDE.md` で source に反映する（スキルと同じ運用。source を直接編集して apply する手順は 2026-09-02 に廃止）
+- Codex のグローバル: live の `~/.codex/AGENTS.md`（CLAUDE.md をほぼ写した二重管理。Codex 版 harness-audit は判断メモ圧縮しか持たないので、ここで見る）。CLAUDE.md 側に入れた変更が AGENTS.md に写っているか、ずれも提案に含める。編集後は `chezmoi re-add ~/.codex/AGENTS.md`
 - 今いるプロジェクトの `./CLAUDE.md`（あれば）
 
 監査の基準は memory `feedback_claude-md-audit-cant-know`（モデルが知り得ないことだけ残す）。
