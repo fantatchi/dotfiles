@@ -44,7 +44,7 @@ allowed-tools: Read, Edit, Write, Glob, Grep, Bash, Skill
 
 ### Phase 3: スキルの利用実績
 
-手順は `references/skill-usage.md`。`node ~/.claude/scripts/skill-usage.js` の出力から撤去候補を出す。提案のみ。
+手順は `references/skill-usage.md`。`node ~/.claude/scripts/skill-usage.js` の出力から撤去候補を出す。あわせて、live にだけ残ったスキルと Codex 側にしかないスキル（消し残し）も同ファイルの手順で拾う。提案のみ。
 
 ### Phase 4: 判断メモ圧縮（自動適用）
 
@@ -66,6 +66,7 @@ Phase 2: memory の陳腐化
 
 Phase 3: スキルの利用実績（観測 N 日・M 台分）
   - image-prompt: 0 回 → 撤去候補（参考）
+  - 消し残し: .claude/skills/foo → 削除
 
 適用する項目を選んでください（全部 / 一部 / スキップ）
 ```

@@ -17,6 +17,22 @@
 - **ルーティンや他スキルの中から使われるスキル**（`obsidian-mail` はルーティン経由、`obsidian-log` / `context-save` は `session-save` の中から）は、transcript に残らなかったり、親スキルの中で Read されるだけで `Skill` 呼び出しにならなかったりする。0 回でも撤去候補にせず、起動経路を 1 行添える
 - **用途が季節的なスキル**（例: 案件の実装期だけ使うもの）は、0 回でも撤去せず、再検討トリガーを context.md の判断メモに残す案を出す
 
+## 消し残しと Codex ミラーのずれ
+
+chezmoi は source から消しただけでは live を消さない。2026-11-19 に、07-07 に削除した `documentation-writer` / `frontend-patterns` が live に残り、description が毎セッション注入されていた。次の 2 つを確かめ、見つかったものを提案に出す（削除は選択後。live の消去は `.chezmoiremove` に登録して `chezmoi apply`）。
+
+1. **live にだけ残っているスキル**: `~/.claude/skills/*` と `~/.agents/skills/*` のうち `chezmoi managed` に出てこないもの
+   ```bash
+   for d in ~/.claude/skills/*/ ~/.agents/skills/*/; do r=${d#$HOME/}; r=${r%/}; chezmoi managed | grep -qx "$r" || echo "$r"; done
+   ```
+   除外（意図して chezmoi の外に置いている）: `install-moomoo-opend` / `moomooapi`（moomoo のインストーラーが置く外部スキル）、`synced`（同期データの置き場）
+2. **Codex 側にしかないスキル**: Codex 専用スキルは置かない方針（`~/.claude/docs/skill-management.md`）なので、出てきたら Claude 側で削除した写しの消し残し
+   ```bash
+   comm -13 <(ls ~/.claude/skills | sort) <(ls ~/.agents/skills | sort)
+   ```
+
+提示の形式: `Phase 3` の下に `- 消し残し: <パス> → 削除` のように並べる。
+
 ## 撤去・手動専用化を適用するとき
 
 `~/.claude/docs/skill-management.md` の「既存スキル削除時」のチェックリスト（CLAUDE.md の「# スキルコマンド」、chezmoi の README のスキル一覧、chezmoi source 側の削除）に従う。
