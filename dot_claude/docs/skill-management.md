@@ -19,6 +19,7 @@
 - [ ] `~/.claude/CLAUDE.md` の「# スキルコマンド」セクションから該当行を削除
 - [ ] `~/.local/share/chezmoi/README.md` の「**スキル一覧:**」テーブルから該当行を削除
 - [ ] README の「使いどころ」テーブルや他セクションの言及箇所を削除
+- [ ] `~/.agents/skills/<skill-name>/`（Codex ミラー）があれば同じコミットで削除する（live と chezmoi source の `dot_agents/skills/<skill-name>/` の両方）。Codex 側の他スキル・`~/.codex/AGENTS.md` からの参照も grep して消す
 
 ### 既存スキル機能拡張時（追加・削除ではない、機能のスコープが広がる場合）
 
@@ -32,6 +33,8 @@
 ### Codex 側ミラーの追従判断（`~/.agents/skills/` に同名スキルがある場合）
 
 Codex CLI 用のスキルは `~/.agents/skills/` に**別実体**として置かれている（symlink による 1 本化は検証のうえ不採用。理由と harness 依存差分の一覧は `~/.codex/design/claude-codex-skill-migration.md`）。Claude 側だけを編集すると Codex 側が古い仕様のまま取り残され、`context.md` / `tasks.md` / `handoff.md` のような**共有正本を古い規約で書かれる**。
+
+**正本は Claude 側**（2026-11-19 ユーザー判断）。Codex 専用のスキルは置かず、Codex 側は Claude 側の写しとして扱う。Claude 側で修正したら追従できるものは同じセッションで Codex 側も直し、Claude 側で削除したら Codex 側も削除する（ユーザーへの個別確認は要らない）。利用実績も Claude 側だけで測る。
 
 - [ ] 編集したスキルが `~/.agents/skills/<skill-name>/` にも存在するか確認する
 - [ ] 存在する場合、その変更が **harness 依存か非依存か**を判断する。`allowed-tools` / `Skill` ツール / `$ARGUMENTS` / `CLAUDE.md` 参照 / `source: claude-*` / `/skill` 記法 / 主語の「Claude」に**該当しない**変更は harness 非依存なので、Codex 側にも同じ変更が要る
