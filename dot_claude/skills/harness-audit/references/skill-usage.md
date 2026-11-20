@@ -24,9 +24,9 @@ chezmoi は source から消しただけでは live を消さない。2026-11-19
 
 1. **live にだけ残っているスキル**: `~/.claude/skills/*` と `~/.agents/skills/*` のうち `chezmoi managed` に出てこないもの
    ```bash
-   for d in ~/.claude/skills/*/ ~/.agents/skills/*/; do r=${d#$HOME/}; r=${r%/}; chezmoi managed | grep -qx "$r" || echo "$r"; done
+   m=$(chezmoi managed); for d in ~/.claude/skills/*/ ~/.agents/skills/*/; do r=${d#$HOME/}; r=${r%/}; grep -qx "$r" <<<"$m" || echo "$r"; done
    ```
-   除外（意図して chezmoi の外に置いている）: `install-moomoo-opend` / `moomooapi`（moomoo のインストーラーが置く外部スキル）、`synced`（同期データの置き場）
+   除外（意図して chezmoi の外に置いている）: `install-moomoo-opend` / `moomooapi`（moomoo のインストーラーが置く外部スキル）、`synced`（同期データの置き場）、`japanese-article-style-workspace`（2026-10-01 の A/B 比較の記録。SKILL.md が無く注入されない）
 2. **Codex 側にしかないスキル**: Codex 専用スキルは置かない方針（`~/.claude/docs/skill-management.md`）なので、出てきたら Claude 側で削除した写しの消し残し
    ```bash
    comm -13 <(ls ~/.claude/skills | sort) <(ls ~/.agents/skills | sort)

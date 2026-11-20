@@ -40,7 +40,9 @@
       "Read(**/.env.prod)",
       "Read(**/.env.dev)",
       "Read(**/.env.test)",
-      "Read(**/secrets/**)"
+      "Read(**/secrets/**)",
+      "Bash(chezmoi destroy:*)",
+      "Bash(chezmoi purge:*)"
     ],
     "defaultMode": "auto"
   },
