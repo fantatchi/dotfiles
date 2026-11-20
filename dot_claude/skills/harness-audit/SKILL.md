@@ -38,6 +38,8 @@ allowed-tools: Read, Edit, Write, Glob, Grep, Bash, Skill
 
 監査の基準は memory `feedback_claude-md-audit-cant-know`（モデルが知り得ないことだけ残す）。
 
+あわせて、前回の監査以降に `/insights` が記録したセッションごとの摩擦も材料にする。既存の規約と突き合わせ、手当てが無いものや再発したものだけを提案に足す（手順は `references/insights-friction.md`）。
+
 ### Phase 2: memory の陳腐化
 
 手順は `references/memory-staleness.md`。提案のみで、適用は手順 3 の選択に従う。
@@ -60,6 +62,7 @@ Phase 4: 判断メモ圧縮（適用済み）
 
 Phase 1: CLAUDE.md 監査
   - （claude-md-improver の提案）
+  - （insights 由来・11-18）古い作業ログを根拠に「未確認」と答えた → 案
 
 Phase 2: memory の陳腐化
   - reference_xxx.md: 本文の `scripts/foo.sh` が存在しない → 削除 or 更新
