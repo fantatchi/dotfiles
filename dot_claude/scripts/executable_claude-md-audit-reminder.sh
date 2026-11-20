@@ -94,7 +94,7 @@ MSG=$(cat <<EOF
 前回の週次点検から ${ELAPSED_DAYS} 日経過しています（閾値: ${THRESHOLD_DAYS} 日）。
 
 このセッションのキリの良いタイミングで、ユーザーに \`/harness-audit\`（週次点検: CLAUDE.md 監査・
-memory の陳腐化・スキルの利用実績・判断メモ圧縮）の実行を提案してください。
+memory の陳腐化・スキルの利用実績・判断メモ圧縮・許可の摩擦）の実行を提案してください。
 実行手順と、完了時の \`last_audit\` 更新（\`~/ObsidianVault/00_meta/claude-state.md\`。全 PC 共通の記録）は
 スキル本文が持っています。
 

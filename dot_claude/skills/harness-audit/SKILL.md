@@ -1,6 +1,6 @@
 ---
 name: harness-audit
-description: '週次点検。CLAUDE.md 監査・memory の陳腐化・スキルの利用実績・判断メモ圧縮（自動適用）を 1 回で回す。`/harness-audit memo` で判断メモ圧縮だけを単独実行。手動 `/harness-audit` 専用（自動起動しない。週次の通知は claude-md-audit-reminder hook が出す）。'
+description: '週次点検。CLAUDE.md 監査・memory の陳腐化・スキルの利用実績・判断メモ圧縮（自動適用）・許可の摩擦を 1 回で回す。`/harness-audit memo` で判断メモ圧縮だけを単独実行。手動 `/harness-audit` 専用（自動起動しない。週次の通知は claude-md-audit-reminder hook が出す）。'
 disable-model-invocation: true
 argument-hint: "[memo]"
 allowed-tools: Read, Edit, Write, Glob, Grep, Bash, Skill
@@ -14,7 +14,7 @@ allowed-tools: Read, Edit, Write, Glob, Grep, Bash, Skill
 
 | 起動 | 実行するフェーズ | `last_audit` 更新 |
 |---|---|---|
-| `/harness-audit` | 1〜4 すべて | する（最後に） |
+| `/harness-audit` | 1〜5 すべて | する（最後に） |
 | `/harness-audit memo` | 4 だけ | しない |
 
 引数が `memo` 以外なら、全フェーズで実行してよいか一言確認する。
@@ -23,7 +23,7 @@ allowed-tools: Read, Edit, Write, Glob, Grep, Bash, Skill
 
 1. **Phase 4 を先に実行して自動適用し、結果を報告する**（確認は取らない。理由と安全策は `references/memo-compaction.md`）
 2. `memo` 指定ならここで終了
-3. Phase 1〜3 の提案を集め、**1 回にまとめて提示**して、適用する項目を選んでもらう（全部 / 一部 / スキップ）
+3. Phase 1〜3 と 5 の提案を集め、**1 回にまとめて提示**して、適用する項目を選んでもらう（全部 / 一部 / スキップ）
 4. 選ばれた項目を適用し、`last_audit` を更新する
 
 ## フェーズ
@@ -52,6 +52,10 @@ allowed-tools: Read, Edit, Write, Glob, Grep, Bash, Skill
 
 手順は `references/memo-compaction.md`。resolver `~/.claude/skills/shared/integrations.md` の `memory_promotion` が `on` でなければ skip し、「Phase 4 → スキップ（memory_promotion off）」と明示する。
 
+### Phase 5: 許可の摩擦
+
+手順は `references/permission-friction.md`。組み込みの `/fewer-permission-prompts` を書き込みなしで呼び、allowlist に足す案を、settings.json と settings.local.json のどちらに置くかを添えて出す。提案のみ。
+
 ## 一括提示の形式
 
 ```
@@ -70,6 +74,9 @@ Phase 2: memory の陳腐化
 Phase 3: スキルの利用実績（観測 N 日・M 台分）
   - image-prompt: 0 回 → 撤去候補（参考）
   - 消し残し: .claude/skills/foo → 削除
+
+Phase 5: 許可の摩擦
+  - Bash(foo *)（12 回）→ settings.local.json
 
 適用する項目を選んでください（全部 / 一部 / スキップ）
 ```

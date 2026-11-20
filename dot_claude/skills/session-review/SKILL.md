@@ -8,7 +8,7 @@ allowed-tools: Read, Edit, Write, Glob, Grep
 # Session Review: セッション完了時の振り返り
 
 タスク完了時にセッション中の作業を振り返り、そのセッションで得たものを環境へ戻す。
-周期で回す点検（CLAUDE.md 全体の監査・memory の陳腐化・スキルの利用実績・判断メモ圧縮）は `/harness-audit` の担当で、ここでは扱わない。判断メモの肥大警告が出ているなら `/harness-audit memo` を案内する。
+周期で回す点検（CLAUDE.md 全体の監査・memory の陳腐化・スキルの利用実績・判断メモ圧縮・許可の摩擦）は `/harness-audit` の担当で、ここでは扱わない。判断メモの肥大警告が出ているなら `/harness-audit memo` を案内する。
 
 2026-11-11 に権限レビュー（auto mode と `/fewer-permission-prompts` で足りる）と判断メモ圧縮（harness-audit へ移して自動適用化）を外した。
 

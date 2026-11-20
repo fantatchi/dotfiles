@@ -25,7 +25,7 @@ for(const f of fs.existsSync(p+"facets")?fs.readdirSync(p+"facets"):[]){
 console.log(`対象 ${n} 件（基準: ${new Date(t0).toISOString()} / facets 最終更新: ${latest?new Date(latest).toISOString().slice(0,10):"なし"}）`)'
 ```
 
-0 件なら、提示に `- insights 由来 → 対象なし（facets 最終更新: <日付>）` の 1 行だけを書く。facets の最終更新が前回の監査より前なら、「`/insights` を先に実行すると材料になる」と添える。
+0 件なら、提示に `- insights 由来 → 対象なし（facets 最終更新: <日付>）` の 1 行だけを書く。`/insights` の実行は求めない（記録があるときだけ使う材料という位置づけ）。
 
 ## 2. 突き合わせ
 
