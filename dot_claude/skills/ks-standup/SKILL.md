@@ -15,7 +15,8 @@ allowed-tools: Read, Bash(date:*), Bash(ls:*), Bash(gh:*)
 ## 1. 対象日を決める
 
 - 引数 `YYYY-MM-DD` があればその日
-- なければ前営業日: 今日から 1 日ずつ戻り、土日を飛ばした最初の日（祝日は考えない。祝日明けは引数で指定してもらう）
+- なければ前営業日: 今日から 1 日ずつ戻り、土日を飛ばした最初の日
+- **祝日は 0 件で判定して飛ばす**: 休日出社はない（ユーザー確認 2026-11-24）ので、引数なしで決めた日が 2・3 節で業務分 0 件なら、祝日とみなして 1 つ前の平日へ戻り 2 節からやり直す（最大 5 平日まで）。祝日の暦は持たない（WSL に jpholiday 等が無く、外部 API も足さないため）。飛ばしたときは 6 節の検証レベルに「<元の日> は業務分 0 件のため祝日とみなし、<D> 分で作った」と 1 行添える。引数で日付を指定したときは飛ばさない
 
 ```bash
 d=$(date -d yesterday +%F); while [ "$(date -d "$d" +%u)" -ge 6 ]; do d=$(date -d "$d -1 day" +%F); done; echo "$d"
@@ -33,7 +34,7 @@ d=$(date -d yesterday +%F); while [ "$(date -d "$d" +%u)" -ge 6 ]; do d=$(date -
 
 アカウントは `kentem-at-kato`（private repo は他アカウントの token では 0 件で返る）。`gh api user --jq .login` が `kentem-at-kato` でなければ、各 `gh` コマンドの頭に `GH_TOKEN=$(gh auth token -u kentem-at-kato)` を付ける。`gh auth switch` は使わない（戻し忘れると、その後の push が別アカウントになる）。
 
-search クエリの罠（先頭スラッシュを付けない、日付範囲は JST で `+` を `%2B` にする）は `~/.claude/skills/obsidian-daily/SKILL.md` の「クエリの罠」と同じ。範囲は `<D>T00:00:00%2B09:00..<D>T23:59:59%2B09:00`（以下 `<R>`）。
+search クエリの罠（先頭スラッシュを付けない、日付範囲は JST で `+` を `%2B` にする）は `~/.claude/skills/obsidian-daily/SKILL.md` の「クエリの罠」と同じ。範囲は**対象日以降すべて** `%3E%3D<D>T00:00:00%2B09:00`（`>=`。以下 `<R>`）。`updated:` は最終更新日時なので、対象日だけに絞ると、その日に手を動かしたあと翌日以降に更新された PR が漏れる（2026-11-20 分で、指摘対応した PR #1723 が 11/23 の更新で漏れた）。対象日より後の分は下の絞り込みで落とす。
 
 逐次実行する（search の rate limit が 30 req/min のため）:
 
@@ -43,7 +44,10 @@ gh api 'search/issues?q=org:ks-kentem+reviewed-by:kentem-at-kato+type:pr+updated
 gh api 'search/issues?q=org:ks-kentem+involves:kentem-at-kato+type:issue+updated:<R>&per_page=100' --jq '.items[] | [.number, .repository_url, .state, .title] | @tsv'
 ```
 
-- `updated:` は他人の更新でも当たるので、自分の PR と Issue は 2 節の作業ログと突き合わせ、その日に自分が手を動かしたものだけを残す
+- 候補には他人の更新や対象日より後の作業も混ざるので、自分の PR は「対象日（JST）に自分のコミットがある・作成した・マージした」か作業ログに出てくるものだけを残す。Issue は作業ログと突き合わせる。コミットの数え方:
+  ```bash
+  gh api 'repos/ks-kentem/<repo>/pulls/<n>/commits?per_page=100' --jq '[.[] | select(.commit.author.date >= "<D-1>T15:00:00Z" and .commit.author.date < "<D>T15:00:00Z")] | length'
+  ```
 - 自分の PR は `gh pr view <n> -R ks-kentem/<repo> --json closingIssuesReferences,state` で Issue にまとめ、Issue の state を `gh issue view` で**今の時点の値**として取る
 - **レビューの正は提出日時**: ブラウザだけでしたレビューは作業ログに残らない（2026-11-16 は Approve 5 件のうち 3 件がログに無かった）。2 本目の search の候補それぞれについて、自分のレビューの `submitted_at` が対象日（JST）に入るかを確かめ、入るものだけを残す。自分の PR（スレッドへの返信もレビュー扱いで当たる）は除く
   ```bash
@@ -81,7 +85,7 @@ gh api 'search/issues?q=org:ks-kentem+involves:kentem-at-kato+type:issue+updated
 - 題は Issue のタイトルを短く言い換える（「不具合修正⑯【優先度２】」のような接頭辞は落とす）
 - **1 件 1 行**。Redmine の個別番号・検証の細部（テスト件数・変異テスト・ペルソナ名）・コミット SHA・ブランチ名は書かない
 - Issue に紐づかない自分の PR や作業は、作業ログから Issue 番号が分かればその Issue の行にまとめる。分からなければ「**その他**」の見出しを足して 1 行で書く
-- 該当がない見出し（例: レビューなし）は出さない。業務分が 0 件なら「<D> の ks-kentem 分の作業ログ・GitHub 実績は見つからなかった」とだけ返す
+- 該当がない見出し（例: レビューなし）は出さない。業務分が 0 件なら、引数なしのときは 1 節の祝日判定で前の平日へ戻る。引数で指定した日が 0 件なら「<D> の ks-kentem 分の作業ログ・GitHub 実績は見つからなかった」とだけ返す
 
 ## 5. gh で確かめられない事項は本文に書かない
 
