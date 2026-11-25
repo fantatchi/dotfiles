@@ -97,7 +97,7 @@ GOをもらってから進める。
 
 - 保存系の手動専用: 復帰=`/context-load` / 調査メモ・ブログドラフト=`/obsidian-resource`（`auto` でセッション内容から自動ドラフト）
 - **Codex への引き継ぎに専用コマンドは無い**: `/context-save` が `.claude/handoff.md` を毎回書き、Codex 側の `context-load` が読む（逆向きも同じ。同じ working tree なのでファイル転送は不要）
-- 捕捉箱（`~/ObsidianVault/00_meta/tasks.md`）: 追加=`/gtd-add` / 完了=`/gtd-done` / 一覧=`/gtd-list`（いずれも手動専用。一覧は `--all` / `--done [N]`）。「TODO として残して」等の依頼でも捕捉箱へは `/gtd-add` を案内する。「このプロジェクトの残タスクは？」には答えない（作業キュー `.claude/tasks.md` は `/context-load` が表示する）
+- 捕捉箱（`~/ObsidianVault/00_meta/tasks.md`）: 一覧・Done の剪定=`/gtd-list`（手動専用。`--all` / `--done [N]`）。チェック済みの行は SessionStart の hook（`gtd-digest-hook.js`）が 1 日 1 回 Done へ移す。「TODO として残して」等の依頼では `shared/tasks-format.md` の決まりに沿って Inbox へ直接書く。「このプロジェクトの残タスクは？」には答えない（作業キュー `.claude/tasks.md` は `/context-load` が表示する）
 - 日報・週報メール=`/obsidian-mail`（手動専用・ルーティーン経由）
 - 朝会の業務報告（前営業日の会社分（ks-kentem・kentem-*）を、リポジトリ別・Issue 別に時刻つきで並べる）=`/ks-standup`（手動専用。`[YYYY-MM-DD]`）
 - 図解: 概念・コードを使い捨ての図解 HTML にする=`/eli5`（手動専用。残す文書は `/spec-writer`）

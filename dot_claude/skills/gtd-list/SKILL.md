@@ -1,6 +1,6 @@
 ---
 name: gtd-list
-description: '捕捉箱（`~/ObsidianVault/00_meta/tasks.md`）のタスクを表示する（--all / --done [N]）。「タスク一覧」「TODO を見せて」「Inbox 確認」といった依頼で使う。追加は gtd-add、完了は gtd-done。プロジェクトの作業キュー（`.claude/tasks.md`）は表示しない（そちらは /context-load）。'
+description: '捕捉箱（`~/ObsidianVault/00_meta/tasks.md`）のタスクを表示する（--all / --done [N]）。「タスク一覧」「TODO を見せて」「Inbox 確認」といった依頼で使う。プロジェクトの作業キュー（`.claude/tasks.md`）は表示しない（そちらは /context-load）。'
 argument-hint: '[--all|--done [N]]'
 disable-model-invocation: true
 allowed-tools: Read, Write, Edit, Bash(date:*), Bash(tasklist.exe:*)
@@ -31,11 +31,11 @@ allowed-tools: Read, Write, Edit, Bash(date:*), Bash(tasklist.exe:*)
 ### 1. タスクストアの解決と読み込み
 
 1. resolver `~/.claude/skills/shared/integrations.md` を Read し `task_store` を取得する（resolver が無い / `task_store` が空なら既定 `~/ObsidianVault/00_meta/tasks.md`）。以降この解決済みパスを「tasks.md」と呼ぶ
-2. tasks.md を Read で読む。存在しない場合は「タスクが登録されていません。`/gtd-add` で追加してください。」と案内して終了
+2. tasks.md を Read で読む。存在しない場合は「タスクが登録されていません。」と案内して終了
 
 ### 2. チェック済みエントリの Done 昇格（副作用）
 
-モバイル（Obsidian モバイルアプリ）やエディタで `- [ ]` を `- [x]` にチェックしただけのエントリを Done セクションに自動移動する。書込みは tasks-format.md の「書き込みプロトコル（複数 writer・MUST）」に従う（再 Read・重複見出しでの停止・Obsidian 起動中の警告）。
+モバイル（Obsidian モバイルアプリ）やエディタで `- [ ]` を `- [x]` にチェックしただけのエントリを Done セクションに自動移動する。通常は SessionStart hook（`gtd-digest-hook.js`）が 1 日 1 回先に移しているので、ここで移るのは hook が動かなかった日（見出しの二重化・Obsidian による書き換え・巻き戻り）の残り。書込みは tasks-format.md の「書き込みプロトコル（複数 writer・MUST）」に従う（再 Read・重複見出しでの停止・Obsidian 起動中の警告）。
 
 #### 手順
 
@@ -130,7 +130,7 @@ Inbox 内のタスクで `@captured-on-mobile` メタを持つものを件数集
 
 ### 5. タスクが 0 件の場合（引数なし）
 
-Inbox と Next の両方が 0 件の場合は「捕捉箱は空です。`/gtd-add` で追加できます（プロジェクトの残タスクは `/context-load`）。」と案内する。
+Inbox と Next の両方が 0 件の場合は「捕捉箱は空です（プロジェクトの残タスクは `/context-load`）。」と案内する。
 
 ## 連携（任意・対象があれば実行）
 
@@ -158,4 +158,4 @@ Inbox と Next の両方が 0 件の場合は「捕捉箱は空です。`/gtd-ad
 ## 注意事項
 
 - 基本は読み込み専用だが、**ステップ 2（Done 昇格）/ 3（Done 剪定）の副作用で書き込みがある**
-- 上記副作用以外の目的で tasks.md を変更しない（タスクの並び替え・修正は `gtd-add` / `gtd-done` の役割）
+- 上記副作用以外の目的で tasks.md を変更しない（タスクの追加・並び替え・修正は人が Obsidian で行う）

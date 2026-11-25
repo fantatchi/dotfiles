@@ -2,7 +2,11 @@
 //
 // 捕捉箱（tasks.md）の Inbox / Next を、その PC で 1 日 1 回だけユーザーへ表示する。
 // /gtd-list を手で起動しないと捕捉箱を見る機会が無かったため（2026-11-04 追加）。
-// - 読むだけ。Done 昇格・@added 補完は /gtd-list の責務なのでここでは書かない
+// - 表示の前に、チェック済み（- [x]）の行を Done へ移す（昇格。2026-11-25 追加）。
+//   モバイルでチェックしても /gtd-list を実行しないと捕捉箱に残り続けたため。
+//   Obsidian 起動中に書くと Sync で巻き戻ることがあるが、巻き戻っても行が元の場所へ戻るだけで
+//   情報は消えないので受け入れる（翌日また移る）。書く直前に読み直し、変わっていたら見送る
+// - 行を消す処理（Done の剪定）と @added 補完は /gtd-list の責務。ここでは剪定の時期を知らせるだけ
 // - systemMessage で表示し、モデルの文脈には入れない
 // - 例外は全て握りつぶして無音 exit（起動を妨げない）
 // Node のみで動く OS 共通実装（context-save-hooks.js と同じく .sh / .ps1 を持たない）。
@@ -38,7 +42,51 @@ function parse(text) {
   return sections;
 }
 
-function digest(text, now) {
+// チェック済みの行を Done の先頭へ移す。変換は gtd-list 2 節「チェック済みエントリの Done 昇格」と同じ。
+// 移すものが無い・見出しが二重（Sync 競合の疑い）のときは、元の文字列をそのまま返す。
+function promote(text, today) {
+  const eol = text.includes('\r\n') ? '\r\n' : '\n';
+  const lines = text.split(/\r?\n/);
+  const heading = l => { const m = l.match(/^## (.+?)\s*$/); return m ? m[1] : null; };
+  const names = lines.map(heading).filter(Boolean);
+  if (new Set(names).size !== names.length) return { text, count: 0 };
+
+  const kept = [], moved = [];
+  let cur = null;
+  for (const line of lines) {
+    const h = heading(line);
+    if (h) cur = h;
+    const t = line.trim();
+    if (!h && cur && cur !== 'Done' && /^- \[x\]/i.test(t)) {
+      let body = t.replace(/^- \[x\]\s*/i, '').replace(/\s*@(added:\S+|captured-on-mobile)/g, '').trim();
+      if (!/^\d{4}-\d{2}-\d{2} /.test(body)) body = `${today} ${body}`;
+      moved.push(`- [x] ${body}`);
+    } else {
+      kept.push(line);
+    }
+  }
+  if (!moved.length) return { text, count: 0 };
+
+  const done = kept.findIndex(l => heading(l) === 'Done');
+  if (done < 0) {
+    // Done が無ければ末尾に作る（末尾の改行の有無は元に合わせる）
+    const hasFinalEol = kept.length > 0 && kept[kept.length - 1] === '';
+    while (kept.length && kept[kept.length - 1] === '') kept.pop();
+    kept.push('', '## Done', '', ...moved);
+    if (hasFinalEol) kept.push('');
+  } else {
+    // 見出し直後の空行は残し、その下（Done の先頭）へ入れる
+    let at = done + 1;
+    while (at < kept.length && kept[at].trim() === '') at++;
+    kept.splice(at, 0, ...moved);
+  }
+
+  // 行を抜いた跡の連続空行を 1 つにまとめる
+  const out = kept.filter((l, i) => !(l.trim() === '' && i > 0 && kept[i - 1].trim() === '' && i < kept.length - 1));
+  return { text: out.join(eol), count: moved.length };
+}
+
+function digest(text, now, promoted = 0) {
   const sections = parse(text);
   const open = name => (sections[name] || []).filter(l => l.startsWith('- [ ]'));
   const clean = l => l.replace(/\s*@(added:\S+|captured-on-mobile)/g, '').trim();
@@ -50,11 +98,16 @@ function digest(text, now) {
   };
 
   const inbox = open('Inbox'), next = open('Next');
-  if (!inbox.length && !next.length) return '';
 
   const active = Object.keys(sections).filter(s => s !== 'Done').flatMap(s => sections[s]);
   const checked = active.filter(l => /^- \[x\]/i.test(l)).length;
   const threshold = localDate(new Date(now.getTime() - OLD_DAYS * 86400000));
+  // 剪定の時期: Done の完了日が保持期間（OLD_DAYS）より前の行（gtd-list 3 節のしきい値と同じく厳密に前）
+  const prunable = (sections.Done || []).filter(l => {
+    const m = l.match(/^- \[x\] (\d{4}-\d{2}-\d{2}) /i);
+    return m && m[1] < threshold;
+  }).length;
+  if (!inbox.length && !next.length && !promoted && !prunable) return '';
   // Someday は寝かせる箱なので「古い」に数えない（数えると常に警告が出て、対処しても消えない）
   const aging = Object.keys(sections).filter(s => s !== 'Done' && s !== 'Someday').flatMap(s => sections[s]);
   const old = aging.filter(l => {
@@ -63,8 +116,11 @@ function digest(text, now) {
   }).length;
 
   const out = ['📥 捕捉箱（今日の 1 回目の表示）', ...block('Inbox', inbox), ...block('Next', next)];
-  if (checked) out.push(`チェック済みが ${checked} 件あります（/gtd-list で Done へ移ります）`);
+  if (promoted) out.push(`✅ チェック済みの ${promoted} 件を Done へ移しました`);
+  // 昇格を見送った（見出しの二重化・読み直しで変化）ときだけ残る
+  if (checked) out.push(`チェック済みが ${checked} 件残っています（/gtd-list で Done へ移ります）`);
   if (old) out.push(`⏳ 登録から ${OLD_DAYS} 日を超えたタスクが ${old} 件あります`);
+  if (prunable) out.push(`🧹 Done に ${OLD_DAYS} 日を超えた完了が ${prunable} 件あります（/gtd-list で剪定）`);
   return out.join('\n');
 }
 
@@ -74,7 +130,16 @@ function run() {
     const today = localDate(now);
     if (shownToday(today)) return;
     if (!fs.existsSync(VAULT_PROBE) || !fs.existsSync(TASK_STORE)) return;
-    const msg = digest(fs.readFileSync(TASK_STORE, 'utf8'), now);
+    let text = fs.readFileSync(TASK_STORE, 'utf8');
+    let promoted = 0;
+    const p = promote(text, today);
+    // 書く直前に読み直し、他の writer（Obsidian・gtd-list）が書き換えていたら今回は見送る
+    if (p.count && fs.readFileSync(TASK_STORE, 'utf8') === text) {
+      fs.writeFileSync(TASK_STORE, p.text);
+      text = p.text;
+      promoted = p.count;
+    }
+    const msg = digest(text, now, promoted);
     // 出力より先に記録する（timeout で kill されても毎起動の再出力に陥らない側へ倒す）
     fs.mkdirSync(path.dirname(STATE_FILE), { recursive: true });
     fs.writeFileSync(STATE_FILE, today);
@@ -84,5 +149,5 @@ function run() {
   }
 }
 
-module.exports = { digest, run };
+module.exports = { promote, digest, run };
 if (require.main === module) run();

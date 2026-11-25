@@ -1,6 +1,6 @@
 # tasks.md フォーマット仕様
 
-タスク管理スキル（`gtd-add`, `gtd-list`, `gtd-done`）および `context-save`, `context-load` が共通で参照するフォーマット定義。
+捕捉箱を扱う `gtd-list`・SessionStart hook `gtd-digest-hook.js`・Claude の直接追記、および `context-save`, `context-load` が共通で参照するフォーマット定義。
 
 ## 2 つのストア
 
@@ -8,7 +8,7 @@
 
 | ストア | 実体（出典） | 中身 | writer | reader |
 |---|---|---|---|---|
-| **捕捉箱** | resolver `task_store`（既定 `~/ObsidianVault/00_meta/tasks.md`） | どのプロジェクトの話か決まっていない思いつき。`## Inbox` が主役 | 人（Obsidian モバイル / デスクトップ）+ `gtd-add` / `gtd-done` / `gtd-list`（Done 昇格・剪定） | `gtd-list` |
+| **捕捉箱** | resolver `task_store`（既定 `~/ObsidianVault/00_meta/tasks.md`） | どのプロジェクトの話か決まっていない思いつき。`## Inbox` が主役 | 人（Obsidian モバイル / デスクトップ）+ SessionStart hook（Done 昇格）/ `gtd-list`（Done 昇格・剪定）/ Claude の直接追記 | `gtd-list` |
 | **作業キュー** | resolver `project_task_store`（既定 `<project>/.claude/tasks.md`） | そのプロジェクトで次にやること | `context-save` + 人（`[x]` を付ける） | `context-load` |
 
 **設計意図**: 書き手が知っている文脈の場所にだけ書く。モバイルには CWD が無いので捕捉箱へ、Claude は CWD を持つのでプロジェクトの作業キューへ書く（1 ファイルに混在させると、人が見て何が重要か分からず、スキル間に暗黙結合ができる）。
@@ -20,9 +20,9 @@
 
 | スキル | 動詞 | ストア | 対象セクション |
 |---|---|---|---|
-| `gtd-add` | 追加（write） | 捕捉箱 | `## Inbox` |
 | `gtd-list` | 表示（read。副作用で `[x]` 行の Done 昇格、`@added:` の補完、Done 剪定） | 捕捉箱 | 全セクション |
-| `gtd-done` | 完了化（write） | 捕捉箱 | `## Done` へ移動 |
+| `gtd-digest-hook.js`（SessionStart） | 表示（1 日 1 回）と `[x]` 行の Done 昇格（write） | 捕捉箱 | 全セクション |
+| Claude の直接追記 | 追加（write。「TODO として残して」等の依頼） | 捕捉箱 | `## Inbox` |
 | `context-save` | 追加・整理（write） | 作業キュー | `## Next` へ追加、`[x]` 行を `## Done` へ移動、古い Done を剪定 |
 | `context-load` | 表示（read） | 作業キュー | `## Next` / `## Someday` |
 
@@ -45,7 +45,7 @@
 （人が Obsidian 上で使いたければ使う。スキルが書くのは `[x]` 行の Done 昇格と `@added:` の補完だけ）
 
 ## Done
-（gtd-done と gtd-list の昇格で完了化した分）
+（hook と gtd-list の昇格で完了化した分）
 ```
 
 セクションの順序と名称は固定。欠けている場合、スキルは該当セクションを追加してよい。
@@ -109,17 +109,17 @@ Done の保持期間は「登録日と期間」の期間と同じ（`gtd-list` �
 **期間は 30 日**。Done の保持期間と、未完了タスクを「古い」とみなすしきい値の両方に使う。日数はこの 1 か所にだけ書き、各スキルはここを参照する。
 
 - **書式**: 未完了行の末尾に `@added:YYYY-MM-DD`（`- [ ] タイトル @added:2026-10-01`）。タイトルの文字数には数えない
-- **付ける**: 行を新しく書くスキル（`gtd-add`・`context-save`）は当日の日付を付ける
+- **付ける**: 行を新しく書く処理（捕捉箱への直接追記・`context-save`）は当日の日付を付ける
 - **補う**: 走査するスキル（`gtd-list`・`context-save`）は、`@added:` の無い未完了行に当日の日付を補う。モバイルの QuickAdd や人が手で足した行も、次の実行で「初めて見た日」が付く
 - **外す**: Done へ移すときは `@added:` と `@captured-on-mobile` を外し、完了日だけにする
 - **知らせる**: 表示するスキル（`gtd-list`・`context-load`）は、`@added:` が期間より前の未完了行の件数を 1 行で出す: `⏳ 登録から 30 日を超えたタスクが N 件あります`。行ごとの経過日数は出さない。0 件なら出さない。捕捉箱の `## Someday` は寝かせる箱なので数えない（数えると警告が常に出て、対処しても消えない）
-- **起動時ダイジェスト**: SessionStart hook `scripts/gtd-digest-hook.js` が捕捉箱の Inbox / Next を PC ごとに 1 日 1 回表示し、「知らせる」と同じ文言を使う（読むだけで書き込まない。日数は本節をミラー）
+- **起動時ダイジェスト**: SessionStart hook `scripts/gtd-digest-hook.js` が捕捉箱の Inbox / Next を PC ごとに 1 日 1 回表示し、「知らせる」と同じ文言を使う。表示の前に `[x]` 行を Done へ移し（昇格。Obsidian 起動中で Sync に巻き戻されても行が元に戻るだけなので受け入れる）、Done の完了日が期間より前の行があれば `🧹 Done に 30 日を超えた完了が N 件あります（/gtd-list で剪定）` と知らせる。剪定と `@added:` の補完はしない（日数は本節をミラー）
 - 2026-10-01 より前から在った行の `@added:` は推定値（セッション記録が残る下限の `2026-09-01` を含む）
 
 ## タイトルの文字数規則（両ストア共通・MUST）
 
 - **1 行 60-100 文字を中心とし、150 文字を絶対上限**とする
-- 150 文字超のタイトルを書き込んではならない。`gtd-add` / `context-save` は書き込み前に文字数（タイトル本体部分）をチェックし、超過時は短縮するまで書き込みを中止する
+- 150 文字超のタイトルを書き込んではならない。捕捉箱へ書く処理と `context-save` は書き込み前に文字数（タイトル本体部分）をチェックし、超過時は短縮するまで書き込みを中止する
 - タスクストアは**タスク管理用**であり、進捗ログ / 判断メモ / コミット履歴を書く場所ではない。詳細は逃がす:
   - 進行中の作業状態・判断メモ → `.claude/context.md` / `.claude/progress.md`
   - 完了内容・コミット ID → git log / コミットメッセージ
@@ -146,7 +146,7 @@ QuickAdd プラグインの `Quick Task` choice は、次の設定で Inbox に�
 - Capture format: `- [ ] #project/global {{VALUE}} @captured-on-mobile  ` + 改行
 - 挿入位置: `<!-- inbox-anchor -->` 行の直後（`insertAfter.after`）。見つからないときは作らない（`createIfNotFound: false`）
 
-**`<!-- inbox-anchor -->` 行はどの処理でも消さない・動かさない（MUST）**。消えるとモバイルからの捕捉が止まる。PC の `gtd-add` は Inbox の末尾に足すので、Inbox の並びはモバイル分が上、PC 分が下になる。
+**`<!-- inbox-anchor -->` 行はどの処理でも消さない・動かさない（MUST）**。消えるとモバイルからの捕捉が止まる。PC から足すときは Inbox の末尾に足すので、Inbox の並びはモバイル分が上、PC 分が下になる。
 iOS では Advanced URI 経由でショートカット.app から 1 タップ起動可能:
 
 ```
@@ -181,7 +181,7 @@ Done は 30 日で剪定され、各日の Daily Note の `## Done アーカイ�
 
 共通原則は `~/.claude/skills/shared/multi-writer.md` を SSOT とし、tasks.md 固有の適用だけを以下に定める。
 
-- ファイルが存在しない場合、初期テンプレートを生成してよいのは捕捉箱では `gtd-add`、作業キューでは `context-save`
+- ファイルが存在しない場合、初期テンプレートを生成してよいのは捕捉箱では Claude の直接追記、作業キューでは `context-save`
 - Done セクションは追記のみ（新しいものが上）。セクション間の移動は「移動先へ挿入 → 元の行を削除」の順にする（途中で止まっても行が消えず重複で済む）
 - **捕捉箱は Obsidian 起動中なら 1 行警告する**（WSL のみ・ブロックしない）: 書き込み前に `tasklist.exe /FI "IMAGENAME eq Obsidian.exe"` で起動を確かめ、起動中なら `⚠️ Obsidian が起動中です。外部編集が Sync で巻き戻る場合があります` と添えてから書く。1 行の小さな編集は残ることが多いので止めはしない。複数行の書き換え（推定日の一括付与など）は終了してもらってから行う。`gtd-list` の Done 剪定（削除を伴う lossy 処理）は起動中なら見送る（memory `feedback_obsidian-sync-external-edit-conflict`）
 - **重複セクションの検出**: 同名のセクション見出しが **2 回以上出現**する場合、Sync 競合等でファイルが二重化している疑いがある。セクションを anchor に編集すると意図しない側をサイレントに書き換えるため、**自動編集せずユーザーに警告**し、競合解消を促す
