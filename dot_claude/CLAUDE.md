@@ -99,7 +99,7 @@ GOをもらってから進める。
 - **Codex への引き継ぎに専用コマンドは無い**: `/context-save` が `.claude/handoff.md` を毎回書き、Codex 側の `context-load` が読む（逆向きも同じ。同じ working tree なのでファイル転送は不要）
 - 捕捉箱（`~/ObsidianVault/00_meta/tasks.md`）: 追加=`/gtd-add` / 完了=`/gtd-done` / 一覧=`/gtd-list`（いずれも手動専用。一覧は `--all` / `--done [N]`）。「TODO として残して」等の依頼でも捕捉箱へは `/gtd-add` を案内する。「このプロジェクトの残タスクは？」には答えない（作業キュー `.claude/tasks.md` は `/context-load` が表示する）
 - 日報・週報メール=`/obsidian-mail`（手動専用・ルーティーン経由）
-- 朝会の業務報告（前営業日の ks-kentem 分を Issue 単位の短い箇条書きに）=`/ks-standup`（手動専用。`[YYYY-MM-DD]`）
+- 朝会の業務報告（前営業日の会社分（ks-kentem・kentem-*）を、リポジトリ別・Issue 別に時刻つきで並べる）=`/ks-standup`（手動専用。`[YYYY-MM-DD]`）
 - 図解: 概念・コードを使い捨ての図解 HTML にする=`/eli5`（手動専用。残す文書は `/spec-writer`）
 - 画像: 日本語の一言から AI っぽさを削った画像生成用の英語プロンプトを 1 本組み立てる=`/image-prompt`（手動専用。画像自体は生成しない）
 - LLM っぽい語彙の禁止リスト `skills/shared/llm-tone.md` は `japanese-doc-style`（論証文書）だけが執筆中に参照する。`japanese-article-style`（一人称の記事）は書いた後に grep で点検する（経緯は `docs/japanese-article-style-retired.md`）
