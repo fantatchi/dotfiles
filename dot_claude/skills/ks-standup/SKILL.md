@@ -59,7 +59,7 @@ gh api 'search/issues?q=org:ks-kentem+user:kentem-at-kato+involves:kentem-at-kat
 - 正式なレビューを出さず実機確認だけした PR は search に出ないので、作業ログを根拠に足す（状態は「実機確認まで」とし、5 節の要確認にも回す）
 - レビューした PR は作成者（`author.login`）・自分のレビューの種別（APPROVED / COMMENTED / CHANGES_REQUESTED）・今の state・紐づく Issue（`closingIssuesReferences`）を取る。報告では作成者を「〇〇さん」と姓で書く（作業ログの呼び方に合わせる。ログに出てこない人はログイン名の姓の部分を使う）
 - **出来事の時刻を集める**（4 節は時刻順に並べるため）。対象日（JST）に入るものだけを拾い、JST の `HH:MM` に直す:
-  - 自分の PR: 作成（Draft で作ったときは `ready_for_review` の時刻）・マージ（`mergedAt`。`mergedBy` が自分のときだけ）・対象日のコミット（最後のコミットの時刻。何をしたかは作業ログから取る）
+  - 自分の PR: 作成（Draft で作ったときは `ready_for_review` の時刻）・マージ（`mergedAt`。`mergedBy` が自分のときだけ）・対象日のコミット（最後のコミットの時刻。何をしたかは作業ログから取る）。親に方針のコメントが無いときは、最初のコミットの時刻も取る（4 節の「実装を開始」）
     ```bash
     gh pr view <n> -R <owner>/<repo> --json createdAt,isDraft,mergedAt,mergedBy
     gh api 'repos/<owner>/<repo>/issues/<n>/timeline?per_page=100' --jq '[.[] | select(.event=="ready_for_review") | .created_at]'
@@ -82,6 +82,7 @@ gh api 'search/issues?q=org:ks-kentem+user:kentem-at-kato+involves:kentem-at-kat
 ```
 **11/24（火）作業報告**
 
+**cloud-cmp**
 - #1274 略図の拡張子が重複して表示される
   - 09:26 Redmine に対応方法を記載
   - 09:55 PR #1719 をマージ → クローズ
@@ -98,13 +99,20 @@ gh api 'search/issues?q=org:ks-kentem+user:kentem-at-kato+involves:kentem-at-kat
   - 11:20 マージ
 - #1232 照合で未確定のまま画面を離れても確認が出ない（勝亦さん担当）
   - 16:34 PR #1727 を実機確認のうえ Approve → 今朝マージ、クローズ
+
+**ks-access-log-analyzer（kala）**
+- PR #32 レポートに「課題と次の一手」タブを足す
+  - 13:10 実装を開始
+  - 17:27 課題を AI でなくルールで出す形にして実装し、PR を作成 → 未マージ（レビュー依頼なし）
 ```
 
 （#1730 は Issue の無い PR の書き方を示す例で、11/24 の実績には無い。ほかは 11/24 分の抜粋）
 
 規則:
-- **Issue を親の行（`#<Issue> <題>`）にし、その日の出来事を子の行（`<時刻> <出来事>`）に時刻順で並べる**。時刻は JST の `HH:MM`。見出しは付けない
-- 親の行は、その Issue の**最初の出来事の時刻順**に並べる。同じ時刻なら次の出来事が早い順
+- **リポジトリ名を太字の見出しにし、その下に Issue を親の行（`#<Issue> <題>`）、その日の出来事を子の行（`<時刻> <出来事>`）として時刻順に並べる**。時刻は JST の `HH:MM`
+- リポジトリの見出しは正式なリポジトリ名にし、ふだんの呼び名があれば括弧で添える（`ks-access-log-analyzer（kala）`）。1 リポジトリだけの日も見出しを出す
+- リポジトリは、その中の**最初の出来事の時刻順**に並べる。親の行も同じく、その Issue の最初の出来事の時刻順。同じ時刻なら次の出来事が早い順
+- 親に方針のコメントが無いときは、最初のコミットの時刻で「実装を開始」の子の行を足す（方針のコメントがあれば、それが着手の時刻を示すので足さない）
 - PR は子の行の中に `PR #<n>` で書く。レビューした PR も紐づく Issue を親にし、担当者を「（〇〇さん担当）」と添える
 - **Issue に紐づかない PR**（自分の PR・レビューした PR とも）は親の行を `PR #<n> <PR の題>` にし、Issue と同じ並びに混ぜる
 - 「→ 今の状態」は、その親の最後の子の行にだけ付ける（クローズ / レビュー待ち / 指摘の未対応 / 未マージ など、今の時点の値）
