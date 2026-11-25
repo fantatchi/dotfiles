@@ -1,6 +1,6 @@
 ---
 name: ks-standup
-description: '朝会で読み上げる業務報告を作る。前営業日（または指定日）の org ks-kentem 分だけを、作業ログと GitHub の実績から「完了 / 対応中 / レビュー」の短い箇条書きにする。自分の担当分は Issue 単位、レビューは PR 単位。`/ks-standup [YYYY-MM-DD]` で明示呼び出しする（自動発火しない）。'
+description: '朝会で読み上げる業務報告を作る。前営業日（または指定日）の業務分（org ks-kentem と会社アカウント kentem-* のリポジトリ）だけを、作業ログと GitHub の実績から Issue ごとに時刻つきの出来事を並べた箇条書きにする。`/ks-standup [YYYY-MM-DD]` で明示呼び出しする（自動発火しない）。'
 argument-hint: '[YYYY-MM-DD]'
 disable-model-invocation: true
 allowed-tools: Read, Bash(date:*), Bash(ls:*), Bash(gh:*)
@@ -8,7 +8,7 @@ allowed-tools: Read, Bash(date:*), Bash(ls:*), Bash(gh:*)
 
 # ks-standup — 朝会の業務報告
 
-前営業日の業務を、朝会でそのまま読み上げられる粒度の箇条書きにして**ターミナルに出す**（ファイルには保存しない）。業務の範囲は GitHub の org `ks-kentem` に関わるものだけ。kabuto・yoroi・genjuu などの業務外は、作業ログがあっても出さない（名前の除外リストではなく org で絞るので、新しい業務外プロジェクトが増えても漏れない）。
+前営業日の業務を、朝会でそのまま読み上げられる粒度の箇条書きにして**ターミナルに出す**（ファイルには保存しない）。業務の範囲は、GitHub の org `ks-kentem` と、会社アカウント `kentem-*`（自分は `kentem-at-kato`）が持つリポジトリに関わるものだけ（`kentem-*` は会社での作業。2026-11-25 ユーザー確認。kala = `kentem-at-kato/ks-access-log-analyzer` がこれに当たる）。kabuto・yoroi・genjuu などの業務外は、作業ログがあっても出さない（名前の除外リストではなくリポジトリの持ち主で絞るので、新しい業務外プロジェクトが増えても漏れない）。
 
 全プロジェクトを Obsidian に記録するのは `obsidian-daily` の役目で、本スキルはそれと出口が違う（口頭報告用・業務分だけ）。
 
@@ -28,7 +28,7 @@ d=$(date -d yesterday +%F); while [ "$(date -d "$d" +%u)" -ge 6 ]; do d=$(date -
 
 `~/ObsidianVault/20_log/<YM>/` のうち、ファイル名が `<D8>` で始まるものを全部 Read する（日をまたいだセッションは翌日付のファイル名になることがあるので、本文の `date:` が `<D>` のものも拾う）。
 
-業務分の判定: 本文に `ks-kentem/` のリポジトリ・PR / Issue の URL が出てくる、または frontmatter の `project` が ks-kentem のリポジトリ名（cloud-cmp・specmaster-search-dialog など）であるログだけを残す。判断がつかないログは報告に入れず、6 節の「要確認」に「業務分か判定できなかったログ」として名前を出す。
+業務分の判定: 本文に `ks-kentem/` か `kentem-*/` のリポジトリ・PR / Issue の URL が出てくる、または frontmatter の `project` のリポジトリの持ち主が `ks-kentem` か `kentem-*` であるログだけを残す（cloud-cmp・specmaster-search-dialog・ks-access-log-analyzer など。持ち主が分からなければ、手元の clone の `git remote get-url origin` で確かめる）。判断がつかないログは報告に入れず、6 節の「要確認」に「業務分か判定できなかったログ」として名前を出す。
 
 ## 3. GitHub で状態を確かめる
 
@@ -36,22 +36,24 @@ d=$(date -d yesterday +%F); while [ "$(date -d "$d" +%u)" -ge 6 ]; do d=$(date -
 
 search クエリの罠（先頭スラッシュを付けない、日付範囲は JST で `+` を `%2B` にする）は `~/.claude/skills/obsidian-daily/SKILL.md` の「クエリの罠」と同じ。範囲は**対象日以降すべて** `%3E%3D<D>T00:00:00%2B09:00`（`>=`。以下 `<R>`）。`updated:` は最終更新日時なので、対象日だけに絞ると、その日に手を動かしたあと翌日以降に更新された PR が漏れる（2026-11-20 分で、指摘対応した PR #1723 が 11/23 の更新で漏れた）。対象日より後の分は下の絞り込みで落とす。
 
+`org:` と `user:` を並べると OR になる（2026-11-25 に 7 件 + 1 件 = 8 件で確認）。ほかの `kentem-*` アカウントのリポジトリはワイルドカードで検索できないので、作業ログに出てきたときだけ `user:<そのアカウント>` を足す。以下の `<owner>` はリポジトリの持ち主（`ks-kentem` / `kentem-at-kato` など）。
+
 逐次実行する（search の rate limit が 30 req/min のため）:
 
 ```bash
-gh api 'search/issues?q=org:ks-kentem+author:kentem-at-kato+type:pr+updated:<R>&per_page=100' --jq '.items[] | [.number, .repository_url, .state, .title] | @tsv'
-gh api 'search/issues?q=org:ks-kentem+reviewed-by:kentem-at-kato+type:pr+updated:<R>&per_page=100' --jq '.items[] | [.number, .repository_url, .user.login, .state, .title] | @tsv'
-gh api 'search/issues?q=org:ks-kentem+involves:kentem-at-kato+type:issue+updated:<R>&per_page=100' --jq '.items[] | [.number, .repository_url, .state, .title] | @tsv'
+gh api 'search/issues?q=org:ks-kentem+user:kentem-at-kato+author:kentem-at-kato+type:pr+updated:<R>&per_page=100' --jq '.items[] | [.number, .repository_url, .state, .title] | @tsv'
+gh api 'search/issues?q=org:ks-kentem+user:kentem-at-kato+reviewed-by:kentem-at-kato+type:pr+updated:<R>&per_page=100' --jq '.items[] | [.number, .repository_url, .user.login, .state, .title] | @tsv'
+gh api 'search/issues?q=org:ks-kentem+user:kentem-at-kato+involves:kentem-at-kato+type:issue+updated:<R>&per_page=100' --jq '.items[] | [.number, .repository_url, .state, .title] | @tsv'
 ```
 
 - 候補には他人の更新や対象日より後の作業も混ざるので、自分の PR は「対象日（JST）に自分のコミットがある・作成した・マージした」か作業ログに出てくるものだけを残す。Issue は作業ログと突き合わせる。コミットの数え方:
   ```bash
-  gh api 'repos/ks-kentem/<repo>/pulls/<n>/commits?per_page=100' --jq '[.[] | select(.commit.author.date >= "<D-1>T15:00:00Z" and .commit.author.date < "<D>T15:00:00Z")] | length'
+  gh api 'repos/<owner>/<repo>/pulls/<n>/commits?per_page=100' --jq '[.[] | select(.commit.author.date >= "<D-1>T15:00:00Z" and .commit.author.date < "<D>T15:00:00Z")] | length'
   ```
-- 自分の PR は `gh pr view <n> -R ks-kentem/<repo> --json closingIssuesReferences,state` で Issue にまとめ、Issue の state を `gh issue view` で**今の時点の値**として取る
+- 自分の PR は `gh pr view <n> -R <owner>/<repo> --json closingIssuesReferences,state` で Issue にまとめ、Issue の state を `gh issue view` で**今の時点の値**として取る
 - **レビューの正は提出日時**: ブラウザだけでしたレビューは作業ログに残らない（2026-11-16 は Approve 5 件のうち 3 件がログに無かった）。2 本目の search の候補それぞれについて、自分のレビューの `submitted_at` が対象日（JST）に入るかを確かめ、入るものだけを残す。自分の PR（スレッドへの返信もレビュー扱いで当たる）は除く
   ```bash
-  gh api 'repos/ks-kentem/<repo>/pulls/<n>/reviews' --jq '[.[] | select(.user.login=="kentem-at-kato") | select(.submitted_at >= "<D-1>T15:00:00Z" and .submitted_at < "<D>T15:00:00Z") | .state] | join(",")'
+  gh api 'repos/<owner>/<repo>/pulls/<n>/reviews' --jq '[.[] | select(.user.login=="kentem-at-kato") | select(.submitted_at >= "<D-1>T15:00:00Z" and .submitted_at < "<D>T15:00:00Z") | .state] | join(",")'
   ```
   （`<D-1>` は対象日の前日。JST の 0 時は UTC の前日 15 時）
 - 正式なレビューを出さず実機確認だけした PR は search に出ないので、作業ログを根拠に足す（状態は「実機確認まで」とし、5 節の要確認にも回す）
@@ -59,12 +61,12 @@ gh api 'search/issues?q=org:ks-kentem+involves:kentem-at-kato+type:issue+updated
 - **出来事の時刻を集める**（4 節は時刻順に並べるため）。対象日（JST）に入るものだけを拾い、JST の `HH:MM` に直す:
   - 自分の PR: 作成（Draft で作ったときは `ready_for_review` の時刻）・マージ（`mergedAt`。`mergedBy` が自分のときだけ）・対象日のコミット（最後のコミットの時刻。何をしたかは作業ログから取る）
     ```bash
-    gh pr view <n> -R ks-kentem/<repo> --json createdAt,isDraft,mergedAt,mergedBy
-    gh api 'repos/ks-kentem/<repo>/issues/<n>/timeline?per_page=100' --jq '[.[] | select(.event=="ready_for_review") | .created_at]'
+    gh pr view <n> -R <owner>/<repo> --json createdAt,isDraft,mergedAt,mergedBy
+    gh api 'repos/<owner>/<repo>/issues/<n>/timeline?per_page=100' --jq '[.[] | select(.event=="ready_for_review") | .created_at]'
     ```
   - 自分の Issue へのコメント（方針の共有など）: 最初に書いた時刻（`created_at`）
     ```bash
-    gh api 'repos/ks-kentem/<repo>/issues/<n>/comments?per_page=100' --jq '.[] | select(.user.login=="kentem-at-kato") | .created_at'
+    gh api 'repos/<owner>/<repo>/issues/<n>/comments?per_page=100' --jq '.[] | select(.user.login=="kentem-at-kato") | .created_at'
     ```
   - レビュー: 上で確かめた `submitted_at`
   - 開いている自分の PR は、対象日より後に他人から付いたレビューも取る（「→ 今の状態」に使う）
@@ -111,7 +113,7 @@ gh api 'search/issues?q=org:ks-kentem+involves:kentem-at-kato+type:issue+updated
 - Redmine の記載は Issue ごとに子の行として入れる（1 ファイルに複数の Issue 分を書いたときは、どれも同じ時刻になる）
 - 実機確認は、本人が「済」と言ったものだけ、修正やレビューの子の行に「（実機確認済み）」「実機確認のうえ」と添える
 - GitHub にも `.claude/pr/` のファイルにも時刻が残らない作業（作業ログにしか無いもの）は本文に入れず、6 節の「要確認」に回す
-- 業務分が 0 件なら、引数なしのときは 1 節の祝日判定で前の平日へ戻る。引数で指定した日が 0 件なら「<D> の ks-kentem 分の作業ログ・GitHub 実績は見つからなかった」とだけ返す
+- 業務分が 0 件なら、引数なしのときは 1 節の祝日判定で前の平日へ戻る。引数で指定した日が 0 件なら「<D> の業務分の作業ログ・GitHub 実績は見つからなかった」とだけ返す
 
 ## 5. gh で確かめられない事項は本文に書かない
 
