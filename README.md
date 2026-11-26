@@ -41,7 +41,12 @@ chezmoi init --apply fantatchi
 |------|---------|------|
 | zsh | `.zshrc`, `.zsh/` | oh-my-zsh（プラグイン: git のみ） |
 | vim | `.vimrc`, `.vim/` | プラグインレス |
-| Claude Code | `.claude/` | 設定・スキル・スクリプト |
+| Claude Code | `.claude/` | 設定・スキル・mod・hook スクリプト |
+| Codex | `.codex/`, `.agents/skills/` | 作業規約・hooks・ユーザー Skill（[Codex 設定を他 PC に展開する](#codex-設定を他-pc-に展開する) を参照） |
+| Gemini / Antigravity | `.gemini/AGENTS.md` | `~/AGENTS.md`（共通の作業規約）へのシンボリックリンク |
+| Muse 用ラッパー | `.local/bin/muse-run`, `muse-status`, `muse-usage` | ホスト名 `A8` の Linux（WSL）にだけ配る（`.chezmoiignore` の条件） |
+| 初回セットアップ | `run_once_install-packages.sh.tmpl` | oh-my-zsh・Claude Code などの導入（Windows 以外） |
+| テスト | `tests/` | hook スクリプトのテスト（chezmoi の配布対象外） |
 
 ## 環境別設定
 
@@ -124,8 +129,21 @@ Claude Code の `settings.json`・有効化済みプラグイン・このリポ�
 | `claude-code-setup@claude-plugins-official` | Claude Code の自動化（hooks / subagents / skills）推奨構成の提案 |
 | `superpowers@claude-plugins-official` | 実装フローのプロセススキル群（brainstorming / writing-plans / systematic-debugging 等） |
 | `code-simplifier@claude-plugins-official` | 変更済みコードの整理・簡素化 |
+| `prompt-rail@oikon48` | セッション中のプロンプトを一覧するレール（クリックでその位置へ移動） |
 
 セッション中のモデル切り替えは `/model sonnet` などを使用。
+
+**hooks（すべて `scripts/run-hook.js` ラッパー経由）:**
+
+| イベント | hook | 役割 |
+|---------|------|------|
+| SessionStart | `gtd-digest` | 捕捉箱のチェック済み行を 1 日 1 回 Done へ移す |
+| SessionStart | `context-inject` | `.claude/tasks.md` の Next・進行中の作業・判断メモ・handoff の要点を注入 |
+| UserPromptSubmit | `context-save-reminder` / `claude-md-audit-reminder` / `chezmoi-drift-reminder` | 保存・週次点検・chezmoi のドリフトを知らせる |
+| PostToolUse | `context-save-git-trigger` | git の commit / push の後に保存を促す |
+| Notification | `notification-hook` | デスクトップ通知（Windows は BurntToast） |
+
+Codex も `~/.codex/hooks.json` から同じ `~/.claude/scripts` の `context-inject` などを呼ぶ。
 
 **スキル一覧:**
 
@@ -141,19 +159,27 @@ Claude Code の `settings.json`・有効化済みプラグイン・このリポ�
 | `/image-prompt` † | 「こんな画像が欲しい」という日本語の一言から、AI っぽさを削った画像生成用の英語プロンプトを 1 本組み立てて返す。38 種の画風カタログ（手描き / フラット / ポップ / 印刷・版画 / 漫画 / 実務・教材）と AI っぽさ除去ブロックを内蔵し、用途から画風を自動選択。`SUBJECT / VISUAL STYLE / HUMAN-MADE CHARACTER / COMPOSITION / AVOID` の 5 ブロック構成で出力。画像自体は生成しない（Codex 側 `~/.agents/skills/` にミラーあり） |
 | `japanese-doc-style` | 論証を積む日本語文書（書籍の章・仕様書・設計ドキュメント）のスタイル規約（ロール変換型、執筆・推敲時に自動発動） |
 | `japanese-article-style` | 一人称の記事（体験記・ブログ・Obsidian 記事ノート）向けに、モデルが知り得ない環境固有の事項だけを定める: 書き手はユーザー・内輪の語の言い換え・観測範囲の明示・事実の等級・段落整形（ロール変換型、自動発動。Codex 側 `~/.agents/skills/` にミラーあり。文章一般論は 2026-10-01 の A/B 検証で撤去、`docs/japanese-article-style-retired.md`） |
-| `/ks-standup` † | 朝会の業務報告。前営業日（または `[YYYY-MM-DD]`）の org `ks-kentem` 分だけを、作業ログと GitHub の実績から「完了 / 対応中 / レビュー」の短い箇条書きにしてターミナルに出す（担当分は Issue 単位、レビューは提出日時で拾う PR 単位。gh で確かめられない事項は本文外の「要確認」へ） |
+| `/ks-standup` † | 朝会の業務報告。前営業日（または `[YYYY-MM-DD]`）の業務分（org `ks-kentem` と会社アカウント `kentem-*` のリポジトリ）だけを、作業ログと GitHub の実績から「完了 / 対応中 / レビュー」の短い箇条書きにしてターミナルに出す（担当分は Issue 単位、レビューは提出日時で拾う PR 単位。gh で確かめられない事項は本文外の「要確認」へ） |
 | `/m365-agents-ts` † | Microsoft 365 Agents SDK (TypeScript) の開発支援リファレンス |
 | `/multi-persona-review` | 3〜5 人の専門ペルソナを並列 Agent で起動して読取専用レビューを行い、見落とし・別仮説・推奨アクションを統合 |
 | `/obsidian-daily` | GitHub アクティビティと作業ログからデイリーサマリーを生成（KPI 行・リポ別コミットグルーピング・作業ログ折り畳み callout の構成）。**複数 GH アカウント (`fantatchi` + `kentem-at-kato`) 対応**。Obsidian Core Daily notes テンプレ (`90_config/templates/daily_notes.md`) を SSOT として動的読み込み、Thino プラグインとの共存を考慮した `# Journal` セクション前提 |
 | `/obsidian-log` | 作業ログを Obsidian に記録（自動記録についてはセクション参照） |
 | `/obsidian-mail` † | デイリーサマリーを Gmail SMTP でメール送信（日報・週報。`/obsidian-mail daily\|weekly [YYYY-MM-DD]` で明示呼び出し、または火〜土 8:00 / 月 8:00 のローカル routine 経由） |
 | `/obsidian-resource` † | 調査メモ・参考リンク・ブログドラフトを Obsidian Vault に保存（`/obsidian-resource auto` でセッション内容から自動ドラフト化） |
-| `/pr-review` | GitHub PR の URL または番号を渡すと、ブランチ切替・最新化、Copilot/discussion コメント取得、3-5 体のペルソナ並列レビュー、メインでの実コード裏取り、`.claude/reviews/pr-{NNN}-{branch-key}-{YYYY-MM-DD}.md` への所見草稿出力までを一気通貫で実施。投稿はしない（草稿のみ）。公式 `/code-review ultra` と棲み分け（本スキル=ローカル草稿・ペルソナ並列・MEMORY 運用ルール遵守、公式=inline 投稿）。投稿要否判断が残る所見はそのリポジトリの `.claude/tasks.md` への起票を提案（起票自体は `/context-save` の担当） |
+| `/pr-review` | GitHub PR の URL または番号を渡すと、ブランチ切替・最新化、既存レビュー・discussion コメント取得、3-5 体のペルソナ並列レビュー、メインでの実コード裏取り、`.claude/reviews/pr-{NNN}-{branch-key}-{YYYY-MM-DD}.md` への所見草稿出力までを一気通貫で実施。投稿はしない（草稿のみ）。公式 `/code-review ultra` と棲み分け（本スキル=ローカル草稿・ペルソナ並列・MEMORY 運用ルール遵守、公式=inline 投稿）。投稿要否判断が残る所見はそのリポジトリの `.claude/tasks.md` への起票を提案（起票自体は `/context-save` の担当） |
 | `/session-review` † | セッション振り返り（CLAUDE.md への知見の追記・スキルの洗練）。権限レビューと判断メモ圧縮は 2026-11-11 に外した |
 | `/session-save` | 作業ログ記録とコンテキスト保存をまとめて実行する（アウトプット提案は 2026-11-06 に撤去。リソース化は手動の `/obsidian-resource`） |
 | `/spec-writer` | 仕様書（specification / 設計ドキュメント / requirements / architecture / ADR / C4 / 用語集）の設計・作成・レビューを担うロール変換型スキル（旧 spec-design + dashboard-design を 2026-06 に統合）。読み手別入口・図種選択・ADR 形式・要件レベル語・Diátaxis 4 分類・テンプレ集を内蔵。HTML 補足ページは DADS v2.0.1 準拠（key-color = Blue 固定で JIS X 8341-3 AA 自動充足） |
 
 † = `disable-model-invocation: true`（自動発動しない手動呼び出し専用。コンテキスト注入削減のため、低頻度スキルに適用 2026-07-07）。japanese-doc-style と japanese-article-style はロール変換型のためコマンドでなく文脈で自動発動する（前者は論証を積む文書、後者は一人称の記事）。
+
+**mod（`skills/` 配下に置く Claude Code の拡張。コマンドではなく hook で動く）:**
+
+| mod | 役割 |
+|-----|------|
+| `context-autosave` | 保存リマインダーの条件を満たしたターンの後と、自動 compact の前に `context-save` を自動実行する |
+| `reminder-band` | CLAUDE.md 監査・chezmoi ドリフトのリマインダーを Claude に注入せず、入力欄の上の帯とボタンで出す |
+| `session-save-next` | `/session-save` の完了後に、続ける（`/clear` → `/context-load`）か終了（`/exit`）かを選ばせる |
 
 2026-07-07 の剪定で `frontend-patterns`（モデル既知の汎用知識）と `documentation-writer`（spec-writer と重複、Diátaxis 判断軸は `spec-writer/references/diataxis.md` へ吸収）を削除。
 
@@ -266,7 +292,7 @@ Claude で行き詰まったら Codex へ、Codex で行き詰まったら Claud
 |----------|----------|
 | `/context-save` | セッションの区切り、作業中断前 |
 | `/context-load` | プロジェクト再開時。直近の状態・判断を思い出したいとき |
-| `/session-save` | 区切りをまとめて：作業ログ（Obsidian） + コンテキスト保存 + ブログ/リソース提案 |
+| `/session-save` | 区切りをまとめて：作業ログ（Obsidian） + コンテキスト保存 |
 
 **注意点:**
 
@@ -302,7 +328,7 @@ Vault が未配置でも `chezmoi apply` は警告を出して継続するが、
 
 **自動記録:**
 
-コンテキストが圧縮される直前に、Claude が未記録の作業内容を自動で `/obsidian-log` に記録する。長いセッションでもログが漏れない。
+作業ログ（`/obsidian-log`）の自動記録はしない。自動で走るのはコンテキスト保存のほうで、mod の `context-autosave` が、保存リマインダーの条件を満たしたターンの後と自動 compact の前に `context-save` を実行する。作業ログを残すときは `/obsidian-log` か `/session-save` を使う。
 
 **保存先フォルダ（自動作成される）:**
 
@@ -320,16 +346,26 @@ Vault が未配置でも `chezmoi apply` は警告を出して継続するが、
 
 Vault 本体は Windows の `C:\Users\<username>\ObsidianVault` に配置。
 
-- メモの同期は Obsidian の git 拡張機能（obsidian-git プラグイン）
+- メモの同期は Obsidian Sync（全 PC・モバイル共通）
 - `.obsidian` フォルダは別リポジトリ（`fantatchi/obsidian-config`）で管理・同期
 
 ### WSL / Windows 共有構成
 
-`.claude` は Windows 側から WSL 側へのシンボリックリンクで共有している
-（`C:\Users\<username>\.claude` → `\\wsl.localhost\Ubuntu\home\<username>\.claude`）。
-そのため **chezmoi は WSL 側からのみ実行する**こと。Windows 側で
-`chezmoi apply` を走らせるとシンボリックリンクを実体ディレクトリに
-置き換えてしまい、共有構成が壊れる。
+Windows 側の `.claude` は「ハイブリッド構造」（2026-05-22 から）。
+`C:\Users\<username>\.claude` は実ディレクトリのままにし、chezmoi 管理分とホームワークスペース系だけを
+WSL 側（`\\wsl.localhost\Ubuntu\home\<username>\.claude\...`）への個別シンボリックリンクにする。
+`plugins/` などの PC 固有の状態は Windows ネイティブで持つ（Claude Code の plugin システムが
+Linux の絶対パスを書き込むため、`.claude` 丸ごとのリンクでは Windows 側が plugin を解決できない）。
+
+初回は Windows PowerShell で次を実行する（`-WhatIf` で内容確認のみ）。以降に増えた管理ファイルのリンクは
+`scripts/powershell-utf8-profile.ps1` が起動時に補完する。
+
+```powershell
+powershell -ExecutionPolicy Bypass -File '\\wsl.localhost\Ubuntu\home\<wsl-user>\.claude\scripts\setup-windows-claude.ps1'
+```
+
+**chezmoi は WSL 側からのみ実行する**こと。Windows 側で `chezmoi apply` を走らせると
+リンクを実体ファイルに置き換えてしまい、共有構成が壊れる。
 
 `.chezmoiscripts/*.ps1.tmpl` は `.chezmoi.os == "windows"` の分岐で
 Windows 側で chezmoi を実行したときのみ評価されるため、上記の WSL 実行
