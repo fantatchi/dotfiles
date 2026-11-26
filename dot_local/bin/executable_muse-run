@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+# muse-run <agent> <project> <prompt-file>
+# Starts an agent non-interactively inside tmux session muse-<project> on a8.
+# Exit 75 = busy (lock held / session running / local interactive agent in project)
+set -u
+
+AGENTS="claude codex agy"
+
+if [ "${1:-}" = "--inner" ]; then
+  # --- inner mode: runs inside tmux, holds the lock while the agent runs ---
+  agent="$2"; project="$3"; prompt_file="$4"
+  projdir="$HOME/work/$project"
+  cd "$projdir" || exit 70
+  mkdir -p "$projdir/.claude" "$HOME/.muse/logs"
+  exec 9>"$projdir/.claude/.muse.lock"
+  if ! flock -n 9; then
+    echo "muse-run: lock held for $project" >&2; exit 75
+  fi
+  # local interactive agent check: any claude/codex/agy process (not us / not our tmux pane)
+  # whose cwd is this project and which is not the process we are about to start.
+  myppid_chain="$$,$PPID"
+  for p in /proc/[0-9]*; do
+    pid="${p#/proc/}"
+    [ "$pid" = "$$" ] && continue
+    cwd="$(readlink "$p/cwd" 2>/dev/null || true)"
+    [ "$cwd" = "$projdir" ] || continue
+    comm="$(cat "$p/comm" 2>/dev/null || true)"
+    case "$comm" in
+      claude|codex|agy)
+        # ignore processes that are children of this tmux pane (none yet at this point)
+        echo "muse-run: local interactive $comm (pid $pid) in $projdir" >&2
+        exit 75
+        ;;
+    esac
+  done
+  prompt="$(cat "$prompt_file")"
+  ts="$(date +%Y%m%d-%H%M%S)"
+  log="$HOME/.muse/logs/${ts}-${project}-${agent}.log"
+  start_epoch="$(date +%s)"
+  echo "[muse-run] agent=$agent project=$project start=$(date -Is) log=$log" | tee "$log"
+  set +e
+  case "$agent" in
+    claude) claude -p --permission-mode auto --output-format stream-json --verbose "$prompt" 2>&1 | tee -a "$log" ;;
+    codex)  codex exec -C "$projdir" -s workspace-write --json "$prompt" 2>&1 | tee -a "$log" ;;
+    agy)    agy --mode auto --output-format stream-json -p "$prompt" 2>&1 | tee -a "$log" ;;
+  esac
+  rc=${PIPESTATUS[0]}
+  set -e
+  end_epoch="$(date +%s)"
+  dur=$((end_epoch - start_epoch))
+  status="$(grep -aoE 'status[^a-z]{0,8}(done|blocked|needs_confirmation|failed)' "$log" | tail -1 | grep -oE '(done|blocked|needs_confirmation|failed)$' || true)"
+  [ -n "$status" ] || status="exit_$rc"
+  jq -cn --arg ts "$(date -Is)" --arg agent "$agent" --arg project "$project" \
+    --argjson exit_code "$rc" --argjson duration_sec "$dur" --arg log "$log" --arg status "$status" \
+    '{ts:$ts, agent:$agent, project:$project, exit_code:$exit_code, duration_sec:$duration_sec, log:$log, status:$status}' \
+    >> "$HOME/.muse/runs.jsonl"
+  echo "[muse-run] done exit=$rc duration=${dur}s status=$status" | tee -a "$log"
+  exit "$rc"
+fi
+
+# --- outer mode ---
+if [ $# -ne 3 ]; then
+  echo "usage: muse-run <claude|codex|agy> <project> <prompt-file>" >&2; exit 64
+fi
+agent="$1"; project="$2"; prompt_file="$3"
+case " $AGENTS " in *" $agent "*) ;; *) echo "unknown agent: $agent" >&2; exit 64;; esac
+case "$project" in *[!A-Za-z0-9._-]*|"") echo "bad project name: $project" >&2; exit 64;; esac
+[ -f "$prompt_file" ] || { echo "prompt file not found: $prompt_file" >&2; exit 66; }
+prompt_abs="$(readlink -f "$prompt_file")"
+projdir="$HOME/work/$project"
+if [ ! -d "$projdir" ]; then
+  mkdir -p "$projdir"
+  (cd "$projdir" && git init -q)
+fi
+mkdir -p "$projdir/.claude" "$HOME/.muse/logs"
+# local interactive agent pre-check (inner re-checks as well)
+for p in /proc/[0-9]*; do
+  cwd="$(readlink "$p/cwd" 2>/dev/null || true)"
+  [ "$cwd" = "$projdir" ] || continue
+  comm="$(cat "$p/comm" 2>/dev/null || true)"
+  case "$comm" in
+    claude|codex|agy)
+      echo "muse-run: local interactive $comm in $projdir" >&2; exit 75 ;;
+  esac
+done
+session="muse-$project"
+if tmux has-session -t "$session" 2>/dev/null; then
+  echo "muse-run: session $session already running" >&2; exit 75
+fi
+# fast lock pre-check (inner re-checks under the held lock)
+exec 9>"$projdir/.claude/.muse.lock"
+if ! flock -n 9; then echo "muse-run: lock held for $project" >&2; exit 75; fi
+flock -u 9; exec 9>&-
+self="$(readlink -f "$0")"
+tmux new-session -d -s "$session" -c "$projdir" \
+  "bash '$self' --inner '$agent' '$project' '$prompt_abs'; echo '[muse-run session end]'; sleep 5"
+echo "started: session=$session agent=$agent project=$project"
+echo "attach: tmux attach -t $session"

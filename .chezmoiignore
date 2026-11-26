@@ -18,3 +18,8 @@ tests/**
 .claude/skills/*/.claude-plugin/types
 .claude/skills/*/.claude-plugin/types/**
 .claude/skills/*/tsconfig.json
+
+# Muse 用のラッパー（muse-run / muse-status / muse-usage）は a8 の WSL だけに配る
+{{ if or (ne .chezmoi.hostname "A8") (ne .chezmoi.os "linux") }}
+.local/bin/muse-*
+{{ end }}

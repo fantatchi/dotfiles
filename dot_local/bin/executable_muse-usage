@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# muse-usage: best-effort usage info as JSON. Unknown values are null (see instructions sec.6-2).
+set -u
+python3 - <<'PY'
+import json, glob, os, re
+out = {"agents": {}}
+# Codex: latest non-empty rate_limits in session logs
+rate = None
+files = sorted(glob.glob(os.path.expanduser("~/.codex/sessions/**/*.jsonl"), recursive=True), key=lambda p: os.path.getmtime(p) if os.path.exists(p) else 0)
+for path in reversed(files[-20:]):
+    try:
+        with open(path, errors="replace") as f:
+            for line in f:
+                if "rate_limits" in line:
+                    try:
+                        obj = json.loads(line)
+                    except Exception:
+                        continue
+                    # find rate_limits anywhere nested (shallow scan of the line's json)
+                    def find(o):
+                        if isinstance(o, dict):
+                            if "rate_limits" in o and o["rate_limits"]:
+                                return o["rate_limits"]
+                            for v in o.values():
+                                r = find(v)
+                                if r: return r
+                        elif isinstance(o, list):
+                            for v in o:
+                                r = find(v)
+                                if r: return r
+                        return None
+                    r = find(obj)
+                    if r: rate = r
+        if rate: break
+    except OSError:
+        continue
+out["agents"]["codex"] = {"rate_limits": rate, "source": "~/.codex/sessions/**/*.jsonl" if rate else None}
+out["agents"]["claude"] = {"rate_limits": None, "note": "no non-interactive source confirmed yet"}
+out["agents"]["agy"] = {"rate_limits": None, "note": "no non-interactive source confirmed yet"}
+# run counts from runs.jsonl
+runs = {}
+rp = os.path.expanduser("~/.muse/runs.jsonl")
+if os.path.exists(rp):
+    with open(rp, errors="replace") as f:
+        for line in f:
+            try: o = json.loads(line)
+            except Exception: continue
+            a = o.get("agent"); runs[a] = runs.get(a, 0) + 1
+out["runs_recorded"] = runs
+print(json.dumps(out, ensure_ascii=False, indent=2))
+PY

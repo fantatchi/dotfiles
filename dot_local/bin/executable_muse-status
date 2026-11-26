@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# muse-status [project]
+set -u
+project="${1:-}"
+echo "== tmux sessions =="
+tmux list-sessions 2>/dev/null | grep -E '^muse-' || echo "(none)"
+echo
+echo "== locks =="
+found=0
+for lock in "$HOME"/work/*/.claude/.muse.lock; do
+  [ -e "$lock" ] || continue
+  proj="$(basename "$(dirname "$(dirname "$lock")")")"
+  if [ -n "$project" ] && [ "$proj" != "$project" ]; then continue; fi
+  found=1
+  if flock -n "$lock" -c true 2>/dev/null; then state="free"; else state="HELD"; fi
+  echo "$proj: $state ($lock)"
+done
+[ "$found" = 0 ] && echo "(none)"
+echo
+echo "== recent log (last 20 lines) =="
+if [ -n "$project" ]; then
+  latest="$(ls -t "$HOME/.muse/logs/"*"-${project}-"*.log 2>/dev/null | head -1 || true)"
+else
+  latest="$(ls -t "$HOME/.muse/logs/"*.log 2>/dev/null | head -1 || true)"
+fi
+if [ -n "${latest:-}" ] && [ -f "$latest" ]; then
+  echo "-- $latest"
+  tail -n 20 "$latest"
+else
+  echo "(no logs)"
+fi
+echo
+echo "== recent runs =="
+tail -n 5 "$HOME/.muse/runs.jsonl" 2>/dev/null || echo "(none)"
