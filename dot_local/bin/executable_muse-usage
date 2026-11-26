@@ -35,7 +35,31 @@ for path in reversed(files[-20:]):
     except OSError:
         continue
 out["agents"]["codex"] = {"rate_limits": rate, "source": "~/.codex/sessions/**/*.jsonl" if rate else None}
-out["agents"]["claude"] = {"rate_limits": None, "note": "no non-interactive source confirmed yet"}
+# Claude: latest rate_limit_event in muse-run stream-json logs (~/.muse/logs/*-claude.log)
+crate = None; csrc = None
+cfiles = sorted(glob.glob(os.path.expanduser("~/.muse/logs/*-claude.log")), key=lambda q: os.path.getmtime(q) if os.path.exists(q) else 0)
+for path in reversed(cfiles):
+    try:
+        with open(path, errors="replace") as f:
+            for line in f:
+                if '"rate_limit_event"' not in line:
+                    continue
+                try:
+                    obj = json.loads(line)
+                except Exception:
+                    continue
+                info = obj.get("rate_limit_info") or {}
+                uw = info.get("unifiedWindows") or {}
+                if uw:
+                    def win(w):
+                        if not isinstance(w, dict): return None
+                        return {"utilization": w.get("utilization"), "status": w.get("status"), "resetsAt": w.get("resetsAt")}
+                    crate = {"five_hour": win(uw.get("five_hour")), "seven_day": win(uw.get("seven_day")), "rateLimitType": info.get("rateLimitType"), "overageStatus": info.get("overageStatus")}
+                    csrc = path
+        if crate: break
+    except OSError:
+        continue
+out["agents"]["claude"] = {"rate_limits": crate, "source": csrc} if crate else {"rate_limits": None, "note": "no rate_limit_event found in ~/.muse/logs/*-claude.log"}
 out["agents"]["agy"] = {"rate_limits": None, "note": "no non-interactive source confirmed yet"}
 # run counts from runs.jsonl
 runs = {}

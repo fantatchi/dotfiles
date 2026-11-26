@@ -23,7 +23,7 @@ if [ "${1:-}" = "--inner" ]; then
     pid="${p#/proc/}"
     [ "$pid" = "$$" ] && continue
     cwd="$(readlink "$p/cwd" 2>/dev/null || true)"
-    [ "$cwd" = "$projdir" ] || continue
+    case "$cwd" in "$projdir"|"$projdir"/*) ;; *) continue ;; esac
     comm="$(cat "$p/comm" 2>/dev/null || true)"
     case "$comm" in
       claude|codex|agy)
@@ -76,7 +76,7 @@ mkdir -p "$projdir/.claude" "$HOME/.muse/logs"
 # local interactive agent pre-check (inner re-checks as well)
 for p in /proc/[0-9]*; do
   cwd="$(readlink "$p/cwd" 2>/dev/null || true)"
-  [ "$cwd" = "$projdir" ] || continue
+  case "$cwd" in "$projdir"|"$projdir"/*) ;; *) continue ;; esac
   comm="$(cat "$p/comm" 2>/dev/null || true)"
   case "$comm" in
     claude|codex|agy)
