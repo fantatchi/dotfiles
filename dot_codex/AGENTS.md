@@ -78,7 +78,7 @@
 - API key、token、password などの認証情報のハードコード。
 - HTTP 認証情報を含む `Authorization: Basic ...` ヘッダや `https://user:pass@host/` 形式の URL。
 - メールアドレス、電話番号、口座情報、医療データなどの個人情報。テスト用には `user1@example.com` など予約ドメインのダミー値を使う。
-- 破壊的 SQL の無確認実行。特に `DELETE FROM ...` の WHERE 句なし、`DROP TABLE`、`TRUNCATE` は確認必須。
+- 破壊的 SQL の無確認実行。特に `DELETE FROM ...` の WHERE 句なし、`DROP TABLE`、`TRUNCATE` はステージングで検証してからユーザーに確認する。
 - `NODE_ENV=production` など、本番判定や本番向け挙動への無確認切替。
 - API key やアプリパスワードを会話にも設定ファイルにも書かない。会話に貼ると履歴に残留し、`~/.codex/config.toml` などの設定ファイルに素のリテラルで書くとバックアップ・同期経路で漏れる。secrets は OS の資格情報マネージャか環境変数経由で渡し、設定ファイルにはキー名のみ書く。既に直書きがあれば rotate と環境変数化を検討する。
 

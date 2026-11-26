@@ -16,3 +16,7 @@
 .agents/skills/frontend-patterns
 .claude/skills/documentation-writer
 .claude/skills/frontend-patterns
+.claude/skills/gtd-add
+.claude/skills/gtd-done
+.agents/skills/gtd-add
+.agents/skills/gtd-done
