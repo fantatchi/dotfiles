@@ -140,8 +140,8 @@ Claude Code の `settings.json`・有効化済みプラグイン・このリポ�
 | SessionStart | `gtd-digest` | 捕捉箱のチェック済み行を 1 日 1 回 Done へ移す |
 | SessionStart | `context-inject` | `.claude/tasks.md` の Next・進行中の作業・判断メモ・handoff の要点を注入 |
 | UserPromptSubmit | `context-save-reminder` / `claude-md-audit-reminder` / `chezmoi-drift-reminder` | 保存・週次点検・chezmoi のドリフトを知らせる |
-| PostToolUse | `context-save-git-trigger` | git の commit / push の後に保存を促す |
-| Notification | `notification-hook` | デスクトップ通知（Windows は BurntToast） |
+| PostToolUse | `context-save-git-trigger` | `git commit`・`gh pr create` の後に `context-save` の実行を促す（対象リポジトリに `.claude/context.md` があり、直近 15 分に保存しておらず、commit は 120 秒以内のものに限る） |
+| Notification | `notification-hook` | 「確認が必要です」のデスクトップ通知（WSL は PowerShell 経由の BurntToast、macOS は osascript、Linux は notify-send） |
 
 Codex も `~/.codex/hooks.json` から同じ `~/.claude/scripts` の `context-inject` などを呼ぶ。
 
