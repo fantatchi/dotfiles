@@ -72,7 +72,7 @@ gh api 'search/issues?q=org:ks-kentem+user:kentem-at-kato+involves:kentem-at-kat
   - 開いている自分の PR は、対象日より後に他人から付いたレビューも取る（「→ 今の状態」に使う）
   - Redmine の対応方法の記載: 文面は土台（`~/.claude/skills/shared/project-root.md`）の `.claude/work/<issue-N | pr-N>/redmine-<Redmine 番号>.md` に 1 チケット 1 ファイルで置く。対象日（JST）に更新されたファイルの更新時刻を、記載した時刻とする（文面は出力の直後にユーザーが Redmine へ反映している。2026-11-25 ユーザー確認）。Issue はフォルダ名から取る（`pr-N` なら PR から引く）。クローズ後に `work/_archive/` へ移したものも含める
     ```bash
-    find <土台>/.claude/work -name 'redmine-*.md' -newermt '<D> 00:00' ! -newermt '<D+1> 00:00' -printf '%TY-%Tm-%Td %TH:%TM  %P\n'
+    find <土台>/.claude/work -name 'redmine-*.md' -not -path '*/_archive/legacy/*' -newermt '<D> 00:00' ! -newermt '<D+1> 00:00' -printf '%TY-%Tm-%Td %TH:%TM  %P\n'
     ```
 
 ## 4. 組み立てる
