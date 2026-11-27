@@ -44,7 +44,7 @@ allowed-tools: Read, Write, Glob, Grep, WebSearch, WebFetch, Bash(date:*), Bash(
 
 1. `date +%Y%m%d-%H%M` でタイムスタンプを取る
 2. 既定の保存先は**セッションの scratchpad ディレクトリ**（使い捨て前提）。ファイル名は `eli5-<slug>-YYYYMMDD-HHmm.html`
-3. 「残して」「後で見たい」と言われたときは、プロジェクトの `.claude/eli5/` を提案し、**パスを提示してから**書く（`git rev-parse --show-toplevel` でルートを取得。git 管理外なら CWD）
+3. 「残して」「後で見たい」と言われたときは、プロジェクトの `.claude/eli5/` を提案し、**パスを提示してから**書く（ルートは `~/.claude/skills/shared/project-root.md` の規則で決める。worktree の中でも土台に置く）
 4. ブラウザで開く。**コマンドは `&&` で繋がず個別に実行する**（チェーンすると permission パターンにマッチしない）
    - 第一候補: `wslview <path>`
    - 失敗したら: `wslpath -w <path>` で Windows パスへ変換し、`explorer.exe "<変換後>"`

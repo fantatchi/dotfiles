@@ -2,7 +2,7 @@
 name: pr-review
 description: 'GitHub PR の URL または番号を渡すと、ブランチ切替・最新化、既存レビュー・discussion コメント取得、3-5 体のペルソナ並列レビュー、メインでの実コード裏取り、`.claude/reviews/` への所見草稿出力までを一気通貫で行う。投稿はしない（草稿のみ）。「PR レビュー」「<PR URL> を見て」「<番号> 番見て」「これマージしていい？」「ペルソナで PR 見て」等の依頼で使う。GitHub へ直接投稿したいなら公式 /code-review を使う。'
 argument-hint: '<PR URL or PR番号>'
-allowed-tools: Agent, Read, Glob, Grep, Bash(git:*), Bash(gh:*), Write, AskUserQuestion
+allowed-tools: Agent, Read, Glob, Grep, Bash(git:*), Bash(gh:*), Write, AskUserQuestion, EnterWorktree, ExitWorktree
 ---
 
 # PR Review
@@ -13,6 +13,7 @@ allowed-tools: Agent, Read, Glob, Grep, Bash(git:*), Bash(gh:*), Write, AskUserQ
 
 ### Phase 1: 取得
 
+0. **レビュー用 worktree へ入る**: 土台（`~/.claude/skills/shared/project-root.md`）に `.claude/worktrees/review/` があり、今の作業場所がそこでなければ、`EnterWorktree(path=<土台>/.claude/worktrees/review)` で入ってから以下を行う（土台や開発用の worktree のブランチは切り替えない。2026-11-27 に cloud-cmp を「土台 + worktree」構成にした）。終わっても自分からは戻らない（ユーザーが「戻って」と言ったら `ExitWorktree(keep)`）。review の worktree が無いリポジトリでは今いる場所で行う
 1. **未コミット変更チェック**: `git status --porcelain` で**追跡対象の modified / staged**があれば中断。「未コミット変更があります。コミット or stash 後に再実行してください」とユーザーに依頼。submodule 由来の untracked（`ks-react-components/` 等）は無視する（cloud-cmp 系の常態）
 2. **引数パース**: URL / 番号のみ（origin から repo 推定）/ `<owner>/<repo>#<NNN>` を受ける
 3. **ブランチ切替・最新化**:
@@ -155,7 +156,7 @@ Phase 3 の並列は「各ペルソナが自分の観点で見つけたもの」
 
 ### Phase 5: 所見ファイル出力
 
-1. ファイル名: `.claude/reviews/pr-{NNN}-{branch-key-snippet}-{YYYY-MM-DD}.md`
+1. ファイル名: `<土台>/.claude/reviews/pr-{NNN}-{branch-key-snippet}-{YYYY-MM-DD}.md`（土台は `shared/project-root.md`。review の worktree の中の `.claude/` には書かない）
    - `{branch-key-snippet}` = ブランチ名の最後のセグメント（`pr/sh-watanabe/feat_photoPlaceListDialog` → `photoPlaceListDialog`）
 2. **書く前に `~/.claude/skills/shared/review-output-style.md` を Read する**（`multi-persona-review` Step 5 と共通の出力規約 SSOT）。初見のジュニアエンジニアが読み通せる密度が要件で、その 4 ルールをすべて適用する。
 

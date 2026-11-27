@@ -31,6 +31,10 @@ fi
 
 if REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null); then
     IN_GIT=1
+    # .claude/ の正本は土台（main checkout）に置く（skills/shared/project-root.md）。git の比較は今の作業場所で行う
+    WORK_ROOT=$REPO_ROOT
+    HUB=$(git worktree list --porcelain 2>/dev/null | awk 'NR==1{p=substr($0,10)} NR==2&&$1=="bare"{p=""} END{print p}')
+    [ -n "$HUB" ] && [ -d "$HUB" ] && REPO_ROOT=$HUB
 else
     REPO_ROOT=$PWD
     IN_GIT=0
@@ -89,7 +93,7 @@ OUT=$(
                 echo "- 保存後のコミット: なし"
             fi
         fi
-        if [ -n "$(git -C "$REPO_ROOT" status --porcelain -- . ':!.claude/context.md' ':!.claude/tasks.md' ':!.claude/handoff.md' ':!.claude/progress.md' 2>/dev/null)" ]; then
+        if [ -n "$(git -C "$WORK_ROOT" status --porcelain -- . ':!.claude/context.md' ':!.claude/tasks.md' ':!.claude/handoff.md' ':!.claude/progress.md' 2>/dev/null)" ]; then
             echo "- 未コミットの変更: あり"
         else
             echo "- 未コミットの変更: なし"

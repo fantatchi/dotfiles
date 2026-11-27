@@ -13,7 +13,7 @@ allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(gh pr view:*), Bash(echo:*), 
 
 ## 手順
 
-プロジェクトルートは `git rev-parse --show-toplevel`、git 外なら CWD。`{project-root}/.claude/context.md` が無ければ「コンテキストが保存されていません。`/context-save` で保存してください。」と案内して終了。
+プロジェクトルートは `~/.claude/skills/shared/project-root.md` の規則で決める（worktree の中でも土台 = main checkout。git 外なら CWD）。git の状態の比較（2 節）は今の作業場所で行う。`{project-root}/.claude/context.md` が無ければ「コンテキストが保存されていません。`/context-save` で保存してください。」と案内して終了。
 
 ### 1. コンテキストファイルの読み込み
 
@@ -22,7 +22,7 @@ allowed-tools: Read, Glob, Grep, Bash(git:*), Bash(gh pr view:*), Bash(echo:*), 
 保存時と現在の状態を比較し、差分があれば警告する：
 
 - **比較の前に `git fetch -q` を実行する**（読取のみで working tree は変えない）。fetch しないとローカルの追跡ブランチ同士の比較になり、cron などがリモートに積んだコミットが見えない（2026-11-05 に toto-predictor で、27 日ぶりの復帰時に origin が 9 コミット先行していたことが fetch するまで出なかった）。オフライン等で失敗したら「リモート未取得」と 1 行添えて続行し、`HEAD..@{u}` の件数を表示する
-- ブランチが異なる場合: 「保存時のブランチ: `xxx` → 現在: `yyy`」
+- ブランチが異なる場合: 「保存時のブランチ: `xxx` → 現在: `yyy`」（今の作業場所が土台と別の worktree なら、ブランチが違うのは当然なので警告せず「worktree `<name>`（`yyy`）で作業中」と 1 行出す）
 - 未コミットの変更がある場合: 注意喚起
 - 保存時以降に新しいコミットがある場合: その旨を表示
 - **context.md に PR 番号が出てくる場合は、提示前に `gh pr view <番号> --json state,isDraft,reviewDecision,mergeable` で実査する**（PR の状態は他人の操作で変わる）。実査できない場合は「保存時点の記述」と明示して提示する

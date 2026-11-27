@@ -115,6 +115,15 @@ function git(cwd, args) {
   } catch (_) { return null; }
 }
 
+// .claude/ の正本は土台（main checkout）に置く。worktree の中でも土台を返す（skills/shared/project-root.md）。
+function hubRoot(cwd) {
+  const top = git(cwd, ['rev-parse', '--show-toplevel'])?.trim();
+  if (!top) return null;
+  const lines = (git(cwd, ['worktree', 'list', '--porcelain']) || '').split(/\r?\n/);
+  const main = lines[0]?.startsWith('worktree ') && lines[1] !== 'bare' ? lines[0].slice(9) : '';
+  return main && fs.existsSync(main) ? main : top;
+}
+
 function readUpdated(root) {
   const content = fs.readFileSync(path.join(root, '.claude', 'context.md'), 'utf8');
   const frontmatter = content.match(/^\uFEFF?---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
@@ -127,13 +136,13 @@ function gitTrigger(input, { cwd = process.cwd(), now = Date.now() } = {}) {
   if (typeof command !== 'string') return '';
   const notifications = new Map();
   for (const event of events(command, cwd)) {
-    const root = git(event.cwd, ['rev-parse', '--show-toplevel'])?.trim();
+    const root = hubRoot(event.cwd);
     if (!root) continue;
     let updated;
     try { updated = readUpdated(root); } catch (_) { continue; }
     if (Number.isFinite(updated) && now - updated < DEBOUNCE_MIN * 60000) continue;
     if (event.kind === 'コミット') {
-      const epoch = Number(git(root, ['log', '-1', '--format=%ct'])?.trim());
+      const epoch = Number(git(event.cwd, ['log', '-1', '--format=%ct'])?.trim());
       const age = now / 1000 - epoch;
       if (!epoch || age < 0 || age > COMMIT_FRESH_SEC) continue;
     }
@@ -206,13 +215,14 @@ function sessionStart(input, home, now) {
 function reminder(input, { cwd = process.cwd(), home = os.homedir(), now = Date.now() } = {}) {
   const start = sessionStart(input, home, now);
   if (start === null) return '';
-  const root = git(cwd, ['rev-parse', '--show-toplevel'])?.trim();
+  const root = hubRoot(cwd);
   if (!root) return '';
+  const work = git(cwd, ['rev-parse', '--show-toplevel'])?.trim() || root;
   let updated;
   try { updated = readUpdated(root); } catch (_) { return ''; }
   if (!Number.isFinite(updated)) return '';
   const minutes = Math.floor((now - Math.max(updated, start)) / 60000);
-  if (minutes < THRESHOLD_MIN || !hasChangeSinceSave(root, updated)) return '';
+  if (minutes < THRESHOLD_MIN || !hasChangeSinceSave(work, updated)) return '';
   return `<system-reminder>
 最後の context 保存またはセッション開始から ${minutes} 分経過し、保存後の変更があります（閾値: ${THRESHOLD_MIN} 分）。
 このターンの応答に入る前に context-save スキルを実行して、最新状態を .claude/ 配下（context.md / tasks.md / handoff.md）に書き出してください。
@@ -239,5 +249,5 @@ function run(name) {
   process.stdout.write(output + '\n');
 }
 
-module.exports = { events, statusPaths, gitTrigger, reminder, hasChangeSinceSave, run };
+module.exports = { events, statusPaths, gitTrigger, reminder, hasChangeSinceSave, hubRoot, run };
 if (require.main === module) run(process.argv[2]);

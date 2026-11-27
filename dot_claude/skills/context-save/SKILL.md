@@ -19,7 +19,7 @@ frontmatter の `disable-model-invocation: false` は明示指定で、hook の�
 
 context.md は Claude 専用ファイルではなく、**Codex 等の他 writer と共有する正本**である。書込みは `~/.claude/skills/shared/multi-writer.md` の書込みプロトコル（6 原則 + 再読込・競合停止・検証）に従う（MUST）。
 
-プロジェクトルートは `git rev-parse --show-toplevel`、git 外なら CWD。
+プロジェクトルートは `~/.claude/skills/shared/project-root.md` の規則で決める（worktree の中でも土台 = main checkout。git 外なら CWD）。
 
 ### 保存内容
 
@@ -31,7 +31,7 @@ context.md は Claude 専用ファイルではなく、**Codex 等の他 writer 
 - **プロジェクト概要**: セッション中の作業内容から簡潔にまとめる
 - **進行中の作業**: 現在取り組んでいるタスクや未完了の作業。**各 entry は `- YYYY-MM-DD（任意の補足）: 内容` 形式で書く**（日付プレフィックスがローテーションの基準。古い entry は「## 進行中の作業のローテーション」セクションで自動削除）。既存ファイルの entry がこの形式になっていない場合は、保存時に Claude が当時の日付を推定して付け直す（git log の日付・本文中の日付・前後の文脈から推定。推定できなければ「YYYY-MM-DD不明」のままにして保守的に残す）
 - **判断メモ**: セッション中に行った重要な判断とその理由（プロジェクト固有の判断は context.md に残す。プロジェクトをまたいで再利用される普遍知見の MEMORY.md 昇格は「## 連携」の連携2 で扱う）
-- **重要ファイル**: 作業に関連する主要ファイル（プロジェクトルートからの相対パス）
+- **重要ファイル**: 作業に関連する主要ファイル（プロジェクトルート = 土台からの相対パス。worktree の中のファイルは `.claude/worktrees/<name>/...`）
 - **関連リポジトリ履歴**（ホームワークスペース用・任意）: `chezmoi source-path` でパスを取得し、`git -C <path> log --oneline -n 5` と `git -C <path> remote get-url origin` を「関連リポジトリ」セクションに埋め込む。コマンド失敗時（chezmoi が無い等）はスキップ
 
 **次のステップについて**: 次回セッションで着手すべきタスクは context.md には書かない。同じ `.claude/` 配下の作業キュー `tasks.md` に保存する（後述「タスクの保存」）。

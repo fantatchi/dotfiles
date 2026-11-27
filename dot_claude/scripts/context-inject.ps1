@@ -23,6 +23,15 @@ try {
 $repoRoot = (& git rev-parse --show-toplevel 2>$null)
 $inGit = [bool]$repoRoot
 if (-not $inGit) { $repoRoot = (Get-Location).Path }
+# .claude/ の正本は土台（main checkout）に置く（skills/shared/project-root.md）。git の比較は今の作業場所で行う
+$workRoot = $repoRoot
+if ($inGit) {
+    $wt = @(& git worktree list --porcelain 2>$null)
+    if ($wt.Count -ge 1 -and $wt[0] -like 'worktree *' -and -not ($wt.Count -ge 2 -and $wt[1] -eq 'bare')) {
+        $hub = $wt[0].Substring(9)
+        if (Test-Path -LiteralPath $hub) { $repoRoot = $hub }
+    }
+}
 $contextFile = Join-Path $repoRoot '.claude/context.md'
 $tasksFile = Join-Path $repoRoot '.claude/tasks.md'
 $handoffFile = Join-Path $repoRoot '.claude/handoff.md'
@@ -84,7 +93,7 @@ if (-not $inGit) {
             }
         } catch {}
     }
-    if (& git -C $repoRoot status --porcelain -- . ':!.claude/context.md' ':!.claude/tasks.md' ':!.claude/handoff.md' ':!.claude/progress.md' 2>$null) {
+    if (& git -C $workRoot status --porcelain -- . ':!.claude/context.md' ':!.claude/tasks.md' ':!.claude/handoff.md' ':!.claude/progress.md' 2>$null) {
         [void]$sb.AppendLine('- 未コミットの変更: あり')
     } else {
         [void]$sb.AppendLine('- 未コミットの変更: なし')

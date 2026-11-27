@@ -70,9 +70,9 @@ gh api 'search/issues?q=org:ks-kentem+user:kentem-at-kato+involves:kentem-at-kat
     ```
   - レビュー: 上で確かめた `submitted_at`
   - 開いている自分の PR は、対象日より後に他人から付いたレビューも取る（「→ 今の状態」に使う）
-  - Redmine の対応方法の記載: 作業ログに「対応方法の文面」を書いた記録があれば、そのリポジトリの `.claude/pr/redmine-responses-<D>*.md` の更新時刻を記載した時刻とする（文面は出力の直後にユーザーが Redmine へ反映している。2026-11-25 ユーザー確認）。各ファイルの `## #<Redmine 番号> … — PR #<n>` の見出しから PR を引き、PR から Issue を引く
+  - Redmine の対応方法の記載: 文面は土台（`~/.claude/skills/shared/project-root.md`）の `.claude/work/<issue-N | pr-N>/redmine-<Redmine 番号>.md` に 1 チケット 1 ファイルで置く。対象日（JST）に更新されたファイルの更新時刻を、記載した時刻とする（文面は出力の直後にユーザーが Redmine へ反映している。2026-11-25 ユーザー確認）。Issue はフォルダ名から取る（`pr-N` なら PR から引く）。クローズ後に `work/_archive/` へ移したものも含める
     ```bash
-    ls -l --time-style='+%F %T' <repo>/.claude/pr/redmine-responses-<D>*.md; grep -h '^## ' <repo>/.claude/pr/redmine-responses-<D>*.md
+    find <土台>/.claude/work -name 'redmine-*.md' -newermt '<D> 00:00' ! -newermt '<D+1> 00:00' -printf '%TY-%Tm-%Td %TH:%TM  %P\n'
     ```
 
 ## 4. 組み立てる
@@ -128,7 +128,7 @@ gh api 'search/issues?q=org:ks-kentem+user:kentem-at-kato+involves:kentem-at-kat
 - Redmine の個別番号・検証の細部（テスト件数・変異テスト・ペルソナ名）・コミット SHA・ブランチ名は書かない
 - Redmine の記載は Issue ごとに子の行として入れる（1 ファイルに複数の Issue 分を書いたときは、どれも同じ時刻になる）
 - 実機確認は、本人が「済」と言ったものだけ、修正やレビューの子の行に「（実機確認済み）」「実機確認のうえ」と添える
-- GitHub にも `.claude/pr/` のファイルにも時刻が残らない作業（作業ログにしか無いもの）は本文に入れず、6 節の「要確認」に回す
+- GitHub にも `.claude/work/` のファイルにも時刻が残らない作業（作業ログにしか無いもの）は本文に入れず、6 節の「要確認」に回す
 - 業務分が 0 件なら、引数なしのときは 1 節の祝日判定で前の平日へ戻る。引数で指定した日が 0 件なら「<D> の業務分の作業ログ・GitHub 実績は見つからなかった」とだけ返す
 
 ## 5. gh で確かめられない事項は本文に書かない
