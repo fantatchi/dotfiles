@@ -134,7 +134,8 @@
     "claude-code-setup@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true,
     "code-simplifier@claude-plugins-official": true,
-    "prompt-rail@oikon48": true
+    "prompt-rail@oikon48": true,
+    "claude-security@anthropic-plugin-directory": true
   },
   "extraKnownMarketplaces": {
     "anthropic-agent-skills": {
@@ -176,6 +177,11 @@
     "prompt-rail@oikon48": {
       "options": {
         "mode": "horizontal"
+      }
+    },
+    "claude-security@anthropic-plugin-directory": {
+      "options": {
+        "live_view": true
       }
     }
   },
